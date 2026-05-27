@@ -1,111 +1,102 @@
+"""GemeenteOplossingen connector.
+
+This connector is based on the proven API usage from the existing Huizen RIS
+Monitor beta:
+
+- GET {base_url}documents?limit=1
+- response path: result.totalCount
+- GET {base_url}documents?limit={limit}&offset={offset}
+- response path: result.documents
+- download URL pattern: {base_url}documents/{id}/download
+"""
+
 from __future__ import annotations
 
 from typing import Any
+from urllib.parse import urljoin
 
-import httpx
+import requests
 
-from open_ris_monitor.connectors.base import BaseConnector, ConnectorError, RawRecord
+from .base import BaseConnector
 
 
 class GemeenteOplossingenConnector(BaseConnector):
-    """Connector for GemeenteOplossingen RIS API endpoints.
-
-    The exact endpoint mapping can differ per municipality and still needs to be
-    validated for Huizen. This connector is intentionally defensive:
-
-    - endpoint paths are configurable,
-    - multiple common response shapes are accepted,
-    - the connector returns raw records only,
-    - normalisation is handled elsewhere.
-    """
-
-    DEFAULT_ENDPOINTS = {
-        "meetings": "vergaderingen",
-        "agenda_items": "agendapunten",
-        "documents": "documenten",
-    }
+    """Connector for GemeenteOplossingen RIS API v2."""
 
     def __init__(
         self,
         base_url: str,
-        timeout_seconds: int = 30,
-        endpoints: dict[str, str] | None = None,
+        timeout: int = 30,
+        user_agent: str = "open-ris-monitor/0.1",
     ) -> None:
-        super().__init__(base_url)
-        self.client = httpx.Client(timeout=timeout_seconds)
-        self.endpoints = {**self.DEFAULT_ENDPOINTS, **(endpoints or {})}
-
-    def close(self) -> None:
-        """Close the underlying HTTP client."""
-        self.client.close()
-
-    def _build_url(self, path: str) -> str:
-        return f"{self.base_url}/{path.lstrip('/')}"
-
-    def _get_json(self, path: str) -> Any:
-        url = self._build_url(path)
-        try:
-            response = self.client.get(
-                url,
-                headers={"Accept": "application/json"},
-            )
-            response.raise_for_status()
-            return response.json()
-        except httpx.HTTPStatusError as exc:
-            raise ConnectorError(
-                f"GemeenteOplossingen API returned HTTP "
-                f"{exc.response.status_code} for {url}"
-            ) from exc
-        except httpx.HTTPError as exc:
-            raise ConnectorError(f"Could not fetch {url}: {exc}") from exc
-        except ValueError as exc:
-            raise ConnectorError(f"Response from {url} is not valid JSON") from exc
-
-    def _as_records(self, payload: Any, resource_name: str) -> list[RawRecord]:
-        """Convert common API response shapes to a list of raw records."""
-        if isinstance(payload, list):
-            return self._ensure_record_list(payload, resource_name)
-
-        if isinstance(payload, dict):
-            for key in ("data", "items", "results", "value"):
-                value = payload.get(key)
-                if isinstance(value, list):
-                    return self._ensure_record_list(value, resource_name)
-
-            # Some APIs return a single object. Treat it as one record only when
-            # it looks like a resource and not like a wrapper without records.
-            if payload and not any(k in payload for k in ("data", "items", "results", "value")):
-                return [payload]
-
-        raise ConnectorError(
-            f"Unexpected response shape for {resource_name}: {type(payload).__name__}"
+        self.base_url = base_url.rstrip("/") + "/"
+        self.timeout = timeout
+        self.session = requests.Session()
+        self.session.headers.update(
+            {
+                "Accept": "application/json",
+                "User-Agent": user_agent,
+            }
         )
 
-    def _ensure_record_list(self, records: list[Any], resource_name: str) -> list[RawRecord]:
-        invalid_items = [item for item in records if not isinstance(item, dict)]
-        if invalid_items:
-            raise ConnectorError(
-                f"Expected {resource_name} records to be objects, "
-                f"but found {len(invalid_items)} invalid item(s)."
-            )
-        return records
+    def _get_json(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        url = urljoin(self.base_url, path.lstrip("/"))
+        response = self.session.get(url, params=params, timeout=self.timeout)
+        response.raise_for_status()
+        payload = response.json()
+        if not isinstance(payload, dict):
+            raise ValueError(f"Expected JSON object from {url}, got {type(payload).__name__}")
+        return payload
 
-    def fetch_meetings(self) -> list[RawRecord]:
-        payload = self._get_json(self.endpoints["meetings"])
-        return self._as_records(payload, "meetings")
+    @staticmethod
+    def _result(payload: dict[str, Any]) -> dict[str, Any]:
+        result = payload.get("result")
+        if not isinstance(result, dict):
+            raise KeyError("Expected response field 'result' to be an object.")
+        return result
 
-    def fetch_agenda_items(self) -> list[RawRecord]:
-        payload = self._get_json(self.endpoints["agenda_items"])
-        return self._as_records(payload, "agenda_items")
+    def fetch_document_count(self) -> int:
+        """Return `result.totalCount` from the documents endpoint."""
+        payload = self._get_json("documents", params={"limit": 1})
+        result = self._result(payload)
+        total_count = result.get("totalCount")
+        if total_count is None:
+            raise KeyError("Expected response field 'result.totalCount'.")
+        return int(total_count)
 
-    def fetch_documents(self) -> list[RawRecord]:
-        payload = self._get_json(self.endpoints["documents"])
-        return self._as_records(payload, "documents")
+    def fetch_documents(self, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
+        """Fetch raw documents from `result.documents`."""
+        if limit < 1:
+            raise ValueError("limit must be at least 1")
+        if offset < 0:
+            raise ValueError("offset must be 0 or greater")
 
-    def fetch_document_file(self, download_url: str) -> bytes:
-        try:
-            response = self.client.get(download_url)
-            response.raise_for_status()
-            return response.content
-        except httpx.HTTPError as exc:
-            raise ConnectorError(f"Could not download document {download_url}: {exc}") from exc
+        payload = self._get_json("documents", params={"limit": limit, "offset": offset})
+        result = self._result(payload)
+        documents = result.get("documents")
+        if not isinstance(documents, list):
+            raise KeyError("Expected response field 'result.documents' to be a list.")
+        return documents
+
+    def fetch_latest_documents(self, limit: int = 500) -> list[dict[str, Any]]:
+        """Fetch the latest documents using totalCount and offset.
+
+        This mirrors the current Streamlit beta behavior.
+        """
+        total_count = self.fetch_document_count()
+        offset = max(0, total_count - limit)
+        return self.fetch_documents(limit=limit, offset=offset)
+
+    def build_document_download_url(self, document_id: str | int) -> str:
+        """Build the public download URL for a document."""
+        return urljoin(self.base_url, f"documents/{document_id}/download")
+
+    def download_document(self, document_id: str | int) -> bytes:
+        """Download a document file.
+
+        Keep disabled in the default MVP pipeline unless explicitly configured.
+        """
+        url = self.build_document_download_url(document_id)
+        response = self.session.get(url, timeout=self.timeout)
+        response.raise_for_status()
+        return response.content

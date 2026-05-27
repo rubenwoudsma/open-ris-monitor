@@ -1,30 +1,22 @@
 municipality:
+  id: gm0406
   name: Huizen
   slug: huizen
-  official_identifier: gm0406
   country: NL
+  timezone: Europe/Amsterdam
   website_url: https://www.huizen.nl
   ris_url: https://ris.gemeenteraadhuizen.nl
-  timezone: Europe/Amsterdam
 
 source_system:
+  id: huizen-gemeenteoplossingen
   vendor: GemeenteOplossingen
   connector: gemeenteoplossingen
-  base_url: https://ris.gemeenteraadhuizen.nl/api/v2/
   api_version: v2
-  active: true
-  endpoints:
-    meetings: vergaderingen
-    agenda_items: agendapunten
-    documents: documenten
+  base_url: https://ris.gemeenteraadhuizen.nl/api/v2/
 
 harvest:
-  enabled: true
-  schedule: daily
-  from_date: "2022-01-01"
-  include_meetings: true
-  include_agenda_items: true
-  include_documents: true
+  strategy: document_first
+  fetch_limit: 500
   download_documents_temporarily: false
   extract_text: false
 
@@ -32,12 +24,10 @@ storage:
   mode: metadata_only
   commit_raw_api: true
   commit_pdf_files: false
-  keep_action_artifacts_days: 3
 
-publish:
-  github_pages: true
+publication:
   formats:
     - jsonl
     - json
     - csv
-    - jsonld
+  github_pages: true

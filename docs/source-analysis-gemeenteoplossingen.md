@@ -1,285 +1,240 @@
-# Source analysis, GemeenteOplossingen RIS API
+# Source analysis, GemeenteOplossingen API, gemeente Huizen
 
-## Status
+Status: concept voor issue #1  
+Branch: `milestone-1-huizen-harvest`  
+Bron: https://ris.gemeenteraadhuizen.nl/api/v2/
 
-**Status:** concept voor issue #1, nog te valideren tegen de live API van Huizen.
+## 1. Doel
 
-Deze analyse beschrijft hoe de GemeenteOplossingen API voor het Raadsinformatiesysteem van de gemeente Huizen onderzocht moet worden en welke aannames voorlopig in de connector worden gebruikt.
+Dit document beschrijft de eerste werkende analyse van de GemeenteOplossingen API voor het raadsinformatiesysteem van de gemeente Huizen. Het doel is om vast te leggen welke API-onderdelen aantoonbaar werken, welke responsevorm gebruikt wordt en hoe deze brondata later kan worden gemapt naar het canonieke model van Open RIS Monitor.
 
-De publieke basis-URL voor Huizen is:
+Deze analyse vervangt de eerdere, te voorzichtige aanname dat de API-root zelf leidend moest zijn. De bestaande Huizen RIS Monitor bewijst dat ten minste het endpoint `documents` werkt met `limit` en `offset` parameters.
 
-```text
-https://ris.gemeenteraadhuizen.nl/api/v2/
-```
-
-De API-root zelf kan een foutmelding of geen directory listing geven. Dat betekent niet automatisch dat de API niet bruikbaar is. Het kan zijn dat alleen concrete endpoints werken.
-
-## Doel van deze analyse
-
-Het doel van deze analyse is om vast te leggen:
-
-1. welke endpoints beschikbaar zijn,
-2. hoe responses zijn opgebouwd,
-3. hoe vergaderingen, agendapunten en documenten aan elkaar gekoppeld zijn,
-4. of paginering aanwezig is,
-5. welke velden bruikbaar zijn voor het canonieke datamodel,
-6. welke onzekerheden nog openstaan.
-
-Deze analyse is de basis voor:
-
-- issue #2, connector-contract,
-- issue #3, eerste Huizen harvester,
-- issue #4, canonieke modellen,
-- issue #5, publieke JSONL-exports.
-
-## Bron
+## 2. Basisgegevens
 
 | Onderdeel | Waarde |
 |---|---|
-| Gemeente | Huizen |
-| RIS | Gemeenteraad Huizen |
 | Leverancier | GemeenteOplossingen |
-| API-versie | v2 |
-| Basis-URL | `https://ris.gemeenteraadhuizen.nl/api/v2/` |
-| Gemeenteconfig | `config/municipalities/huizen.yml` |
+| Gemeente | Huizen |
+| RIS website | https://ris.gemeenteraadhuizen.nl/ |
+| API base URL | https://ris.gemeenteraadhuizen.nl/api/v2/ |
+| Bewezen endpoint | `documents` |
+| Bewezen downloadpatroon | `documents/{id}/download` |
+| Bewezen paginering | `limit` en `offset` |
+| Bewezen responsepad | `result.documents` |
+| Bewezen totaalveld | `result.totalCount` |
 
-## Voorlopige endpoint-kandidaten
+## 3. Bewezen werking vanuit bestaande Streamlit-app
 
-De endpointnamen hieronder zijn voorlopige kandidaten. Ze moeten worden gevalideerd in de browser, via GitHub Codespaces, of met een handmatige GitHub Action.
+De bestaande Huizen RIS Monitor gebruikt de volgende API-aanpak:
 
-| Resource | Kandidaat-endpoint | Verwachte inhoud | Status |
-|---|---|---|---|
-| Vergaderingen | `/vergaderingen` | Lijst met vergaderingen | Te valideren |
-| Agendapunten | `/agendapunten` | Lijst met agendapunten | Te valideren |
-| Documenten | `/documenten` | Lijst met documentmetadata | Te valideren |
+```python
+API_BASE = "https://ris.gemeenteraadhuizen.nl/api/v2/"
 
-Mogelijke alternatieve namen die gecontroleerd moeten worden:
+r = requests.get(f"{API_BASE}documents?limit=1")
+total = int(r.json()["result"]["totalCount"])
 
-```text
-/meetings
-/vergadering
-/agenda
-/agendas
-/agendapunten
-/documenten
-/documents
-/bestanden
+offset = max(0, total - fetch_limit)
+r = requests.get(f"{API_BASE}documents?limit={fetch_limit}&offset={offset}")
+documents = r.json()["result"]["documents"]
 ```
 
-## Verwachte kernrelaties
+Voor documentdownloads gebruikt de bestaande app:
 
-Voor de MVP willen we minimaal deze relaties kunnen afleiden:
-
-```text
-Meeting
-  contains AgendaItem
-
-AgendaItem
-  has Document
-
-Document
-  belongs to AgendaItem, optional
-  belongs to Meeting, optional
+```python
+download_url = f"https://ris.gemeenteraadhuizen.nl/api/v2/documents/{doc_id}/download"
 ```
 
-De relatievelden kunnen per bron verschillen. Mogelijke veldnamen zijn:
+Daarmee zijn voor milestone 1 minimaal de volgende zaken zeker genoeg om op te bouwen:
 
-```text
-meeting_id
-vergadering_id
-vergaderingId
-agenda_item_id
-agendapunt_id
-agendapuntId
-document_id
-documentId
-id
-```
+1. documenten kunnen via de API worden opgehaald;
+2. het aantal documenten kan via `result.totalCount` worden bepaald;
+3. paginering werkt via `limit` en `offset`;
+4. documenten staan in `result.documents`;
+5. een document bevat een `id` waarmee een download-URL kan worden opgebouwd.
 
-De normalisatielaag moet daarom tolerant zijn voor verschillende veldnamen.
+## 4. Bewezen velden in documentobjecten
 
-## Te verzamelen voorbeeldresponses
+De bestaande Streamlit-app gebruikt de volgende documentvelden:
 
-Vul dit onderdeel aan zodra de API lokaal of via Codespaces is geïnspecteerd.
+| Bronveld | Betekenis in bestaande app | Opmerking |
+|---|---|---|
+| `id` | document-ID | Wordt gebruikt voor download-URL |
+| `publicationDate.date` | publicatiedatum | Datumstring bevat tijd en fracties |
+| `description` | titel of omschrijving | Voorkeursveld voor titel |
+| `fileName` | bestandsnaam | Fallback voor titel |
+| `documentTypeLabel` | documenttype | Bijvoorbeeld besluit, bijlage, motie, enzovoort |
 
-### Vergaderingen
+Voor de eerste MVP moeten we niet meer velden verplicht maken dan deze. Extra velden kunnen worden bewaard in `source_data` of `raw`.
+
+## 5. Voorlopige endpointanalyse
+
+### 5.1 Documents
 
 Endpoint:
 
 ```text
-GET https://ris.gemeenteraadhuizen.nl/api/v2/...
+GET https://ris.gemeenteraadhuizen.nl/api/v2/documents?limit={limit}&offset={offset}
 ```
 
-Voorbeeldresponse:
+Verwachte responsevorm:
 
 ```json
 {
-  "todo": "plak hier een kleine geanonimiseerde of publieke voorbeeldresponse"
+  "result": {
+    "totalCount": 1234,
+    "documents": [
+      {
+        "id": 123,
+        "description": "...",
+        "fileName": "...",
+        "documentTypeLabel": "...",
+        "publicationDate": {
+          "date": "2026-05-21 20:00:00.000000"
+        }
+      }
+    ]
+  }
 }
 ```
 
-Belangrijke velden:
+Downloadpatroon:
 
-| Canoniek veld | Bronveld | Status |
+```text
+GET https://ris.gemeenteraadhuizen.nl/api/v2/documents/{id}/download
+```
+
+MVP-status:
+
+```text
+Bewezen bruikbaar.
+```
+
+### 5.2 Meetings
+
+Mogelijk endpoint, nog te valideren:
+
+```text
+GET https://ris.gemeenteraadhuizen.nl/api/v2/meetings?limit={limit}&offset={offset}
+```
+
+MVP-status:
+
+```text
+Nog niet bewezen vanuit bestaande Streamlit-app.
+```
+
+### 5.3 Agenda items
+
+Mogelijke endpointvormen, nog te valideren:
+
+```text
+GET https://ris.gemeenteraadhuizen.nl/api/v2/agenda-items?limit={limit}&offset={offset}
+GET https://ris.gemeenteraadhuizen.nl/api/v2/agendaitems?limit={limit}&offset={offset}
+GET https://ris.gemeenteraadhuizen.nl/api/v2/meetings/{meeting_id}/agenda-items
+```
+
+MVP-status:
+
+```text
+Nog niet bewezen vanuit bestaande Streamlit-app.
+```
+
+## 6. Implicatie voor milestone 1
+
+Milestone 1 moet worden versimpeld naar een document-first MVP:
+
+```text
+Eerst documents ophalen en publiceren.
+Daarna pas meetings en agenda items toevoegen zodra de endpoints bewezen zijn.
+```
+
+Dat betekent dat issue #3, Bouw eerste Huizen harvester, in eerste instantie alleen hoeft te bewijzen dat `documents` werkt.
+
+Voorgestelde volgorde:
+
+1. `documents?limit=1` ophalen;
+2. `result.totalCount` lezen;
+3. laatste batch documenten ophalen met `limit` en `offset`;
+4. raw response opslaan als `data/raw/latest/documents.json`;
+5. documentrecords normaliseren naar `data/public/documents.jsonl`.
+
+## 7. Mapping naar canoniek Document-model
+
+| Canoniek veld | Bronveld | Regel |
 |---|---|---|
-| `source_id` | `id` of alternatief | Te valideren |
-| `title` | `title`, `titel`, `naam` | Te valideren |
-| `start_datetime` | `datum`, `start`, `starttijd` | Te valideren |
-| `location` | `locatie` | Te valideren |
-| `web_url` | `url`, `link`, `webUrl` | Te valideren |
+| `id` | `id` | Bijvoorbeeld `huizen-document-{id}` |
+| `source_id` | `id` | Bron-ID ongewijzigd bewaren |
+| `municipality_id` | config | Voor Huizen: `gm0406` |
+| `source_system_id` | config | Bijvoorbeeld `huizen-gemeenteoplossingen` |
+| `title` | `description`, fallback `fileName` | Als titel generiek is, combineren met documenttype |
+| `document_type` | `documentTypeLabel` | Fallback `onbekend` |
+| `filename` | `fileName` | Fallback leeg of null |
+| `date_published` | `publicationDate.date` | Converteren naar ISO datum waar mogelijk |
+| `download_url` | `id` | `{base_url}documents/{id}/download` |
+| `source_url` | onbekend | Later aanvullen indien beschikbaar |
+| `raw` | volledig object | Voorlopig bewaren voor traceerbaarheid |
 
-### Agendapunten
+## 8. Normalisatieregels voor titels
 
-Endpoint:
+De bestaande Streamlit-app bevat al een nuttige curator-regel:
+
+```python
+title = document.get("description") or document.get("fileName") or "Geen titel"
+document_type = document.get("documentTypeLabel", "Onbekend")
+
+if title.lower() in ["besluit", "besluit.pdf", "bijlage", "bijlage.pdf"]:
+    title = f"{document_type}: {title}"
+```
+
+Deze regel kan worden overgenomen in de normalisatielaag, maar moet daar als afgeleide titel worden behandeld. De originele bronvelden blijven beschikbaar in `raw`.
+
+## 9. Open vragen
+
+Voor issue #1 blijven deze vragen open:
+
+1. Bestaan `meetings` en `agenda_items` als API-endpoints, en welke namen gebruiken ze exact?
+2. Kan een document gekoppeld worden aan een vergadering of agendapunt via velden in het documentobject?
+3. Bevat het documentobject een publieke webpagina-URL naast de download-URL?
+4. Welke documenttypes komen voor in `documentTypeLabel`?
+5. Is er sortering mogelijk via queryparameters, of is offset op basis van `totalCount` voldoende?
+6. Is er filtering op publicatiedatum mogelijk?
+7. Is de API stabiel zonder aanvullende headers?
+
+## 10. Advies voor issue #1
+
+Issue #1 kan nog niet volledig gesloten worden, maar kan wel worden aangescherpt:
 
 ```text
-GET https://ris.gemeenteraadhuizen.nl/api/v2/...
+Scope issue #1:
+Bevestig en documenteer minimaal het documents-endpoint volledig.
+Meetings en agenda items mogen als vervolgonderzoek blijven staan.
 ```
 
-Voorbeeldresponse:
+Acceptatiecriteria voor afronding issue #1:
 
-```json
-{
-  "todo": "plak hier een kleine geanonimiseerde of publieke voorbeeldresponse"
-}
+- `documents?limit=1` is getest;
+- `totalCount` is vastgelegd;
+- minimaal één voorbeeldobject is opgenomen in dit document;
+- de gebruikte velden zijn beschreven;
+- open vragen voor meetings en agenda items zijn benoemd.
+
+## 11. Advies voor issue #2
+
+Het connector-contract moet document-first zijn, met optionele methodes voor meetings en agenda items.
+
+Minimaal verplicht voor milestone 1:
+
+```python
+fetch_documents(limit: int, offset: int = 0) -> list[dict]
+fetch_document_count() -> int
+build_document_download_url(document_id: str | int) -> str
 ```
 
-Belangrijke velden:
+Optioneel voor latere milestones:
 
-| Canoniek veld | Bronveld | Status |
-|---|---|---|
-| `source_id` | `id` of alternatief | Te valideren |
-| `meeting_source_id` | `vergadering_id` of alternatief | Te valideren |
-| `number` | `nummer`, `volgnummer` | Te valideren |
-| `title` | `title`, `titel`, `onderwerp` | Te valideren |
-| `description` | `omschrijving`, `toelichting` | Te valideren |
-
-### Documenten
-
-Endpoint:
-
-```text
-GET https://ris.gemeenteraadhuizen.nl/api/v2/...
+```python
+fetch_meetings(limit: int, offset: int = 0) -> list[dict]
+fetch_agenda_items(limit: int, offset: int = 0) -> list[dict]
+download_document(document_id: str | int) -> bytes
 ```
-
-Voorbeeldresponse:
-
-```json
-{
-  "todo": "plak hier een kleine geanonimiseerde of publieke voorbeeldresponse"
-}
-```
-
-Belangrijke velden:
-
-| Canoniek veld | Bronveld | Status |
-|---|---|---|
-| `source_id` | `id` of alternatief | Te valideren |
-| `title` | `title`, `titel`, `naam` | Te valideren |
-| `filename` | `filename`, `bestandsnaam` | Te valideren |
-| `download_url` | `url`, `downloadUrl`, `bestandUrl` | Te valideren |
-| `meeting_source_id` | `vergadering_id` of alternatief | Te valideren |
-| `agenda_item_source_id` | `agendapunt_id` of alternatief | Te valideren |
-
-## Responsevormen waarmee de connector rekening moet houden
-
-De connector moet meerdere responsevormen aankunnen:
-
-### Directe lijst
-
-```json
-[
-  {"id": 1},
-  {"id": 2}
-]
-```
-
-### Object met data-lijst
-
-```json
-{
-  "data": [
-    {"id": 1},
-    {"id": 2}
-  ]
-}
-```
-
-### Object met items-lijst
-
-```json
-{
-  "items": [
-    {"id": 1},
-    {"id": 2}
-  ]
-}
-```
-
-### Object met results-lijst
-
-```json
-{
-  "results": [
-    {"id": 1},
-    {"id": 2}
-  ]
-}
-```
-
-## Paginering
-
-Nog te valideren.
-
-Mogelijke vormen:
-
-```text
-?page=1
-?page=1&pageSize=100
-?skip=0&take=100
-?offset=0&limit=100
-```
-
-De eerste connector hoeft nog geen perfecte paginering te ondersteunen. Voor de MVP is het acceptabel om eerst de eerste responsevorm te ondersteunen en paginering daarna expliciet te maken.
-
-## Documentdownloadbeleid
-
-Voor de MVP geldt:
-
-```text
-PDF's niet opslaan in Git.
-PDF's eventueel later tijdelijk downloaden tijdens een workflow.
-Voor issue #1 tot en met #5 nog geen PDF-verwerking verplicht maken.
-```
-
-Documentlinks worden wel opgeslagen als metadata, zodat latere verrijking mogelijk blijft.
-
-## Open vragen
-
-1. Wat zijn de exacte endpointnamen voor vergaderingen, agendapunten en documenten?
-2. Is er paginering, en zo ja, hoe werkt die?
-3. Zijn documentlinks directe downloadlinks of webpagina-links?
-4. Zijn agendapunten direct gekoppeld aan vergaderingen?
-5. Zijn documenten direct gekoppeld aan agendapunten, vergaderingen, of beide?
-6. Zijn IDs stabiel over meerdere runs?
-7. Worden gewijzigde documenten onder dezelfde ID gepubliceerd of als nieuw document?
-8. Zijn historische vergaderingen volledig beschikbaar via de API?
-
-## Aanbevolen acceptatiecriteria voor issue #1
-
-Issue #1 kan worden gesloten wanneer:
-
-- minimaal één werkend endpoint is vastgesteld,
-- voorbeeldresponses zijn toegevoegd aan dit document,
-- bekend is hoe vergaderingen, agendapunten en documenten worden gekoppeld,
-- open vragen zijn bijgewerkt,
-- duidelijk is welke aannames issue #2 en #3 mogen gebruiken.
-
-## Vervolg
-
-Na deze analyse:
-
-1. connector-contract aanscherpen in `src/open_ris_monitor/connectors/base.py`,
-2. GemeenteOplossingen connector defensief implementeren,
-3. eerste raw harvest maken,
-4. pas daarna canonieke normalisatie toevoegen.

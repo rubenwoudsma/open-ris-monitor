@@ -1,45 +1,55 @@
+"""Base connector contract for Open RIS Monitor.
+
+Connectors are intentionally source-oriented. They fetch raw data from a RIS
+source system. Mapping to the canonical Open RIS Monitor model happens in the
+normalization layer, not in the connector.
+"""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import Any
 
 
-RawRecord = dict[str, Any]
-
-
-class ConnectorError(RuntimeError):
-    """Raised when a source connector cannot retrieve or parse data."""
-
-
 class BaseConnector(ABC):
-    """Base interface for RIS source connectors.
+    """Abstract base class for RIS source connectors.
 
-    Connectors are source-specific. They should return raw source records and
-    should not convert records to the canonical Open RIS Monitor data model.
-    Normalisation belongs in the pipeline layer.
+    Milestone 1 is document-first, because the Huizen beta already proves that
+    the GemeenteOplossingen `documents` endpoint works. Meeting and agenda item
+    methods are included as optional extension points, but implementations may
+    raise `NotImplementedError` until those endpoints are validated.
     """
 
-    def __init__(self, base_url: str) -> None:
-        self.base_url = base_url.rstrip("/")
+    @abstractmethod
+    def fetch_document_count(self) -> int:
+        """Return the total number of documents available from the source."""
 
     @abstractmethod
-    def fetch_meetings(self) -> list[RawRecord]:
-        """Fetch raw meeting records from the source system."""
+    def fetch_documents(self, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
+        """Fetch raw document records from the source."""
 
     @abstractmethod
-    def fetch_agenda_items(self) -> list[RawRecord]:
-        """Fetch raw agenda item records from the source system."""
+    def build_document_download_url(self, document_id: str | int) -> str:
+        """Build a public document download URL for a source document ID."""
 
-    @abstractmethod
-    def fetch_documents(self) -> list[RawRecord]:
-        """Fetch raw document metadata records from the source system."""
+    def fetch_meetings(self, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
+        """Fetch raw meeting records.
 
-    def fetch_document_file(self, download_url: str) -> bytes:
-        """Fetch a document file.
-
-        Document downloads are deliberately optional. The MVP should first work
-        with metadata-only harvesting before enabling PDF enrichment.
+        Optional for milestone 1. Implement once the endpoint is validated.
         """
-        raise NotImplementedError(
-            "Document file download is not implemented for this connector yet."
-        )
+        raise NotImplementedError("Meeting endpoint has not been validated for this source.")
+
+    def fetch_agenda_items(self, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
+        """Fetch raw agenda item records.
+
+        Optional for milestone 1. Implement once the endpoint is validated.
+        """
+        raise NotImplementedError("Agenda item endpoint has not been validated for this source.")
+
+    def download_document(self, document_id: str | int) -> bytes:
+        """Download a document file.
+
+        Optional for milestone 1. PDF downloading should not be enabled until
+        the metadata-only pipeline is stable.
+        """
+        raise NotImplementedError("Document downloading is disabled for milestone 1.")
