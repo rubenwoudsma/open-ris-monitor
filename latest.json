@@ -1,0 +1,13 @@
+{
+  "documents_normalized": 25,
+  "documents_seen": 25,
+  "generated_at": "2026-05-27 20:57:03.246753+00:00",
+  "harvest_run_id": "harvest-huizen-20260527T205701Z",
+  "municipality": "huizen",
+  "municipality_id": "gm0406",
+  "outputs": {
+    "documents": "documents.jsonl",
+    "harvest_runs": "harvest_runs.jsonl"
+  },
+  "source_system_id": "huizen-gemeenteoplossingen"
+}
