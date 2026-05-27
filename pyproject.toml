@@ -5,15 +5,15 @@ description = "Generieke open-data-pipeline voor publieke raadsinformatie uit ge
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "pydantic>=2.7",
-    "pyyaml>=6.0",
-    "requests>=2.32",
+  "pydantic>=2.7",
+  "pyyaml>=6.0",
+  "requests>=2.32",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.0",
-    "ruff>=0.5",
+  "pytest>=8.0",
+  "ruff>=0.5",
 ]
 
 [tool.ruff]

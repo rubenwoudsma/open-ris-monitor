@@ -1,13 +1,13 @@
-"""Harvest run model."""
+"""Harvest run metadata model."""
 
 from __future__ import annotations
 
 from datetime import datetime
 
-from open_ris_monitor.models.common import CanonicalModel
+from pydantic import BaseModel
 
 
-class HarvestRun(CanonicalModel):
+class HarvestRun(BaseModel):
     """Metadata about one harvest execution."""
 
     id: str
@@ -19,6 +19,7 @@ class HarvestRun(CanonicalModel):
     meetings_seen: int = 0
     agenda_items_seen: int = 0
     documents_seen: int = 0
-    documents_downloaded_temporarily: int = 0
+    documents_normalized: int = 0
     documents_committed: int = 0
+    documents_downloaded_temporarily: int = 0
     quality_issues_detected: int = 0
