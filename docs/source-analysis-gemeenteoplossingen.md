@@ -66,3 +66,20 @@ Milestone 1 gebruikt een metadata-only aanpak:
 - het responsepad `result.documents` is vastgelegd
 - het downloadpatroon is vastgelegd
 - open vragen voor meetings en agenda items zijn benoemd
+
+## Eerste succesvolle harvest
+
+Op 2026-05-27 is de eerste handmatige GitHub Actions harvest succesvol uitgevoerd.
+
+Resultaat:
+- documents_seen: 25
+- meetings_seen: 0
+- agenda_items_seen: 0
+- status: success
+
+De artifact bevatte:
+- documents.json
+- harvest_run.json
+
+Conclusie:
+Het endpoint `/documents?limit={limit}&offset={offset}` is bruikbaar voor een document-first MVP.
