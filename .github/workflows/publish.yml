@@ -4,12 +4,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish-placeholder:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Publish placeholder
-        run: echo "Publishing is planned after the first harvest and public JSONL exports are available."
+      - name: Placeholder publish step
+        run: |
+          echo "Publish workflow is reserved for GitHub Pages in a later milestone."

@@ -30,7 +30,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e .
 
-      - name: Run metadata-only harvest
+      - name: Run metadata-only harvest and public export
         run: |
           python -m open_ris_monitor.pipeline.run \
             --municipality "${{ inputs.municipality }}" \
@@ -41,5 +41,13 @@ jobs:
         with:
           name: raw-harvest-${{ inputs.municipality }}
           path: data/raw/latest/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload public export output
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-export-${{ inputs.municipality }}
+          path: data/public/
           if-no-files-found: error
           retention-days: 7
