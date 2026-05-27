@@ -1,0 +1,25 @@
+[project]
+name = "open-ris-monitor"
+version = "0.1.0"
+description = "Generieke open-data-pipeline voor publieke raadsinformatie uit gemeentelijke RIS-systemen."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "httpx>=0.27",
+  "pydantic>=2.7",
+  "pyyaml>=6.0",
+  "python-dateutil>=2.9",
+  "pymupdf>=1.24",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.5",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

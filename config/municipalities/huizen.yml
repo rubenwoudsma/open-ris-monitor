@@ -1,16 +1,16 @@
 municipality:
-  name: Example Municipality
-  slug: example
-  official_identifier: gm0000
+  name: Huizen
+  slug: huizen
+  official_identifier: gm0406
   country: NL
-  website_url: https://www.example.nl
-  ris_url: https://ris.example.nl
+  website_url: https://www.huizen.nl
+  ris_url: https://ris.gemeenteraadhuizen.nl
   timezone: Europe/Amsterdam
 
 source_system:
   vendor: GemeenteOplossingen
   connector: gemeenteoplossingen
-  base_url: https://ris.example.nl/api/v2/
+  base_url: https://ris.gemeenteraadhuizen.nl/api/v2/
   api_version: v2
   active: true
 
