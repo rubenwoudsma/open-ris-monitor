@@ -1,3 +1,5 @@
+"""Source system model."""
+
 from __future__ import annotations
 
 from pydantic import HttpUrl
@@ -9,7 +11,7 @@ class SourceSystem(CanonicalModel):
     id: str
     municipality_id: str
     vendor: str
+    connector: str
     base_url: HttpUrl
     api_version: str | None = None
-    connector: str
     active: bool = True
