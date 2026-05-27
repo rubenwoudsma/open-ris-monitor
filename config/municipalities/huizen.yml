@@ -13,6 +13,10 @@ source_system:
   base_url: https://ris.gemeenteraadhuizen.nl/api/v2/
   api_version: v2
   active: true
+  endpoints:
+    meetings: vergaderingen
+    agenda_items: agendapunten
+    documents: documenten
 
 harvest:
   enabled: true
@@ -21,11 +25,11 @@ harvest:
   include_meetings: true
   include_agenda_items: true
   include_documents: true
-  download_documents_temporarily: true
-  extract_text: true
+  download_documents_temporarily: false
+  extract_text: false
 
 storage:
-  mode: metadata_plus_text
+  mode: metadata_only
   commit_raw_api: true
   commit_pdf_files: false
   keep_action_artifacts_days: 3
