@@ -1,6 +1,7 @@
 """GemeenteOplossingen connector.
 
-This connector is based on the proven API usage from the existing Huizen RIS Monitor beta:
+This connector is based on the proven API usage from the existing Huizen RIS
+Monitor beta:
 
 - GET {base_url}documents?limit=1
 - response path: result.totalCount
@@ -55,7 +56,7 @@ class GemeenteOplossingenConnector(BaseConnector):
         return result
 
     def fetch_document_count(self) -> int:
-        """Return ``result.totalCount`` from the documents endpoint."""
+        """Return `result.totalCount` from the documents endpoint."""
         payload = self._get_json("documents", params={"limit": 1})
         result = self._result(payload)
         total_count = result.get("totalCount")
@@ -64,7 +65,7 @@ class GemeenteOplossingenConnector(BaseConnector):
         return int(total_count)
 
     def fetch_documents(self, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
-        """Fetch raw documents from ``result.documents``."""
+        """Fetch raw documents from `result.documents`."""
         if limit < 1:
             raise ValueError("limit must be at least 1")
         if offset < 0:
@@ -76,6 +77,15 @@ class GemeenteOplossingenConnector(BaseConnector):
         if not isinstance(documents, list):
             raise KeyError("Expected response field 'result.documents' to be a list.")
         return documents
+
+    def fetch_latest_documents(self, limit: int = 500) -> list[dict[str, Any]]:
+        """Fetch the latest documents using totalCount and offset.
+
+        This mirrors the current Streamlit beta behavior.
+        """
+        total_count = self.fetch_document_count()
+        offset = max(0, total_count - limit)
+        return self.fetch_documents(limit=limit, offset=offset)
 
     def build_document_download_url(self, document_id: str | int) -> str:
         """Build the public download URL for a document."""

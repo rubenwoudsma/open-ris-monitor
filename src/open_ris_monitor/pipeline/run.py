@@ -13,7 +13,6 @@ import yaml
 from open_ris_monitor.connectors.gemeenteoplossingen import GemeenteOplossingenConnector
 from open_ris_monitor.models.harvest_run import HarvestRun
 
-
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
@@ -75,10 +74,12 @@ def run_harvest(municipality: str, limit: int) -> HarvestRun:
         documents_seen=len(documents),
     )
     write_json(raw_dir / "harvest_run.json", harvest_run.model_dump(mode="json"))
+
     return harvest_run
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description="Run Open RIS Monitor harvest.")
     parser.add_argument("--municipality", default="huizen", help="Municipality config slug")
     parser.add_argument("--limit", type=int, default=500, help="Number of latest documents to fetch")
@@ -86,6 +87,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Run the command-line harvester."""
     args = parse_args()
     harvest_run = run_harvest(municipality=args.municipality, limit=args.limit)
     print(

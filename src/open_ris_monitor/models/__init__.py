@@ -1,1 +1,1 @@
-"""Canonical Open RIS Monitor models."""
+"""Canonical data models for Open RIS Monitor."""

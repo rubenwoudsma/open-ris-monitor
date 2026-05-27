@@ -1,1 +1,1 @@
-"""Pipeline module placeholder."""
+"""Pipeline entry points for Open RIS Monitor."""
