@@ -4,17 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       municipality:
-        description: "Municipality config slug"
+        description: Municipality config slug
         required: true
-        default: "huizen"
+        default: huizen
       limit:
-        description: "Number of latest documents to fetch"
+        description: Number of latest documents to fetch
         required: true
         default: "25"
 
 jobs:
   harvest:
-    name: Run metadata-only harvest
     runs-on: ubuntu-latest
 
     steps:
@@ -29,9 +28,9 @@ jobs:
       - name: Install package
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e ".[dev]"
+          python -m pip install -e .
 
-      - name: Run harvest
+      - name: Run metadata-only harvest
         run: |
           python -m open_ris_monitor.pipeline.run \
             --municipality "${{ inputs.municipality }}" \
@@ -40,7 +39,7 @@ jobs:
       - name: Upload raw harvest output
         uses: actions/upload-artifact@v4
         with:
-          name: raw-harvest-output
+          name: raw-harvest-${{ inputs.municipality }}
           path: data/raw/latest/
           if-no-files-found: error
-          retention-days: 3
+          retention-days: 7

@@ -4,16 +4,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish:
-    name: Publish placeholder
+  publish-placeholder:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Validate site folder exists
-        run: test -d site
-
-      - name: Explain current status
-        run: echo "GitHub Pages publication will be implemented after public JSONL exports exist."
+      - name: Publish placeholder
+        run: echo "Publishing is planned after the first harvest and public JSONL exports are available."
