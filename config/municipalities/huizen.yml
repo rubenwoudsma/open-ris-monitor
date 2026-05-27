@@ -29,5 +29,4 @@ publication:
   formats:
     - jsonl
     - json
-    - csv
   github_pages: true

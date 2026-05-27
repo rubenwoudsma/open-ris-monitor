@@ -1,8 +1,8 @@
-# Source analysis, GemeenteOplossingen RIS API voor Huizen
+# Source analysis: GemeenteOplossingen API, Huizen
 
 ## Status
 
-Dit document hoort bij issue #1. De analyse is nu document-first, omdat de bestaande Huizen RIS Monitor beta al werkend gebruikmaakt van het documents-endpoint.
+De document-first harvest is bewezen via GitHub Actions. De workflow haalt documenten op uit het Huizer RIS en schrijft de ruwe output als artifact.
 
 ## Bewezen endpoint
 
@@ -12,74 +12,76 @@ Base URL:
 https://ris.gemeenteraadhuizen.nl/api/v2/
 ```
 
-Document count:
+Documenten:
 
 ```text
-GET documents?limit=1
+GET /documents?limit={limit}&offset={offset}
 ```
 
-Verwacht responsepad:
-
-```text
-result.totalCount
-```
-
-Documenten ophalen:
-
-```text
-GET documents?limit={limit}&offset={offset}
-```
-
-Verwacht responsepad:
+Bewezen responsepad:
 
 ```text
 result.documents
 ```
 
-Documentdownload:
+Telling:
 
 ```text
-GET documents/{document_id}/download
+GET /documents?limit=1
+result.totalCount
 ```
 
-## MVP-besluit
+Downloadpatroon:
 
-Milestone 1 gebruikt een metadata-only aanpak:
-
-- documenten ophalen via het bewezen endpoint
-- raw JSON opslaan in `data/raw/latest/documents.json`
-- geen PDF-bestanden committen
-- geen tekstextractie in milestone 1
-
-## Nog te valideren
-
-- exacte veldnamen per documentrecord
-- stabiele document-ID
-- mogelijke endpoints voor vergaderingen
-- mogelijke endpoints voor agendapunten
-- relatievelden tussen documenten, vergaderingen en agendapunten
-- volgorde van `documents` bij `offset` en `limit`
-
-## Acceptatiecriteria voor issue #1
-
-- het bewezen documents-endpoint is beschreven
-- het responsepad `result.documents` is vastgelegd
-- het downloadpatroon is vastgelegd
-- open vragen voor meetings en agenda items zijn benoemd
+```text
+GET /documents/{id}/download
+```
 
 ## Eerste succesvolle harvest
 
-Op 2026-05-27 is de eerste handmatige GitHub Actions harvest succesvol uitgevoerd.
+Op 2026-05-27 is een handmatige GitHub Actions harvest succesvol uitgevoerd.
 
 Resultaat:
-- documents_seen: 25
-- meetings_seen: 0
-- agenda_items_seen: 0
-- status: success
+
+```text
+documents_seen: 25
+meetings_seen: 0
+agenda_items_seen: 0
+status: success
+```
 
 De artifact bevatte:
-- documents.json
-- harvest_run.json
 
-Conclusie:
-Het endpoint `/documents?limit={limit}&offset={offset}` is bruikbaar voor een document-first MVP.
+```text
+documents.json
+harvest_run.json
+```
+
+Conclusie: het endpoint `/documents?limit={limit}&offset={offset}` is bruikbaar voor een document-first MVP.
+
+## Beschikbare bronvelden in documentrecords
+
+De eerste harvest bevestigt onder andere deze velden:
+
+| Bronveld | Betekenis | Canoniek veld |
+|---|---|---|
+| `id` | Document-ID in bron | `source_id` |
+| `objectId` | Object-ID in bron | `source_object_id` |
+| `description` | Omschrijving/titel | `title`, `description` |
+| `documentTypeLabel` | Type document | `document_type` |
+| `fileName` | Bestandsnaam | `filename` |
+| `fileSize` | Bestandsgrootte in bytes | `file_size_bytes` |
+| `publicationDate.date` | Publicatiedatum | `publication_datetime` |
+| `publicationDate.timezone` | Tijdzone | `publication_timezone` |
+| `confidential` | Vertrouwelijkheidsindicator | `is_confidential` |
+| `isTabsignDocument` | Tabsign-indicator | `is_tabsign_document` |
+
+## Open punten
+
+Voor latere issues moeten nog worden onderzocht:
+
+- endpoints voor vergaderingen;
+- endpoints voor agendapunten;
+- relatie tussen document, vergadering en agendapunt;
+- eventuele detail-endpoints voor documentmetadata;
+- betrouwbaarheid van `objectId` als relatieve sleutel.
