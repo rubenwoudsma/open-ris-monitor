@@ -35,6 +35,15 @@ jobs:
           python -m open_ris_monitor.pipeline.run \
             --municipality "${{ inputs.municipality }}" \
             --limit "${{ inputs.limit }}"
+  
+      - name: Show generated output
+        run: |
+          echo "Raw output:"
+          find data/raw/latest -maxdepth 1 -type f -print
+          echo "Public output:"
+          find data/public -maxdepth 1 -type f -print
+          echo "Latest summary:"
+          cat data/public/latest.json
 
       - name: Upload raw harvest output
         uses: actions/upload-artifact@v4
