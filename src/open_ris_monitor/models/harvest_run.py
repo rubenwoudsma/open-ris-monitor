@@ -1,3 +1,5 @@
+"""Harvest run model."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -6,6 +8,8 @@ from open_ris_monitor.models.common import CanonicalModel
 
 
 class HarvestRun(CanonicalModel):
+    """Metadata about one harvest execution."""
+
     id: str
     municipality_id: str
     source_system_id: str

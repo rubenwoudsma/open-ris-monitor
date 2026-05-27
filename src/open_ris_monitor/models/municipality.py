@@ -1,3 +1,5 @@
+"""Municipality model."""
+
 from __future__ import annotations
 
 from pydantic import HttpUrl
@@ -10,7 +12,7 @@ class Municipality(CanonicalModel):
     slug: str
     name: str
     country: str = "NL"
-    official_identifier: str
-    website_url: HttpUrl
-    ris_url: HttpUrl
-    timezone: str
+    official_identifier: str | None = None
+    website_url: HttpUrl | None = None
+    ris_url: HttpUrl | None = None
+    timezone: str = "Europe/Amsterdam"

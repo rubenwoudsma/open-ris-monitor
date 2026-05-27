@@ -1,16 +1,11 @@
-from __future__ import annotations
+"""Shared model configuration."""
 
-from datetime import datetime
-from typing import Optional
+from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict
 
 
 class CanonicalModel(BaseModel):
+    """Base model for canonical Open RIS Monitor objects."""
+
     model_config = ConfigDict(extra="forbid")
-
-
-class SourceTrackedModel(CanonicalModel):
-    id: str
-    source_id: Optional[str] = None
-    retrieved_at: datetime

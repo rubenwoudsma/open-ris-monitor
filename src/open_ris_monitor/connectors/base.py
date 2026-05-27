@@ -1,3 +1,5 @@
+"""Base connector contract for source systems."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -5,23 +7,24 @@ from typing import Any
 
 
 class BaseConnector(ABC):
-    """Base interface for RIS source connectors."""
+    """Minimal connector contract for milestone 1.
 
-    def __init__(self, base_url: str) -> None:
-        self.base_url = base_url.rstrip("/")
-
-    @abstractmethod
-    def fetch_meetings(self) -> list[dict[str, Any]]:
-        """Fetch raw meeting records from the source system."""
+    Milestone 1 is document-first and metadata-only. Meetings and agenda items
+    will be added after the document endpoint is harvested reliably.
+    """
 
     @abstractmethod
-    def fetch_agenda_items(self) -> list[dict[str, Any]]:
-        """Fetch raw agenda item records from the source system."""
+    def fetch_document_count(self) -> int:
+        """Return the total number of documents available in the source system."""
 
     @abstractmethod
-    def fetch_documents(self) -> list[dict[str, Any]]:
-        """Fetch raw document metadata records from the source system."""
+    def fetch_documents(self, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
+        """Fetch raw document records from the source system."""
 
-    def fetch_document_file(self, download_url: str) -> bytes:
-        """Fetch a document file. Implement when document enrichment is needed."""
-        raise NotImplementedError("Document file download is not implemented for this connector yet.")
+    @abstractmethod
+    def fetch_latest_documents(self, limit: int = 500) -> list[dict[str, Any]]:
+        """Fetch the latest document records from the source system."""
+
+    @abstractmethod
+    def build_document_download_url(self, document_id: str | int) -> str:
+        """Build a document download URL without downloading the document."""
