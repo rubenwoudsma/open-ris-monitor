@@ -7,25 +7,37 @@ on:
         description: Municipality config slug
         required: true
         default: huizen
-      limit:
-        description: Number of latest documents to fetch
+      mode:
+        description: Harvest mode, latest or full
         required: true
-        default: "25"
-      commit_public:
-        description: Commit generated data/public output back to the current branch
-        required: true
-        default: "true"
+        default: latest
         type: choice
         options:
-          - "true"
+          - latest
+          - full
+      limit:
+        description: Number of latest documents to fetch in latest mode
+        required: true
+        default: "25"
+      batch_size:
+        description: Number of documents per API page in full mode
+        required: true
+        default: "100"
+      max_documents:
+        description: Safety cap for full mode, 0 means no explicit cap
+        required: true
+        default: "500"
+      commit_public:
+        description: Commit generated data/public output back to the selected branch
+        required: true
+        default: "false"
+        type: choice
+        options:
           - "false"
+          - "true"
 
 permissions:
   contents: write
-
-concurrency:
-  group: harvest-${{ github.ref }}-${{ inputs.municipality }}
-  cancel-in-progress: false
 
 jobs:
   harvest:
@@ -35,7 +47,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
+          ref: ${{ github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -51,7 +63,10 @@ jobs:
         run: |
           python -m open_ris_monitor.pipeline.run \
             --municipality "${{ inputs.municipality }}" \
-            --limit "${{ inputs.limit }}"
+            --mode "${{ inputs.mode }}" \
+            --limit "${{ inputs.limit }}" \
+            --batch-size "${{ inputs.batch_size }}" \
+            --max-documents "${{ inputs.max_documents }}"
 
       - name: Show generated output
         run: |
