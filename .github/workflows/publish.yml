@@ -1,16 +1,47 @@
-name: Publish
+name: Publish site check
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "site/**"
+      - "data/public/**"
+      - ".github/workflows/publish.yml"
+  pull_request:
+    paths:
+      - "site/**"
+      - "data/public/**"
+      - ".github/workflows/publish.yml"
   workflow_dispatch:
 
 jobs:
-  publish:
+  check-site-assets:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Placeholder publish step
+      - name: Verify site and public data files
         run: |
-          echo "Publish workflow is reserved for GitHub Pages in a later milestone."
+          test -f site/index.html
+          test -f site/assets/app.js
+          test -f site/assets/styles.css
+          test -f data/public/latest.json
+          test -f data/public/documents.jsonl
+          python -m json.tool data/public/latest.json > /tmp/latest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          documents_path = Path("data/public/documents.jsonl")
+          count = 0
+          for line in documents_path.read_text(encoding="utf-8").splitlines():
+              if line.strip():
+                  json.loads(line)
+                  count += 1
+          if count == 0:
+              raise SystemExit("documents.jsonl bevat geen records")
+          print(f"documents.jsonl bevat {count} records")
+          PY
