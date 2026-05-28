@@ -1,5 +1,3 @@
-"""Base connector contract for source systems."""
-
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -7,24 +5,33 @@ from typing import Any
 
 
 class BaseConnector(ABC):
-    """Minimal connector contract for milestone 1.
+    """Base contract for RIS source connectors.
 
-    Milestone 1 is document-first and metadata-only. Meetings and agenda items
-    will be added after the document endpoint is harvested reliably.
+    Connectors return raw source records. Mapping to canonical Open RIS Monitor
+    models belongs in the normalizer layer.
     """
 
     @abstractmethod
     def fetch_document_count(self) -> int:
-        """Return the total number of documents available in the source system."""
+        """Return the total number of documents available at the source."""
 
     @abstractmethod
-    def fetch_documents(self, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
-        """Fetch raw document records from the source system."""
+    def fetch_documents_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
+        """Return one page of raw document records from the source."""
 
     @abstractmethod
-    def fetch_latest_documents(self, limit: int = 500) -> list[dict[str, Any]]:
-        """Fetch the latest document records from the source system."""
+    def fetch_latest_documents(self, *, limit: int) -> list[dict[str, Any]]:
+        """Return the latest raw document records from the source."""
+
+    @abstractmethod
+    def fetch_all_documents(
+        self,
+        *,
+        batch_size: int = 100,
+        max_documents: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Return raw document records using pagination."""
 
     @abstractmethod
     def build_document_download_url(self, document_id: str | int) -> str:
-        """Build a document download URL without downloading the document."""
+        """Build a direct download URL for a source document."""

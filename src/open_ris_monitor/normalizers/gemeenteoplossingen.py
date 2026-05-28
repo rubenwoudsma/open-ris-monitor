@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from datetime import datetime
 from typing import Any
 
@@ -17,19 +18,35 @@ def _slugify(value: str) -> str:
 
 
 def _parse_publication_datetime(raw_value: Any) -> tuple[datetime | None, str | None]:
+    """Parse the GemeenteOplossingen publicationDate object."""
     if not isinstance(raw_value, dict):
         return None, None
 
     date_value = raw_value.get("date")
     timezone_value = raw_value.get("timezone")
+    timezone = timezone_value if isinstance(timezone_value, str) else None
+
     if not isinstance(date_value, str) or not date_value:
-        return None, timezone_value if isinstance(timezone_value, str) else None
+        return None, timezone
 
     normalized = date_value.replace(" ", "T")
     try:
-        return datetime.fromisoformat(normalized), timezone_value if isinstance(timezone_value, str) else None
+        return datetime.fromisoformat(normalized), timezone
     except ValueError:
-        return None, timezone_value if isinstance(timezone_value, str) else None
+        return None, timezone
+
+
+def _resolve_download_url_builder(
+    *,
+    connector: GemeenteOplossingenConnector | None = None,
+    build_download_url: Callable[[str], str] | None = None,
+) -> Callable[[str], str]:
+    """Return a download URL builder from either the old or new call style."""
+    if build_download_url is not None:
+        return build_download_url
+    if connector is not None:
+        return connector.build_document_download_url
+    raise ValueError("Either connector or build_download_url must be provided")
 
 
 def normalize_document(
@@ -37,10 +54,21 @@ def normalize_document(
     *,
     municipality_id: str,
     source_system_id: str,
-    connector: GemeenteOplossingenConnector,
     retrieved_at: datetime,
+    municipality_slug: str | None = None,
+    connector: GemeenteOplossingenConnector | None = None,
+    build_download_url: Callable[[str], str] | None = None,
 ) -> Document:
-    """Convert one raw GemeenteOplossingen document into a canonical Document."""
+    """Convert one raw GemeenteOplossingen document into a canonical Document.
+
+    The function accepts both the earlier call style, using a connector object,
+    and the newer pipeline call style, using an explicit download URL builder.
+    """
+    url_builder = _resolve_download_url_builder(
+        connector=connector,
+        build_download_url=build_download_url,
+    )
+
     source_id = str(raw_document["id"])
     source_object_id = raw_document.get("objectId")
     publication_datetime, publication_timezone = _parse_publication_datetime(
@@ -51,8 +79,9 @@ def normalize_document(
     filename = raw_document.get("fileName")
     title = str(description or filename or f"Document {source_id}").strip()
 
-    canonical_id = f"{_slugify(municipality_id)}-document-{source_id}"
-    download_url = connector.build_document_download_url(source_id)
+    id_prefix = municipality_slug or municipality_id
+    canonical_id = f"{_slugify(id_prefix)}-document-{source_id}"
+    download_url = url_builder(source_id)
 
     return Document(
         id=canonical_id,
@@ -81,16 +110,20 @@ def normalize_documents(
     *,
     municipality_id: str,
     source_system_id: str,
-    connector: GemeenteOplossingenConnector,
     retrieved_at: datetime,
+    municipality_slug: str | None = None,
+    connector: GemeenteOplossingenConnector | None = None,
+    build_download_url: Callable[[str], str] | None = None,
 ) -> list[Document]:
-    """Normalize a list of raw documents."""
+    """Normalize a list of raw GemeenteOplossingen documents."""
     return [
         normalize_document(
             raw_document,
             municipality_id=municipality_id,
+            municipality_slug=municipality_slug,
             source_system_id=source_system_id,
             connector=connector,
+            build_download_url=build_download_url,
             retrieved_at=retrieved_at,
         )
         for raw_document in raw_documents

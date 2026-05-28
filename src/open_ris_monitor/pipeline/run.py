@@ -1,8 +1,7 @@
-"""Command-line entry point for the metadata-only document harvest."""
-
 from __future__ import annotations
 
 import argparse
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -14,84 +13,111 @@ from open_ris_monitor.exporters.json_exporter import write_json, write_jsonl
 from open_ris_monitor.models.harvest_run import HarvestRun
 from open_ris_monitor.normalizers.gemeenteoplossingen import normalize_documents
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
-def load_municipality_config(slug: str) -> dict[str, Any]:
-    """Load a municipality YAML config from config/municipalities."""
-    config_path = REPO_ROOT / "config" / "municipalities" / f"{slug}.yml"
-    if not config_path.exists():
-        raise FileNotFoundError(f"Municipality config not found: {config_path}")
-
-    with config_path.open("r", encoding="utf-8") as file:
-        payload = yaml.safe_load(file)
-
-    if not isinstance(payload, dict):
-        raise ValueError(f"Expected YAML object in {config_path}")
-
-    return payload
+def load_config(municipality: str) -> dict[str, Any]:
+    path = Path("config") / "municipalities" / f"{municipality}.yml"
+    if not path.exists():
+        raise FileNotFoundError(f"Municipality config not found: {path}")
+    with path.open("r", encoding="utf-8") as handle:
+        return yaml.safe_load(handle)
 
 
-def create_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
-    """Create the configured source connector."""
-    source_system = config["source_system"]
-    connector_name = source_system["connector"]
-
-    if connector_name != "gemeenteoplossingen":
-        raise ValueError(f"Unsupported connector for this MVP: {connector_name}")
-
-    return GemeenteOplossingenConnector(base_url=source_system["base_url"])
-
-
-def run_harvest(municipality: str, limit: int) -> HarvestRun:
-    """Run a document-first, metadata-only harvest and public export."""
-    started_at = datetime.now(timezone.utc)
-    config = load_municipality_config(municipality)
-    connector = create_connector(config)
-
-    raw_documents = connector.fetch_latest_documents(limit=limit)
-    retrieved_at = datetime.now(timezone.utc)
-
-    municipality_config = config["municipality"]
-    source_system_config = config["source_system"]
-    municipality_id = municipality_config["id"]
-    source_system_id = source_system_config["id"]
-
-    documents = normalize_documents(
-        raw_documents,
-        municipality_id=municipality_id,
-        source_system_id=source_system_id,
-        connector=connector,
-        retrieved_at=retrieved_at,
+def build_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
+    source = config["source_system"]
+    harvest = config.get("harvest", {})
+    return GemeenteOplossingenConnector(
+        base_url=source["base_url"],
+        timeout_seconds=int(harvest.get("timeout_seconds", 30)),
+        request_delay_seconds=float(harvest.get("request_delay_seconds", 0.0)),
     )
 
+
+def parse_max_documents(value: int) -> int | None:
+    if value <= 0:
+        return None
+    return value
+
+
+def run_harvest(
+    *,
+    municipality: str,
+    mode: str,
+    limit: int,
+    batch_size: int,
+    max_documents: int | None,
+) -> None:
+    if mode not in {"latest", "full"}:
+        raise ValueError("mode must be 'latest' or 'full'")
+
+    started_at = utc_now()
+    started_token = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    config = load_config(municipality)
+    municipality_config = config["municipality"]
+    source_system = config["source_system"]
+
+    municipality_id = municipality_config["id"]
+    municipality_slug = municipality_config["slug"]
+    source_system_id = source_system["id"]
+
     harvest_run = HarvestRun(
-        id=f"harvest-{municipality}-{started_at.strftime('%Y%m%dT%H%M%SZ')}",
+        id=f"harvest-{municipality_slug}-{started_token}",
         municipality_id=municipality_id,
         source_system_id=source_system_id,
         started_at=started_at,
-        finished_at=datetime.now(timezone.utc),
-        status="success",
-        documents_seen=len(raw_documents),
-        documents_normalized=len(documents),
+        mode=mode,
+        batch_size=batch_size if mode == "full" else None,
+        max_documents=max_documents if mode == "full" else limit,
     )
 
-    raw_dir = REPO_ROOT / "data" / "raw" / "latest"
-    public_dir = REPO_ROOT / "data" / "public"
+    connector = build_connector(config)
+
+    if mode == "full":
+        raw_documents = connector.fetch_all_documents(
+            batch_size=batch_size,
+            max_documents=max_documents,
+        )
+    else:
+        raw_documents = connector.fetch_latest_documents(limit=limit)
+
+    retrieved_at = utc_now()
+    documents = normalize_documents(
+        raw_documents,
+        municipality_id=municipality_id,
+        municipality_slug=municipality_slug,
+        source_system_id=source_system_id,
+        build_download_url=connector.build_document_download_url,
+        retrieved_at=retrieved_at,
+    )
+
+    harvest_run.documents_seen = len(raw_documents)
+    harvest_run.documents_normalized = len(documents)
+    harvest_run.status = "success"
+    harvest_run.finished_at = utc_now()
+
+    raw_dir = Path("data/raw/latest")
+    public_dir = Path("data/public")
 
     write_json(raw_dir / "documents.json", raw_documents)
-    write_json(raw_dir / "harvest_run.json", harvest_run)
+    write_json(raw_dir / "harvest_run.json", harvest_run.to_dict())
 
     write_jsonl(public_dir / "documents.jsonl", documents)
-    write_jsonl(public_dir / "harvest_runs.jsonl", [harvest_run])
+    write_jsonl(public_dir / "harvest_runs.jsonl", [harvest_run.to_dict()])
     write_json(
         public_dir / "latest.json",
         {
-            "municipality": municipality,
+            "generated_at": harvest_run.finished_at,
+            "harvest_run_id": harvest_run.id,
+            "municipality": municipality_slug,
             "municipality_id": municipality_id,
             "source_system_id": source_system_id,
-            "harvest_run_id": harvest_run.id,
-            "generated_at": harvest_run.finished_at,
+            "mode": mode,
+            "limit": limit if mode == "latest" else None,
+            "batch_size": batch_size if mode == "full" else None,
+            "max_documents": max_documents if mode == "full" else None,
             "documents_seen": harvest_run.documents_seen,
             "documents_normalized": harvest_run.documents_normalized,
             "outputs": {
@@ -101,25 +127,24 @@ def run_harvest(municipality: str, limit: int) -> HarvestRun:
         },
     )
 
-    return harvest_run
-
-
-def parse_args() -> argparse.Namespace:
-    """Parse command-line arguments."""
-    parser = argparse.ArgumentParser(description="Run Open RIS Monitor harvest.")
-    parser.add_argument("--municipality", default="huizen", help="Municipality config slug")
-    parser.add_argument("--limit", type=int, default=500, help="Number of latest documents to fetch")
-    return parser.parse_args()
+    print(json.dumps(harvest_run.to_dict(), ensure_ascii=False, indent=2, sort_keys=True))
 
 
 def main() -> None:
-    """Run the command-line harvester."""
-    args = parse_args()
-    harvest_run = run_harvest(municipality=args.municipality, limit=args.limit)
-    print(
-        f"Harvest {harvest_run.id} completed: "
-        f"{harvest_run.documents_seen} documents seen, "
-        f"{harvest_run.documents_normalized} documents normalized."
+    parser = argparse.ArgumentParser(description="Run Open RIS Monitor harvest pipeline")
+    parser.add_argument("--municipality", required=True)
+    parser.add_argument("--mode", choices=["latest", "full"], default="latest")
+    parser.add_argument("--limit", type=int, default=25)
+    parser.add_argument("--batch-size", type=int, default=100)
+    parser.add_argument("--max-documents", type=int, default=500)
+    args = parser.parse_args()
+
+    run_harvest(
+        municipality=args.municipality,
+        mode=args.mode,
+        limit=args.limit,
+        batch_size=args.batch_size,
+        max_documents=parse_max_documents(args.max_documents),
     )
 
 

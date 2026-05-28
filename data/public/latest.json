@@ -1,8 +1,12 @@
 {
-  "documents_normalized": 25,
-  "documents_seen": 25,
-  "generated_at": "2026-05-28 07:51:20.306718+00:00",
-  "harvest_run_id": "harvest-huizen-20260528T075118Z",
+  "batch_size": 100,
+  "documents_normalized": 250,
+  "documents_seen": 250,
+  "generated_at": "2026-05-28T12:16:53.685674+00:00",
+  "harvest_run_id": "harvest-huizen-20260528T121650Z",
+  "limit": null,
+  "max_documents": 250,
+  "mode": "full",
   "municipality": "huizen",
   "municipality_id": "gm0406",
   "outputs": {
