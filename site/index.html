@@ -3,19 +3,117 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Open RIS Monitor</title>
+    <title>Open RIS Monitor, Huizen</title>
+    <meta
+      name="description"
+      content="Open RIS Monitor publiceert en toont publieke raadsinformatie uit het RIS van gemeente Huizen."
+    />
     <link rel="stylesheet" href="assets/styles.css" />
   </head>
   <body>
-    <main>
-      <h1>Open RIS Monitor</h1>
-      <p>Publieke raadsinformatie als herbruikbare open data.</p>
+    <header class="site-header">
+      <div class="container header-grid">
+        <div>
+          <p class="eyebrow">Open RIS Monitor</p>
+          <h1>Raadsinformatie Huizen</h1>
+          <p class="lead">
+            Een open, reproduceerbare viewer op publieke RIS-data, opgebouwd uit
+            canonieke JSONL-exportbestanden.
+          </p>
+        </div>
+        <nav class="header-actions" aria-label="Belangrijke links">
+          <a href="../data/public/latest.json">latest.json</a>
+          <a href="../data/public/documents.jsonl">documents.jsonl</a>
+          <a href="../README.md">README</a>
+        </nav>
+      </div>
+    </header>
 
-      <section id="status">
-        <h2>Status</h2>
-        <pre id="latest">Laden...</pre>
+    <main class="container">
+      <section class="status-panel" aria-labelledby="status-title">
+        <div>
+          <h2 id="status-title">Laatste export</h2>
+          <p id="status-message" class="muted">Data wordt geladen...</p>
+        </div>
+        <div class="cards" aria-live="polite">
+          <article class="card">
+            <span class="card-label">Gemeente</span>
+            <strong id="municipality">-</strong>
+          </article>
+          <article class="card">
+            <span class="card-label">Documenten gezien</span>
+            <strong id="documents-seen">-</strong>
+          </article>
+          <article class="card">
+            <span class="card-label">Genormaliseerd</span>
+            <strong id="documents-normalized">-</strong>
+          </article>
+          <article class="card">
+            <span class="card-label">Gegenereerd</span>
+            <strong id="generated-at">-</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="toolbar" aria-label="Zoeken en filters">
+        <label class="search-label" for="search-input">Zoeken</label>
+        <input
+          id="search-input"
+          type="search"
+          placeholder="Zoek op titel, bestandsnaam of documenttype"
+          autocomplete="off"
+        />
+        <select id="type-filter" aria-label="Filter op documenttype">
+          <option value="">Alle documenttypen</option>
+        </select>
+      </section>
+
+      <section class="table-section" aria-labelledby="documents-title">
+        <div class="section-heading">
+          <h2 id="documents-title">Documenten</h2>
+          <p id="result-count" class="muted">-</p>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Datum</th>
+                <th>Type</th>
+                <th>Titel</th>
+                <th>Bestand</th>
+                <th>Grootte</th>
+                <th>Download</th>
+              </tr>
+            </thead>
+            <tbody id="documents-table-body">
+              <tr>
+                <td colspan="6">Documenten worden geladen...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="notes" aria-labelledby="notes-title">
+        <h2 id="notes-title">Over deze versie</h2>
+        <p>
+          Deze website gebruikt de publieke exportbestanden in
+          <code>data/public</code>. De ruwe RIS-data blijft bedoeld voor analyse
+          en debugging. PDF-bestanden worden in deze fase niet in de repository
+          opgeslagen.
+        </p>
       </section>
     </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>
+          Open RIS Monitor, metadata-only MVP. Brondata blijft afkomstig uit het
+          Raadsinformatiesysteem van gemeente Huizen.
+        </p>
+      </div>
+    </footer>
+
     <script src="assets/app.js"></script>
   </body>
 </html>
