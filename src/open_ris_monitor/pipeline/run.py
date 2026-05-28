@@ -23,14 +23,42 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def load_municipality_config(slug: str) -> dict[str, Any]:
+    """Load the municipality configuration by slug."""
     config_path = REPO_ROOT / "config" / "municipalities" / f"{slug}.yml"
     if not config_path.exists():
         raise FileNotFoundError(f"Municipality config not found: {config_path}")
+
     with config_path.open("r", encoding="utf-8") as file:
         payload = yaml.safe_load(file)
+
     if not isinstance(payload, dict):
         raise ValueError(f"Expected YAML object in {config_path}")
+
     return payload
+
+
+def parse_max_documents(value: int | str | None) -> int | None:
+    """Interpret max document input values.
+
+    GitHub Actions inputs are strings, while tests and direct Python calls may pass
+    integers. A value of 0, an empty string, or None means "no explicit cap".
+    """
+    if value is None:
+        return None
+
+    if isinstance(value, str):
+        value = value.strip()
+        if value == "":
+            return None
+        parsed = int(value)
+    else:
+        parsed = int(value)
+
+    if parsed == 0:
+        return None
+    if parsed < 0:
+        raise ValueError("max_documents must be 0 or greater")
+    return parsed
 
 
 def _as_float(value: Any, default: float = 0.0) -> float:
@@ -42,6 +70,7 @@ def _as_float(value: Any, default: float = 0.0) -> float:
 def build_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
     source_system = config["source_system"]
     connector_name = source_system["connector"]
+
     if connector_name != "gemeenteoplossingen":
         raise ValueError(f"Unsupported connector: {connector_name}")
 
@@ -125,6 +154,7 @@ def run_harvest(
 
     write_jsonl(public_dir / "documents.jsonl", documents)
     write_jsonl(public_dir / "harvest_runs.jsonl", [harvest_run])
+
     if enrich_checksums:
         write_jsonl(previous_versions_path, merged_versions)
 
@@ -156,9 +186,22 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mode", choices=["latest", "full"], default="latest", help="Harvest mode")
     parser.add_argument("--limit", type=int, default=25, help="Number of latest documents to fetch")
     parser.add_argument("--batch-size", type=int, default=100, help="Batch size for full harvest")
-    parser.add_argument("--max-documents", type=int, default=None, help="Maximum documents for full harvest")
-    parser.add_argument("--enrich-checksums", action="store_true", help="Download selected documents temporarily and calculate SHA-256 checksums")
-    parser.add_argument("--checksum-max-documents", type=int, default=50, help="Maximum documents to checksum per run")
+    parser.add_argument(
+        "--max-documents",
+        default=None,
+        help="Maximum documents for full harvest. Use 0 or omit for no explicit cap.",
+    )
+    parser.add_argument(
+        "--enrich-checksums",
+        action="store_true",
+        help="Download selected documents temporarily and calculate SHA-256 checksums",
+    )
+    parser.add_argument(
+        "--checksum-max-documents",
+        type=int,
+        default=50,
+        help="Maximum documents to checksum per run",
+    )
     return parser.parse_args()
 
 
@@ -169,7 +212,7 @@ def main() -> None:
         mode=args.mode,
         limit=args.limit,
         batch_size=args.batch_size,
-        max_documents=args.max_documents,
+        max_documents=parse_max_documents(args.max_documents),
         enrich_checksums=args.enrich_checksums,
         checksum_max_documents=args.checksum_max_documents,
     )
