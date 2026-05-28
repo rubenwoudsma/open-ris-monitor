@@ -11,7 +11,7 @@ Status: afgerond.
 Resultaat:
 
 - Gemeente Huizen is als eerste configuratie toegevoegd.
-- De GemeenteOplossingen connector kan de laatste documenten ophalen.
+- De GemeenteOplossingen connector kan documenten ophalen.
 - De harvest draait via GitHub Actions.
 - Raw harvest-output wordt als artifact beschikbaar gemaakt.
 
@@ -35,30 +35,42 @@ Resultaat:
 - De site leest `data/public/latest.json` en `data/public/documents.jsonl`.
 - De site toont harvestinformatie, documenttypen, zoekfunctie en documentlinks.
 
+### Milestone 4, automatisch bijwerken van data/public
+
+Status: afgerond.
+
+Gerelateerd issue:
+
+```text
+#9 Automatisch bijwerken van data/public na harvest
+```
+
+Resultaat:
+
+- De harvest workflow heeft een input `commit_public`.
+- Bij `commit_public: true` commit de workflow alleen wijzigingen onder `data/public/`.
+- Bij `commit_public: false` worden alleen artifacts gemaakt.
+- `data/raw/` blijft artifact-only.
+- PDF-bestanden worden niet gecommit.
+- GitHub Pages kan de nieuwste public exports tonen zonder handmatige upload.
+
 ## Actueel
 
-### Issue #9, automatisch bijwerken van `data/public` na harvest
+### Documentatie bijwerken na publicatiemilestones
 
 Doel:
 
-Na een handmatige harvest moet de workflow de gegenereerde public exports automatisch kunnen terugschrijven naar de repository, zodat GitHub Pages direct de nieuwste publieke data toont.
+De documentatie moet de huidige status van het project goed weergeven, zodat de repo begrijpelijk en forkbaar blijft.
 
 Scope:
 
-- `data/public/` mag automatisch worden gecommit.
-- `data/raw/` blijft artifact-only.
-- PDF-bestanden worden niet gecommit.
-- De workflow moet ook zonder commit kunnen draaien voor testdoeleinden.
+- README actualiseren.
+- Architectuur actualiseren.
+- Datamodel actualiseren.
+- Opslagbeleid actualiseren.
+- Handleiding voor nieuwe gemeenten actualiseren.
 
-Acceptatiecriteria:
-
-- De harvest-workflow heeft een input `commit_public`.
-- Bij `commit_public: true` commit de workflow alleen wijzigingen onder `data/public/`.
-- Bij `commit_public: false` worden alleen artifacts gemaakt.
-- Als er geen wijzigingen zijn, maakt de workflow geen lege commit.
-- README beschrijft het publicatiebeleid.
-
-## Volgende issues
+## Volgende technische issues
 
 ### Issue #11, volledige document-harvest met paginering
 
@@ -73,6 +85,7 @@ Voorlopige richting:
 - `fetch_all_documents` toevoegen aan de connector.
 - Duplicaten voorkomen op basis van `source_id`.
 - Een configureerbare limiet behouden, zodat test-runs klein kunnen blijven.
+- Workflow input toevoegen voor `harvest_mode`, bijvoorbeeld `latest` of `full`.
 
 ### Issue #12, document_versions en checksum metadata
 
@@ -86,6 +99,7 @@ Voorlopige richting:
 - SHA256 en bestandsgrootte vastleggen.
 - `document_versions.jsonl` toevoegen.
 - PDF's niet committen.
+- Alleen metadata en checksums publiceren.
 
 ### Issue #13, kwaliteitsrapportage
 
@@ -101,6 +115,7 @@ Voorlopige signalen:
 - zeer grote bestanden
 - mogelijk vertrouwelijke documenten
 - dode downloadlinks
+- ontbrekende relatie met vergadering of agendapunt
 
 ### Issue #14, meetings en agenda-items endpoints onderzoeken
 
@@ -111,16 +126,31 @@ Onderzoeken hoe GemeenteOplossingen vergaderingen en agendapunten ontsluit, zoda
 Voorlopige richting:
 
 - API-endpoints inventariseren.
-- Relaties tussen documenten, objectId, vergaderingen en agendapunten onderzoeken.
+- Relaties tussen documenten, `objectId`, vergaderingen en agendapunten onderzoeken.
 - Canonieke modellen uitbreiden met `Meeting` en `AgendaItem`.
+- Relaties expliciet vastleggen in een `relations.jsonl` export.
 
 ## Latere richting
 
 Na deze issues kan het project doorgroeien naar:
 
 - tekstextractie uit PDF's
-- linked data of JSON-LD export
+- JSON-LD export
 - dossierclustering
 - ondersteuning voor meerdere gemeenten
 - ondersteuning voor meerdere RIS-leveranciers
 - automatische dagelijkse harvests
+- kwaliteitsdashboard per gemeente
+- archiefstrategie buiten Git voor PDF-bestanden
+
+## Architectuurbewaking
+
+Bij iedere nieuwe milestone moet worden gecontroleerd of de wijziging past binnen deze uitgangspunten:
+
+1. De public exports blijven het contract voor hergebruikers.
+2. De viewer blijft vervangbaar.
+3. Raw data blijft beperkt en wordt niet automatisch onbeperkt gecommit.
+4. PDF's blijven buiten Git.
+5. Nieuwe bronlogica hoort in connectors.
+6. Nieuwe domeinlogica hoort in normalizers, models, enrichers of exporters.
+7. Huizen-specifieke keuzes moeten zoveel mogelijk in configuratie blijven.

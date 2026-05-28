@@ -6,26 +6,42 @@ Het project is bedoeld als herbruikbaar startpunt voor anderen die vergelijkbare
 
 ## Huidige status
 
-De huidige versie is een metadata-only MVP.
+De huidige versie is een document-first, metadata-only MVP.
 
 Wat werkt nu:
 
 - document-first harvest voor gemeente Huizen
-- ophalen van de laatste documenten via het RIS documents-endpoint
+- ophalen van documenten via het GemeenteOplossingen `documents` endpoint
 - opslag van raw harvest-output als GitHub Actions artifact
 - normalisatie naar een canoniek documentmodel
 - public export naar JSONL en JSON
+- automatisch bijwerken van `data/public/` na een handmatige harvest, indien `commit_public` is ingeschakeld
 - eenvoudige GitHub Pages-site in `site/`
-- optioneel automatisch committen van `data/public` na een handmatige harvest
 
 Wat bewust nog niet in scope zit:
 
 - PDF-bestanden structureel opslaan in Git
 - tekstextractie uit PDF's
 - checksums en documentversies
+- volledige harvest met paginering
 - vergaderingen en agendapunten
 - linked data export
-- automatische commit van `data/raw`
+- automatische dagelijkse harvests
+
+## Website
+
+De publieke website is beschikbaar via:
+
+```text
+https://rubenwoudsma.github.io/open-ris-monitor/site/index.html
+```
+
+De website leest de publieke exportbestanden uit:
+
+```text
+data/public/latest.json
+data/public/documents.jsonl
+```
 
 ## Projectopzet
 
@@ -33,7 +49,7 @@ Wat bewust nog niet in scope zit:
 open-ris-monitor/
   .github/workflows/       GitHub Actions voor validatie, harvest en sitechecks
   config/municipalities/   Gemeenteconfiguraties
-  data/raw/                Ruwe API-output, voor analyse en debugging
+  data/raw/                Ruwe API-output, vooral artifact-only
   data/public/             Publieke exportbestanden voor hergebruik en website
   docs/                    Architectuur, datamodel, roadmap en handleidingen
   site/                    Statische viewer voor GitHub Pages
@@ -48,12 +64,15 @@ GemeenteOplossingen RIS API
   -> GitHub Actions harvest
   -> data/raw/latest, artifact-only
   -> normalisatie naar canoniek model
-  -> data/public
-  -> optionele commit van data/public
-  -> site/index.html
+  -> data/public, committed public exports
+  -> site/index.html, GitHub Pages viewer
 ```
 
-In de huidige MVP wordt `data/raw/latest` vooral als artifact beschikbaar gemaakt. `data/public` bevat de bestanden die bedoeld zijn voor hergebruik en voor de website. Via de harvest-workflow kan `data/public` automatisch terug naar de actieve branch worden gecommit.
+Belangrijk uitgangspunt:
+
+- `data/raw/` is bedoeld voor debugging, controle en tijdelijke inspectie.
+- `data/public/` is bedoeld voor hergebruik, publicatie en de website.
+- De frontend is niet de bron van waarheid. De public exports zijn dat.
 
 ## Publieke databestanden
 
@@ -65,28 +84,7 @@ data/public/documents.jsonl
 data/public/harvest_runs.jsonl
 ```
 
-`latest.json` bevat een samenvatting van de laatste export. `documents.jsonl` bevat één canoniek document per regel. `harvest_runs.jsonl` bevat informatie over uitgevoerde harvest-runs.
-
-## Website
-
-De statische website staat in:
-
-```text
-site/index.html
-```
-
-De site leest de publieke exportbestanden uit:
-
-```text
-data/public/latest.json
-data/public/documents.jsonl
-```
-
-Voor deze repository is de site beschikbaar via:
-
-```text
-https://rubenwoudsma.github.io/open-ris-monitor/site/
-```
+`latest.json` bevat een samenvatting van de laatste export. `documents.jsonl` bevat een canoniek document per regel. `harvest_runs.jsonl` bevat informatie over uitgevoerde harvest-runs.
 
 ## Harvest handmatig draaien
 
@@ -106,32 +104,46 @@ limit: 25
 commit_public: true
 ```
 
-De workflow maakt twee artifacts:
+De workflow maakt artifacts:
 
 ```text
 raw-harvest-huizen
 public-export-huizen
 ```
 
-Als `commit_public` op `true` staat, commit de workflow alleen de gegenereerde bestanden onder `data/public/` terug naar de actieve branch. `data/raw/` wordt niet automatisch gecommit en blijft artifact-only.
-
-Voor testen op een featurebranch kun je `commit_public` tijdelijk op `false` zetten. De artifacts worden dan nog steeds gemaakt, maar de branch wordt niet automatisch aangepast.
-
-## Publicatiebeleid voor data
-
-Voor deze MVP geldt:
+Als `commit_public` op `true` staat, commit de workflow alleen wijzigingen onder:
 
 ```text
-data/raw      niet automatisch committen, alleen artifact voor debugging
-data/public   wel bedoeld voor publicatie en GitHub Pages
-PDF's         niet opslaan in Git
+data/public/
 ```
 
-Deze keuze houdt de repository licht, terwijl de publieke website toch reproduceerbare data kan tonen.
+De workflow commit niet:
+
+```text
+data/raw/
+PDF-bestanden
+tijdelijke downloadbestanden
+```
 
 ## Waarom PDF's niet in Git worden opgeslagen
 
-PDF's kunnen groot zijn en Git bewaart historie. Daarom slaat de MVP geen PDF-bestanden structureel op in de repository. In latere fases kan de workflow PDF's tijdelijk downloaden om checksums, bestandsgrootte en tekstextractie te bepalen, maar de PDF zelf blijft dan buiten Git.
+PDF's kunnen groot zijn en Git bewaart historie. Daarom slaat de MVP geen PDF-bestanden structureel op in de repository. In latere fases kan de workflow PDF's tijdelijk downloaden om checksums, bestandsgrootte en tekstextractie te bepalen. De PDF zelf blijft dan buiten Git.
+
+## Architectuur en datamodel
+
+De architectuur blijft gericht op een generiek, forkbaar open-data-project. De kern is niet de website, maar de pipeline:
+
+```text
+bronconnector -> raw data -> normalisatie -> public exports -> viewer
+```
+
+Zie voor de details:
+
+```text
+docs/architecture.md
+docs/data-model.md
+docs/storage-policy.md
+```
 
 ## Een andere gemeente toevoegen
 
@@ -161,9 +173,4 @@ De actuele roadmap staat in:
 docs/roadmap.md
 ```
 
-De eerstvolgende stappen zijn:
-
-- volledige document-harvest met paginering
-- documentversies en checksums toevoegen
-- kwaliteitsrapportage toevoegen
-- later vergaderingen en agendapunten toevoegen
+De eerstvolgende technische stap is volledige document-harvesting met paginering. Daarna volgen documentversies, checksums, kwaliteitsrapportage en onderzoek naar meetings en agenda-items.
