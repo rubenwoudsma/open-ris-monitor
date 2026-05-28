@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from typing import Any
 
 import requests
@@ -8,12 +9,13 @@ import requests
 class GemeenteOplossingenConnector:
     """Connector for the GemeenteOplossingen RIS API.
 
-    The constructor intentionally accepts both positional and keyword usage:
+    The constructor accepts both positional and keyword usage:
 
         GemeenteOplossingenConnector("https://example/api/v2/")
         GemeenteOplossingenConnector(base_url="https://example/api/v2/")
 
-    This keeps the connector backwards-compatible with earlier tests and examples.
+    The optional request_delay_seconds setting is used by paginated harvests to
+    avoid sending many API requests back-to-back.
     """
 
     def __init__(
@@ -21,13 +23,18 @@ class GemeenteOplossingenConnector:
         base_url: str,
         *,
         timeout_seconds: int = 30,
+        request_delay_seconds: float = 0.0,
         session: requests.Session | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/") + "/"
         self.timeout_seconds = timeout_seconds
+        self.request_delay_seconds = max(0.0, float(request_delay_seconds))
         self.session = session or requests.Session()
 
     def _get_json(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        if self.request_delay_seconds:
+            time.sleep(self.request_delay_seconds)
+
         url = self.base_url + path.lstrip("/")
         response = self.session.get(url, params=params, timeout=self.timeout_seconds)
         response.raise_for_status()
