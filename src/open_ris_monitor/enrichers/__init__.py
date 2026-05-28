@@ -1,1 +1,1 @@
-"""Package placeholder."""
+"""Enrichment helpers for Open RIS Monitor."""

@@ -1,22 +1,16 @@
+"""GemeenteOplossingen connector."""
+
 from __future__ import annotations
 
 import time
 from typing import Any
+from urllib.parse import urljoin
 
 import requests
 
 
 class GemeenteOplossingenConnector:
-    """Connector for the GemeenteOplossingen RIS API.
-
-    The constructor intentionally accepts both positional and keyword usage:
-
-        GemeenteOplossingenConnector("https://example/api/v2/")
-        GemeenteOplossingenConnector(base_url="https://example/api/v2/")
-
-    It also accepts request_delay_seconds, which is used by the paginated
-    full-harvest flow to avoid hammering the RIS API with back-to-back requests.
-    """
+    """Connector for the GemeenteOplossingen RIS API v2."""
 
     def __init__(
         self,
@@ -25,19 +19,25 @@ class GemeenteOplossingenConnector:
         timeout_seconds: int = 30,
         request_delay_seconds: float = 0.0,
         session: requests.Session | None = None,
+        user_agent: str = "open-ris-monitor/0.1",
     ) -> None:
         self.base_url = base_url.rstrip("/") + "/"
         self.timeout_seconds = timeout_seconds
-        self.request_delay_seconds = max(0.0, float(request_delay_seconds))
+        self.request_delay_seconds = request_delay_seconds
         self.session = session or requests.Session()
+        self.session.headers.update(
+            {
+                "Accept": "application/json",
+                "User-Agent": user_agent,
+            }
+        )
 
-    def _sleep_if_needed(self) -> None:
+    def _sleep_between_requests(self) -> None:
         if self.request_delay_seconds > 0:
             time.sleep(self.request_delay_seconds)
 
     def _get_json(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
-        self._sleep_if_needed()
-        url = self.base_url + path.lstrip("/")
+        url = urljoin(self.base_url, path.lstrip("/"))
         response = self.session.get(url, params=params, timeout=self.timeout_seconds)
         response.raise_for_status()
         data = response.json()
@@ -101,14 +101,21 @@ class GemeenteOplossingenConnector:
             page = self.fetch_documents_page(limit=limit, offset=offset)
             if not page:
                 break
-
             documents.extend(page)
             offset += len(page)
 
             if len(page) < limit:
                 break
 
+            self._sleep_between_requests()
+
         return documents
 
     def build_document_download_url(self, document_id: int | str) -> str:
-        return f"{self.base_url}documents/{document_id}/download"
+        return urljoin(self.base_url, f"documents/{document_id}/download")
+
+    def download_document(self, document_id: int | str) -> bytes:
+        url = self.build_document_download_url(document_id)
+        response = self.session.get(url, timeout=self.timeout_seconds)
+        response.raise_for_status()
+        return response.content
