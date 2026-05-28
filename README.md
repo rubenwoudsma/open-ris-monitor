@@ -86,7 +86,7 @@ Voor GitHub Pages kan de site in eerste instantie worden bekeken via:
 https://<gebruikersnaam>.github.io/open-ris-monitor/site/
 ```
 
-Voor deze repository wordt dat naar verwachting:
+Voor deze repository is dat:
 
 ```text
 https://rubenwoudsma.github.io/open-ris-monitor/site/
