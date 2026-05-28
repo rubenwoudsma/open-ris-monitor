@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict, is_dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -10,8 +11,13 @@ from pydantic import BaseModel
 
 
 def _to_jsonable(record: Any) -> Any:
+    """Convert supported model objects to JSON-serializable structures."""
     if isinstance(record, BaseModel):
         return record.model_dump(mode="json")
+    if hasattr(record, "to_dict") and callable(record.to_dict):
+        return record.to_dict()
+    if is_dataclass(record) and not isinstance(record, type):
+        return asdict(record)
     return record
 
 

@@ -23,7 +23,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def load_municipality_config(slug: str) -> dict[str, Any]:
-    """Load the municipality configuration by slug."""
+    """Load a municipality configuration file."""
     config_path = REPO_ROOT / "config" / "municipalities" / f"{slug}.yml"
     if not config_path.exists():
         raise FileNotFoundError(f"Municipality config not found: {config_path}")
@@ -33,44 +33,32 @@ def load_municipality_config(slug: str) -> dict[str, Any]:
 
     if not isinstance(payload, dict):
         raise ValueError(f"Expected YAML object in {config_path}")
-
     return payload
 
 
-def parse_max_documents(value: int | str | None) -> int | None:
-    """Interpret max document input values.
-
-    GitHub Actions inputs are strings, while tests and direct Python calls may pass
-    integers. A value of 0, an empty string, or None means "no explicit cap".
-    """
-    if value is None:
-        return None
-
-    if isinstance(value, str):
-        value = value.strip()
-        if value == "":
-            return None
-        parsed = int(value)
-    else:
-        parsed = int(value)
-
-    if parsed == 0:
-        return None
-    if parsed < 0:
-        raise ValueError("max_documents must be 0 or greater")
-    return parsed
-
-
 def _as_float(value: Any, default: float = 0.0) -> float:
-    if value is None:
+    if value is None or value == "":
         return default
     return float(value)
 
 
+def parse_max_documents(value: Any) -> int | None:
+    """Parse max_documents from CLI or workflow input.
+
+    Empty, None and 0 mean: no explicit max_documents limit.
+    """
+    if value is None or value == "":
+        return None
+    parsed = int(value)
+    if parsed <= 0:
+        return None
+    return parsed
+
+
 def build_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
+    """Build the configured source connector."""
     source_system = config["source_system"]
     connector_name = source_system["connector"]
-
     if connector_name != "gemeenteoplossingen":
         raise ValueError(f"Unsupported connector: {connector_name}")
 
@@ -91,6 +79,7 @@ def run_harvest(
     enrich_checksums: bool,
     checksum_max_documents: int,
 ) -> HarvestRun:
+    """Run a metadata harvest and optional checksum enrichment."""
     started_at = datetime.now(timezone.utc)
     config = load_municipality_config(municipality)
     connector = build_connector(config)
@@ -123,7 +112,7 @@ def run_harvest(
 
     previous_versions_path = public_dir / "document_versions.jsonl"
     existing_versions = load_previous_versions(previous_versions_path)
-    new_versions = []
+    new_versions: list[Any] = []
     merged_versions: list[Any] = existing_versions
 
     if enrich_checksums:
@@ -137,20 +126,25 @@ def run_harvest(
         )
         merged_versions = merge_document_versions(existing_versions, new_versions)
 
+    finished_at = datetime.now(timezone.utc)
     harvest_run = HarvestRun(
         id=f"harvest-{municipality}-{started_at.strftime('%Y%m%dT%H%M%SZ')}",
         municipality_id=municipality_config["id"],
         source_system_id=source_system_config["id"],
-        started_at=started_at,
-        finished_at=datetime.now(timezone.utc),
+        started_at=started_at.isoformat(),
+        finished_at=finished_at.isoformat(),
         status="success",
+        mode=mode,
+        batch_size=batch_size if mode == "full" else None,
+        max_documents=max_documents if mode == "full" else None,
         documents_seen=len(raw_documents),
+        documents_normalized=len(documents),
         documents_committed=0,
         documents_downloaded_temporarily=len(new_versions),
     )
 
     write_json(raw_dir / "documents.json", raw_documents)
-    write_json(raw_dir / "harvest_run.json", harvest_run.model_dump(mode="json"))
+    write_json(raw_dir / "harvest_run.json", harvest_run)
 
     write_jsonl(public_dir / "documents.jsonl", documents)
     write_jsonl(public_dir / "harvest_runs.jsonl", [harvest_run])
@@ -181,16 +175,13 @@ def run_harvest(
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description="Run Open RIS Monitor harvest.")
     parser.add_argument("--municipality", default="huizen", help="Municipality config slug")
     parser.add_argument("--mode", choices=["latest", "full"], default="latest", help="Harvest mode")
     parser.add_argument("--limit", type=int, default=25, help="Number of latest documents to fetch")
     parser.add_argument("--batch-size", type=int, default=100, help="Batch size for full harvest")
-    parser.add_argument(
-        "--max-documents",
-        default=None,
-        help="Maximum documents for full harvest. Use 0 or omit for no explicit cap.",
-    )
+    parser.add_argument("--max-documents", default=None, help="Maximum documents for full harvest")
     parser.add_argument(
         "--enrich-checksums",
         action="store_true",
@@ -206,6 +197,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """CLI entrypoint."""
     args = parse_args()
     harvest_run = run_harvest(
         municipality=args.municipality,
