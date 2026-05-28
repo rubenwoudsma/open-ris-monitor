@@ -1,42 +1,24 @@
 # Storage policy
 
-## Doel
+## Public data
 
-De opslagstrategie houdt de repository licht, forkbaar en geschikt voor GitHub Pages.
+`data/public/` is the durable public data layer. It is intended to be committed and read by the GitHub Pages site.
 
-## data/raw
+Current public outputs:
 
-`data/raw/` bevat raw bronoutput. Deze data wordt tijdens de harvest aangemaakt en als artifact geupload.
+- `documents.jsonl`
+- `harvest_runs.jsonl`
+- `latest.json`
+- `document_versions.jsonl`, when checksum enrichment is enabled
 
-Beleid:
+## Raw data
 
-- Niet automatisch committen.
-- Alleen gebruiken voor inspectie en debugging.
-- Geen PDF-bestanden opslaan.
+`data/raw/` is used during the workflow and uploaded as a GitHub Actions artifact. It is not the primary public dataset and should not be automatically committed.
 
-## data/public
+## PDF files
 
-`data/public/` bevat genormaliseerde, herbruikbare exports.
+PDF files are not stored in Git. During checksum enrichment, PDFs may be downloaded temporarily inside GitHub Actions. The only durable output is metadata, such as SHA-256 checksums and downloaded file size.
 
-Beleid:
+## Checksums
 
-- Mag automatisch worden gecommit door GitHub Actions.
-- Wordt gebruikt door GitHub Pages.
-- Bevat lichte bestanden zoals JSONL en JSON.
-
-## PDF-bestanden
-
-PDF-bestanden worden niet opgeslagen in Git.
-
-Latere verrijking mag PDF's tijdelijk downloaden om metadata, checksums of tekst te extraheren. Daarna worden PDF's verwijderd uit de workflow-runner.
-
-## Full harvest
-
-Full harvests moeten gecontroleerd worden uitgevoerd met:
-
-```text
-batch_size
-max_documents
-```
-
-Zo voorkomen we onnodige belasting van de bron-API en onbeheersbare groei van de repository.
+Checksums are stored in `data/public/document_versions.jsonl`. A checksum observation is treated as a document version. If the same document receives a different SHA-256 hash in a later run, this is evidence that the source file changed.

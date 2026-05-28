@@ -20,21 +20,27 @@ on:
         required: true
         default: "25"
       batch_size:
-        description: Number of documents per API page in full mode
+        description: Batch size for full harvest
         required: true
         default: "100"
       max_documents:
-        description: Safety cap for full mode, 0 means no explicit cap
+        description: Maximum documents for full harvest, leave empty for all
+        required: false
+        default: ""
+      enrich_checksums:
+        description: Temporarily download selected PDFs and calculate SHA-256 checksums
         required: true
-        default: "500"
+        default: false
+        type: boolean
+      checksum_max_documents:
+        description: Maximum documents to checksum in this run
+        required: true
+        default: "50"
       commit_public:
-        description: Commit generated data/public output back to the selected branch
+        description: Commit generated data/public output back to the branch
         required: true
-        default: "false"
-        type: choice
-        options:
-          - "false"
-          - "true"
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -47,7 +53,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -59,14 +65,26 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e .
 
-      - name: Run metadata-only harvest and public export
+      - name: Run harvest and public export
         run: |
+          MAX_DOCUMENTS_ARG=""
+          if [ -n "${{ inputs.max_documents }}" ]; then
+            MAX_DOCUMENTS_ARG="--max-documents ${{ inputs.max_documents }}"
+          fi
+
+          CHECKSUM_ARG=""
+          if [ "${{ inputs.enrich_checksums }}" = "true" ]; then
+            CHECKSUM_ARG="--enrich-checksums"
+          fi
+
           python -m open_ris_monitor.pipeline.run \
             --municipality "${{ inputs.municipality }}" \
             --mode "${{ inputs.mode }}" \
             --limit "${{ inputs.limit }}" \
             --batch-size "${{ inputs.batch_size }}" \
-            --max-documents "${{ inputs.max_documents }}"
+            $MAX_DOCUMENTS_ARG \
+            $CHECKSUM_ARG \
+            --checksum-max-documents "${{ inputs.checksum_max_documents }}"
 
       - name: Show generated output
         run: |
@@ -94,14 +112,10 @@ jobs:
           retention-days: 7
 
       - name: Commit public export output
-        if: ${{ inputs.commit_public == 'true' }}
+        if: ${{ inputs.commit_public == true }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/public/
-          if git diff --cached --quiet; then
-            echo "No changes in data/public to commit."
-          else
-            git commit -m "Update public RIS data for ${{ inputs.municipality }}"
-            git push
-          fi
+          git diff --cached --quiet || git commit -m "Update public RIS data for ${{ inputs.municipality }}"
+          git push
