@@ -1,6 +1,6 @@
 # Roadmap
 
-Deze roadmap beschrijft de beoogde ontwikkeling van Open RIS Monitor. De volgorde is bewust incrementeel: eerst een werkende document-first keten, daarna pas verrijking, bredere RIS-structuur en linked data.
+Deze roadmap beschrijft de gefaseerde ontwikkeling van Open RIS Monitor. Het uitgangspunt is dat elke fase een werkende, kleine uitbreiding oplevert en dat de repository forkbaar blijft voor andere gemeenten.
 
 ## Afgerond
 
@@ -10,189 +10,117 @@ Status: afgerond.
 
 Resultaat:
 
-- GitHub Actions workflow voor handmatige harvest
-- Gemeente Huizen als eerste configuratie
-- GemeenteOplossingen connector voor het documents-endpoint
-- Raw output als artifact
-- Eerste succesvolle harvest met 25 documenten
+- Gemeente Huizen is als eerste configuratie toegevoegd.
+- De GemeenteOplossingen connector kan de laatste documenten ophalen.
+- De harvest draait via GitHub Actions.
+- Raw harvest-output wordt als artifact beschikbaar gemaakt.
 
-Belangrijke keuze:
-
-- eerst metadata-only werken
-- geen PDF-bestanden opslaan in Git
-
-### Milestone 2, canonieke modellen en public exports
+### Milestone 2, canonieke modellen en publieke exports
 
 Status: afgerond.
 
 Resultaat:
 
-- canoniek Document model
-- normalisatie van GemeenteOplossingen-documenten
-- export naar `data/public/documents.jsonl`
-- export naar `data/public/harvest_runs.jsonl`
-- export naar `data/public/latest.json`
-- public export artifact in GitHub Actions
-
-Belangrijke keuze:
-
-- frontend en hergebruikers lezen niet uit raw brondata, maar uit de canonieke public export
-
-## Huidige milestone
+- Raw GemeenteOplossingen-documenten worden genormaliseerd naar een canoniek documentmodel.
+- De pipeline maakt `documents.jsonl`, `harvest_runs.jsonl` en `latest.json`.
+- De public export wordt als artifact beschikbaar gemaakt.
 
 ### Milestone 3, publieke site
 
-Status: in uitvoering.
+Status: afgerond.
+
+Resultaat:
+
+- Een eenvoudige frameworkloze GitHub Pages-site is toegevoegd in `site/`.
+- De site leest `data/public/latest.json` en `data/public/documents.jsonl`.
+- De site toont harvestinformatie, documenttypen, zoekfunctie en documentlinks.
+
+## Actueel
+
+### Issue #9, automatisch bijwerken van `data/public` na harvest
 
 Doel:
 
-- bestaande `data/public` bestanden zichtbaar maken via een eenvoudige GitHub Pages-site
-- geen build-framework gebruiken
-- site direct laten lezen uit `data/public/latest.json` en `data/public/documents.jsonl`
+Na een handmatige harvest moet de workflow de gegenereerde public exports automatisch kunnen terugschrijven naar de repository, zodat GitHub Pages direct de nieuwste publieke data toont.
 
 Scope:
 
-- dashboard met laatste harvestinformatie
-- documenttabel
-- zoeken op titel, bestandsnaam en documenttype
-- filteren op documenttype
-- links naar publieke databestanden
-
-Niet in scope:
-
-- automatische commit van nieuwe harvest-output
-- PDF-downloads en tekstextractie
-- vergaderingen en agendapunten
-- eigen backend API
+- `data/public/` mag automatisch worden gecommit.
+- `data/raw/` blijft artifact-only.
+- PDF-bestanden worden niet gecommit.
+- De workflow moet ook zonder commit kunnen draaien voor testdoeleinden.
 
 Acceptatiecriteria:
 
-- `site/index.html` laadt zonder buildstap
-- site leest `data/public/latest.json`
-- site leest `data/public/documents.jsonl`
-- documenttabel toont de genormaliseerde documenten
-- eenvoudige zoekfunctie werkt client-side
-- README beschrijft hoe de site gebruikt kan worden
+- De harvest-workflow heeft een input `commit_public`.
+- Bij `commit_public: true` commit de workflow alleen wijzigingen onder `data/public/`.
+- Bij `commit_public: false` worden alleen artifacts gemaakt.
+- Als er geen wijzigingen zijn, maakt de workflow geen lege commit.
+- README beschrijft het publicatiebeleid.
 
-## Volgende milestones
+## Volgende issues
 
-### Milestone 4, public export persistentie
-
-Gekoppeld aan issue #9.
+### Issue #11, volledige document-harvest met paginering
 
 Doel:
 
-- bepalen hoe gegenereerde public exports structureel beschikbaar blijven
-- voorkomen dat raw data en grote bestanden onnodig in Git groeien
+De harvester moet meer dan de laatste 25 documenten kunnen ophalen door het GemeenteOplossingen `documents` endpoint in batches te benaderen.
 
-Mogelijke aanpakken:
+Voorlopige richting:
 
-1. `data/public` automatisch committen bij een succesvolle harvest
-2. alleen committen wanneer de inhoud gewijzigd is
-3. public exports publiceren via GitHub Pages zonder raw data te committen
-4. raw data artifact-only houden
+- `totalCount` ophalen.
+- `limit` en `offset` gebruiken.
+- `fetch_all_documents` toevoegen aan de connector.
+- Duplicaten voorkomen op basis van `source_id`.
+- Een configureerbare limiet behouden, zodat test-runs klein kunnen blijven.
 
-Aanbevolen richting:
-
-- `data/public` mag structureel gepubliceerd worden
-- `data/raw` blijft in principe artifact-only
-- automatische commits pas toevoegen nadat de website goed werkt
-
-### Milestone 5, documentkwaliteit en versies
+### Issue #12, document_versions en checksum metadata
 
 Doel:
 
-- documentversies bijhouden
-- checksums berekenen
-- bestandsgrootte monitoren
-- kwaliteitsissues vastleggen
+Documentwijzigingen detecteerbaar maken zonder PDF's structureel in Git op te slaan.
 
-Mogelijke outputs:
+Voorlopige richting:
 
-```text
-data/public/document_versions.jsonl
-data/public/quality_issues.jsonl
-```
+- PDF's tijdelijk downloaden tijdens de workflow.
+- SHA256 en bestandsgrootte vastleggen.
+- `document_versions.jsonl` toevoegen.
+- PDF's niet committen.
 
-Voorbeelden van kwaliteitsissues:
+### Issue #13, kwaliteitsrapportage
 
-- generieke bestandsnaam
-- ontbrekende titel
-- ontbrekend documenttype
-- extreem groot bestand
+Doel:
+
+Datakwaliteit zichtbaar maken voor inwoners, journalisten, gemeente en hergebruikers.
+
+Voorlopige signalen:
+
+- generieke bestandsnamen
 - ontbrekende publicatiedatum
+- ontbrekend documenttype
+- zeer grote bestanden
+- mogelijk vertrouwelijke documenten
+- dode downloadlinks
 
-### Milestone 6, tijdelijke PDF-verwerking
-
-Doel:
-
-- PDF's tijdelijk downloaden tijdens de harvest
-- tekst extraheren waar mogelijk
-- PDF zelf niet committen
-
-Mogelijke outputs:
-
-```text
-data/public/document_text_index.jsonl
-data/public/text/<document-id>.txt
-```
-
-Besluitpunt:
-
-- tekstextracten wel of niet structureel opslaan in Git
-
-### Milestone 7, vergaderingen en agendapunten
+### Issue #14, meetings en agenda-items endpoints onderzoeken
 
 Doel:
 
-- RIS-structuur uitbreiden van document-first naar volledige context
-- vergaderingen, agendapunten en documentrelaties ophalen
-- canonieke modellen voor Meeting en AgendaItem activeren
+Onderzoeken hoe GemeenteOplossingen vergaderingen en agendapunten ontsluit, zodat documenten later aan de juiste context kunnen worden gekoppeld.
 
-Gewenste relaties:
+Voorlopige richting:
 
-```text
-Meeting -> AgendaItem -> Document
-Meeting -> Document
-AgendaItem -> Decision
-```
+- API-endpoints inventariseren.
+- Relaties tussen documenten, objectId, vergaderingen en agendapunten onderzoeken.
+- Canonieke modellen uitbreiden met `Meeting` en `AgendaItem`.
 
-### Milestone 8, forkbaarheid voor andere gemeenten
+## Latere richting
 
-Doel:
+Na deze issues kan het project doorgroeien naar:
 
-- documenteren hoe een andere gemeente toegevoegd kan worden
-- voorbeeldconfiguraties verbeteren
-- connector-contract aanscherpen
-- tests toevoegen met fixturedata
-
-Output:
-
-```text
-docs/adding-a-municipality.md
-config/municipalities/example.yml
-```
-
-### Milestone 9, linked data en open standaarden
-
-Doel:
-
-- JSON-LD export toevoegen
-- aansluiten op relevante begrippen uit Open Raadsinformatie waar praktisch mogelijk
-- stabiele URI's voor documenten, vergaderingen en agendapunten
-
-Mogelijke outputs:
-
-```text
-data/public/jsonld/documents.jsonld
-data/public/jsonld/meetings.jsonld
-```
-
-## Principes
-
-1. Houd de pipeline belangrijker dan de viewer.
-2. Raw brondata is nuttig, maar public exports vormen het contract.
-3. Geen PDF's in Git zolang daar geen expliciet opslagbeleid voor is.
-4. Maak elke uitbreiding eerst werkend voor Huizen, daarna pas generiek.
-5. Documenteer aannames en beperkingen in de repo.
-6. Houd het project forkbaar voor andere gemeenten.
+- tekstextractie uit PDF's
+- linked data of JSON-LD export
+- dossierclustering
+- ondersteuning voor meerdere gemeenten
+- ondersteuning voor meerdere RIS-leveranciers
+- automatische dagelijkse harvests
