@@ -104,7 +104,7 @@ def run_harvest(
     write_json(raw_dir / "documents.json", raw_documents)
     write_json(raw_dir / "harvest_run.json", harvest_run.to_dict())
 
-    write_jsonl(public_dir / "documents.jsonl", [document.to_dict() for document in documents])
+    write_jsonl(public_dir / "documents.jsonl", documents)
     write_jsonl(public_dir / "harvest_runs.jsonl", [harvest_run.to_dict()])
     write_json(
         public_dir / "latest.json",
