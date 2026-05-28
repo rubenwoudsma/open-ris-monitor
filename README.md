@@ -16,6 +16,7 @@ Wat werkt nu:
 - normalisatie naar een canoniek documentmodel
 - public export naar JSONL en JSON
 - eenvoudige GitHub Pages-site in `site/`
+- optioneel automatisch committen van `data/public` na een handmatige harvest
 
 Wat bewust nog niet in scope zit:
 
@@ -24,7 +25,7 @@ Wat bewust nog niet in scope zit:
 - checksums en documentversies
 - vergaderingen en agendapunten
 - linked data export
-- automatische commit van gegenereerde public exports
+- automatische commit van `data/raw`
 
 ## Projectopzet
 
@@ -45,13 +46,14 @@ open-ris-monitor/
 ```text
 GemeenteOplossingen RIS API
   -> GitHub Actions harvest
-  -> data/raw/latest
+  -> data/raw/latest, artifact-only
   -> normalisatie naar canoniek model
   -> data/public
+  -> optionele commit van data/public
   -> site/index.html
 ```
 
-In de huidige MVP wordt `data/raw/latest` vooral als artifact beschikbaar gemaakt. `data/public` bevat de bestanden die bedoeld zijn voor hergebruik en voor de website.
+In de huidige MVP wordt `data/raw/latest` vooral als artifact beschikbaar gemaakt. `data/public` bevat de bestanden die bedoeld zijn voor hergebruik en voor de website. Via de harvest-workflow kan `data/public` automatisch terug naar de actieve branch worden gecommit.
 
 ## Publieke databestanden
 
@@ -80,13 +82,7 @@ data/public/latest.json
 data/public/documents.jsonl
 ```
 
-Voor GitHub Pages kan de site in eerste instantie worden bekeken via:
-
-```text
-https://<gebruikersnaam>.github.io/open-ris-monitor/site/
-```
-
-Voor deze repository is dat:
+Voor deze repository is de site beschikbaar via:
 
 ```text
 https://rubenwoudsma.github.io/open-ris-monitor/site/
@@ -107,6 +103,7 @@ Gebruik bijvoorbeeld:
 ```text
 municipality: huizen
 limit: 25
+commit_public: true
 ```
 
 De workflow maakt twee artifacts:
@@ -115,6 +112,22 @@ De workflow maakt twee artifacts:
 raw-harvest-huizen
 public-export-huizen
 ```
+
+Als `commit_public` op `true` staat, commit de workflow alleen de gegenereerde bestanden onder `data/public/` terug naar de actieve branch. `data/raw/` wordt niet automatisch gecommit en blijft artifact-only.
+
+Voor testen op een featurebranch kun je `commit_public` tijdelijk op `false` zetten. De artifacts worden dan nog steeds gemaakt, maar de branch wordt niet automatisch aangepast.
+
+## Publicatiebeleid voor data
+
+Voor deze MVP geldt:
+
+```text
+data/raw      niet automatisch committen, alleen artifact voor debugging
+data/public   wel bedoeld voor publicatie en GitHub Pages
+PDF's         niet opslaan in Git
+```
+
+Deze keuze houdt de repository licht, terwijl de publieke website toch reproduceerbare data kan tonen.
 
 ## Waarom PDF's niet in Git worden opgeslagen
 
@@ -150,7 +163,7 @@ docs/roadmap.md
 
 De eerstvolgende stappen zijn:
 
-- GitHub Pages-site afronden op basis van `data/public`
-- beleid bepalen voor het automatisch bijwerken van `data/public`
+- volledige document-harvest met paginering
 - documentversies en checksums toevoegen
+- kwaliteitsrapportage toevoegen
 - later vergaderingen en agendapunten toevoegen
