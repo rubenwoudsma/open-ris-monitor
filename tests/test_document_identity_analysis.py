@@ -7,40 +7,43 @@ from open_ris_monitor.analysis.document_identity import (
 )
 
 
-def test_analyze_document_identity_counts_duplicates() -> None:
+def test_analyze_document_identity_detects_unique_composite_keys() -> None:
     documents = [
-        {"id": "huizen-document-1", "source_id": "1", "source_object_id": "10", "document_type": "Agenda"},
-        {"id": "huizen-document-2", "source_id": "2", "source_object_id": "20", "document_type": "Bijlage"},
-        {"id": "huizen-document-3", "source_id": "2", "source_object_id": "30", "document_type": "Bijlage"},
+        {"id": "huizen-document-1", "source_id": "1", "source_object_id": "10"},
+        {"id": "huizen-document-2", "source_id": "2", "source_object_id": "20"},
     ]
 
     report = analyze_document_identity(documents)
 
-    assert report["documents_total"] == 3
-    assert report["source_id"]["unique_count"] == 2
-    assert report["source_id"]["duplicate_count"] == 2
-    assert report["source_object_id"]["unique_count"] == 3
+    assert report["documents_total"] == 2
+    assert report["source_id"]["duplicate_count"] == 0
+    assert report["source_object_id"]["duplicate_count"] == 0
+    assert report["composite_source_key"]["duplicate_count"] == 0
+    assert report["recommended_identity_key"] == "municipality_id + source_system_id + source_id + source_object_id"
 
 
-def test_document_type_analysis_proposes_compact_categories() -> None:
+def test_normalize_document_type_maps_known_source_values() -> None:
+    assert normalize_document_type("Raadsvoorstel") == "proposal"
+    assert normalize_document_type("Bijlage") == "attachment"
+    assert normalize_document_type("Document ter kennisname (Inkomend)") == "notice"
+    assert normalize_document_type("Uitnodigingen (Intern)") == "invitation"
+    assert normalize_document_type("Rapportage (Intern)") == "report"
+    assert normalize_document_type("Toezeggingenlijst (Intern)") == "commitment"
+    assert normalize_document_type("Verzoek om informatie (Inkomend)") == "request"
+    assert normalize_document_type("Zienswijze (Inkomend)") == "objection_or_response"
+    assert normalize_document_type("Onbekend") == "unknown"
+
+
+def test_analyze_document_types_reports_unknown_count() -> None:
     documents = [
-        {"document_type": "Agenda"},
-        {"document_type": "Bijlage"},
-        {"document_type": "Bijlage"},
         {"document_type": "Raadsvoorstel"},
-        {"document_type": None},
+        {"document_type": "Document ter kennisname (Inkomend)"},
+        {"document_type": "Onbekend"},
     ]
 
     report = analyze_document_types(documents)
 
-    assert report["documents_total"] == 5
-    assert report["source_document_type_count"] == 4
-    assert report["mapping"]["Bijlage"]["normalized_document_type"] == "attachment"
-    assert report["mapping"]["Raadsvoorstel"]["normalized_document_type"] == "proposal"
-
-
-def test_normalize_document_type_handles_known_values() -> None:
-    assert normalize_document_type("Mededelingen") == "announcement"
-    assert normalize_document_type("Ingekomen stuk") == "incoming_document"
-    assert normalize_document_type("Resumés") == "minutes_or_summary"
-    assert normalize_document_type("") == "unknown"
+    assert report["documents_total"] == 3
+    assert report["unknown_document_type_count"] == 1
+    assert report["unknown_document_type_percentage"] == 33.33
+    assert report["mapping"]["Document ter kennisname (Inkomend)"]["normalized_document_type"] == "notice"

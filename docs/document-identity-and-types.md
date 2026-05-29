@@ -1,75 +1,73 @@
-# Documentidentiteit en documenttypen
+# Document identity and document type analysis
 
-Deze notitie hoort bij issue #22. Het doel is om de betrouwbaarheid van documentidentiteit te onderzoeken en tegelijk inzicht te krijgen in de documenttypen die het RIS levert.
+This project keeps the original GemeenteOplossingen source fields, but adds analysis reports that help decide which identifiers and document categories are safe to use in the canonical model and public viewer.
 
-## Waarom dit belangrijk is
+## Identity analysis
 
-De Open RIS Monitor gebruikt documenten als eerste kernobject. Voor versiebeheer, checksums, kwaliteitsrapportage en latere koppelingen met vergaderingen en agendapunten moet duidelijk zijn welke identifier stabiel genoeg is.
-
-De bron levert onder meer:
-
-- `source_id`, afkomstig uit het RIS-veld `id`
-- `source_object_id`, afkomstig uit het RIS-veld `objectId`
-- `document_type`, afkomstig uit `documentTypeLabel`
-
-## Analyse-output
-
-De analyse publiceert twee rapporten:
+The identity report is written to:
 
 ```text
- data/public/quality/id_stability.json
- data/public/quality/document_types.json
+data/public/quality/id_stability.json
 ```
 
-Deze rapporten worden gemaakt op basis van `data/public/documents.jsonl`.
+It checks:
 
-## Documentidentiteit
+- canonical document ids
+- source ids
+- source object ids
+- composite source keys, `source_id + source_object_id`
+- duplicate and missing values
 
-Het rapport `id_stability.json` bevat onder meer:
-
-- totaal aantal documenten
-- aantal unieke canonieke ids
-- aantal unieke `source_id` waarden
-- aantal unieke `source_object_id` waarden
-- ontbrekende waarden
-- dubbele waarden
-- aanbevolen identiteitssleutel
-
-Voorlopige voorkeursrichting:
+The current recommendation is to use the following traceable identity basis for versioning:
 
 ```text
 municipality_id + source_system_id + source_id + source_object_id
 ```
 
-Deze keuze is voorzichtig, omdat nog onderzocht moet worden of `id` of `objectId` stabieler is over meerdere harvests.
+This is still a snapshot analysis. True stability requires comparing several harvests over time.
 
-## Documenttypen
+## Document type analysis
 
-Het rapport `document_types.json` bevat:
-
-- alle bronwaarden uit `document_type`
-- aantallen per bronwaarde
-- voorgestelde compacte categorie per bronwaarde
-- aantallen per compacte categorie
-
-Voorbeeld:
+The document type report is written to:
 
 ```text
-Raadsvoorstel -> proposal
-Bijlage -> attachment
-Agenda -> agenda
-Mededelingen -> announcement
-Ingekomen stuk -> incoming_document
-Overig -> other
+data/public/quality/document_types.json
 ```
 
-De originele bronwaarde blijft altijd behouden. Een latere milestone kan een extra veld toevoegen aan het canonieke Document-model:
+The report keeps the original RIS document type value and proposes a compact analytical category.
+
+The source value remains important for traceability:
 
 ```text
-source_document_type
-normalized_document_type
+source document type: Document ter kennisname (Inkomend)
 ```
 
-## Bewuste beperking
+The compact value is useful for filters and dashboards:
 
-Deze analyse kijkt naar de actuele public export. Echte stabiliteit over tijd kan pas worden vastgesteld door meerdere harvests naast elkaar te vergelijken.
+```text
+normalized document type: notice
+```
+
+## Mapping principle
+
+The mapping should be broad enough for users and future analysis, but not so broad that everything becomes `other` or `unknown`.
+
+`unknown` should only be used when the source value is missing or explicitly says `Onbekend`.
+
+Examples:
+
+| Source label | Compact category |
+|---|---|
+| Raadsvoorstel | proposal |
+| Collegevoorstel (Intern) | proposal |
+| Bijlage | attachment |
+| Document ter kennisname (Inkomend) | notice |
+| Kennisgeving (Inkomend) | notice |
+| Rapportage (Intern) | report |
+| Toezeggingenlijst (Intern) | commitment |
+| Uitnodigingen (Intern) | invitation |
+| Verzoek om informatie (Inkomend) | request |
+| Zienswijze (Inkomend) | objection_or_response |
+| Onbekend | unknown |
+
+This is still an analysis layer. Adding `normalized_document_type` to the canonical `Document` model should be handled in a separate issue after reviewing the report output.
