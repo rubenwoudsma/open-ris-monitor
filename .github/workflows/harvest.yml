@@ -86,6 +86,11 @@ jobs:
             $CHECKSUM_ARG \
             --checksum-max-documents "${{ inputs.checksum_max_documents }}"
 
+      - name: Generate public quality reports
+        run: |
+          python -m open_ris_monitor.analysis.generate_public_reports \
+            --public-dir data/public
+
       - name: Show generated output
         run: |
           echo "Raw output:"

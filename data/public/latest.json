@@ -1,17 +1,19 @@
 {
-  "checksums_enabled": true,
+  "checksums_enabled": false,
   "documents_normalized": 1000,
   "documents_seen": 1000,
-  "documents_versioned": 25,
-  "generated_at": "2026-05-28T15:17:55.752554+00:00",
-  "harvest_run_id": "harvest-huizen-20260528T151736Z",
+  "documents_versioned": 0,
+  "generated_at": "2026-05-29T11:04:10.718968+00:00",
+  "harvest_run_id": "harvest-huizen-20260529T110402Z",
   "mode": "full",
   "municipality": "huizen",
   "municipality_id": "gm0406",
   "outputs": {
-    "document_versions": "document_versions.jsonl",
+    "document_types": "quality/document_types.json",
+    "document_versions": null,
     "documents": "documents.jsonl",
-    "harvest_runs": "harvest_runs.jsonl"
+    "harvest_runs": "harvest_runs.jsonl",
+    "id_stability": "quality/id_stability.json"
   },
   "source_system_id": "huizen-gemeenteoplossingen"
 }
