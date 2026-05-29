@@ -8,90 +8,92 @@
   </head>
   <body>
     <header class="site-header">
-      <div>
-        <p class="eyebrow">Open RIS Monitor</p>
-        <h1>Raadsinformatie Huizen</h1>
-        <p class="lead">
-          Een open, reproduceerbare viewer op publieke RIS-data, opgebouwd uit canonieke JSONL-exportbestanden.
-        </p>
-      </div>
-      <nav class="links" aria-label="Databestanden en projectlinks">
+      <p class="eyebrow">Open RIS Monitor</p>
+      <h1>Raadsinformatie Huizen</h1>
+      <p>
+        Een open, reproduceerbare viewer op publieke RIS-data, opgebouwd uit
+        canonieke JSONL-exportbestanden.
+      </p>
+      <nav class="link-row" aria-label="Databestanden">
         <a href="../data/public/latest.json">latest.json</a>
         <a href="../data/public/documents.jsonl">documents.jsonl</a>
-        <a href="https://github.com/rubenwoudsma/open-ris-monitor">GitHub</a>
+        <a href="../data/public/document_versions.jsonl">document_versions.jsonl</a>
+        <a href="../data/public/quality/document_types.json">documenttypenrapport</a>
+        <a href="../README.md">README</a>
       </nav>
     </header>
 
     <main>
-      <section class="panel" aria-labelledby="latest-export-title">
-        <div class="section-heading">
-          <h2 id="latest-export-title">Laatste export</h2>
-          <p id="status-message">Data wordt geladen...</p>
-        </div>
+      <section class="panel" aria-labelledby="latest-title">
+        <h2 id="latest-title">Laatste export</h2>
+        <p id="status-message">Data wordt geladen...</p>
+        <dl class="summary-grid">
+          <div>
+            <dt>Gemeente</dt>
+            <dd id="municipality">-</dd>
+          </div>
+          <div>
+            <dt>Documenten gezien</dt>
+            <dd id="documents-seen">-</dd>
+          </div>
+          <div>
+            <dt>Genormaliseerd</dt>
+            <dd id="documents-normalized">-</dd>
+          </div>
+          <div>
+            <dt>Gegenereerd</dt>
+            <dd id="generated-at">-</dd>
+          </div>
+        </dl>
+      </section>
 
-        <div class="summary-grid" aria-label="Samenvatting laatste export">
-          <article class="summary-card">
-            <span>Gemeente</span>
-            <strong id="municipality">-</strong>
-          </article>
-          <article class="summary-card">
-            <span>Documenten gezien</span>
-            <strong id="documents-seen">-</strong>
-          </article>
-          <article class="summary-card">
-            <span>Genormaliseerd</span>
-            <strong id="documents-normalized">-</strong>
-          </article>
-          <article class="summary-card">
-            <span>Gegenereerd</span>
-            <strong id="generated-at">-</strong>
-          </article>
+      <section class="panel" aria-labelledby="filters-title">
+        <h2 id="filters-title">Zoeken en filteren</h2>
+        <div class="controls">
+          <label>
+            Zoeken
+            <input id="search-input" type="search" placeholder="Zoek op titel, bestand, type of id" />
+          </label>
+          <label>
+            Compact documenttype
+            <select id="type-filter">
+              <option value="">Alle compacte documenttypen</option>
+            </select>
+          </label>
+          <label>
+            Sorteer
+            <select id="sort-select">
+              <option value="date-desc">Datum, nieuwste eerst</option>
+              <option value="date-asc">Datum, oudste eerst</option>
+              <option value="title-asc">Titel, A-Z</option>
+              <option value="type-asc">Compact type, A-Z</option>
+              <option value="source-type-asc">Bron type, A-Z</option>
+              <option value="size-desc">Grootte, groot naar klein</option>
+              <option value="size-asc">Grootte, klein naar groot</option>
+            </select>
+          </label>
+          <label>
+            Per pagina
+            <select id="page-size-select">
+              <option value="25">25</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+            </select>
+          </label>
         </div>
       </section>
 
       <section class="panel" aria-labelledby="documents-title">
-        <div class="section-heading document-heading">
+        <div class="section-heading">
           <div>
             <h2 id="documents-title">Documenten</h2>
             <p id="result-count">-</p>
           </div>
-          <div class="controls" aria-label="Zoeken, filteren en sorteren">
-            <label>
-              <span>Zoeken</span>
-              <input id="search-input" type="search" placeholder="Zoek op titel, bestand of type" />
-            </label>
-            <label>
-              <span>Documenttype</span>
-              <select id="type-filter">
-                <option value="">Alle documenttypen</option>
-              </select>
-            </label>
-            <label>
-              <span>Sorteren</span>
-              <select id="sort-select">
-                <option value="date-desc">Nieuwste eerst</option>
-                <option value="date-asc">Oudste eerst</option>
-                <option value="title-asc">Titel A-Z</option>
-                <option value="type-asc">Type A-Z</option>
-                <option value="size-desc">Grootste bestanden</option>
-                <option value="size-asc">Kleinste bestanden</option>
-              </select>
-            </label>
-            <label>
-              <span>Per pagina</span>
-              <select id="page-size-select">
-                <option value="25">25</option>
-                <option value="50" selected>50</option>
-                <option value="100">100</option>
-              </select>
-            </label>
+          <div class="pagination">
+            <button id="previous-page-top" type="button">Vorige</button>
+            <span id="page-info-top">Pagina 1 van 1</span>
+            <button id="next-page-top" type="button">Volgende</button>
           </div>
-        </div>
-
-        <div class="pagination-bar" aria-label="Paginering bovenaan">
-          <button id="previous-page-top" type="button">Vorige</button>
-          <span id="page-info-top">Pagina -</span>
-          <button id="next-page-top" type="button">Volgende</button>
         </div>
 
         <div class="table-scroll" role="region" aria-label="Documenttabel" tabindex="0">
@@ -99,7 +101,8 @@
             <thead>
               <tr>
                 <th>Datum</th>
-                <th>Type</th>
+                <th>Compact type</th>
+                <th>Bron type</th>
                 <th>Titel</th>
                 <th>Bestand</th>
                 <th>Grootte</th>
@@ -108,15 +111,15 @@
             </thead>
             <tbody id="documents-table-body">
               <tr>
-                <td colspan="6">Documenten worden geladen...</td>
+                <td colspan="7">Documenten worden geladen...</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div class="pagination-bar" aria-label="Paginering onderaan">
+        <div class="pagination pagination-bottom">
           <button id="previous-page-bottom" type="button">Vorige</button>
-          <span id="page-info-bottom">Pagina -</span>
+          <span id="page-info-bottom">Pagina 1 van 1</span>
           <button id="next-page-bottom" type="button">Volgende</button>
         </div>
       </section>
@@ -124,13 +127,16 @@
       <section class="panel muted" aria-labelledby="about-title">
         <h2 id="about-title">Over deze versie</h2>
         <p>
-          Deze website gebruikt de publieke exportbestanden in <code>data/public</code>. De ruwe RIS-data blijft bedoeld voor analyse en debugging. PDF-bestanden worden in deze fase niet in de repository opgeslagen.
+          Deze website gebruikt de publieke exportbestanden in <code>data/public</code>.
+          De originele RIS-documenttypen blijven bewaard als bronwaarde. Daarnaast
+          toont de viewer compacte genormaliseerde documenttypen voor betere filtering
+          en analyse.
         </p>
       </section>
     </main>
 
     <footer>
-      Open RIS Monitor, metadata-only MVP. Brondata blijft afkomstig uit het Raadsinformatiesysteem van gemeente Huizen.
+      <p>Open RIS Monitor, metadata-only MVP. Brondata blijft afkomstig uit het Raadsinformatiesysteem van gemeente Huizen.</p>
     </footer>
 
     <script src="assets/app.js"></script>

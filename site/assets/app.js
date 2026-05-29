@@ -33,7 +33,6 @@ function requireElements() {
   const missing = Object.entries(elements)
     .filter(([, element]) => !element)
     .map(([name]) => name);
-
   if (missing.length > 0) {
     throw new Error(`HTML mist verwachte elementen: ${missing.join(", ")}`);
   }
@@ -112,6 +111,14 @@ function getDocumentDate(documentRecord) {
   );
 }
 
+function getCompactType(documentRecord) {
+  return documentRecord.normalized_document_type || "unknown";
+}
+
+function getCompactTypeLabel(documentRecord) {
+  return documentRecord.normalized_document_type_label || "Onbekend";
+}
+
 function renderSummary() {
   const latest = state.latest || {};
   elements.municipality.textContent = latest.municipality || latest.municipality_id || "-";
@@ -123,12 +130,18 @@ function renderSummary() {
 
 function renderTypeFilter() {
   const selected = elements.typeFilter.value;
-  const types = [...new Set(state.documents.map((item) => item.document_type).filter(Boolean))].sort();
-  elements.typeFilter.innerHTML = '<option value="">Alle documenttypen</option>';
-  for (const type of types) {
+  const typeMap = new Map();
+  for (const item of state.documents) {
+    const value = getCompactType(item);
+    const label = getCompactTypeLabel(item);
+    typeMap.set(value, label);
+  }
+  const types = [...typeMap.entries()].sort((a, b) => a[1].localeCompare(b[1], "nl"));
+  elements.typeFilter.innerHTML = '<option value="">Alle compacte documenttypen</option>';
+  for (const [value, label] of types) {
     const option = document.createElement("option");
-    option.value = type;
-    option.textContent = type;
+    option.value = value;
+    option.textContent = label;
     elements.typeFilter.appendChild(option);
   }
   elements.typeFilter.value = selected;
@@ -143,6 +156,9 @@ function sortDocuments(documents) {
       return String(a.title || a.description || "").localeCompare(String(b.title || b.description || ""), "nl");
     }
     if (state.sortMode === "type-asc") {
+      return String(getCompactTypeLabel(a)).localeCompare(String(getCompactTypeLabel(b)), "nl");
+    }
+    if (state.sortMode === "source-type-asc") {
       return String(a.document_type || "").localeCompare(String(b.document_type || ""), "nl");
     }
     if (state.sortMode === "size-desc") {
@@ -159,10 +175,8 @@ function updatePagination(totalPages) {
   const pageText = `Pagina ${state.currentPage} van ${totalPages}`;
   elements.pageInfoTop.textContent = pageText;
   elements.pageInfoBottom.textContent = pageText;
-
   const previousDisabled = state.currentPage <= 1;
   const nextDisabled = state.currentPage >= totalPages;
-
   elements.previousTop.disabled = previousDisabled;
   elements.previousBottom.disabled = previousDisabled;
   elements.nextTop.disabled = nextDisabled;
@@ -173,7 +187,6 @@ function renderDocuments() {
   const sorted = sortDocuments(state.filteredDocuments);
   const totalPages = Math.max(1, Math.ceil(sorted.length / state.pageSize));
   state.currentPage = Math.min(Math.max(1, state.currentPage), totalPages);
-
   const start = (state.currentPage - 1) * state.pageSize;
   const pageDocuments = sorted.slice(start, start + state.pageSize);
 
@@ -181,7 +194,7 @@ function renderDocuments() {
   updatePagination(totalPages);
 
   if (pageDocuments.length === 0) {
-    elements.tableBody.innerHTML = '<tr><td colspan="6">Geen documenten gevonden.</td></tr>';
+    elements.tableBody.innerHTML = '<tr><td colspan="7">Geen documenten gevonden.</td></tr>';
     return;
   }
 
@@ -194,9 +207,10 @@ function renderDocuments() {
       return `
         <tr>
           <td>${escapeHtml(formatDate(getDocumentDate(documentRecord)))}</td>
+          <td>${escapeHtml(getCompactTypeLabel(documentRecord))}</td>
           <td>${escapeHtml(documentRecord.document_type || "Onbekend")}</td>
-          <td class="wrap-cell">${escapeHtml(documentRecord.title || documentRecord.description || "Geen titel")}</td>
-          <td class="wrap-cell filename-cell">${escapeHtml(documentRecord.filename || "-")}</td>
+          <td class="wrap">${escapeHtml(documentRecord.title || documentRecord.description || "Geen titel")}</td>
+          <td class="wrap">${escapeHtml(documentRecord.filename || "-")}</td>
           <td>${escapeHtml(formatBytes(documentRecord.file_size_bytes))}</td>
           <td>${downloadLink}</td>
         </tr>
@@ -208,15 +222,17 @@ function renderDocuments() {
 function applyFilters() {
   const query = elements.searchInput.value.trim().toLowerCase();
   const type = elements.typeFilter.value;
-
   state.filteredDocuments = state.documents.filter((documentRecord) => {
-    const matchesType = !type || documentRecord.document_type === type;
+    const matchesType = !type || getCompactType(documentRecord) === type;
     const haystack = [
       documentRecord.title,
       documentRecord.description,
       documentRecord.filename,
       documentRecord.document_type,
+      documentRecord.normalized_document_type,
+      documentRecord.normalized_document_type_label,
       documentRecord.source_id,
+      documentRecord.source_object_id,
     ]
       .filter(Boolean)
       .join(" ")
@@ -224,7 +240,6 @@ function applyFilters() {
     const matchesQuery = !query || haystack.includes(query);
     return matchesType && matchesQuery;
   });
-
   state.currentPage = 1;
   renderDocuments();
 }
@@ -260,7 +275,6 @@ async function init() {
     const documentsPath = state.latest.outputs?.documents || "documents.jsonl";
     state.documents = await fetchJsonl(`${DATA_BASE}/${documentsPath}`);
     state.filteredDocuments = state.documents;
-
     renderSummary();
     renderTypeFilter();
     renderDocuments();
@@ -271,7 +285,7 @@ async function init() {
       elements.statusMessage.textContent = "De publieke data kon niet worden geladen.";
     }
     if (elements.tableBody) {
-      elements.tableBody.innerHTML = `<tr><td colspan="6">${escapeHtml(error.message)}</td></tr>`;
+      elements.tableBody.innerHTML = `<tr><td colspan="7">${escapeHtml(error.message)}</td></tr>`;
     }
   }
 }
