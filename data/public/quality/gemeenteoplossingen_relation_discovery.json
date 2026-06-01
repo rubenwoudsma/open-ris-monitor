@@ -1,0 +1,323 @@
+{
+  "generated_at": "2026-06-01T12:23:36.504669+00:00",
+  "municipality": "huizen",
+  "base_url": "https://ris.gemeenteraadhuizen.nl/api/v2/",
+  "meeting_limit": 3,
+  "item_limit": 5,
+  "summary": {
+    "sampled_meeting_ids": [
+      1223,
+      1212,
+      1202
+    ],
+    "sampled_meeting_item_ids": [],
+    "working_path_count": 13,
+    "working_paths": [
+      "meetings",
+      "dmus",
+      "events",
+      "meetingsessions",
+      "meetings/1223",
+      "meetings/1223/documents",
+      "meetings/1223/meetingitems",
+      "meetings/1212",
+      "meetings/1212/documents",
+      "meetings/1212/meetingitems",
+      "meetings/1202",
+      "meetings/1202/documents",
+      "meetings/1202/meetingitems"
+    ],
+    "meeting_items_discovered": 0
+  },
+  "probes": [
+    {
+      "path": "meetings",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings?limit=3&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "meetings"
+      ],
+      "sample_keys": [
+        "id",
+        "confidential",
+        "location",
+        "description",
+        "date",
+        "startTime",
+        "dmu",
+        "url",
+        "meetingLabel"
+      ],
+      "sample_count": 3,
+      "sample_ids": [
+        1223,
+        1212,
+        1202
+      ]
+    },
+    {
+      "path": "dmus",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/dmus?limit=10&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "dmus"
+      ],
+      "sample_keys": [
+        "id",
+        "name",
+        "sortOrder"
+      ],
+      "sample_count": 10,
+      "sample_ids": [
+        11,
+        14,
+        17,
+        19,
+        21,
+        22,
+        23,
+        27,
+        29,
+        30
+      ]
+    },
+    {
+      "path": "events",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/events?limit=3&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "events"
+      ],
+      "sample_keys": [
+        "id",
+        "title",
+        "fragment",
+        "location",
+        "description",
+        "publicationDate",
+        "startDate",
+        "endDate",
+        "startTime",
+        "endTime",
+        "confidential",
+        "url"
+      ],
+      "sample_count": 3,
+      "sample_ids": [
+        1,
+        2,
+        6
+      ]
+    },
+    {
+      "path": "meetingsessions",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetingsessions?limit=3&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "meetingsessions"
+      ],
+      "sample_keys": [
+        "id",
+        "location",
+        "title",
+        "order",
+        "container"
+      ],
+      "sample_count": 3,
+      "sample_ids": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "path": "meetings/1223",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1223",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object",
+      "result_keys": [
+        "meeting"
+      ],
+      "sample_keys": [
+        "meeting"
+      ],
+      "sample_count": null,
+      "sample_ids": []
+    },
+    {
+      "path": "meetings/1223/documents",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1223/documents?limit=5&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "documents"
+      ],
+      "sample_keys": [],
+      "sample_count": 0,
+      "sample_ids": []
+    },
+    {
+      "path": "meetings/1223/meetingitems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1223/meetingitems?limit=5&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "meetingitems"
+      ],
+      "sample_keys": [],
+      "sample_count": 0,
+      "sample_ids": []
+    },
+    {
+      "path": "meetings/1212",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1212",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object",
+      "result_keys": [
+        "meeting"
+      ],
+      "sample_keys": [
+        "meeting"
+      ],
+      "sample_count": null,
+      "sample_ids": []
+    },
+    {
+      "path": "meetings/1212/documents",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1212/documents?limit=5&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "documents"
+      ],
+      "sample_keys": [],
+      "sample_count": 0,
+      "sample_ids": []
+    },
+    {
+      "path": "meetings/1212/meetingitems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1212/meetingitems?limit=5&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "meetingitems"
+      ],
+      "sample_keys": [],
+      "sample_count": 0,
+      "sample_ids": []
+    },
+    {
+      "path": "meetings/1202",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1202",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object",
+      "result_keys": [
+        "meeting"
+      ],
+      "sample_keys": [
+        "meeting"
+      ],
+      "sample_count": null,
+      "sample_ids": []
+    },
+    {
+      "path": "meetings/1202/documents",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1202/documents?limit=5&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "documents"
+      ],
+      "sample_keys": [],
+      "sample_count": 0,
+      "sample_ids": []
+    },
+    {
+      "path": "meetings/1202/meetingitems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1202/meetingitems?limit=5&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "meetingitems"
+      ],
+      "sample_keys": [],
+      "sample_count": 0,
+      "sample_ids": []
+    }
+  ],
+  "notes": [
+    "This report uses documented nested routes and a small number of sampled meetings.",
+    "Review sample_keys before implementing canonical Meeting and AgendaItem models.",
+    "A 200 response with zero sample_count can still be a valid relationship endpoint for meetings without documents or items."
+  ]
+}
