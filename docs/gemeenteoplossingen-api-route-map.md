@@ -1,6 +1,6 @@
 # GemeenteOplossingen API route map
 
-This document records the API routes used by Open RIS Monitor for GemeenteOplossingen.
+This document records the routes discovered for the Huizen RIS implementation.
 
 ## Proven top-level routes
 
@@ -10,7 +10,7 @@ This document records the API routes used by Open RIS Monitor for GemeenteOploss
 - `/events`
 - `/meetingsessions`
 
-## Proven relation routes
+## Proven nested meeting routes
 
 - `/meetings/{meetingId}`
 - `/meetings/{meetingId}/documents`
@@ -18,14 +18,16 @@ This document records the API routes used by Open RIS Monitor for GemeenteOploss
 - `/meetingitems/{meetingItemId}`
 - `/meetingitems/{meetingItemId}/documents`
 
-## Notes
+## Discovery note
 
-Meeting items are not exposed through a top-level `/agendaItems` endpoint. The documented route is:
+The `/meetings` endpoint returns recent and future meetings first. These may not yet have agenda items or documents. The `/meetingsessions` endpoint exposes historical meetings through `container.meeting.id`; those IDs are useful candidates for relation discovery.
+
+## Next implementation target
+
+Issue #15 should use the proven chain:
 
 ```text
-/meetings/{meetingId}/meetingitems
+meetings -> meetingitems -> documents
 ```
 
-`meetingsessions` can contain `container.meeting.id`. These IDs are useful for discovering historical meetings with actual agenda structure, because the newest meetings can be future meetings without agenda items or documents yet.
-
-Manual IDs supplied to the discovery workflow must be meeting IDs. If `/meetings/{id}` returns 404, the supplied value is probably not a meeting ID.
+and should also preserve DMU information from each meeting.
