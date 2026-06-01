@@ -1,4 +1,4 @@
-name: Discover RIS API
+name: Discover RIS Relations
 
 on:
   workflow_dispatch:
@@ -7,22 +7,32 @@ on:
         description: Municipality config slug
         required: true
         default: huizen
-      limit:
-        description: Number of records to request per candidate endpoint
+      meeting_limit:
+        description: Number of meetings to sample
         required: true
         default: "3"
-      endpoints:
-        description: Optional comma-separated endpoint list. Leave empty for default candidates.
-        required: false
-        default: ""
+      item_limit:
+        description: Number of meeting items or documents to sample per endpoint
+        required: true
+        default: "5"
+      commit_report:
+        description: Commit relation discovery report to data/public/quality
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
 
 jobs:
-  discover:
+  discover-relations:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,22 +44,31 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e .
 
-      - name: Probe candidate endpoints
+      - name: Run targeted relation discovery
         run: |
-          python -m open_ris_monitor.analysis.gemeenteoplossingen_discovery \
+          python -m open_ris_monitor.analysis.gemeenteoplossingen_relation_discovery \
             --municipality "${{ inputs.municipality }}" \
-            --limit "${{ inputs.limit }}" \
-            --endpoints "${{ inputs.endpoints }}" \
-            --output data/public/quality/gemeenteoplossingen_endpoint_discovery.json
+            --meeting-limit "${{ inputs.meeting_limit }}" \
+            --item-limit "${{ inputs.item_limit }}" \
+            --output data/public/quality/gemeenteoplossingen_relation_discovery.json
 
-      - name: Show discovery summary
+      - name: Show relation discovery summary
         run: |
-          cat data/public/quality/gemeenteoplossingen_endpoint_discovery.json
+          cat data/public/quality/gemeenteoplossingen_relation_discovery.json
 
-      - name: Upload discovery report
+      - name: Upload relation discovery report
         uses: actions/upload-artifact@v4
         with:
-          name: ris-api-discovery-${{ inputs.municipality }}
-          path: data/public/quality/gemeenteoplossingen_endpoint_discovery.json
+          name: ris-relation-discovery-${{ inputs.municipality }}
+          path: data/public/quality/gemeenteoplossingen_relation_discovery.json
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7
+
+      - name: Commit relation discovery report
+        if: ${{ inputs.commit_report }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/public/quality/gemeenteoplossingen_relation_discovery.json
+          git diff --cached --quiet || git commit -m "Update GemeenteOplossingen relation discovery report"
+          git push
