@@ -25,7 +25,7 @@ def parse_ids(value: str | None) -> list[int]:
     return ids
 
 
-def classify_payload(payload: Any) -> str:
+def response_shape(payload: Any) -> str:
     if isinstance(payload, list):
         return "list"
     if not isinstance(payload, dict):
@@ -38,6 +38,23 @@ def classify_payload(payload: Any) -> str:
     if isinstance(result, list):
         return "object.result.list"
     return "object"
+
+
+def classify_payload(payload: Any) -> tuple[str | None, list[str], list[str], int | None, list[Any]]:
+    """Backward-compatible payload classifier used by existing tests.
+
+    Returns response_shape, result_keys, sample_keys, sample_count and sample_ids.
+    Newer discovery code uses response_shape() and make_probe(), but keeping this
+    tuple-returning function prevents older tests and downstream imports from
+    breaking.
+    """
+    if not isinstance(payload, dict):
+        return response_shape(payload), [], [], None, []
+
+    result = payload.get("result")
+    result_keys = list(result.keys()) if isinstance(result, dict) else []
+    records = list_from_result(payload)
+    return response_shape(payload), result_keys, sample_keys(records), len(records), sample_ids(records)
 
 
 def list_from_result(payload: dict[str, Any], preferred_key: str | None = None) -> list[dict[str, Any]]:
@@ -137,7 +154,7 @@ def make_probe(path: str, url: str, payload: dict[str, Any] | None, error: str |
         "ok": True,
         "status_code": status_code,
         "error": None,
-        "response_shape": classify_payload(payload),
+        "response_shape": response_shape(payload),
         "result_keys": result_keys,
         "sample_keys": sample_keys(records),
         "sample_count": len(records),
