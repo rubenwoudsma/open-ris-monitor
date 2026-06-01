@@ -1,0 +1,92 @@
+name: Discover RIS Relations
+
+on:
+  workflow_dispatch:
+    inputs:
+      municipality:
+        description: Municipality config slug
+        required: true
+        default: huizen
+      meeting_limit:
+        description: Number of meetings to sample when no manual meeting IDs are provided
+        required: true
+        default: "3"
+      item_limit:
+        description: Number of meeting items/documents to fetch per meeting
+        required: true
+        default: "5"
+      meeting_ids:
+        description: Optional comma-separated meeting IDs to probe directly, for example 1223,1212,1202
+        required: false
+        default: ""
+      commit_report:
+        description: Commit discovery report to data/public/quality
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  discover-relations:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+
+      - name: Run relation discovery
+        run: |
+          python -m open_ris_monitor.analysis.gemeenteoplossingen_relation_discovery \
+            --municipality "${{ inputs.municipality }}" \
+            --meeting-limit "${{ inputs.meeting_limit }}" \
+            --item-limit "${{ inputs.item_limit }}" \
+            --meeting-ids "${{ inputs.meeting_ids }}" \
+            --output "data/public/quality/gemeenteoplossingen_relation_discovery.json"
+
+      - name: Show discovery summary
+        run: |
+          echo "Generated discovery report:"
+          ls -la data/public/quality
+          echo "Summary:"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("data/public/quality/gemeenteoplossingen_relation_discovery.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          print(json.dumps(data.get("summary", {}), indent=2, ensure_ascii=False))
+          PY
+
+      - name: Upload relation discovery report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ris-relation-discovery-${{ inputs.municipality }}
+          path: data/public/quality/gemeenteoplossingen_relation_discovery.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Commit relation discovery report
+        if: ${{ inputs.commit_report }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/public/quality/gemeenteoplossingen_relation_discovery.json
+          if git diff --cached --quiet; then
+            echo "No discovery report changes to commit."
+          else
+            git commit -m "Update GemeenteOplossingen relation discovery report"
+            git push
+          fi
