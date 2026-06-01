@@ -8,17 +8,21 @@ on:
         required: true
         default: huizen
       meeting_limit:
-        description: Number of meetings to sample when no manual meeting IDs are provided
+        description: Number of recent meetings to sample
         required: true
         default: "3"
       item_limit:
         description: Number of meeting items/documents to fetch per meeting
         required: true
-        default: "5"
+        default: "10"
       meeting_ids:
-        description: Optional comma-separated meeting IDs to probe directly, for example 1223,1212,1202
+        description: Optional comma-separated meeting IDs to probe directly
         required: false
         default: ""
+      scan_limit:
+        description: Number of meeting/session records to scan when searching for populated meetings
+        required: true
+        default: "100"
       commit_report:
         description: Commit discovery report to data/public/quality
         required: true
@@ -29,14 +33,12 @@ permissions:
   contents: write
 
 jobs:
-  discover-relations:
+  discover:
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -55,20 +57,12 @@ jobs:
             --meeting-limit "${{ inputs.meeting_limit }}" \
             --item-limit "${{ inputs.item_limit }}" \
             --meeting-ids "${{ inputs.meeting_ids }}" \
-            --output "data/public/quality/gemeenteoplossingen_relation_discovery.json"
+            --scan-limit "${{ inputs.scan_limit }}" \
+            --output data/public/quality/gemeenteoplossingen_relation_discovery.json
 
-      - name: Show discovery summary
+      - name: Show discovery output
         run: |
-          echo "Generated discovery report:"
-          ls -la data/public/quality
-          echo "Summary:"
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          path = Path("data/public/quality/gemeenteoplossingen_relation_discovery.json")
-          data = json.loads(path.read_text(encoding="utf-8"))
-          print(json.dumps(data.get("summary", {}), indent=2, ensure_ascii=False))
-          PY
+          cat data/public/quality/gemeenteoplossingen_relation_discovery.json
 
       - name: Upload relation discovery report
         uses: actions/upload-artifact@v4
@@ -78,15 +72,11 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Commit relation discovery report
-        if: ${{ inputs.commit_report }}
+      - name: Commit discovery report
+        if: ${{ inputs.commit_report == true }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/public/quality/gemeenteoplossingen_relation_discovery.json
-          if git diff --cached --quiet; then
-            echo "No discovery report changes to commit."
-          else
-            git commit -m "Update GemeenteOplossingen relation discovery report"
-            git push
-          fi
+          git diff --cached --quiet || git commit -m "Update GemeenteOplossingen relation discovery report"
+          git push
