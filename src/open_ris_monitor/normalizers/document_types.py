@@ -29,7 +29,7 @@ TYPE_LABELS: dict[str, str] = {
     "incoming_document": "Ingekomen stuk",
     "invitation": "Uitnodiging",
     "memo_or_advice": "Memo of advies",
-    "minutes_or_summary": "Notulen, verslag of resume",
+    "minutes_or_summary": "Notulen, verslag of samenvatting",
     "motion": "Motie",
     "notice": "Kennisgeving of ter kennisname",
     "objection_or_response": "Bezwaar, klacht of zienswijze",
