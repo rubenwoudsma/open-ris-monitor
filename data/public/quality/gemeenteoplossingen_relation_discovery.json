@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-06-01T12:23:36.504669+00:00",
+  "generated_at": "2026-06-01T12:44:56.979972+00:00",
   "municipality": "huizen",
   "base_url": "https://ris.gemeenteraadhuizen.nl/api/v2/",
   "meeting_limit": 3,
   "item_limit": 5,
   "summary": {
     "sampled_meeting_ids": [
-      42745,
-      40215,
-      40074
+      1223,
+      1212,
+      1202
     ],
     "sampled_meeting_item_ids": [],
     "working_path_count": 13,
@@ -17,15 +17,15 @@
       "dmus",
       "events",
       "meetingsessions",
-      "meetings/42745",
-      "meetings/42745/documents",
-      "meetings/42745/meetingitems",
-      "meetings/40215",
-      "meetings/40215/documents",
-      "meetings/40215/meetingitems",
-      "meetings/40074",
-      "meetings/40074/documents",
-      "meetings/40074/meetingitems"
+      "meetings/1223",
+      "meetings/1223/documents",
+      "meetings/1223/meetingitems",
+      "meetings/1212",
+      "meetings/1212/documents",
+      "meetings/1212/meetingitems",
+      "meetings/1202",
+      "meetings/1202/documents",
+      "meetings/1202/meetingitems"
     ],
     "meeting_items_discovered": 0
   },
@@ -57,9 +57,9 @@
       ],
       "sample_count": 3,
       "sample_ids": [
-        42745,
-        40215,
-        40074
+        1223,
+        1212,
+        1202
       ]
     },
     {
@@ -159,8 +159,8 @@
       ]
     },
     {
-      "path": "meetings/42745",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/42745",
+      "path": "meetings/1223",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1223",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -175,8 +175,8 @@
       "sample_ids": []
     },
     {
-      "path": "meetings/42745/documents",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/42745/documents?limit=5&offset=0",
+      "path": "meetings/1223/documents",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1223/documents?limit=5&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -193,8 +193,8 @@
       "sample_ids": []
     },
     {
-      "path": "meetings/42745/meetingitems",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/42745/meetingitems?limit=5&offset=0",
+      "path": "meetings/1223/meetingitems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1223/meetingitems?limit=5&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -211,8 +211,8 @@
       "sample_ids": []
     },
     {
-      "path": "meetings/40215",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40215",
+      "path": "meetings/1212",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1212",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -227,8 +227,8 @@
       "sample_ids": []
     },
     {
-      "path": "meetings/40215/documents",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40215/documents?limit=5&offset=0",
+      "path": "meetings/1212/documents",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1212/documents?limit=5&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -245,8 +245,8 @@
       "sample_ids": []
     },
     {
-      "path": "meetings/40215/meetingitems",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40215/meetingitems?limit=5&offset=0",
+      "path": "meetings/1212/meetingitems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1212/meetingitems?limit=5&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -263,8 +263,8 @@
       "sample_ids": []
     },
     {
-      "path": "meetings/40074",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40074",
+      "path": "meetings/1202",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1202",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -279,8 +279,8 @@
       "sample_ids": []
     },
     {
-      "path": "meetings/40074/documents",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40074/documents?limit=5&offset=0",
+      "path": "meetings/1202/documents",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1202/documents?limit=5&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -297,8 +297,8 @@
       "sample_ids": []
     },
     {
-      "path": "meetings/40074/meetingitems",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40074/meetingitems?limit=5&offset=0",
+      "path": "meetings/1202/meetingitems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1202/meetingitems?limit=5&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
