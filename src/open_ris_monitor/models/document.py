@@ -11,9 +11,8 @@ from pydantic import BaseModel, Field, HttpUrl
 class Document(BaseModel):
     """Canonical metadata representation of a RIS document.
 
-    The model is intentionally metadata-only for the MVP. PDF files are not
-    stored in Git. Download URLs are preserved so a later enrichment phase can
-    calculate checksums or extract text temporarily.
+    The model keeps the original source document type for traceability and adds
+    a compact normalized type for filtering and analysis.
     """
 
     id: str
@@ -24,6 +23,8 @@ class Document(BaseModel):
     title: str
     description: str | None = None
     document_type: str | None = None
+    normalized_document_type: str | None = None
+    normalized_document_type_label: str | None = None
     filename: str | None = None
     file_size_bytes: int | None = None
     publication_datetime: datetime | None = None

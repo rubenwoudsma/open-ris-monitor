@@ -9,6 +9,7 @@ from typing import Any
 
 from open_ris_monitor.connectors.gemeenteoplossingen import GemeenteOplossingenConnector
 from open_ris_monitor.models.document import Document
+from open_ris_monitor.normalizers.document_types import normalize_document_type
 
 
 def _slugify(value: str) -> str:
@@ -19,6 +20,7 @@ def _slugify(value: str) -> str:
 
 def _parse_publication_datetime(raw_value: Any) -> tuple[datetime | None, str | None]:
     """Parse the GemeenteOplossingen publicationDate object."""
+
     if not isinstance(raw_value, dict):
         return None, None
 
@@ -42,6 +44,7 @@ def _resolve_download_url_builder(
     build_download_url: Callable[[str], str] | None = None,
 ) -> Callable[[str], str]:
     """Return a download URL builder from either the old or new call style."""
+
     if build_download_url is not None:
         return build_download_url
     if connector is not None:
@@ -59,29 +62,27 @@ def normalize_document(
     connector: GemeenteOplossingenConnector | None = None,
     build_download_url: Callable[[str], str] | None = None,
 ) -> Document:
-    """Convert one raw GemeenteOplossingen document into a canonical Document.
+    """Convert one raw GemeenteOplossingen document into a canonical Document."""
 
-    The function accepts both the earlier call style, using a connector object,
-    and the newer pipeline call style, using an explicit download URL builder.
-    """
     url_builder = _resolve_download_url_builder(
         connector=connector,
         build_download_url=build_download_url,
     )
-
     source_id = str(raw_document["id"])
     source_object_id = raw_document.get("objectId")
     publication_datetime, publication_timezone = _parse_publication_datetime(
         raw_document.get("publicationDate")
     )
-
     description = raw_document.get("description")
     filename = raw_document.get("fileName")
     title = str(description or filename or f"Document {source_id}").strip()
-
     id_prefix = municipality_slug or municipality_id
     canonical_id = f"{_slugify(id_prefix)}-document-{source_id}"
     download_url = url_builder(source_id)
+    source_document_type = raw_document.get("documentTypeLabel")
+    normalized_type = normalize_document_type(
+        str(source_document_type) if source_document_type is not None else None
+    )
 
     return Document(
         id=canonical_id,
@@ -91,7 +92,9 @@ def normalize_document(
         source_object_id=str(source_object_id) if source_object_id is not None else None,
         title=title,
         description=str(description).strip() if description else None,
-        document_type=raw_document.get("documentTypeLabel"),
+        document_type=str(source_document_type).strip() if source_document_type else None,
+        normalized_document_type=normalized_type.value,
+        normalized_document_type_label=normalized_type.label,
         filename=raw_document.get("fileName"),
         file_size_bytes=raw_document.get("fileSize"),
         publication_datetime=publication_datetime,
@@ -116,6 +119,7 @@ def normalize_documents(
     build_download_url: Callable[[str], str] | None = None,
 ) -> list[Document]:
     """Normalize a list of raw GemeenteOplossingen documents."""
+
     return [
         normalize_document(
             raw_document,
