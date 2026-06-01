@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -10,158 +9,232 @@ from typing import Any
 import requests
 import yaml
 
-
-@dataclass
-class ProbeResult:
-    path: str
-    url: str
-    ok: bool
-    status_code: int | None
-    error: str | None
-    response_shape: str | None
-    result_keys: list[str]
-    sample_keys: list[str]
-    sample_count: int | None
-    sample_ids: list[int | str]
+DEFAULT_BASE_URL = "https://ris.gemeenteraadhuizen.nl/api/v2/"
 
 
-def classify_payload(payload: Any) -> tuple[str | None, list[str], list[str], int | None, list[int | str]]:
-    if not isinstance(payload, dict):
-        return type(payload).__name__, [], [], None, []
-
-    result = payload.get("result")
-    if isinstance(result, dict):
-        result_keys = list(result.keys())
-        list_values = [(key, value) for key, value in result.items() if isinstance(value, list)]
-        if list_values:
-            _, values = max(list_values, key=lambda item: len(item[1]))
-            sample = values[0] if values and isinstance(values[0], dict) else {}
-            sample_ids = [item.get("id") for item in values if isinstance(item, dict) and item.get("id") is not None]
-            return (
-                "object.result.object_with_list",
-                result_keys,
-                list(sample.keys()) if isinstance(sample, dict) else [],
-                len(values),
-                sample_ids[:10],
-            )
-        return "object.result.object", result_keys, list(result.keys()), None, [result.get("id")] if result.get("id") is not None else []
-
-    if isinstance(result, list):
-        sample = result[0] if result and isinstance(result[0], dict) else {}
-        sample_ids = [item.get("id") for item in result if isinstance(item, dict) and item.get("id") is not None]
-        return "object.result.list", [], list(sample.keys()) if isinstance(sample, dict) else [], len(result), sample_ids[:10]
-
-    return "object", [], list(payload.keys()), None, []
+def load_config(municipality: str) -> dict[str, Any]:
+    config_path = Path("config") / "municipalities" / f"{municipality}.yml"
+    if not config_path.exists():
+        raise FileNotFoundError(f"Municipality config not found: {config_path}")
+    with config_path.open("r", encoding="utf-8") as handle:
+        loaded = yaml.safe_load(handle) or {}
+    if not isinstance(loaded, dict):
+        raise ValueError(f"Expected mapping in {config_path}")
+    return loaded
 
 
-class RelationDiscoveryClient:
-    def __init__(self, base_url: str, timeout_seconds: int = 30) -> None:
-        self.base_url = base_url.rstrip("/") + "/"
-        self.timeout_seconds = timeout_seconds
-        self.session = requests.Session()
-
-    def get(self, path: str, params: dict[str, Any] | None = None) -> ProbeResult:
-        path = path.lstrip("/")
-        url = self.base_url + path
-        try:
-            response = self.session.get(url, params=params, timeout=self.timeout_seconds)
-            status_code = response.status_code
-            response.raise_for_status()
-            payload = response.json()
-            shape, result_keys, sample_keys, sample_count, sample_ids = classify_payload(payload)
-            return ProbeResult(
-                path=path,
-                url=response.url,
-                ok=True,
-                status_code=status_code,
-                error=None,
-                response_shape=shape,
-                result_keys=result_keys,
-                sample_keys=sample_keys,
-                sample_count=sample_count,
-                sample_ids=sample_ids,
-            )
-        except Exception as exc:  # noqa: BLE001 - discovery should report rather than crash
-            status_code = getattr(getattr(exc, "response", None), "status_code", None)
-            return ProbeResult(
-                path=path,
-                url=url,
-                ok=False,
-                status_code=status_code,
-                error=str(exc),
-                response_shape=None,
-                result_keys=[],
-                sample_keys=[],
-                sample_count=None,
-                sample_ids=[],
-            )
-
-    def get_payload(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
-        response = self.session.get(self.base_url + path.lstrip("/"), params=params, timeout=self.timeout_seconds)
-        response.raise_for_status()
-        payload = response.json()
-        if not isinstance(payload, dict):
-            raise ValueError(f"Expected object response for {path}")
-        return payload
+def get_nested(config: dict[str, Any], *keys: str, default: Any = None) -> Any:
+    current: Any = config
+    for key in keys:
+        if not isinstance(current, dict) or key not in current:
+            return default
+        current = current[key]
+    return current
 
 
-def list_from_result(payload: dict[str, Any], preferred_key: str) -> list[dict[str, Any]]:
-    result = payload.get("result")
-    if not isinstance(result, dict):
+def get_base_url(config: dict[str, Any]) -> str:
+    candidates = [
+        get_nested(config, "source", "base_url"),
+        get_nested(config, "source_system", "base_url"),
+        get_nested(config, "source", "api_base_url"),
+        get_nested(config, "source_system", "api_base_url"),
+        get_nested(config, "municipality", "source", "base_url"),
+        get_nested(config, "municipality", "source_system", "base_url"),
+        config.get("base_url") if isinstance(config, dict) else None,
+    ]
+    for candidate in candidates:
+        if isinstance(candidate, str) and candidate.strip():
+            return candidate.rstrip("/") + "/"
+    return DEFAULT_BASE_URL
+
+
+def parse_ids(value: str | None) -> list[int]:
+    if not value or not value.strip():
         return []
-    value = result.get(preferred_key)
-    if isinstance(value, list):
-        return [item for item in value if isinstance(item, dict)]
-    for candidate in result.values():
-        if isinstance(candidate, list):
-            return [item for item in candidate if isinstance(item, dict)]
+    ids: list[int] = []
+    for part in value.split(","):
+        stripped = part.strip()
+        if not stripped:
+            continue
+        try:
+            ids.append(int(stripped))
+        except ValueError as exc:
+            raise ValueError(f"Invalid meeting id {stripped!r}. Use comma-separated integers.") from exc
+    return ids
+
+
+def result_object(payload: dict[str, Any]) -> dict[str, Any]:
+    result = payload.get("result", {})
+    return result if isinstance(result, dict) else {}
+
+
+def first_list_from_result(result: dict[str, Any]) -> list[Any]:
+    for value in result.values():
+        if isinstance(value, list):
+            return value
     return []
 
 
-def load_config(path: Path, municipality: str) -> dict[str, Any]:
-    config_path = path / "config" / "municipalities" / f"{municipality}.yml"
-    with config_path.open("r", encoding="utf-8") as handle:
-        return yaml.safe_load(handle)
+def classify_response(payload: Any) -> str:
+    if isinstance(payload, list):
+        return "list"
+    if not isinstance(payload, dict):
+        return type(payload).__name__
+    result = payload.get("result")
+    if isinstance(result, dict):
+        if any(isinstance(value, list) for value in result.values()):
+            return "object.result.object_with_list"
+        return "object.result.object"
+    if isinstance(result, list):
+        return "object.result.list"
+    return "object"
+
+
+def extract_sample_ids(items: list[Any]) -> list[int]:
+    ids: list[int] = []
+    for item in items:
+        if isinstance(item, dict) and "id" in item:
+            try:
+                ids.append(int(item["id"]))
+            except (TypeError, ValueError):
+                continue
+    return ids
+
+
+def probe(session: requests.Session, base_url: str, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+    url = base_url.rstrip("/") + "/" + path.lstrip("/")
+    try:
+        response = session.get(url, params=params, timeout=30)
+        status_code = response.status_code
+        response.raise_for_status()
+        payload = response.json()
+        result = result_object(payload) if isinstance(payload, dict) else {}
+        sample_items = first_list_from_result(result)
+        sample = sample_items[0] if sample_items and isinstance(sample_items[0], dict) else None
+        return {
+            "path": path,
+            "url": response.url,
+            "ok": True,
+            "status_code": status_code,
+            "error": None,
+            "response_shape": classify_response(payload),
+            "result_keys": list(result.keys()),
+            "sample_keys": list(sample.keys()) if sample else [],
+            "sample_count": len(sample_items),
+            "sample_ids": extract_sample_ids(sample_items),
+            "total_count": result.get("totalCount"),
+            "sample_records": sample_items[:3] if sample_items else [],
+        }
+    except requests.HTTPError as exc:
+        return {
+            "path": path,
+            "url": getattr(exc.response, "url", url),
+            "ok": False,
+            "status_code": getattr(exc.response, "status_code", None),
+            "error": f"HTTP {getattr(exc.response, 'status_code', 'unknown')}",
+            "response_shape": None,
+            "result_keys": [],
+            "sample_keys": [],
+            "sample_count": None,
+            "sample_ids": [],
+            "total_count": None,
+            "sample_records": [],
+        }
+    except Exception as exc:  # pragma: no cover - defensive for workflow diagnostics
+        return {
+            "path": path,
+            "url": url,
+            "ok": False,
+            "status_code": None,
+            "error": str(exc),
+            "response_shape": None,
+            "result_keys": [],
+            "sample_keys": [],
+            "sample_count": None,
+            "sample_ids": [],
+            "total_count": None,
+            "sample_records": [],
+        }
 
 
 def discover_relations(
     *,
-    base_url: str,
     municipality: str,
+    base_url: str,
     meeting_limit: int,
     item_limit: int,
+    meeting_ids: list[int] | None = None,
 ) -> dict[str, Any]:
-    client = RelationDiscoveryClient(base_url)
-    probes: list[ProbeResult] = []
+    session = requests.Session()
+    meeting_ids = meeting_ids or []
 
-    meetings_payload = client.get_payload("meetings", params={"limit": meeting_limit, "offset": 0})
-    meetings = list_from_result(meetings_payload, "meetings")
-    meeting_ids = [meeting.get("id") for meeting in meetings if meeting.get("id") is not None]
+    probes: list[dict[str, Any]] = []
 
-    probes.append(client.get("meetings", params={"limit": meeting_limit, "offset": 0}))
-    probes.append(client.get("dmus", params={"limit": 10, "offset": 0}))
-    probes.append(client.get("events", params={"limit": meeting_limit, "offset": 0}))
-    probes.append(client.get("meetingsessions", params={"limit": meeting_limit, "offset": 0}))
+    meetings_probe = probe(session, base_url, "meetings", {"limit": meeting_limit, "offset": 0})
+    probes.append(meetings_probe)
+    probes.append(probe(session, base_url, "dmus", {"limit": 10, "offset": 0}))
+    probes.append(probe(session, base_url, "events", {"limit": 3, "offset": 0}))
+    probes.append(probe(session, base_url, "meetingsessions", {"limit": 3, "offset": 0}))
 
-    meeting_item_ids: list[int | str] = []
-    for meeting_id in meeting_ids[:meeting_limit]:
-        probes.append(client.get(f"meetings/{meeting_id}"))
-        probes.append(client.get(f"meetings/{meeting_id}/documents", params={"limit": item_limit, "offset": 0}))
-        meeting_items_probe = client.get(f"meetings/{meeting_id}/meetingitems", params={"limit": item_limit, "offset": 0})
-        probes.append(meeting_items_probe)
+    if meeting_ids:
+        sampled_meeting_ids = meeting_ids
+        meeting_selection_source = "manual"
+    else:
+        sampled_meeting_ids = meetings_probe.get("sample_ids", [])
+        meeting_selection_source = "meetings_endpoint_sample"
 
-        try:
-            items_payload = client.get_payload(f"meetings/{meeting_id}/meetingitems", params={"limit": item_limit, "offset": 0})
-            items = list_from_result(items_payload, "meetingitems")
-            meeting_item_ids.extend([item.get("id") for item in items if item.get("id") is not None])
-        except Exception:
-            pass
+    sampled_meeting_item_ids: list[int] = []
+    populated_meetings: list[dict[str, Any]] = []
 
-    for meeting_item_id in meeting_item_ids[:item_limit]:
-        probes.append(client.get(f"meetingitems/{meeting_item_id}"))
-        probes.append(client.get(f"meetingitems/{meeting_item_id}/documents", params={"limit": item_limit, "offset": 0}))
+    for meeting_id in sampled_meeting_ids:
+        meeting_detail = probe(session, base_url, f"meetings/{meeting_id}")
+        meeting_documents = probe(
+            session,
+            base_url,
+            f"meetings/{meeting_id}/documents",
+            {"limit": item_limit, "offset": 0},
+        )
+        meeting_items = probe(
+            session,
+            base_url,
+            f"meetings/{meeting_id}/meetingitems",
+            {"limit": item_limit, "offset": 0},
+        )
 
-    working_paths = [probe.path for probe in probes if probe.ok]
+        probes.extend([meeting_detail, meeting_documents, meeting_items])
+
+        item_ids = meeting_items.get("sample_ids", []) or []
+        doc_ids = meeting_documents.get("sample_ids", []) or []
+        sampled_meeting_item_ids.extend(item_ids)
+
+        if item_ids or doc_ids:
+            populated_meetings.append(
+                {
+                    "meeting_id": meeting_id,
+                    "meetingitems_count": meeting_items.get("sample_count", 0),
+                    "meetingitems_total_count": meeting_items.get("total_count"),
+                    "documents_count": meeting_documents.get("sample_count", 0),
+                    "documents_total_count": meeting_documents.get("total_count"),
+                    "sample_meetingitem_ids": item_ids,
+                    "sample_document_ids": doc_ids,
+                    "sample_meetingitem_keys": meeting_items.get("sample_keys", []),
+                    "sample_document_keys": meeting_documents.get("sample_keys", []),
+                }
+            )
+
+    # Probe a few meeting item detail and document relation endpoints when found.
+    for meeting_item_id in sampled_meeting_item_ids[:item_limit]:
+        probes.append(probe(session, base_url, f"meetingitems/{meeting_item_id}"))
+        probes.append(
+            probe(
+                session,
+                base_url,
+                f"meetingitems/{meeting_item_id}/documents",
+                {"limit": item_limit, "offset": 0},
+            )
+        )
+
+    working_paths = [entry["path"] for entry in probes if entry.get("ok")]
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -169,47 +242,54 @@ def discover_relations(
         "base_url": base_url,
         "meeting_limit": meeting_limit,
         "item_limit": item_limit,
+        "manual_meeting_ids": meeting_ids,
         "summary": {
-            "sampled_meeting_ids": meeting_ids[:meeting_limit],
-            "sampled_meeting_item_ids": meeting_item_ids[:item_limit],
+            "meeting_selection_source": meeting_selection_source,
+            "sampled_meeting_ids": sampled_meeting_ids,
+            "sampled_meeting_item_ids": sampled_meeting_item_ids,
             "working_path_count": len(working_paths),
             "working_paths": working_paths,
-            "meeting_items_discovered": len(meeting_item_ids),
+            "meeting_items_discovered": len(sampled_meeting_item_ids),
+            "populated_meeting_count": len(populated_meetings),
+            "populated_meetings": populated_meetings,
         },
-        "probes": [asdict(probe) for probe in probes],
+        "probes": probes,
         "notes": [
             "This report uses documented nested routes and a small number of sampled meetings.",
-            "Review sample_keys before implementing canonical Meeting and AgendaItem models.",
+            "Manual meeting IDs can be supplied to probe known meetings with likely agenda items or documents.",
             "A 200 response with zero sample_count can still be a valid relationship endpoint for meetings without documents or items.",
         ],
     }
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Discover GemeenteOplossingen meeting relation endpoints.")
     parser.add_argument("--municipality", default="huizen")
-    parser.add_argument("--repo-root", default=".")
     parser.add_argument("--meeting-limit", type=int, default=3)
     parser.add_argument("--item-limit", type=int, default=5)
-    parser.add_argument("--output", default="data/public/quality/gemeenteoplossingen_relation_discovery.json")
+    parser.add_argument("--meeting-ids", default="")
+    parser.add_argument(
+        "--output",
+        default="data/public/quality/gemeenteoplossingen_relation_discovery.json",
+    )
     args = parser.parse_args()
 
-    repo_root = Path(args.repo_root)
-    config = load_config(repo_root, args.municipality)
-    source = config["source"] if "source" in config else config["source_system"]
-    base_url = source["base_url"]
+    config = load_config(args.municipality)
+    base_url = get_base_url(config)
+    manual_ids = parse_ids(args.meeting_ids)
 
     report = discover_relations(
-        base_url=base_url,
         municipality=args.municipality,
+        base_url=base_url,
         meeting_limit=args.meeting_limit,
         item_limit=args.item_limit,
+        meeting_ids=manual_ids,
     )
 
-    output_path = repo_root / args.output
+    output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps(report["summary"], ensure_ascii=False, indent=2))
+    output_path.write_text(json.dumps(report, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"Wrote relation discovery report to {output_path}")
 
 
 if __name__ == "__main__":

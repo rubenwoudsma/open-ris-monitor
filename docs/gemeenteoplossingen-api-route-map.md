@@ -1,78 +1,55 @@
 # GemeenteOplossingen API route map
 
-This document records the routes that are relevant for moving from a document-only harvest to meetings, meeting items and document relations.
+This document records the relevant API routes for the Open RIS Monitor implementation.
 
-## Confirmed by live discovery
+## Proven top-level routes
 
-The first discovery run against `https://ris.gemeenteraadhuizen.nl/api/v2/` showed that these list endpoints respond successfully:
+The first discovery runs confirmed these top-level routes for Huizen:
 
 - `/documents`
 - `/meetings`
-- `/meetingsessions`
+- `/dmus`
 - `/events`
+- `/meetingsessions`
 
-The discovery run also showed that generic agenda endpoints such as `/agendas`, `/agenda`, `/agendaItems`, `/agendaitems` and `/agenda-items` return HTTP 400. Agenda items are therefore not exposed as a top-level collection in this API.
+## Meeting and agenda item routes
 
-## Relevant documented routes
+The GemeenteOplossingen API documentation uses `meetingitems` for agenda items. Agenda items are not exposed as a top-level `/agendaItems` endpoint.
 
-The API documentation describes the following routes as relevant for the next phase.
+Relevant routes:
 
-### Meetings
+- `/meetings`
+- `/meetings/{meetingId}`
+- `/meetings/{meetingId}/meetingitems`
+- `/meetingitems/{meetingItemId}`
+- `/meetings/{meetingId}/documents`
+- `/meetingitems/{meetingItemId}/documents`
 
-- `GET /meetings`
-- `GET /meetings/{meetingId}`
-- `GET /dmus/`
-- `GET /dmus/{dmuId}/meetings`
+## Manual meeting ID discovery
 
-### Meeting items
+The relation discovery workflow supports optional manual meeting IDs. This is useful when the newest meetings do not contain agenda items or documents.
 
-- `GET /meetings/{meetingId}/meetingitems`
-- `GET /meetingitems/{meetingItemId}`
-
-### Document relations
-
-- `GET /meetings/{meetingId}/documents`
-- `GET /meetingitems/{meetingItemId}/documents`
-- `GET /documents/{documentId}`
-- `GET /documents/{documentId}/download`
-
-### Events and attachments
-
-- `GET /events`
-- `GET /events/{eventId}`
-- `GET /events/{eventId}/attachments`
-- `GET /attachments/{attachmentId}`
-- `GET /attachments/{attachmentId}/download`
-
-Events and attachments may be relevant later, but they should not be part of the first meeting and agenda item implementation unless the meeting/document routes turn out to be insufficient.
-
-## Recommended interpretation
-
-For this project, the term `AgendaItem` should map to the GemeenteOplossingen `meetingitem` resource.
-
-That means:
+Example input:
 
 ```text
-Meeting
-  /meetings/{meetingId}
-  /meetings
-
-AgendaItem
-  /meetingitems/{meetingItemId}
-  /meetings/{meetingId}/meetingitems
-
-Document relations
-  /meetings/{meetingId}/documents
-  /meetingitems/{meetingItemId}/documents
+42745,40215,40074
 ```
 
-## Recommended next step
+The workflow will probe:
 
-Before implementing canonical models for `Meeting` and `AgendaItem`, run the targeted relation discovery workflow. It selects a small number of meetings and probes:
+- `/meetings/{id}`
+- `/meetings/{id}/meetingitems`
+- `/meetings/{id}/documents`
 
-- meeting details
-- meeting items per meeting
-- documents per meeting
-- documents per meeting item
+If meeting items are discovered, it will also probe:
 
-The output should be reviewed before implementing issue #15.
+- `/meetingitems/{meetingItemId}`
+- `/meetingitems/{meetingItemId}/documents`
+
+## Next implementation step
+
+After finding populated meetings and meeting items, issue #15 can implement canonical exports:
+
+- `meetings.jsonl`
+- `agenda_items.jsonl`
+- `relations.jsonl`
