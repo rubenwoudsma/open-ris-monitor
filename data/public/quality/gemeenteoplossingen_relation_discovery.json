@@ -1,33 +1,38 @@
 {
-  "generated_at": "2026-06-01T12:44:56.979972+00:00",
+  "generated_at": "2026-06-01T13:18:26.355651+00:00",
   "municipality": "huizen",
   "base_url": "https://ris.gemeenteraadhuizen.nl/api/v2/",
   "meeting_limit": 3,
-  "item_limit": 5,
+  "item_limit": 10,
+  "manual_meeting_ids": [
+    42745,
+    40215,
+    40074
+  ],
   "summary": {
+    "meeting_selection_source": "manual",
     "sampled_meeting_ids": [
-      1223,
-      1212,
-      1202
+      42745,
+      40215,
+      40074
     ],
     "sampled_meeting_item_ids": [],
-    "working_path_count": 13,
+    "working_path_count": 10,
     "working_paths": [
       "meetings",
       "dmus",
       "events",
       "meetingsessions",
-      "meetings/1223",
-      "meetings/1223/documents",
-      "meetings/1223/meetingitems",
-      "meetings/1212",
-      "meetings/1212/documents",
-      "meetings/1212/meetingitems",
-      "meetings/1202",
-      "meetings/1202/documents",
-      "meetings/1202/meetingitems"
+      "meetings/42745/documents",
+      "meetings/42745/meetingitems",
+      "meetings/40215/documents",
+      "meetings/40215/meetingitems",
+      "meetings/40074/documents",
+      "meetings/40074/meetingitems"
     ],
-    "meeting_items_discovered": 0
+    "meeting_items_discovered": 0,
+    "populated_meeting_count": 0,
+    "populated_meetings": []
   },
   "probes": [
     {
@@ -60,6 +65,54 @@
         1223,
         1212,
         1202
+      ],
+      "total_count": "911",
+      "sample_records": [
+        {
+          "id": 1223,
+          "confidential": 0,
+          "location": "Raadzaal",
+          "description": "<p>Commissie Algemeen Bestuur en Middelen 4 februari 2027</p>",
+          "date": "2027-02-04",
+          "startTime": "20:00",
+          "dmu": {
+            "id": 22,
+            "name": "Commissie Algemeen Bestuur en Middelen (ABM)",
+            "sortOrder": 7
+          },
+          "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2027/4-februari/20:00",
+          "meetingLabel": null
+        },
+        {
+          "id": 1212,
+          "confidential": 0,
+          "location": "Raadzaal",
+          "description": "<p>Commissie Fysiek Domein 3 februari 2027</p>",
+          "date": "2027-02-03",
+          "startTime": "20:00",
+          "dmu": {
+            "id": 17,
+            "name": "Commissie Fysiek Domein",
+            "sortOrder": 6
+          },
+          "url": "/Vergaderingen/Commissie-Fysiek-Domein/2027/3-februari/20:00",
+          "meetingLabel": null
+        },
+        {
+          "id": 1202,
+          "confidential": 0,
+          "location": "Raadzaal",
+          "description": "<p>Commissie Sociaal Domein 2 februari 2027</p>",
+          "date": "2027-02-02",
+          "startTime": "20:00",
+          "dmu": {
+            "id": 21,
+            "name": "Commissie Sociaal Domein",
+            "sortOrder": 5
+          },
+          "url": "/Vergaderingen/Commissie-Sociaal-Domein/2027/2-februari/20:00",
+          "meetingLabel": null
+        }
       ]
     },
     {
@@ -93,6 +146,24 @@
         27,
         29,
         30
+      ],
+      "total_count": "23",
+      "sample_records": [
+        {
+          "id": 11,
+          "name": "Collegevergadering",
+          "sortOrder": 3
+        },
+        {
+          "id": 14,
+          "name": "Raadsvergadering",
+          "sortOrder": 0
+        },
+        {
+          "id": 17,
+          "name": "Commissie Fysiek Domein",
+          "sortOrder": 6
+        }
       ]
     },
     {
@@ -128,6 +199,51 @@
         1,
         2,
         6
+      ],
+      "total_count": "390",
+      "sample_records": [
+        {
+          "id": 1,
+          "title": "Raadsinformatiebijeenkomst Veiligheidsregio G&V",
+          "fragment": "Raadsinformatiebijeenkomst-Veiligheidsregio-G-V",
+          "location": "Brandweerkazerne Hilversum",
+          "description": "<p>Raadsinformatiebijeenkomsten waarin we de raadsleden van alle gemeenten in onze regio informeren over Brandweer Gooi en Vechtstreek, in het bijzonder over het nieuwe brandrisicoprofiel en het nieuwe dekkingsplan.</p>\r\n\r\n<p>Hieruit zijn twee data naar voren gekomen waarop we alle raden bereiken, namelijk:</p>\r\n\r\n<ul>\r\n<li>10 oktober 19.30 -21.30 uur, brandweerkazerne Hilversum: Huizen, Weesp, Laren en Blaricum</li>\r\n<li>16 oktober 19.30 -21.30 uur, brandweerkazerne Hilversum: Gooise Meren, Wijdemeren en Hilversum en wederom Weesp</li>\r\n</ul>\r\n<p> Er volgt de komende dagen een vooraankondiging in de raadsinformatiebrief n.a.v. het algemeen bestuur van vandaag en een formele separate uitnodiging per mail voor alle raadsleden.</p>\r\n",
+          "publicationDate": "2018-07-04",
+          "startDate": "2018-10-10",
+          "endDate": "2018-10-10",
+          "startTime": "19:30",
+          "endTime": "21:30",
+          "confidential": 0,
+          "url": "/Evenement/2018/10/10/Raadsinformatiebijeenkomst-Veiligheidsregio-G-V"
+        },
+        {
+          "id": 2,
+          "title": "Werkbezoek Versa Welzijn",
+          "fragment": "Werkbezoek-Versa-Welzijn",
+          "location": "volgt nog",
+          "description": "",
+          "publicationDate": "2018-08-20",
+          "startDate": "2018-09-19",
+          "endDate": "2018-09-19",
+          "startTime": "16:00",
+          "endTime": "18:00",
+          "confidential": 0,
+          "url": "/Evenement/2018/09/19/Werkbezoek-Versa-Welzijn"
+        },
+        {
+          "id": 6,
+          "title": "Commissie ABM vervallen",
+          "fragment": "Commissie-ABM-vervallen",
+          "location": "Raadszaal",
+          "description": "",
+          "publicationDate": "2018-08-23",
+          "startDate": "2018-09-13",
+          "endDate": "2018-09-13",
+          "startTime": "20:00",
+          "endTime": "20:00",
+          "confidential": 0,
+          "url": "/Evenement/2018/09/13/Commissie-ABM-vervallen"
+        }
       ]
     },
     {
@@ -156,27 +272,112 @@
         1,
         2,
         3
+      ],
+      "total_count": "1144",
+      "sample_records": [
+        {
+          "id": 1,
+          "location": {
+            "id": 1,
+            "location": "Raadzaal"
+          },
+          "title": "",
+          "order": 1,
+          "container": {
+            "id": 1,
+            "meeting": {
+              "id": 19,
+              "confidential": 0,
+              "location": "Raadzaal",
+              "description": "<p>Raadsvergadering 05 Jul 2018</p>",
+              "date": "2018-07-05",
+              "startTime": "20:00",
+              "dmu": {
+                "id": 14,
+                "name": "Raadsvergadering",
+                "sortOrder": 0
+              },
+              "url": "/Vergaderingen/Raadsvergadering/2018/5-juli/20:00",
+              "meetingLabel": null
+            },
+            "order": 1
+          }
+        },
+        {
+          "id": 2,
+          "location": {
+            "id": 1,
+            "location": "Raadzaal"
+          },
+          "title": "",
+          "order": 1,
+          "container": {
+            "id": 2,
+            "meeting": {
+              "id": 20,
+              "confidential": 0,
+              "location": "Raadzaal",
+              "description": "<p>Raadsvergadering 12 Jul 2018</p>",
+              "date": "2018-07-12",
+              "startTime": "20:00",
+              "dmu": {
+                "id": 14,
+                "name": "Raadsvergadering",
+                "sortOrder": 0
+              },
+              "url": "/Vergaderingen/Raadsvergadering/2018/12-juli/20:00",
+              "meetingLabel": null
+            },
+            "order": 1
+          }
+        },
+        {
+          "id": 3,
+          "location": {
+            "id": 1,
+            "location": "Raadzaal"
+          },
+          "title": "",
+          "order": 1,
+          "container": {
+            "id": 3,
+            "meeting": {
+              "id": 27,
+              "confidential": 0,
+              "location": "Raadzaal",
+              "description": "<p>Commissie Sociaal Domein 11 september 2018</p>",
+              "date": "2018-09-11",
+              "startTime": "20:00",
+              "dmu": {
+                "id": 21,
+                "name": "Commissie Sociaal Domein",
+                "sortOrder": 5
+              },
+              "url": "/Vergaderingen/Commissie-Sociaal-Domein/2018/11-september/20:00",
+              "meetingLabel": null
+            },
+            "order": 1
+          }
+        }
       ]
     },
     {
-      "path": "meetings/1223",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1223",
-      "ok": true,
-      "status_code": 200,
-      "error": null,
-      "response_shape": "object.result.object",
-      "result_keys": [
-        "meeting"
-      ],
-      "sample_keys": [
-        "meeting"
-      ],
+      "path": "meetings/42745",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/42745",
+      "ok": false,
+      "status_code": 404,
+      "error": "HTTP 404",
+      "response_shape": null,
+      "result_keys": [],
+      "sample_keys": [],
       "sample_count": null,
-      "sample_ids": []
+      "sample_ids": [],
+      "total_count": null,
+      "sample_records": []
     },
     {
-      "path": "meetings/1223/documents",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1223/documents?limit=5&offset=0",
+      "path": "meetings/42745/documents",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/42745/documents?limit=10&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -190,11 +391,13 @@
       ],
       "sample_keys": [],
       "sample_count": 0,
-      "sample_ids": []
+      "sample_ids": [],
+      "total_count": "0",
+      "sample_records": []
     },
     {
-      "path": "meetings/1223/meetingitems",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1223/meetingitems?limit=5&offset=0",
+      "path": "meetings/42745/meetingitems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/42745/meetingitems?limit=10&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -208,27 +411,27 @@
       ],
       "sample_keys": [],
       "sample_count": 0,
-      "sample_ids": []
+      "sample_ids": [],
+      "total_count": "0",
+      "sample_records": []
     },
     {
-      "path": "meetings/1212",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1212",
-      "ok": true,
-      "status_code": 200,
-      "error": null,
-      "response_shape": "object.result.object",
-      "result_keys": [
-        "meeting"
-      ],
-      "sample_keys": [
-        "meeting"
-      ],
+      "path": "meetings/40215",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40215",
+      "ok": false,
+      "status_code": 404,
+      "error": "HTTP 404",
+      "response_shape": null,
+      "result_keys": [],
+      "sample_keys": [],
       "sample_count": null,
-      "sample_ids": []
+      "sample_ids": [],
+      "total_count": null,
+      "sample_records": []
     },
     {
-      "path": "meetings/1212/documents",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1212/documents?limit=5&offset=0",
+      "path": "meetings/40215/documents",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40215/documents?limit=10&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -242,11 +445,13 @@
       ],
       "sample_keys": [],
       "sample_count": 0,
-      "sample_ids": []
+      "sample_ids": [],
+      "total_count": "0",
+      "sample_records": []
     },
     {
-      "path": "meetings/1212/meetingitems",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1212/meetingitems?limit=5&offset=0",
+      "path": "meetings/40215/meetingitems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40215/meetingitems?limit=10&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -260,27 +465,27 @@
       ],
       "sample_keys": [],
       "sample_count": 0,
-      "sample_ids": []
+      "sample_ids": [],
+      "total_count": "0",
+      "sample_records": []
     },
     {
-      "path": "meetings/1202",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1202",
-      "ok": true,
-      "status_code": 200,
-      "error": null,
-      "response_shape": "object.result.object",
-      "result_keys": [
-        "meeting"
-      ],
-      "sample_keys": [
-        "meeting"
-      ],
+      "path": "meetings/40074",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40074",
+      "ok": false,
+      "status_code": 404,
+      "error": "HTTP 404",
+      "response_shape": null,
+      "result_keys": [],
+      "sample_keys": [],
       "sample_count": null,
-      "sample_ids": []
+      "sample_ids": [],
+      "total_count": null,
+      "sample_records": []
     },
     {
-      "path": "meetings/1202/documents",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1202/documents?limit=5&offset=0",
+      "path": "meetings/40074/documents",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40074/documents?limit=10&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -294,11 +499,13 @@
       ],
       "sample_keys": [],
       "sample_count": 0,
-      "sample_ids": []
+      "sample_ids": [],
+      "total_count": "0",
+      "sample_records": []
     },
     {
-      "path": "meetings/1202/meetingitems",
-      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/1202/meetingitems?limit=5&offset=0",
+      "path": "meetings/40074/meetingitems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings/40074/meetingitems?limit=10&offset=0",
       "ok": true,
       "status_code": 200,
       "error": null,
@@ -312,12 +519,14 @@
       ],
       "sample_keys": [],
       "sample_count": 0,
-      "sample_ids": []
+      "sample_ids": [],
+      "total_count": "0",
+      "sample_records": []
     }
   ],
   "notes": [
     "This report uses documented nested routes and a small number of sampled meetings.",
-    "Review sample_keys before implementing canonical Meeting and AgendaItem models.",
+    "Manual meeting IDs can be supplied to probe known meetings with likely agenda items or documents.",
     "A 200 response with zero sample_count can still be a valid relationship endpoint for meetings without documents or items."
   ]
 }
