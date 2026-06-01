@@ -63,6 +63,67 @@ def parse_ids(value: str | None) -> list[int]:
     return ids
 
 
+
+def classify_payload(payload: Any) -> tuple[str | None, list[str], list[str], int | None, list[int | str]]:
+    """Backward-compatible payload classifier used by earlier tests.
+
+    Returns response_shape, result_keys, sample_keys, sample_count and sample_ids.
+    The relation discovery workflow itself uses classify_response/probe, but keeping
+    this function prevents older tests and downstream imports from breaking.
+    """
+    if not isinstance(payload, dict):
+        return type(payload).__name__, [], [], None, []
+
+    result = payload.get("result")
+    if isinstance(result, dict):
+        result_keys = list(result.keys())
+        list_values = [(key, value) for key, value in result.items() if isinstance(value, list)]
+        if list_values:
+            _, values = max(list_values, key=lambda item: len(item[1]))
+            sample = values[0] if values and isinstance(values[0], dict) else {}
+            sample_ids = [
+                item.get("id")
+                for item in values
+                if isinstance(item, dict) and item.get("id") is not None
+            ]
+            return (
+                "object.result.object_with_list",
+                result_keys,
+                list(sample.keys()) if isinstance(sample, dict) else [],
+                len(values),
+                sample_ids[:10],
+            )
+        sample_ids = [result.get("id")] if result.get("id") is not None else []
+        return "object.result.object", result_keys, list(result.keys()), None, sample_ids
+
+    if isinstance(result, list):
+        sample = result[0] if result and isinstance(result[0], dict) else {}
+        sample_ids = [
+            item.get("id")
+            for item in result
+            if isinstance(item, dict) and item.get("id") is not None
+        ]
+        return "object.result.list", [], list(sample.keys()) if isinstance(sample, dict) else [], len(result), sample_ids[:10]
+
+    return "object", [], list(payload.keys()), None, []
+
+
+def list_from_result(payload: dict[str, Any], preferred_key: str) -> list[dict[str, Any]]:
+    """Return a list from result, preferring the expected collection key.
+
+    This is kept for compatibility with the original relation discovery tests.
+    """
+    result = payload.get("result")
+    if not isinstance(result, dict):
+        return []
+    value = result.get(preferred_key)
+    if isinstance(value, list):
+        return [item for item in value if isinstance(item, dict)]
+    for candidate in result.values():
+        if isinstance(candidate, list):
+            return [item for item in candidate if isinstance(item, dict)]
+    return []
+
 def result_object(payload: dict[str, Any]) -> dict[str, Any]:
     result = payload.get("result", {})
     return result if isinstance(result, dict) else {}
