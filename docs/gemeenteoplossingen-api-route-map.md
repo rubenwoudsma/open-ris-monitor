@@ -1,10 +1,8 @@
 # GemeenteOplossingen API route map
 
-This document records the relevant API routes for the Open RIS Monitor implementation.
+This document records the API routes used by Open RIS Monitor for GemeenteOplossingen.
 
 ## Proven top-level routes
-
-The first discovery runs confirmed these top-level routes for Huizen:
 
 - `/documents`
 - `/meetings`
@@ -12,44 +10,22 @@ The first discovery runs confirmed these top-level routes for Huizen:
 - `/events`
 - `/meetingsessions`
 
-## Meeting and agenda item routes
+## Proven relation routes
 
-The GemeenteOplossingen API documentation uses `meetingitems` for agenda items. Agenda items are not exposed as a top-level `/agendaItems` endpoint.
-
-Relevant routes:
-
-- `/meetings`
 - `/meetings/{meetingId}`
+- `/meetings/{meetingId}/documents`
 - `/meetings/{meetingId}/meetingitems`
 - `/meetingitems/{meetingItemId}`
-- `/meetings/{meetingId}/documents`
 - `/meetingitems/{meetingItemId}/documents`
 
-## Manual meeting ID discovery
+## Notes
 
-The relation discovery workflow supports optional manual meeting IDs. This is useful when the newest meetings do not contain agenda items or documents.
-
-Example input:
+Meeting items are not exposed through a top-level `/agendaItems` endpoint. The documented route is:
 
 ```text
-42745,40215,40074
+/meetings/{meetingId}/meetingitems
 ```
 
-The workflow will probe:
+`meetingsessions` can contain `container.meeting.id`. These IDs are useful for discovering historical meetings with actual agenda structure, because the newest meetings can be future meetings without agenda items or documents yet.
 
-- `/meetings/{id}`
-- `/meetings/{id}/meetingitems`
-- `/meetings/{id}/documents`
-
-If meeting items are discovered, it will also probe:
-
-- `/meetingitems/{meetingItemId}`
-- `/meetingitems/{meetingItemId}/documents`
-
-## Next implementation step
-
-After finding populated meetings and meeting items, issue #15 can implement canonical exports:
-
-- `meetings.jsonl`
-- `agenda_items.jsonl`
-- `relations.jsonl`
+Manual IDs supplied to the discovery workflow must be meeting IDs. If `/meetings/{id}` returns 404, the supplied value is probably not a meeting ID.
