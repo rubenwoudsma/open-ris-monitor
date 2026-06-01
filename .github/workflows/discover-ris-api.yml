@@ -8,13 +8,21 @@ on:
         required: true
         default: huizen
       limit:
-        description: Number of records to request per candidate endpoint
+        description: Number of sample records to request per endpoint
         required: true
         default: "3"
       endpoints:
-        description: Optional comma-separated endpoint list. Leave empty for default candidates.
+        description: Optional comma-separated endpoint list. Leave empty for defaults.
         required: false
         default: ""
+      commit_report:
+        description: Commit discovery report to data/public/quality
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
 
 jobs:
   discover:
@@ -23,6 +31,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,7 +44,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e .
 
-      - name: Probe candidate endpoints
+      - name: Run endpoint discovery
         run: |
           python -m open_ris_monitor.analysis.gemeenteoplossingen_discovery \
             --municipality "${{ inputs.municipality }}" \
@@ -52,4 +62,13 @@ jobs:
           name: ris-api-discovery-${{ inputs.municipality }}
           path: data/public/quality/gemeenteoplossingen_endpoint_discovery.json
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7
+
+      - name: Commit discovery report
+        if: ${{ inputs.commit_report }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/public/quality/gemeenteoplossingen_endpoint_discovery.json
+          git diff --cached --quiet || git commit -m "Update GemeenteOplossingen discovery report"
+          git push

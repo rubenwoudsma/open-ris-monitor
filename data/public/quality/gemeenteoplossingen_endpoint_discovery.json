@@ -1,0 +1,303 @@
+{
+  "generated_at": "2026-06-01T11:53:51.050215+00:00",
+  "municipality": "huizen",
+  "base_url": "https://ris.gemeenteraadhuizen.nl/api/v2/",
+  "limit": 3,
+  "summary": {
+    "working_endpoints": [
+      "documents",
+      "meetings",
+      "meetingsessions",
+      "events"
+    ],
+    "working_endpoint_count": 4,
+    "likely_meeting_endpoints": [
+      "meetings",
+      "meetingsessions",
+      "events"
+    ],
+    "likely_agenda_endpoints": []
+  },
+  "probes": [
+    {
+      "endpoint": "documents",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/documents?limit=3&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "top_level_keys": [
+        "status",
+        "code",
+        "messages",
+        "result"
+      ],
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "documents"
+      ],
+      "sample_keys": [
+        "id",
+        "objectId",
+        "confidential",
+        "fileName",
+        "documentTypeLabel",
+        "description",
+        "fileSize",
+        "publicationDate",
+        "isTabsignDocument"
+      ],
+      "sample_count": 3
+    },
+    {
+      "endpoint": "meetings",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetings?limit=3&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "top_level_keys": [
+        "status",
+        "code",
+        "messages",
+        "result"
+      ],
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "meetings"
+      ],
+      "sample_keys": [
+        "id",
+        "confidential",
+        "location",
+        "description",
+        "date",
+        "startTime",
+        "dmu",
+        "url",
+        "meetingLabel"
+      ],
+      "sample_count": 3
+    },
+    {
+      "endpoint": "meeting",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meeting?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "meetingsessions",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/meetingsessions?limit=3&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "top_level_keys": [
+        "status",
+        "code",
+        "messages",
+        "result"
+      ],
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "meetingsessions"
+      ],
+      "sample_keys": [
+        "id",
+        "location",
+        "title",
+        "order",
+        "container"
+      ],
+      "sample_count": 3
+    },
+    {
+      "endpoint": "sessions",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/sessions?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "events",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/events?limit=3&offset=0",
+      "ok": true,
+      "status_code": 200,
+      "error": null,
+      "response_shape": "object.result.object_with_list",
+      "top_level_keys": [
+        "status",
+        "code",
+        "messages",
+        "result"
+      ],
+      "result_keys": [
+        "offset",
+        "limit",
+        "count",
+        "totalCount",
+        "events"
+      ],
+      "sample_keys": [
+        "id",
+        "title",
+        "fragment",
+        "location",
+        "description",
+        "publicationDate",
+        "startDate",
+        "endDate",
+        "startTime",
+        "endTime",
+        "confidential",
+        "url"
+      ],
+      "sample_count": 3
+    },
+    {
+      "endpoint": "calendar",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/calendar?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "agendas",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/agendas?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "agenda",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/agenda?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "agendaItems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/agendaItems?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "agendaitems",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/agendaitems?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "agenda-items",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/agenda-items?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "items",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/items?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "committees",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/committees?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "councils",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/councils?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    },
+    {
+      "endpoint": "organizations",
+      "url": "https://ris.gemeenteraadhuizen.nl/api/v2/organizations?limit=3&offset=0",
+      "ok": false,
+      "status_code": 400,
+      "error": "HTTP 400",
+      "response_shape": null,
+      "top_level_keys": [],
+      "result_keys": [],
+      "sample_keys": [],
+      "sample_count": null
+    }
+  ],
+  "notes": [
+    "HTTP 404 or 403 responses are expected for unsupported endpoint candidates.",
+    "This report is discovery output and should be reviewed before implementing canonical Meeting or AgendaItem models.",
+    "The documents endpoint is included as a known baseline endpoint."
+  ]
+}
