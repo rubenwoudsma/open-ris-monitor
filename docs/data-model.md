@@ -4,7 +4,7 @@
 
 Het canonieke datamodel zorgt ervoor dat data uit verschillende RIS-bronnen op dezelfde manier kan worden verwerkt, gepubliceerd en getoond. De brondata mag per leverancier verschillen. Vanaf de normalisatielaag werkt het project met dezelfde entiteiten, velden en relaties.
 
-De huidige MVP implementeert vooral het documentdeel van dit model. Dat is bewust: documenten zijn het eerste bewezen endpoint in de Huizen-implementatie. Het bredere model blijft richtinggevend voor de volgende fases.
+De MVP is begonnen als document-first implementatie. Vanaf issue #15 bevat het model ook de eerste relationele laag met vergaderingen, agendapunten en documentrelaties.
 
 ## Status van het model
 
@@ -13,28 +13,31 @@ De huidige MVP implementeert vooral het documentdeel van dit model. Dat is bewus
 | Municipality | conceptueel aanwezig | via gemeenteconfiguratie |
 | SourceSystem | conceptueel aanwezig | via gemeenteconfiguratie |
 | Document | geimplementeerd | eerste canonieke model |
+| DocumentVersion | geimplementeerd | checksums en documentobservaties |
 | HarvestRun | geimplementeerd | vastlegging van harvest-resultaten |
-| Meeting | gepland | afhankelijk van endpointonderzoek |
-| AgendaItem | gepland | afhankelijk van endpointonderzoek |
-| DocumentVersion | gepland | nodig voor checksums en wijzigingen |
+| Meeting | geimplementeerd voor GemeenteOplossingen | via `/meetingsessions` en `/meetings/{id}` |
+| MeetingItem | geimplementeerd voor GemeenteOplossingen | functioneel het agendapunt |
+| MeetingDocumentRelation | geimplementeerd | koppeling tussen vergadering en document |
+| MeetingItemDocumentRelation | geimplementeerd | koppeling tussen agendapunt en document |
 | QualityIssue | gepland | nodig voor datakwaliteitsrapportage |
-| Relation | gepland | nodig voor koppelingen tussen entiteiten |
+| DocumentTypeMapping | gepland | nodig voor documenttypenormalisatie |
 | Person, Organization, Topic, Decision | later | buiten MVP-scope |
 
 ## Kernentiteiten
 
-Voor de MVP en directe vervolgstappen zijn dit de kernentiteiten:
+Voor de huidige MVP en directe vervolgstappen zijn dit de kernentiteiten:
 
 ```text
 Municipality
 SourceSystem
 Document
-HarvestRun
 DocumentVersion
-QualityIssue
+HarvestRun
 Meeting
-AgendaItem
-Relation
+MeetingItem
+MeetingDocumentRelation
+MeetingItemDocumentRelation
+QualityIssue
 ```
 
 Latere uitbreidingen:
@@ -51,21 +54,19 @@ DocumentText
 
 ```mermaid
 erDiagram
-    MUNICIPALITY ||--o{ SOURCE_SYSTEM : uses
-    SOURCE_SYSTEM ||--o{ SOURCE_RECORD : provides
-    MUNICIPALITY ||--o{ MEETING : has
-    MEETING ||--o{ AGENDA_ITEM : contains
-    MEETING ||--o{ DOCUMENT : has
-    AGENDA_ITEM ||--o{ DOCUMENT : has
-    AGENDA_ITEM ||--o{ DECISION : results_in
-    DOCUMENT ||--o{ DOCUMENT_VERSION : has
-    DOCUMENT ||--o{ DOCUMENT_TEXT : has
-    DOCUMENT ||--o{ QUALITY_ISSUE : may_have
-    MEETING ||--o{ QUALITY_ISSUE : may_have
-    HARVEST_RUN ||--o{ SOURCE_RECORD : retrieves
-    HARVEST_RUN ||--o{ QUALITY_ISSUE : detects
-    TOPIC }o--o{ DOCUMENT : tags
-    TOPIC }o--o{ AGENDA_ITEM : tags
+  MUNICIPALITY ||--o{ SOURCE_SYSTEM : uses
+  SOURCE_SYSTEM ||--o{ DOCUMENT : provides
+  SOURCE_SYSTEM ||--o{ MEETING : provides
+  MUNICIPALITY ||--o{ MEETING : has
+  MEETING ||--o{ MEETING_ITEM : contains
+  MEETING ||--o{ MEETING_DOCUMENT_RELATION : links
+  MEETING_ITEM ||--o{ MEETING_ITEM_DOCUMENT_RELATION : links
+  DOCUMENT ||--o{ MEETING_DOCUMENT_RELATION : referenced_by
+  DOCUMENT ||--o{ MEETING_ITEM_DOCUMENT_RELATION : referenced_by
+  DOCUMENT ||--o{ DOCUMENT_VERSION : has
+  HARVEST_RUN ||--o{ DOCUMENT : observes
+  HARVEST_RUN ||--o{ MEETING : observes
+  HARVEST_RUN ||--o{ QUALITY_ISSUE : detects
 ```
 
 ## Identifierbeleid
@@ -82,8 +83,15 @@ Voorbeelden:
 
 ```text
 huizen-document-25892
-huizen-meeting-2026-05-21-raad
-huizen-agendaitem-abc123
+huizen-meeting-19
+huizen-meeting-item-142
+```
+
+Relatie-ID's combineren de betrokken bron-ID's:
+
+```text
+huizen-meeting-19-document-3127
+huizen-meeting-item-142-document-158
 ```
 
 Bron-ID's blijven altijd bewaard in:
@@ -96,6 +104,9 @@ Als een bron meerdere relevante IDs heeft, bewaren we die expliciet, bijvoorbeel
 
 ```text
 source_object_id
+document_object_id
+meeting_source_id
+meeting_item_source_id
 ```
 
 ## Municipality
@@ -133,7 +144,7 @@ Het bronsysteem komt primair uit configuratie.
 
 ## Document
 
-Status: geimplementeerd voor de document-first MVP.
+Status: geimplementeerd.
 
 Doel: een leveranciersneutrale representatie van een RIS-document.
 
@@ -145,10 +156,10 @@ Doel: een leveranciersneutrale representatie van een RIS-document.
   "municipality_id": "gm0406",
   "municipality_slug": "huizen",
   "source_system_id": "huizen-gemeenteoplossingen",
-  "title": "Verzoek commissiebehandeling de heer Heutink Mededeling over Evaluatie Ellertsveld",
-  "description": "Verzoek commissiebehandeling de heer Heutink Mededeling over Evaluatie Ellertsveld",
+  "title": "Verzoek commissiebehandeling",
+  "description": "Verzoek commissiebehandeling",
   "document_type": "Overig",
-  "filename": "Verzoek commissiebehandeling de heer Heutink Mededeling over Evaluatie Ellertsveld.pdf",
+  "filename": "Verzoek commissiebehandeling.pdf",
   "mime_type": "application/pdf",
   "file_size_bytes": 62118,
   "publication_datetime": "2026-05-19T00:00:00+02:00",
@@ -156,25 +167,146 @@ Doel: een leveranciersneutrale representatie van een RIS-document.
   "source_url": "https://ris.gemeenteraadhuizen.nl/api/v2/documents/25892/download",
   "download_url": "https://ris.gemeenteraadhuizen.nl/api/v2/documents/25892/download",
   "is_confidential": false,
-  "is_tabsign_document": false,
-  "raw": {}
+  "is_tabsign_document": false
 }
 ```
 
-### Mapping GemeenteOplossingen naar Document
+## Meeting
+
+Status: geimplementeerd voor GemeenteOplossingen.
+
+Doel: een vergadering of bestuurlijk overleg uit het RIS.
+
+```json
+{
+  "id": "huizen-meeting-19",
+  "source_id": "19",
+  "municipality_slug": "huizen",
+  "source_system_id": "huizen-gemeenteoplossingen",
+  "date": "2018-07-05",
+  "start_time": "20:00",
+  "description": "Raadsvergadering 05 Jul 2018",
+  "location": "Raadzaal",
+  "dmu_id": "14",
+  "dmu_name": "Raadsvergadering",
+  "dmu_sort_order": 0,
+  "url": "/Vergaderingen/Raadsvergadering/2018/5-juli/20:00",
+  "is_confidential": false
+}
+```
+
+Mapping GemeenteOplossingen naar Meeting:
 
 | Bronveld | Canoniek veld | Opmerking |
 |---|---|---|
-| `id` | `source_id` | bron-ID document |
-| `objectId` | `source_object_id` | aanvullende bron-ID |
-| `description` | `title`, `description` | voorlopig als titel gebruikt |
-| `documentTypeLabel` | `document_type` | bronlabel documentsoort |
-| `fileName` | `filename` | originele bestandsnaam |
-| `fileSize` | `file_size_bytes` | bestandsgrootte volgens API |
-| `publicationDate.date` | `publication_datetime` | bronpublicatiedatum |
-| `publicationDate.timezone` | `publication_timezone` | timezone uit bron |
+| `id` | `source_id` | bron-ID vergadering |
+| `date` | `date` | datum uit bron |
+| `startTime` | `start_time` | starttijd als tekst |
+| `description` | `description` | HTML wordt gestript |
+| `location` | `location` | locatie uit bron |
+| `dmu.id` | `dmu_id` | bestuurlijk orgaan of vergadertype |
+| `dmu.name` | `dmu_name` | naam bestuurlijk orgaan of vergadertype |
+| `dmu.sortOrder` | `dmu_sort_order` | sortering uit bron |
+| `url` | `url` | relatieve RIS URL |
 | `confidential` | `is_confidential` | bronwaarde omgezet naar boolean |
-| `isTabsignDocument` | `is_tabsign_document` | bronwaarde omgezet naar boolean |
+
+## MeetingItem
+
+Status: geimplementeerd voor GemeenteOplossingen.
+
+Doel: een agendapunt binnen een vergadering. De bronterm is `meetingitem`. In de public exports gebruiken we daarom `meeting_items.jsonl`. Functioneel is dit het agendapunt.
+
+```json
+{
+  "id": "huizen-meeting-item-142",
+  "source_id": "142",
+  "meeting_id": "huizen-meeting-19",
+  "meeting_source_id": "19",
+  "municipality_slug": "huizen",
+  "source_system_id": "huizen-gemeenteoplossingen",
+  "number": "5.2.",
+  "sort_order": 11,
+  "title": "Ingekomen stukken rubriek B, om preadvies in handen van het college",
+  "description": null,
+  "status_id": "10",
+  "status_abbreviation": null,
+  "status_description": null,
+  "is_heading": false,
+  "is_confidential": false
+}
+```
+
+Mapping GemeenteOplossingen naar MeetingItem:
+
+| Bronveld | Canoniek veld | Opmerking |
+|---|---|---|
+| `id` | `source_id` | bron-ID agendapunt |
+| `meeting_id` of `meeting.id` | `meeting_source_id` | bron-ID vergadering |
+| `number` | `number` | agendanummer |
+| `sortOrder` | `sort_order` | sorteervolgorde |
+| `title` | `title` | agendapuntnaam |
+| `description` | `description` | HTML wordt gestript indien aanwezig |
+| `status.id` | `status_id` | bronstatus |
+| `status.abbreviation` | `status_abbreviation` | bronstatus |
+| `status.description` | `status_description` | bronstatus |
+| `isHeading` | `is_heading` | bronwaarde omgezet naar boolean |
+| `confidential` | `is_confidential` | bronwaarde omgezet naar boolean |
+
+## MeetingDocumentRelation
+
+Status: geimplementeerd.
+
+Doel: expliciete koppeling tussen een vergadering en een document.
+
+```json
+{
+  "id": "huizen-meeting-19-document-3127",
+  "meeting_id": "huizen-meeting-19",
+  "meeting_source_id": "19",
+  "document_id": "huizen-document-3127",
+  "document_source_id": "3127",
+  "document_object_id": "5709",
+  "municipality_slug": "huizen",
+  "source_system_id": "huizen-gemeenteoplossingen",
+  "relation_type": "meeting_document",
+  "source_path": "/meetings/19/documents"
+}
+```
+
+Deduplicatie gebeurt op:
+
+```text
+municipality_slug + meeting_id + document_id + source_path
+```
+
+## MeetingItemDocumentRelation
+
+Status: geimplementeerd.
+
+Doel: expliciete koppeling tussen een agendapunt en een document.
+
+```json
+{
+  "id": "huizen-meeting-item-142-document-158",
+  "meeting_id": "huizen-meeting-19",
+  "meeting_source_id": "19",
+  "meeting_item_id": "huizen-meeting-item-142",
+  "meeting_item_source_id": "142",
+  "document_id": "huizen-document-158",
+  "document_source_id": "158",
+  "document_object_id": "333",
+  "municipality_slug": "huizen",
+  "source_system_id": "huizen-gemeenteoplossingen",
+  "relation_type": "meeting_item_document",
+  "source_path": "/meetingitems/142/documents"
+}
+```
+
+Deduplicatie gebeurt op:
+
+```text
+municipality_slug + meeting_item_id + document_id + source_path
+```
 
 ## HarvestRun
 
@@ -184,113 +316,21 @@ Doel: vastleggen wat een harvest-run heeft gedaan en hoeveel records zijn verwer
 
 ```json
 {
-  "id": "harvest-huizen-20260527T204635Z",
+  "id": "harvest-huizen-20260602T130816Z",
   "municipality_id": "gm0406",
   "source_system_id": "huizen-gemeenteoplossingen",
-  "started_at": "2026-05-27T20:46:35Z",
-  "finished_at": "2026-05-27T20:46:37Z",
+  "started_at": "2026-06-02T13:08:16Z",
+  "finished_at": "2026-06-02T13:09:36Z",
   "status": "success",
-  "meetings_seen": 0,
-  "agenda_items_seen": 0,
-  "documents_seen": 25,
-  "documents_committed": 0,
+  "documents_seen": 10,
+  "documents_committed": 10,
   "documents_downloaded_temporarily": 0,
+  "meetings_seen": 33,
+  "meeting_items_seen": 200,
+  "meeting_document_relations_seen": 34,
+  "meeting_item_document_relations_seen": 251,
+  "meetings_skipped": 17,
   "quality_issues_detected": 0
-}
-```
-
-## DocumentVersion
-
-Status: gepland voor issue #12.
-
-Doel: documentwijzigingen detecteerbaar maken zonder PDF's structureel in Git op te slaan.
-
-```json
-{
-  "id": "huizen-document-25892-version-2026-05-27",
-  "document_id": "huizen-document-25892",
-  "retrieved_at": "2026-05-27T03:00:00+02:00",
-  "sha256": "...",
-  "file_size_bytes": 62118,
-  "content_changed": false,
-  "metadata_changed": true,
-  "previous_version_id": null
-}
-```
-
-## QualityIssue
-
-Status: gepland voor issue #13.
-
-Doel: datakwaliteit zichtbaar maken.
-
-```json
-{
-  "id": "quality-2026-05-27-001",
-  "resource_type": "document",
-  "resource_id": "huizen-document-25892",
-  "severity": "warning",
-  "issue_type": "generic_filename",
-  "message": "Document heeft een generieke of weinig informatieve bestandsnaam.",
-  "detected_at": "2026-05-27T03:00:00+02:00"
-}
-```
-
-## Meeting
-
-Status: gepland voor issue #14.
-
-```json
-{
-  "id": "huizen-meeting-2026-05-21-raad",
-  "source_id": "12345",
-  "municipality_id": "gm0406",
-  "source_system_id": "huizen-gemeenteoplossingen",
-  "title": "Raadsvergadering",
-  "body_type": "raad",
-  "status": "gepland",
-  "start_datetime": "2026-05-21T20:00:00+02:00",
-  "end_datetime": null,
-  "location": "Raadzaal gemeentehuis Huizen",
-  "web_url": "https://ris.gemeenteraadhuizen.nl/..."
-}
-```
-
-## AgendaItem
-
-Status: gepland voor issue #14.
-
-```json
-{
-  "id": "huizen-agendaitem-abc123",
-  "source_id": "67890",
-  "meeting_id": "huizen-meeting-2026-05-21-raad",
-  "municipality_id": "gm0406",
-  "number": "7",
-  "title": "Vaststellen bestemmingsplan",
-  "description": null,
-  "position": 7,
-  "status": "behandeld",
-  "web_url": "https://ris.gemeenteraadhuizen.nl/..."
-}
-```
-
-## Relation
-
-Status: gepland.
-
-Doel: relaties expliciet vastleggen, zeker wanneer het bronsysteem relaties niet direct of niet uniform levert.
-
-```json
-{
-  "id": "relation-huizen-document-25892-agendaitem-abc123",
-  "source_resource_type": "document",
-  "source_resource_id": "huizen-document-25892",
-  "target_resource_type": "agenda_item",
-  "target_resource_id": "huizen-agendaitem-abc123",
-  "relation_type": "belongs_to",
-  "confidence": 1.0,
-  "derived": false
 }
 ```
 
@@ -302,18 +342,21 @@ Huidig:
 
 ```text
 data/public/documents.jsonl
+data/public/document_versions.jsonl
 data/public/harvest_runs.jsonl
+data/public/meetings.jsonl
+data/public/meeting_items.jsonl
+data/public/meeting_documents.jsonl
+data/public/meeting_item_documents.jsonl
 data/public/latest.json
 ```
 
-Toekomstig:
+Gepland:
 
 ```text
-data/public/meetings.jsonl
-data/public/agenda_items.jsonl
-data/public/document_versions.jsonl
 data/public/quality_issues.jsonl
-data/public/relations.jsonl
+data/public/document_type_mappings.jsonl
+data/public/search_index.json
 ```
 
 Breaking changes in deze bestanden moeten bewust worden gedaan en in de roadmap worden benoemd.
