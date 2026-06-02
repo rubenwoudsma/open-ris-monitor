@@ -1,0 +1,63 @@
+name: Issue 15 Step 2 Smoke Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: Run relation harvest smoke test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python -m pip install pytest requests
+
+      - name: Run small relation harvest
+        run: |
+          python -m open_ris_monitor.pipeline.run \
+            --municipality huizen \
+            --mode latest \
+            --limit 10 \
+            --include-relations \
+            --meeting-scan-limit 50 \
+            --meeting-session-batch-size 50 \
+            --meeting-item-limit 200
+
+      - name: Show relation harvest summary
+        run: |
+          echo "Raw latest files:"
+          ls -la data/raw/latest || true
+
+          echo ""
+          echo "Relation harvest summary:"
+          cat data/raw/latest/relation_harvest_summary.json || true
+
+          echo ""
+          echo "Meeting IDs:"
+          head -c 4000 data/raw/latest/meeting_ids.json || true
+
+      - name: Upload raw relation harvest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-15-step-2-raw-relation-harvest
+          path: |
+            data/raw/latest/meetingsessions.json
+            data/raw/latest/meeting_ids.json
+            data/raw/latest/meetings.json
+            data/raw/latest/meeting_items.json
+            data/raw/latest/meeting_documents.json
+            data/raw/latest/meeting_item_documents.json
+            data/raw/latest/relation_harvest_summary.json
+          if-no-files-found: warn
