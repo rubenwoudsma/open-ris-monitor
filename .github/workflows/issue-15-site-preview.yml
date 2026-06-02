@@ -1,0 +1,48 @@
+name: Issue 15 Site Preview
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - issue-15-meeting-document-relations
+    paths:
+      - "site/**"
+      - "data/public/**"
+      - ".github/workflows/issue-15-site-preview.yml"
+
+jobs:
+  preview:
+    name: Package static site preview
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: issue-15-meeting-document-relations
+
+      - name: Prepare preview directory
+        run: |
+          mkdir -p preview
+          cp -R site preview/site
+          cp -R data preview/data
+
+      - name: Add preview README
+        run: |
+          cat > preview/README.txt <<'TXT'
+          Open RIS Monitor site preview
+
+          Download and unzip this artifact.
+          Open preview/site/index.html in a browser.
+
+          This preview contains:
+          - site/
+          - data/public/
+          - relation-aware viewer code from the feature branch
+          TXT
+
+      - name: Upload site preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-15-site-preview
+          path: preview
