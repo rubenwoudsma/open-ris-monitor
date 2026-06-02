@@ -1,0 +1,43 @@
+name: Issue 15 Step 3 Tests
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - issue-15-meeting-document-relations
+    paths:
+      - "src/open_ris_monitor/models/relations.py"
+      - "src/open_ris_monitor/normalizers/relations.py"
+      - "tests/test_relation_normalization.py"
+      - ".github/workflows/issue-15-step-3-tests.yml"
+
+jobs:
+  test:
+    name: Run relation normalization tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python -m pip install pytest requests pyyaml
+
+      - name: Run focused tests for issue 15 step 3
+        run: |
+          python -m pytest \
+            tests/test_gemeenteoplossingen_connector.py \
+            tests/test_gemeenteoplossingen_pagination.py \
+            tests/test_connector.py \
+            tests/test_gemeenteoplossingen_meeting_endpoints.py \
+            tests/test_relation_harvest.py \
+            tests/test_relation_normalization.py
