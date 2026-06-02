@@ -90,7 +90,7 @@ jobs:
           latest_path = Path("data/public/latest.json")
           latest = json.loads(latest_path.read_text(encoding="utf-8"))
 
-          exports = latest.get("exports", {})
+          outputs = latest.get("outputs", {})
 
           required = [
               "meetings",
@@ -99,12 +99,12 @@ jobs:
               "meeting_item_documents",
           ]
 
-          missing = [key for key in required if key not in exports]
+          missing = [key for key in required if key not in outputs]
           if missing:
-              raise SystemExit(f"Missing relation exports in latest.json exports: {missing}")
+              raise SystemExit(f"Missing relation exports in latest.json outputs: {missing}")
 
           for key in required:
-              path = Path("data/public") / exports[key]
+              path = Path("data/public") / outputs[key]
               if not path.exists():
                   raise SystemExit(f"Manifest points to missing file for {key}: {path}")
               if path.stat().st_size == 0:
