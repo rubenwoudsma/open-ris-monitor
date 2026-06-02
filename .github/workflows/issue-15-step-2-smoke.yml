@@ -2,6 +2,14 @@ name: Issue 15 Step 2 Smoke Test
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - issue-15-meeting-document-relations
+    paths:
+      - ".github/workflows/issue-15-step-2-smoke.yml"
+      - "src/open_ris_monitor/**"
+      - "tests/**"
+      - "pyproject.toml"
 
 jobs:
   smoke:
