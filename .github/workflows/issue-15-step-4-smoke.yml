@@ -90,6 +90,8 @@ jobs:
           latest_path = Path("data/public/latest.json")
           latest = json.loads(latest_path.read_text(encoding="utf-8"))
 
+          exports = latest.get("exports", {})
+
           required = [
               "meetings",
               "meeting_items",
@@ -97,16 +99,31 @@ jobs:
               "meeting_item_documents",
           ]
 
-          missing = [key for key in required if key not in latest]
+          missing = [key for key in required if key not in exports]
           if missing:
-              raise SystemExit(f"Missing relation exports in latest.json: {missing}")
+              raise SystemExit(f"Missing relation exports in latest.json exports: {missing}")
 
           for key in required:
-              path = Path("data/public") / latest[key]
+              path = Path("data/public") / exports[key]
               if not path.exists():
                   raise SystemExit(f"Manifest points to missing file for {key}: {path}")
               if path.stat().st_size == 0:
                   raise SystemExit(f"Manifest points to empty file for {key}: {path}")
+
+          if latest.get("relations_enabled") is not True:
+              raise SystemExit("latest.json does not mark relations_enabled as true")
+
+          summary = latest.get("relations_summary", {})
+          expected_positive = [
+              "meetings_seen",
+              "meeting_items_seen",
+              "meeting_document_relations_seen",
+              "meeting_item_document_relations_seen",
+          ]
+
+          empty = [key for key in expected_positive if summary.get(key, 0) <= 0]
+          if empty:
+              raise SystemExit(f"Relation summary contains non-positive counters: {empty}")
 
           print("Relation export manifest validation passed.")
           PY
