@@ -4,6 +4,14 @@ const state = {
   latest: null,
   documents: [],
   filteredDocuments: [],
+  meetings: [],
+  meetingItems: [],
+  meetingDocumentRelations: [],
+  meetingItemDocumentRelations: [],
+  meetingsById: new Map(),
+  meetingItemsById: new Map(),
+  meetingRelationsByDocumentId: new Map(),
+  meetingItemRelationsByDocumentId: new Map(),
   currentPage: 1,
   pageSize: 50,
   sortMode: "date-desc",
@@ -33,6 +41,7 @@ function requireElements() {
   const missing = Object.entries(elements)
     .filter(([, element]) => !element)
     .map(([name]) => name);
+
   if (missing.length > 0) {
     throw new Error(`HTML mist verwachte elementen: ${missing.join(", ")}`);
   }
@@ -57,6 +66,16 @@ async function fetchJsonl(path) {
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => JSON.parse(line));
+}
+
+async function fetchOptionalJsonl(path) {
+  if (!path) return [];
+  try {
+    return await fetchJsonl(path);
+  } catch (error) {
+    console.warn(`Optionele relationele export kon niet worden geladen: ${path}`, error);
+    return [];
+  }
 }
 
 function formatDate(value) {
@@ -119,13 +138,110 @@ function getCompactTypeLabel(documentRecord) {
   return documentRecord.normalized_document_type_label || "Onbekend";
 }
 
+function getDocumentId(documentRecord) {
+  if (documentRecord.id) return documentRecord.id;
+  if (documentRecord.municipality_slug && documentRecord.source_id) {
+    return `${documentRecord.municipality_slug}-document-${documentRecord.source_id}`;
+  }
+  return null;
+}
+
+function addToLookupList(map, key, value) {
+  if (!key) return;
+  const list = map.get(key) || [];
+  list.push(value);
+  map.set(key, list);
+}
+
+function buildRelationLookups() {
+  state.meetingsById = new Map(state.meetings.map((meeting) => [meeting.id, meeting]));
+  state.meetingItemsById = new Map(state.meetingItems.map((item) => [item.id, item]));
+  state.meetingRelationsByDocumentId = new Map();
+  state.meetingItemRelationsByDocumentId = new Map();
+
+  for (const relation of state.meetingDocumentRelations) {
+    addToLookupList(state.meetingRelationsByDocumentId, relation.document_id, relation);
+  }
+
+  for (const relation of state.meetingItemDocumentRelations) {
+    addToLookupList(state.meetingItemRelationsByDocumentId, relation.document_id, relation);
+  }
+}
+
+function getDocumentRelationContext(documentRecord) {
+  const documentId = getDocumentId(documentRecord);
+  if (!documentId) return [];
+
+  const contexts = [];
+  const seen = new Set();
+
+  const itemRelations = state.meetingItemRelationsByDocumentId.get(documentId) || [];
+  for (const relation of itemRelations) {
+    const meeting = state.meetingsById.get(relation.meeting_id);
+    const item = state.meetingItemsById.get(relation.meeting_item_id);
+    const key = `item:${relation.meeting_item_id}:${relation.document_id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    contexts.push({ meeting, item });
+  }
+
+  const meetingRelations = state.meetingRelationsByDocumentId.get(documentId) || [];
+  for (const relation of meetingRelations) {
+    const meeting = state.meetingsById.get(relation.meeting_id);
+    const key = `meeting:${relation.meeting_id}:${relation.document_id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    contexts.push({ meeting, item: null });
+  }
+
+  return contexts;
+}
+
+function formatMeetingLabel(meeting) {
+  if (!meeting) return "Onbekende vergadering";
+  const parts = [meeting.description, meeting.date, meeting.start_time].filter(Boolean);
+  return parts.join(", ");
+}
+
+function formatMeetingItemLabel(item) {
+  if (!item) return null;
+  return [item.number, item.title].filter(Boolean).join(" ");
+}
+
+function renderRelationContext(documentRecord) {
+  const contexts = getDocumentRelationContext(documentRecord);
+  if (contexts.length === 0) return "";
+
+  const visible = contexts.slice(0, 3);
+  const extraCount = contexts.length - visible.length;
+
+  const rows = visible
+    .map(({ meeting, item }) => {
+      const meetingLabel = formatMeetingLabel(meeting);
+      const itemLabel = formatMeetingItemLabel(item);
+      const itemHtml = itemLabel
+        ? `<div><strong>Agendapunt:</strong> ${escapeHtml(itemLabel)}</div>`
+        : "";
+      return `<li><div><strong>Vergadering:</strong> ${escapeHtml(meetingLabel)}</div>${itemHtml}</li>`;
+    })
+    .join("");
+
+  const extraHtml = extraCount > 0 ? `<li>+ ${extraCount} extra koppeling(en)</li>` : "";
+
+  return `<div class="relation-context"><ul>${rows}${extraHtml}</ul></div>`;
+}
+
 function renderSummary() {
   const latest = state.latest || {};
   elements.municipality.textContent = latest.municipality || latest.municipality_id || "-";
   elements.documentsSeen.textContent = latest.documents_seen ?? "-";
   elements.documentsNormalized.textContent = latest.documents_normalized ?? "-";
   elements.generatedAt.textContent = formatDateTime(latest.generated_at);
-  elements.statusMessage.textContent = `Harvest ${latest.harvest_run_id || "onbekend"} is geladen.`;
+
+  const relationText = latest.relations_enabled
+    ? ` Relationele context: ${latest.relations_summary?.meetings_seen ?? 0} vergaderingen, ${latest.relations_summary?.meeting_items_seen ?? 0} agendapunten.`
+    : "";
+  elements.statusMessage.textContent = `Harvest ${latest.harvest_run_id || "onbekend"} is geladen.${relationText}`;
 }
 
 function renderTypeFilter() {
@@ -136,6 +252,7 @@ function renderTypeFilter() {
     const label = getCompactTypeLabel(item);
     typeMap.set(value, label);
   }
+
   const types = [...typeMap.entries()].sort((a, b) => a[1].localeCompare(b[1], "nl"));
   elements.typeFilter.innerHTML = '<option value="">Alle compacte documenttypen</option>';
   for (const [value, label] of types) {
@@ -204,17 +321,18 @@ function renderDocuments() {
       const downloadLink = downloadUrl
         ? `<a href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener noreferrer">PDF</a>`
         : "-";
-      return `
-        <tr>
-          <td>${escapeHtml(formatDate(getDocumentDate(documentRecord)))}</td>
-          <td>${escapeHtml(getCompactTypeLabel(documentRecord))}</td>
-          <td>${escapeHtml(documentRecord.document_type || "Onbekend")}</td>
-          <td class="wrap">${escapeHtml(documentRecord.title || documentRecord.description || "Geen titel")}</td>
-          <td class="wrap">${escapeHtml(documentRecord.filename || "-")}</td>
-          <td>${escapeHtml(formatBytes(documentRecord.file_size_bytes))}</td>
-          <td>${downloadLink}</td>
-        </tr>
-      `;
+      const title = escapeHtml(documentRecord.title || documentRecord.description || "Geen titel");
+      const relationContext = renderRelationContext(documentRecord);
+
+      return `<tr>
+        <td>${escapeHtml(formatDate(getDocumentDate(documentRecord)))}</td>
+        <td>${escapeHtml(getCompactTypeLabel(documentRecord))}</td>
+        <td>${escapeHtml(documentRecord.document_type || "Onbekend")}</td>
+        <td>${title}${relationContext}</td>
+        <td>${escapeHtml(documentRecord.filename || "-")}</td>
+        <td>${escapeHtml(formatBytes(documentRecord.file_size_bytes))}</td>
+        <td>${downloadLink}</td>
+      </tr>`;
     })
     .join("");
 }
@@ -222,8 +340,18 @@ function renderDocuments() {
 function applyFilters() {
   const query = elements.searchInput.value.trim().toLowerCase();
   const type = elements.typeFilter.value;
+
   state.filteredDocuments = state.documents.filter((documentRecord) => {
     const matchesType = !type || getCompactType(documentRecord) === type;
+    const relationContext = getDocumentRelationContext(documentRecord)
+      .map(({ meeting, item }) => [
+        meeting?.description,
+        meeting?.date,
+        meeting?.dmu_name,
+        item?.number,
+        item?.title,
+      ].filter(Boolean).join(" "))
+      .join(" ");
     const haystack = [
       documentRecord.title,
       documentRecord.description,
@@ -233,6 +361,7 @@ function applyFilters() {
       documentRecord.normalized_document_type_label,
       documentRecord.source_id,
       documentRecord.source_object_id,
+      relationContext,
     ]
       .filter(Boolean)
       .join(" ")
@@ -240,6 +369,7 @@ function applyFilters() {
     const matchesQuery = !query || haystack.includes(query);
     return matchesType && matchesQuery;
   });
+
   state.currentPage = 1;
   renderDocuments();
 }
@@ -268,12 +398,29 @@ function bindEvents() {
   elements.nextBottom.addEventListener("click", () => changePage(1));
 }
 
+async function loadRelationData(outputs) {
+  const [meetings, meetingItems, meetingDocumentRelations, meetingItemDocumentRelations] = await Promise.all([
+    fetchOptionalJsonl(outputs.meetings ? `${DATA_BASE}/${outputs.meetings}` : null),
+    fetchOptionalJsonl(outputs.meeting_items ? `${DATA_BASE}/${outputs.meeting_items}` : null),
+    fetchOptionalJsonl(outputs.meeting_documents ? `${DATA_BASE}/${outputs.meeting_documents}` : null),
+    fetchOptionalJsonl(outputs.meeting_item_documents ? `${DATA_BASE}/${outputs.meeting_item_documents}` : null),
+  ]);
+
+  state.meetings = meetings;
+  state.meetingItems = meetingItems;
+  state.meetingDocumentRelations = meetingDocumentRelations;
+  state.meetingItemDocumentRelations = meetingItemDocumentRelations;
+  buildRelationLookups();
+}
+
 async function init() {
   try {
     requireElements();
     state.latest = await fetchJson(`${DATA_BASE}/latest.json`);
-    const documentsPath = state.latest.outputs?.documents || "documents.jsonl";
+    const outputs = state.latest.outputs || {};
+    const documentsPath = outputs.documents || "documents.jsonl";
     state.documents = await fetchJsonl(`${DATA_BASE}/${documentsPath}`);
+    await loadRelationData(outputs);
     state.filteredDocuments = state.documents;
     renderSummary();
     renderTypeFilter();

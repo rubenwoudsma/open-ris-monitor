@@ -1,19 +1,31 @@
 {
   "checksums_enabled": false,
-  "documents_normalized": 1000,
-  "documents_seen": 1000,
+  "documents_normalized": 10,
+  "documents_seen": 10,
   "documents_versioned": 0,
-  "generated_at": "2026-05-29T11:04:10.718968+00:00",
-  "harvest_run_id": "harvest-huizen-20260529T110402Z",
-  "mode": "full",
+  "generated_at": "2026-06-02T14:38:46.324135+00:00",
+  "harvest_run_id": "harvest-huizen-20260602T143731Z",
+  "mode": "latest",
   "municipality": "huizen",
   "municipality_id": "gm0406",
   "outputs": {
-    "document_types": "quality/document_types.json",
     "document_versions": null,
     "documents": "documents.jsonl",
     "harvest_runs": "harvest_runs.jsonl",
-    "id_stability": "quality/id_stability.json"
+    "meeting_documents": "meeting_documents.jsonl",
+    "meeting_item_documents": "meeting_item_documents.jsonl",
+    "meeting_items": "meeting_items.jsonl",
+    "meetings": "meetings.jsonl"
+  },
+  "relations_enabled": true,
+  "relations_summary": {
+    "candidate_meetings_seen": 50,
+    "meeting_document_relations_seen": 34,
+    "meeting_item_document_relations_seen": 251,
+    "meeting_items_seen": 200,
+    "meeting_sessions_seen": 50,
+    "meetings_seen": 33,
+    "meetings_skipped": 17
   },
   "source_system_id": "huizen-gemeenteoplossingen"
 }
