@@ -18,6 +18,7 @@ from open_ris_monitor.enrichers.checksum import (
 from open_ris_monitor.exporters.json_exporter import write_json, write_jsonl
 from open_ris_monitor.models.harvest_run import HarvestRun
 from open_ris_monitor.normalizers.gemeenteoplossingen import normalize_documents
+from open_ris_monitor.normalizers.relations import normalize_relation_harvest
 from open_ris_monitor.pipeline.relations import collect_raw_relation_harvest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -72,6 +73,70 @@ def build_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
         timeout_seconds=int(source_system.get("timeout_seconds", 30)),
         request_delay_seconds=_as_float(source_system.get("request_delay_seconds"), 0.0),
     )
+
+
+def _to_public_dicts(records: list[Any]) -> list[dict[str, Any]]:
+    """Convert canonical model records to plain dictionaries for JSONL export."""
+
+    result: list[dict[str, Any]] = []
+    for record in records:
+        if hasattr(record, "to_dict"):
+            result.append(record.to_dict())
+        elif isinstance(record, dict):
+            result.append(record)
+        else:
+            raise TypeError(f"Cannot export relation record of type {type(record)!r}")
+    return result
+
+
+def _write_public_relation_exports(
+    public_dir: Path,
+    normalized_relations: dict[str, list[Any]],
+) -> dict[str, str]:
+    """Write canonical relation exports and return latest.json output entries."""
+
+    relation_outputs = {
+        "meetings": "meetings.jsonl",
+        "meeting_items": "meeting_items.jsonl",
+        "meeting_documents": "meeting_documents.jsonl",
+        "meeting_item_documents": "meeting_item_documents.jsonl",
+    }
+
+    write_jsonl(
+        public_dir / relation_outputs["meetings"],
+        _to_public_dicts(normalized_relations.get("meetings", [])),
+    )
+    write_jsonl(
+        public_dir / relation_outputs["meeting_items"],
+        _to_public_dicts(normalized_relations.get("meeting_items", [])),
+    )
+    write_jsonl(
+        public_dir / relation_outputs["meeting_documents"],
+        _to_public_dicts(normalized_relations.get("meeting_documents", [])),
+    )
+    write_jsonl(
+        public_dir / relation_outputs["meeting_item_documents"],
+        _to_public_dicts(normalized_relations.get("meeting_item_documents", [])),
+    )
+
+    return relation_outputs
+
+
+def _build_latest_outputs(
+    *,
+    enrich_checksums: bool,
+    relation_outputs: dict[str, str] | None = None,
+) -> dict[str, str | None]:
+    """Build the outputs block for latest.json."""
+
+    outputs: dict[str, str | None] = {
+        "documents": "documents.jsonl",
+        "harvest_runs": "harvest_runs.jsonl",
+        "document_versions": "document_versions.jsonl" if enrich_checksums else None,
+    }
+    if relation_outputs:
+        outputs.update(relation_outputs)
+    return outputs
 
 
 def _write_raw_relation_harvest(raw_dir: Path, relation_harvest: dict[str, Any]) -> None:
@@ -132,12 +197,18 @@ def run_harvest(
     )
 
     relation_harvest: dict[str, Any] | None = None
+    normalized_relations: dict[str, list[Any]] | None = None
     if include_relations:
         relation_harvest = collect_raw_relation_harvest(
             connector,
             meeting_scan_limit=meeting_scan_limit,
             meeting_session_batch_size=meeting_session_batch_size,
             meeting_item_limit=meeting_item_limit,
+        )
+        normalized_relations = normalize_relation_harvest(
+            relation_harvest,
+            municipality_slug=municipality,
+            source_system_id=source_system_config["id"],
         )
 
     previous_versions_path = public_dir / "document_versions.jsonl"
@@ -186,6 +257,10 @@ def run_harvest(
     if enrich_checksums:
         write_jsonl(previous_versions_path, merged_versions)
 
+    relation_outputs: dict[str, str] = {}
+    if normalized_relations is not None:
+        relation_outputs = _write_public_relation_exports(public_dir, normalized_relations)
+
     latest_payload = {
         "municipality": municipality,
         "municipality_id": municipality_config["id"],
@@ -199,11 +274,10 @@ def run_harvest(
         "checksums_enabled": enrich_checksums,
         "relations_enabled": include_relations,
         "relations_summary": relation_summary,
-        "outputs": {
-            "documents": "documents.jsonl",
-            "harvest_runs": "harvest_runs.jsonl",
-            "document_versions": "document_versions.jsonl" if enrich_checksums else None,
-        },
+        "outputs": _build_latest_outputs(
+            enrich_checksums=enrich_checksums,
+            relation_outputs=relation_outputs,
+        ),
     }
     write_json(public_dir / "latest.json", latest_payload)
 
