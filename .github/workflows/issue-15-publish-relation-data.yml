@@ -2,6 +2,11 @@ name: Issue 15 Publish Relation Data
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - issue-15-meeting-document-relations
+    paths:
+      - ".github/workflows/issue-15-publish-relation-data.yml"
 
 permissions:
   contents: write
