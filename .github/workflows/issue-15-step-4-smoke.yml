@@ -1,0 +1,125 @@
+name: Issue 15 Step 4 Smoke Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - issue-15-meeting-document-relations
+    paths:
+      - ".github/workflows/issue-15-step-4-smoke.yml"
+      - "src/open_ris_monitor/**"
+      - "tests/**"
+      - "pyproject.toml"
+
+jobs:
+  smoke:
+    name: Run public relation export smoke test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .
+          python -m pip install pytest requests
+
+      - name: Run relation harvest with public exports
+        run: |
+          python -m open_ris_monitor.pipeline.run \
+            --municipality huizen \
+            --mode latest \
+            --limit 10 \
+            --include-relations \
+            --meeting-scan-limit 50 \
+            --meeting-session-batch-size 50 \
+            --meeting-item-limit 200
+
+      - name: Show raw relation harvest summary
+        run: |
+          echo "Relation harvest summary:"
+          cat data/raw/latest/relation_harvest_summary.json || true
+
+      - name: Show public export files
+        run: |
+          echo "Public files:"
+          ls -la data/public || true
+
+          echo ""
+          echo "latest.json:"
+          cat data/public/latest.json || true
+
+          echo ""
+          echo "Line counts:"
+          wc -l data/public/meetings.jsonl || true
+          wc -l data/public/meeting_items.jsonl || true
+          wc -l data/public/meeting_documents.jsonl || true
+          wc -l data/public/meeting_item_documents.jsonl || true
+
+      - name: Show sample public records
+        run: |
+          echo "meetings.jsonl sample:"
+          head -n 3 data/public/meetings.jsonl || true
+
+          echo ""
+          echo "meeting_items.jsonl sample:"
+          head -n 3 data/public/meeting_items.jsonl || true
+
+          echo ""
+          echo "meeting_documents.jsonl sample:"
+          head -n 3 data/public/meeting_documents.jsonl || true
+
+          echo ""
+          echo "meeting_item_documents.jsonl sample:"
+          head -n 3 data/public/meeting_item_documents.jsonl || true
+
+      - name: Validate latest manifest relation pointers
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          latest_path = Path("data/public/latest.json")
+          latest = json.loads(latest_path.read_text(encoding="utf-8"))
+
+          required = [
+              "meetings",
+              "meeting_items",
+              "meeting_documents",
+              "meeting_item_documents",
+          ]
+
+          missing = [key for key in required if key not in latest]
+          if missing:
+              raise SystemExit(f"Missing relation exports in latest.json: {missing}")
+
+          for key in required:
+              path = Path("data/public") / latest[key]
+              if not path.exists():
+                  raise SystemExit(f"Manifest points to missing file for {key}: {path}")
+              if path.stat().st_size == 0:
+                  raise SystemExit(f"Manifest points to empty file for {key}: {path}")
+
+          print("Relation export manifest validation passed.")
+          PY
+
+      - name: Upload public relation export artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-15-step-4-public-relation-exports
+          path: |
+            data/raw/latest/relation_harvest_summary.json
+            data/public/latest.json
+            data/public/meetings.jsonl
+            data/public/meeting_items.jsonl
+            data/public/meeting_documents.jsonl
+            data/public/meeting_item_documents.jsonl
+          if-no-files-found: warn
