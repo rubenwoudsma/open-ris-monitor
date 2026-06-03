@@ -20,6 +20,7 @@ from open_ris_monitor.models.harvest_run import HarvestRun
 from open_ris_monitor.normalizers.gemeenteoplossingen import normalize_documents
 from open_ris_monitor.normalizers.relations import normalize_relation_harvest
 from open_ris_monitor.pipeline.profiles import HARVEST_PROFILE_NAMES, resolve_harvest_options
+from open_ris_monitor.pipeline.public_relations import filter_relation_exports_for_documents
 from open_ris_monitor.pipeline.relations import collect_raw_relation_harvest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -37,7 +38,6 @@ def load_municipality_config(slug: str) -> dict[str, Any]:
 
     if not isinstance(payload, dict):
         raise ValueError(f"Expected YAML object in {config_path}")
-
     return payload
 
 
@@ -55,11 +55,9 @@ def parse_max_documents(value: Any) -> int | None:
 
     if value is None or value == "":
         return None
-
     parsed = int(value)
     if parsed <= 0:
         return None
-
     return parsed
 
 
@@ -154,6 +152,7 @@ def _write_raw_relation_harvest(raw_dir: Path, relation_harvest: dict[str, Any])
     write_json(raw_dir / "relation_harvest_summary.json", relation_harvest["summary"])
 
 
+
 def run_harvest(
     *,
     municipality: str,
@@ -186,10 +185,10 @@ def run_harvest(
 
     raw_dir = REPO_ROOT / "data" / "raw" / "latest"
     public_dir = REPO_ROOT / "data" / "public"
+
     municipality_config = config["municipality"]
     source_system_config = config["source_system"]
     retrieved_at = datetime.now(timezone.utc)
-
     documents = normalize_documents(
         raw_documents,
         municipality_id=municipality_config["id"],
@@ -201,17 +200,23 @@ def run_harvest(
 
     relation_harvest: dict[str, Any] | None = None
     normalized_relations: dict[str, list[Any]] | None = None
+    relation_publication_summary: dict[str, int] = {}
     if include_relations:
         relation_harvest = collect_raw_relation_harvest(
             connector,
             meeting_scan_limit=meeting_scan_limit,
             meeting_session_batch_size=meeting_session_batch_size,
             meeting_item_limit=meeting_item_limit,
+            meeting_session_scan_mode="latest" if mode == "latest" else "full",
         )
-        normalized_relations = normalize_relation_harvest(
+        raw_normalized_relations = normalize_relation_harvest(
             relation_harvest,
             municipality_slug=municipality,
             source_system_id=source_system_config["id"],
+        )
+        normalized_relations, relation_publication_summary = filter_relation_exports_for_documents(
+            raw_normalized_relations,
+            documents,
         )
 
     previous_versions_path = public_dir / "document_versions.jsonl"
@@ -232,7 +237,6 @@ def run_harvest(
 
     finished_at = datetime.now(timezone.utc)
     relation_summary = relation_harvest["summary"] if relation_harvest is not None else {}
-
     harvest_run = HarvestRun(
         id=f"harvest-{municipality}-{started_at.strftime('%Y%m%dT%H%M%SZ')}",
         municipality_id=municipality_config["id"],
@@ -278,6 +282,7 @@ def run_harvest(
         "checksums_enabled": enrich_checksums,
         "relations_enabled": include_relations,
         "relations_summary": relation_summary,
+        "relations_publication_summary": relation_publication_summary,
         "outputs": _build_latest_outputs(
             enrich_checksums=enrich_checksums,
             relation_outputs=relation_outputs,
@@ -369,7 +374,6 @@ def main() -> None:
 
     args = parse_args()
     harvest_options = resolve_cli_harvest_options(args)
-
     harvest_run = run_harvest(
         municipality=args.municipality,
         mode=harvest_options["mode"],

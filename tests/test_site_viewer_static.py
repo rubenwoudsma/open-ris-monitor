@@ -28,3 +28,13 @@ def test_viewer_reports_document_relation_match_count():
 
     assert "documentsWithRelations" in app_js
     assert "getoonde documenten hebben een koppeling" in app_js
+
+
+def test_viewer_matches_relations_on_multiple_document_identifiers():
+    app_js = Path("site/assets/app.js").read_text(encoding="utf-8")
+
+    assert "function getDocumentIdentifiers" in app_js
+    assert "function getRelationDocumentIdentifiers" in app_js
+    assert "document_source_id" in app_js
+    assert "document_object_id" in app_js
+    assert "getLookupRelations" in app_js

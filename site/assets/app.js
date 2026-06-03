@@ -214,12 +214,58 @@ function getCompactTypeLabel(documentRecord) {
   return documentRecord.normalized_document_type_label || "Onbekend";
 }
 
-function getDocumentId(documentRecord) {
-  if (documentRecord.id) return documentRecord.id;
-  if (documentRecord.municipality_slug && documentRecord.source_id) {
-    return `${documentRecord.municipality_slug}-document-${documentRecord.source_id}`;
+function addIdentifier(result, value) {
+  if (value === null || value === undefined) return;
+  const text = String(value).trim();
+  if (text) result.add(text);
+}
+
+function getDocumentIdentifiers(documentRecord) {
+  const identifiers = new Set();
+  addIdentifier(identifiers, documentRecord.id);
+  addIdentifier(identifiers, documentRecord.source_id);
+  addIdentifier(identifiers, documentRecord.source_object_id);
+  addIdentifier(identifiers, documentRecord.download_url);
+  addIdentifier(identifiers, documentRecord.source_url);
+
+  if (documentRecord.raw && typeof documentRecord.raw === "object") {
+    addIdentifier(identifiers, documentRecord.raw.id);
+    addIdentifier(identifiers, documentRecord.raw.objectId);
+    addIdentifier(identifiers, documentRecord.raw.object_id);
+    addIdentifier(identifiers, documentRecord.raw.downloadUrl);
+    addIdentifier(identifiers, documentRecord.raw.download_url);
   }
-  return null;
+
+  if (documentRecord.id && documentRecord.source_id && String(documentRecord.id).includes("-document-")) {
+    const prefix = String(documentRecord.id).split("-document-")[0];
+    addIdentifier(identifiers, `${prefix}-document-${documentRecord.source_id}`);
+  }
+
+  return [...identifiers];
+}
+
+function getRelationDocumentIdentifiers(relation) {
+  const identifiers = new Set();
+  addIdentifier(identifiers, relation.document_id);
+  addIdentifier(identifiers, relation.document_source_id);
+  addIdentifier(identifiers, relation.document_object_id);
+  addIdentifier(identifiers, relation.document_url);
+  addIdentifier(identifiers, relation.download_url);
+  addIdentifier(identifiers, relation.source_url);
+
+  if (relation.document && typeof relation.document === "object") {
+    addIdentifier(identifiers, relation.document.id);
+    addIdentifier(identifiers, relation.document.objectId);
+    addIdentifier(identifiers, relation.document.object_id);
+    addIdentifier(identifiers, relation.document.downloadUrl);
+    addIdentifier(identifiers, relation.document.download_url);
+  }
+
+  return [...identifiers];
+}
+
+function getDocumentId(documentRecord) {
+  return getDocumentIdentifiers(documentRecord)[0] || null;
 }
 
 function getDocumentTitle(documentRecord) {
@@ -240,21 +286,39 @@ function buildRelationLookups() {
   state.meetingItemRelationsByDocumentId = new Map();
 
   for (const relation of state.meetingDocumentRelations) {
-    addToLookupList(state.meetingRelationsByDocumentId, relation.document_id, relation);
+    for (const identifier of getRelationDocumentIdentifiers(relation)) {
+      addToLookupList(state.meetingRelationsByDocumentId, identifier, relation);
+    }
   }
 
   for (const relation of state.meetingItemDocumentRelations) {
-    addToLookupList(state.meetingItemRelationsByDocumentId, relation.document_id, relation);
+    for (const identifier of getRelationDocumentIdentifiers(relation)) {
+      addToLookupList(state.meetingItemRelationsByDocumentId, identifier, relation);
+    }
   }
 }
 
+function getLookupRelations(map, identifiers) {
+  const relations = [];
+  const seen = new Set();
+  for (const identifier of identifiers) {
+    for (const relation of map.get(identifier) || []) {
+      const key = relation.id || `${relation.meeting_id}:${relation.meeting_item_id || ""}:${relation.document_id || identifier}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      relations.push(relation);
+    }
+  }
+  return relations;
+}
+
 function getDocumentRelationContext(documentRecord) {
-  const documentId = getDocumentId(documentRecord);
-  if (!documentId) return [];
+  const documentIds = getDocumentIdentifiers(documentRecord);
+  if (documentIds.length === 0) return [];
 
   const contexts = [];
   const seen = new Set();
-  const itemRelations = state.meetingItemRelationsByDocumentId.get(documentId) || [];
+  const itemRelations = getLookupRelations(state.meetingItemRelationsByDocumentId, documentIds);
 
   for (const relation of itemRelations) {
     const meeting = state.meetingsById.get(relation.meeting_id);
@@ -265,7 +329,7 @@ function getDocumentRelationContext(documentRecord) {
     contexts.push({ meeting, item });
   }
 
-  const meetingRelations = state.meetingRelationsByDocumentId.get(documentId) || [];
+  const meetingRelations = getLookupRelations(state.meetingRelationsByDocumentId, documentIds);
   for (const relation of meetingRelations) {
     const meeting = state.meetingsById.get(relation.meeting_id);
     const key = `meeting:${relation.meeting_id}:${relation.document_id}`;

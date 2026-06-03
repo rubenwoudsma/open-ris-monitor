@@ -31,6 +31,11 @@ class FakeRelationConnector:
         self.calls.append(("sessions", {"limit": limit, "offset": offset}))
         return self.session_pages.get(offset, [])[:limit]
 
+    def fetch_latest_meeting_sessions(self, limit: int) -> list[dict[str, Any]]:
+        self.calls.append(("latest_sessions", {"limit": limit}))
+        all_sessions = [session for offset in sorted(self.session_pages) for session in self.session_pages[offset]]
+        return all_sessions[-limit:]
+
     def fetch_meeting(self, meeting_id: int | str) -> dict[str, Any] | None:
         self.calls.append(("meeting", str(meeting_id)))
         if str(meeting_id) == "404":
@@ -95,6 +100,7 @@ def test_collect_raw_relation_harvest_collects_raw_records_and_skips_missing_mee
     assert len(result["meeting_documents"]) == 2
     assert len(result["meeting_item_documents"]) == 3
     assert result["summary"] == {
+        "meeting_session_scan_mode": "full",
         "meeting_sessions_seen": 4,
         "candidate_meetings_seen": 3,
         "meetings_seen": 2,
@@ -174,3 +180,32 @@ def test_collect_raw_relation_harvest_validates_meeting_item_limit() -> None:
             meeting_scan_limit=1,
             meeting_item_limit=0,
         )
+
+
+def test_fetch_meeting_sessions_can_use_latest_tail_window() -> None:
+    connector = FakeRelationConnector()
+
+    sessions = fetch_meeting_sessions(
+        connector,
+        scan_limit=2,
+        batch_size=2,
+        scan_mode="latest",
+    )
+
+    assert [session["id"] for session in sessions] == ["s3", "s4"]
+    assert connector.calls == [("latest_sessions", {"limit": 2})]
+
+
+def test_collect_raw_relation_harvest_marks_latest_session_scan_mode() -> None:
+    connector = FakeRelationConnector()
+
+    result = collect_raw_relation_harvest(
+        connector,
+        meeting_scan_limit=2,
+        meeting_session_batch_size=2,
+        meeting_item_limit=1,
+        meeting_session_scan_mode="latest",
+    )
+
+    assert result["summary"]["meeting_session_scan_mode"] == "latest"
+    assert result["candidate_meeting_ids"] == ["20", "404"]
