@@ -1,388 +1,47 @@
 {
-  "documents_total": 250,
-  "generated_at": "2026-06-03T06:41:50.233860+00:00",
+  "documents_total": 10,
+  "generated_at": "2026-06-03T11:56:41.848978+00:00",
   "mapping": {
     "Agenda": {
-      "count": 3,
+      "count": 1,
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda"
     },
-    "Amendementen": {
+    "Ingekomen stuk": {
       "count": 4,
-      "normalized_document_type": "amendment",
-      "normalized_document_type_label": "Amendement"
-    },
-    "Beantwoording door B&W (Uitgaand)": {
-      "count": 1,
-      "normalized_document_type": "answer",
-      "normalized_document_type_label": "Beantwoording"
-    },
-    "Besluitenlijst raad": {
-      "count": 2,
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    "Besluitenlijsten": {
-      "count": 3,
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    "Bezwaarschrift (Inkomend)": {
-      "count": 2,
-      "normalized_document_type": "objection_or_response",
-      "normalized_document_type_label": "Bezwaar, klacht of zienswijze"
-    },
-    "Bijlage": {
-      "count": 44,
-      "normalized_document_type": "attachment",
-      "normalized_document_type_label": "Bijlage"
-    },
-    "Collegevoorstel (Intern)": {
-      "count": 18,
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel"
-    },
-    "Conceptbesluit (Inkomend)": {
-      "count": 1,
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    "Document ter kennisname (Inkomend)": {
-      "count": 33,
-      "normalized_document_type": "notice",
-      "normalized_document_type_label": "Kennisgeving of ter kennisname"
-    },
-    "Kennisgeving (Inkomend)": {
-      "count": 1,
-      "normalized_document_type": "notice",
-      "normalized_document_type_label": "Kennisgeving of ter kennisname"
-    },
-    "Mededelingen": {
-      "count": 19,
-      "normalized_document_type": "announcement",
-      "normalized_document_type_label": "Mededeling"
-    },
-    "Memo": {
-      "count": 2,
-      "normalized_document_type": "memo_or_advice",
-      "normalized_document_type_label": "Memo of advies"
-    },
-    "Moties": {
-      "count": 5,
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie"
-    },
-    "Notulen Fysiek Domein": {
-      "count": 2,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    "Notulen Raad": {
-      "count": 3,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    "Notulen Sociaal Domein": {
-      "count": 2,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    "Notulen gecombineerde commissies": {
-      "count": 4,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    "Notulen t/m april 2021": {
-      "count": 5,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    "Onbekend": {
-      "count": 11,
-      "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type": "incoming_document",
+      "normalized_document_type_label": "Ingekomen stuk"
     },
     "Overig": {
-      "count": 2,
-      "normalized_document_type": "other",
-      "normalized_document_type_label": "Overig"
-    },
-    "Overig stuk inkomend": {
-      "count": 1,
-      "normalized_document_type": "other",
-      "normalized_document_type_label": "Overig"
-    },
-    "Overig stuk intern": {
-      "count": 6,
-      "normalized_document_type": "other",
-      "normalized_document_type_label": "Overig"
-    },
-    "Principeverzoek bestemmingsplanwijziging (Inkomend)": {
-      "count": 1,
-      "normalized_document_type": "policy_or_plan",
-      "normalized_document_type_label": "Beleid, plan of nota"
-    },
-    "Raadsbesluit": {
-      "count": 9,
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    "Raadsvoorstel": {
-      "count": 24,
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel"
-    },
-    "Raadsvragen": {
-      "count": 6,
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag"
-    },
-    "Rapport van bevindingen (Inkomend)": {
-      "count": 1,
-      "normalized_document_type": "report",
-      "normalized_document_type_label": "Rapportage of evaluatie"
-    },
-    "Resumé Fysiek Domein": {
-      "count": 2,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    "Resumé Sociaal Domein": {
-      "count": 2,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    "Resumé gecombineerde commissies": {
-      "count": 2,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    "Resumés": {
-      "count": 1,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    "Toezeggingen": {
       "count": 5,
-      "normalized_document_type": "commitment",
-      "normalized_document_type_label": "Toezegging"
-    },
-    "Uitnodigingen": {
-      "count": 2,
-      "normalized_document_type": "invitation",
-      "normalized_document_type_label": "Uitnodiging"
-    },
-    "Verzoek om aanvullende gegevens ROW (Uitgaand)": {
-      "count": 1,
-      "normalized_document_type": "request",
-      "normalized_document_type_label": "Verzoek of aanvullende gegevens"
-    },
-    "Verzoek om informatie (Inkomend)": {
-      "count": 3,
-      "normalized_document_type": "request",
-      "normalized_document_type_label": "Verzoek of aanvullende gegevens"
-    },
-    "Voorjaarsnota (Intern)": {
-      "count": 6,
-      "normalized_document_type": "policy_or_plan",
-      "normalized_document_type_label": "Beleid, plan of nota"
-    },
-    "Vraag van raadslid (Inkomend)": {
-      "count": 1,
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag"
-    },
-    "Vragen van raadsleden": {
-      "count": 9,
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag"
-    },
-    "Zienswijze (Inkomend)": {
-      "count": 1,
-      "normalized_document_type": "objection_or_response",
-      "normalized_document_type_label": "Bezwaar, klacht of zienswijze"
+      "normalized_document_type": "other",
+      "normalized_document_type_label": "Overig"
     }
   },
-  "normalized_document_type_count": 20,
+  "normalized_document_type_count": 3,
   "normalized_document_types": [
     {
-      "count": 44,
-      "normalized_document_type": "attachment",
-      "normalized_document_type_label": "Bijlage",
-      "source_document_types": [
-        "Bijlage"
-      ]
-    },
-    {
-      "count": 42,
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel",
-      "source_document_types": [
-        "Collegevoorstel (Intern)",
-        "Raadsvoorstel"
-      ]
-    },
-    {
-      "count": 34,
-      "normalized_document_type": "notice",
-      "normalized_document_type_label": "Kennisgeving of ter kennisname",
-      "source_document_types": [
-        "Document ter kennisname (Inkomend)",
-        "Kennisgeving (Inkomend)"
-      ]
-    },
-    {
-      "count": 23,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting",
-      "source_document_types": [
-        "Notulen Fysiek Domein",
-        "Notulen Raad",
-        "Notulen Sociaal Domein",
-        "Notulen gecombineerde commissies",
-        "Notulen t/m april 2021",
-        "Resumé Fysiek Domein",
-        "Resumé Sociaal Domein",
-        "Resumé gecombineerde commissies",
-        "Resumés"
-      ]
-    },
-    {
-      "count": 19,
-      "normalized_document_type": "announcement",
-      "normalized_document_type_label": "Mededeling",
-      "source_document_types": [
-        "Mededelingen"
-      ]
-    },
-    {
-      "count": 16,
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag",
-      "source_document_types": [
-        "Raadsvragen",
-        "Vraag van raadslid (Inkomend)",
-        "Vragen van raadsleden"
-      ]
-    },
-    {
-      "count": 15,
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit",
-      "source_document_types": [
-        "Besluitenlijst raad",
-        "Besluitenlijsten",
-        "Conceptbesluit (Inkomend)",
-        "Raadsbesluit"
-      ]
-    },
-    {
-      "count": 11,
-      "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend",
-      "source_document_types": [
-        "Onbekend"
-      ]
-    },
-    {
-      "count": 9,
+      "count": 5,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
-        "Overig",
-        "Overig stuk inkomend",
-        "Overig stuk intern"
-      ]
-    },
-    {
-      "count": 7,
-      "normalized_document_type": "policy_or_plan",
-      "normalized_document_type_label": "Beleid, plan of nota",
-      "source_document_types": [
-        "Principeverzoek bestemmingsplanwijziging (Inkomend)",
-        "Voorjaarsnota (Intern)"
-      ]
-    },
-    {
-      "count": 5,
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie",
-      "source_document_types": [
-        "Moties"
-      ]
-    },
-    {
-      "count": 5,
-      "normalized_document_type": "commitment",
-      "normalized_document_type_label": "Toezegging",
-      "source_document_types": [
-        "Toezeggingen"
+        "Overig"
       ]
     },
     {
       "count": 4,
-      "normalized_document_type": "request",
-      "normalized_document_type_label": "Verzoek of aanvullende gegevens",
+      "normalized_document_type": "incoming_document",
+      "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
-        "Verzoek om aanvullende gegevens ROW (Uitgaand)",
-        "Verzoek om informatie (Inkomend)"
+        "Ingekomen stuk"
       ]
     },
     {
-      "count": 4,
-      "normalized_document_type": "amendment",
-      "normalized_document_type_label": "Amendement",
-      "source_document_types": [
-        "Amendementen"
-      ]
-    },
-    {
-      "count": 3,
-      "normalized_document_type": "objection_or_response",
-      "normalized_document_type_label": "Bezwaar, klacht of zienswijze",
-      "source_document_types": [
-        "Bezwaarschrift (Inkomend)",
-        "Zienswijze (Inkomend)"
-      ]
-    },
-    {
-      "count": 3,
+      "count": 1,
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda",
       "source_document_types": [
         "Agenda"
-      ]
-    },
-    {
-      "count": 2,
-      "normalized_document_type": "memo_or_advice",
-      "normalized_document_type_label": "Memo of advies",
-      "source_document_types": [
-        "Memo"
-      ]
-    },
-    {
-      "count": 2,
-      "normalized_document_type": "invitation",
-      "normalized_document_type_label": "Uitnodiging",
-      "source_document_types": [
-        "Uitnodigingen"
-      ]
-    },
-    {
-      "count": 1,
-      "normalized_document_type": "report",
-      "normalized_document_type_label": "Rapportage of evaluatie",
-      "source_document_types": [
-        "Rapport van bevindingen (Inkomend)"
-      ]
-    },
-    {
-      "count": 1,
-      "normalized_document_type": "answer",
-      "normalized_document_type_label": "Beantwoording",
-      "source_document_types": [
-        "Beantwoording door B&W (Uitgaand)"
       ]
     }
   ],
@@ -391,255 +50,28 @@
     "normalized_document_type is now part of the canonical Document export.",
     "Unknown should be reserved for genuinely missing or explicitly unknown source values."
   ],
-  "source_document_type_count": 40,
+  "source_document_type_count": 3,
   "source_document_types": [
     {
-      "count": 44,
-      "document_type": "Bijlage",
-      "normalized_document_type": "attachment",
-      "normalized_document_type_label": "Bijlage"
-    },
-    {
-      "count": 33,
-      "document_type": "Document ter kennisname (Inkomend)",
-      "normalized_document_type": "notice",
-      "normalized_document_type_label": "Kennisgeving of ter kennisname"
-    },
-    {
-      "count": 24,
-      "document_type": "Raadsvoorstel",
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel"
-    },
-    {
-      "count": 19,
-      "document_type": "Mededelingen",
-      "normalized_document_type": "announcement",
-      "normalized_document_type_label": "Mededeling"
-    },
-    {
-      "count": 18,
-      "document_type": "Collegevoorstel (Intern)",
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel"
-    },
-    {
-      "count": 11,
-      "document_type": "Onbekend",
-      "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
-    },
-    {
-      "count": 9,
-      "document_type": "Raadsbesluit",
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    {
-      "count": 9,
-      "document_type": "Vragen van raadsleden",
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag"
-    },
-    {
-      "count": 6,
-      "document_type": "Overig stuk intern",
-      "normalized_document_type": "other",
-      "normalized_document_type_label": "Overig"
-    },
-    {
-      "count": 6,
-      "document_type": "Voorjaarsnota (Intern)",
-      "normalized_document_type": "policy_or_plan",
-      "normalized_document_type_label": "Beleid, plan of nota"
-    },
-    {
-      "count": 6,
-      "document_type": "Raadsvragen",
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag"
-    },
-    {
       "count": 5,
-      "document_type": "Notulen t/m april 2021",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    {
-      "count": 5,
-      "document_type": "Moties",
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie"
-    },
-    {
-      "count": 5,
-      "document_type": "Toezeggingen",
-      "normalized_document_type": "commitment",
-      "normalized_document_type_label": "Toezegging"
-    },
-    {
-      "count": 4,
-      "document_type": "Amendementen",
-      "normalized_document_type": "amendment",
-      "normalized_document_type_label": "Amendement"
-    },
-    {
-      "count": 4,
-      "document_type": "Notulen gecombineerde commissies",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    {
-      "count": 3,
-      "document_type": "Verzoek om informatie (Inkomend)",
-      "normalized_document_type": "request",
-      "normalized_document_type_label": "Verzoek of aanvullende gegevens"
-    },
-    {
-      "count": 3,
-      "document_type": "Notulen Raad",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    {
-      "count": 3,
-      "document_type": "Agenda",
-      "normalized_document_type": "agenda",
-      "normalized_document_type_label": "Agenda"
-    },
-    {
-      "count": 3,
-      "document_type": "Besluitenlijsten",
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    {
-      "count": 2,
-      "document_type": "Bezwaarschrift (Inkomend)",
-      "normalized_document_type": "objection_or_response",
-      "normalized_document_type_label": "Bezwaar, klacht of zienswijze"
-    },
-    {
-      "count": 2,
-      "document_type": "Besluitenlijst raad",
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    {
-      "count": 2,
-      "document_type": "Notulen Fysiek Domein",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    {
-      "count": 2,
-      "document_type": "Resumé Fysiek Domein",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    {
-      "count": 2,
-      "document_type": "Resumé Sociaal Domein",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    {
-      "count": 2,
-      "document_type": "Notulen Sociaal Domein",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    {
-      "count": 2,
-      "document_type": "Memo",
-      "normalized_document_type": "memo_or_advice",
-      "normalized_document_type_label": "Memo of advies"
-    },
-    {
-      "count": 2,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 2,
-      "document_type": "Uitnodigingen",
-      "normalized_document_type": "invitation",
-      "normalized_document_type_label": "Uitnodiging"
-    },
-    {
-      "count": 2,
-      "document_type": "Resumé gecombineerde commissies",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+      "count": 4,
+      "document_type": "Ingekomen stuk",
+      "normalized_document_type": "incoming_document",
+      "normalized_document_type_label": "Ingekomen stuk"
     },
     {
       "count": 1,
-      "document_type": "Principeverzoek bestemmingsplanwijziging (Inkomend)",
-      "normalized_document_type": "policy_or_plan",
-      "normalized_document_type_label": "Beleid, plan of nota"
-    },
-    {
-      "count": 1,
-      "document_type": "Zienswijze (Inkomend)",
-      "normalized_document_type": "objection_or_response",
-      "normalized_document_type_label": "Bezwaar, klacht of zienswijze"
-    },
-    {
-      "count": 1,
-      "document_type": "Kennisgeving (Inkomend)",
-      "normalized_document_type": "notice",
-      "normalized_document_type_label": "Kennisgeving of ter kennisname"
-    },
-    {
-      "count": 1,
-      "document_type": "Overig stuk inkomend",
-      "normalized_document_type": "other",
-      "normalized_document_type_label": "Overig"
-    },
-    {
-      "count": 1,
-      "document_type": "Conceptbesluit (Inkomend)",
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    {
-      "count": 1,
-      "document_type": "Rapport van bevindingen (Inkomend)",
-      "normalized_document_type": "report",
-      "normalized_document_type_label": "Rapportage of evaluatie"
-    },
-    {
-      "count": 1,
-      "document_type": "Verzoek om aanvullende gegevens ROW (Uitgaand)",
-      "normalized_document_type": "request",
-      "normalized_document_type_label": "Verzoek of aanvullende gegevens"
-    },
-    {
-      "count": 1,
-      "document_type": "Vraag van raadslid (Inkomend)",
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag"
-    },
-    {
-      "count": 1,
-      "document_type": "Beantwoording door B&W (Uitgaand)",
-      "normalized_document_type": "answer",
-      "normalized_document_type_label": "Beantwoording"
-    },
-    {
-      "count": 1,
-      "document_type": "Resumés",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+      "document_type": "Agenda",
+      "normalized_document_type": "agenda",
+      "normalized_document_type_label": "Agenda"
     }
   ],
-  "unknown_document_type_count": 11,
-  "unknown_document_type_percentage": 4.4,
-  "unknown_source_document_types": [
-    {
-      "count": 11,
-      "document_type": "Onbekend"
-    }
-  ]
+  "unknown_document_type_count": 0,
+  "unknown_document_type_percentage": 0.0,
+  "unknown_source_document_types": []
 }
