@@ -385,6 +385,22 @@ function appendTextCell(row, className, value) {
   return cell;
 }
 
+function makeTechnicalTextWrappable(value) {
+  return String(value || "-").replace(/([_./\-])/g, "$1\u200B");
+}
+
+function appendFilenameCell(row, value) {
+  const cell = document.createElement("td");
+  cell.className = "filename-cell";
+  const span = document.createElement("span");
+  span.className = "filename-text";
+  span.textContent = makeTechnicalTextWrappable(value);
+  cell.title = value || "";
+  cell.appendChild(span);
+  row.appendChild(cell);
+  return cell;
+}
+
 function createRelationContextElement(documentRecord) {
   const contexts = getDocumentRelationContext(documentRecord);
   if (contexts.length === 0) return null;
@@ -475,7 +491,7 @@ function renderDocuments() {
     if (relationContext) titleCell.appendChild(relationContext);
     row.appendChild(titleCell);
 
-    appendTextCell(row, "filename-cell", documentRecord.filename || "-");
+    appendFilenameCell(row, documentRecord.filename || "-");
     appendTextCell(row, "size-cell", formatBytes(documentRecord.file_size_bytes));
 
     const downloadCell = document.createElement("td");
