@@ -1,0 +1,117 @@
+name: Publish public RIS data
+
+on:
+  workflow_dispatch:
+    inputs:
+      municipality:
+        description: Municipality config slug
+        required: true
+        default: huizen
+      profile:
+        description: Harvest profile
+        required: true
+        default: public
+        type: choice
+        options:
+          - quick
+          - public
+          - backfill
+
+permissions:
+  contents: write
+
+jobs:
+  publish-public-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[dev]
+
+      - name: Run bounded harvest profile
+        run: |
+          python -m open_ris_monitor.pipeline.run \
+            --municipality "${{ inputs.municipality }}" \
+            --profile "${{ inputs.profile }}"
+
+      - name: Generate public quality reports
+        run: |
+          python -m open_ris_monitor.analysis.generate_public_reports \
+            --public-dir data/public
+
+      - name: Validate generated public data
+        run: |
+          python -m json.tool data/public/latest.json > /tmp/latest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          required_outputs = [
+              "documents",
+              "harvest_runs",
+              "meetings",
+              "meeting_items",
+              "meeting_documents",
+              "meeting_item_documents",
+          ]
+          latest = json.loads(Path("data/public/latest.json").read_text(encoding="utf-8"))
+          outputs = latest.get("outputs", {})
+          missing = [key for key in required_outputs if not outputs.get(key)]
+          if missing:
+              raise SystemExit(f"latest.json mist relationele outputs: {missing}")
+          if latest.get("relations_enabled") is not True:
+              raise SystemExit("latest.json heeft relations_enabled niet op true")
+          for output_name in required_outputs:
+              output_path = Path("data/public") / outputs[output_name]
+              if not output_path.exists():
+                  raise SystemExit(f"Ontbrekend public exportbestand: {output_path}")
+              for line_number, line in enumerate(output_path.read_text(encoding="utf-8").splitlines(), 1):
+                  if line.strip():
+                      json.loads(line)
+          print("Public exports en latest.json zijn consistent")
+          PY
+
+      - name: Show generated output
+        run: |
+          echo "Raw output, artifact only:"
+          find data/raw/latest -maxdepth 1 -type f -print | sort
+          echo "Public output, commit candidate:"
+          find data/public -maxdepth 2 -type f -print | sort
+          echo "Latest summary:"
+          cat data/public/latest.json
+
+      - name: Upload raw harvest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: raw-harvest-${{ inputs.municipality }}-${{ inputs.profile }}
+          path: data/raw/latest/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload public export artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-export-${{ inputs.municipality }}-${{ inputs.profile }}
+          path: data/public/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Commit public export output
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/public/
+          git diff --cached --quiet || git commit -m "Update public RIS data for ${{ inputs.municipality }}"
+          git push
