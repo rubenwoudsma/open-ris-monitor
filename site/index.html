@@ -8,60 +8,40 @@
   </head>
   <body>
     <header class="site-header">
-      <p class="eyebrow">Open RIS Monitor</p>
-      <h1>Raadsinformatie Huizen</h1>
-      <p>
-        Een open, reproduceerbare viewer op publieke RIS-data, opgebouwd uit
-        canonieke JSONL-exportbestanden.
-      </p>
-      <nav class="link-row" aria-label="Databestanden">
-        <a href="../data/public/latest.json">latest.json</a>
-        <a href="../data/public/documents.jsonl">documents.jsonl</a>
-        <a href="../data/public/document_versions.jsonl">document_versions.jsonl</a>
-        <a href="../data/public/quality/document_types.json">documenttypenrapport</a>
-        <a href="../README.md">README</a>
-      </nav>
+      <div>
+        <p class="eyebrow">Open RIS Monitor</p>
+        <h1>Raadsinformatie Huizen</h1>
+        <p class="lead">
+          Een open, reproduceerbare viewer op publieke RIS-data, opgebouwd uit
+          canonieke JSONL-exportbestanden.
+        </p>
+      </div>
     </header>
 
     <main>
-      <section class="panel" aria-labelledby="latest-title">
-        <h2 id="latest-title">Laatste export</h2>
-        <p id="status-message">Data wordt geladen...</p>
-        <dl class="summary-grid">
+      <section class="panel filters-panel" aria-labelledby="filters-title">
+        <div class="section-heading compact-heading">
           <div>
-            <dt>Gemeente</dt>
-            <dd id="municipality">-</dd>
+            <h2 id="filters-title">Zoeken en filteren</h2>
+            <p id="status-message">Data wordt geladen...</p>
           </div>
-          <div>
-            <dt>Documenten gezien</dt>
-            <dd id="documents-seen">-</dd>
-          </div>
-          <div>
-            <dt>Genormaliseerd</dt>
-            <dd id="documents-normalized">-</dd>
-          </div>
-          <div>
-            <dt>Gegenereerd</dt>
-            <dd id="generated-at">-</dd>
-          </div>
-        </dl>
-      </section>
+        </div>
 
-      <section class="panel" aria-labelledby="filters-title">
-        <h2 id="filters-title">Zoeken en filteren</h2>
         <div class="controls">
-          <label>
-            Zoeken
-            <input id="search-input" type="search" placeholder="Zoek op titel, bestand, type of id" />
+          <label class="control-search">
+            <span>Zoeken</span>
+            <input id="search-input" type="search" placeholder="Zoek op titel, bestand, type, vergadering of agendapunt" />
           </label>
+
           <label>
-            Compact documenttype
+            <span>Compact documenttype</span>
             <select id="type-filter">
               <option value="">Alle compacte documenttypen</option>
             </select>
           </label>
+
           <label>
-            Sorteer
+            <span>Sorteer</span>
             <select id="sort-select">
               <option value="date-desc">Datum, nieuwste eerst</option>
               <option value="date-asc">Datum, oudste eerst</option>
@@ -72,8 +52,9 @@
               <option value="size-asc">Grootte, klein naar groot</option>
             </select>
           </label>
+
           <label>
-            Per pagina
+            <span>Per pagina</span>
             <select id="page-size-select">
               <option value="25">25</option>
               <option value="50" selected>50</option>
@@ -84,12 +65,13 @@
       </section>
 
       <section class="panel" aria-labelledby="documents-title">
-        <div class="section-heading">
+        <div class="section-heading document-heading">
           <div>
             <h2 id="documents-title">Documenten</h2>
             <p id="result-count">-</p>
           </div>
-          <div class="pagination">
+
+          <div class="pagination" aria-label="Paginering bovenaan">
             <button id="previous-page-top" type="button">Vorige</button>
             <span id="page-info-top">Pagina 1 van 1</span>
             <button id="next-page-top" type="button">Volgende</button>
@@ -97,7 +79,16 @@
         </div>
 
         <div class="table-scroll" role="region" aria-label="Documenttabel" tabindex="0">
-          <table>
+          <table class="documents-table">
+            <colgroup>
+              <col class="col-date" />
+              <col class="col-type" />
+              <col class="col-source-type" />
+              <col class="col-title" />
+              <col class="col-file" />
+              <col class="col-size" />
+              <col class="col-download" />
+            </colgroup>
             <thead>
               <tr>
                 <th>Datum</th>
@@ -117,26 +108,37 @@
           </table>
         </div>
 
-        <div class="pagination pagination-bottom">
+        <div class="pagination pagination-bottom" aria-label="Paginering onderaan">
           <button id="previous-page-bottom" type="button">Vorige</button>
           <span id="page-info-bottom">Pagina 1 van 1</span>
           <button id="next-page-bottom" type="button">Volgende</button>
         </div>
       </section>
-
-      <section class="panel muted" aria-labelledby="about-title">
-        <h2 id="about-title">Over deze versie</h2>
-        <p>
-          Deze website gebruikt de publieke exportbestanden in <code>data/public</code>.
-          De originele RIS-documenttypen blijven bewaard als bronwaarde. Daarnaast
-          toont de viewer compacte genormaliseerde documenttypen voor betere filtering
-          en analyse.
-        </p>
-      </section>
     </main>
 
-    <footer>
-      <p>Open RIS Monitor, metadata-only MVP. Brondata blijft afkomstig uit het Raadsinformatiesysteem van gemeente Huizen.</p>
+    <footer class="site-footer">
+      <details class="metadata-details">
+        <summary>Metadata en databestanden</summary>
+        <p>
+          Laatste export: <span id="generated-at">-</span>.
+          Gemeente: <span id="municipality">-</span>.
+          Documenten gezien: <span id="documents-seen">-</span>.
+          Genormaliseerd: <span id="documents-normalized">-</span>.
+        </p>
+        <nav class="link-row" aria-label="Databestanden">
+          <a href="../data/public/latest.json">latest.json</a>
+          <a href="../data/public/documents.jsonl">documents.jsonl</a>
+          <a href="../data/public/document_versions.jsonl">document_versions.jsonl</a>
+          <a href="../data/public/meeting_documents.jsonl">meeting_documents.jsonl</a>
+          <a href="../data/public/meeting_item_documents.jsonl">meeting_item_documents.jsonl</a>
+          <a href="../data/public/quality/document_types.json">documenttypenrapport</a>
+          <a href="../README.md">README</a>
+        </nav>
+      </details>
+      <p>
+        Open RIS Monitor, metadata-only MVP. Brondata blijft afkomstig uit het
+        Raadsinformatiesysteem van gemeente Huizen.
+      </p>
     </footer>
 
     <script src="assets/app.js"></script>
