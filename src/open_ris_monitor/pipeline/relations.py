@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Any, Protocol
 
+import requests
+
 
 class RelationConnector(Protocol):
     """Connector methods needed by the raw relation harvest."""
@@ -24,6 +26,19 @@ def _as_source_id(value: Any) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _short_error(exc: BaseException) -> dict[str, str]:
+    return {
+        "type": type(exc).__name__,
+        "message": str(exc)[:500],
+    }
+
+
+def _is_relation_fetch_error(exc: BaseException) -> bool:
+    """Return whether a relation endpoint error should not fail the whole harvest."""
+
+    return isinstance(exc, requests.RequestException | ValueError)
 
 
 def extract_meeting_id_from_session(session: dict[str, Any]) -> str | None:
@@ -100,8 +115,10 @@ def collect_raw_relation_harvest(
 ) -> dict[str, Any]:
     """Collect raw meetings, meeting items and document relation records.
 
-    This step intentionally keeps the output raw. Canonical models and public
-    JSONL relation exports are handled in later steps of issue #15.
+    Relation endpoints are optional enrichment for the public export. Individual
+    meeting, meeting-document, meeting-item, or item-document failures are
+    recorded and skipped so a transient source timeout does not fail the entire
+    bounded public harvest.
     """
 
     if meeting_item_limit is not None and meeting_item_limit <= 0:
@@ -122,6 +139,7 @@ def collect_raw_relation_harvest(
 
     meetings: list[dict[str, Any]] = []
     skipped_meeting_ids: list[str] = []
+    relation_errors: list[dict[str, Any]] = []
     meeting_items: list[dict[str, Any]] = []
     meeting_documents: list[dict[str, Any]] = []
     meeting_item_documents: list[dict[str, Any]] = []
@@ -129,21 +147,61 @@ def collect_raw_relation_harvest(
     item_budget_remaining = meeting_item_limit
 
     for meeting_id in candidate_meeting_ids:
-        meeting = connector.fetch_meeting(meeting_id)
+        try:
+            meeting = connector.fetch_meeting(meeting_id)
+        except Exception as exc:
+            if not _is_relation_fetch_error(exc):
+                raise
+            skipped_meeting_ids.append(meeting_id)
+            relation_errors.append(
+                {
+                    "scope": "meeting",
+                    "meeting_id": meeting_id,
+                    "error": _short_error(exc),
+                }
+            )
+            continue
+
         if meeting is None:
             skipped_meeting_ids.append(meeting_id)
             continue
 
         meetings.append(meeting)
 
-        documents_for_meeting = connector.fetch_meeting_documents(meeting_id)
+        try:
+            documents_for_meeting = connector.fetch_meeting_documents(meeting_id)
+        except Exception as exc:
+            if not _is_relation_fetch_error(exc):
+                raise
+            relation_errors.append(
+                {
+                    "scope": "meeting_documents",
+                    "meeting_id": meeting_id,
+                    "error": _short_error(exc),
+                }
+            )
+            documents_for_meeting = []
+
         for document in documents_for_meeting:
             meeting_documents.append({"meeting_id": meeting_id, "document": document})
 
         if item_budget_remaining is not None and item_budget_remaining <= 0:
             continue
 
-        items_for_meeting = connector.fetch_meeting_items(meeting_id)
+        try:
+            items_for_meeting = connector.fetch_meeting_items(meeting_id)
+        except Exception as exc:
+            if not _is_relation_fetch_error(exc):
+                raise
+            relation_errors.append(
+                {
+                    "scope": "meeting_items",
+                    "meeting_id": meeting_id,
+                    "error": _short_error(exc),
+                }
+            )
+            continue
+
         if item_budget_remaining is not None:
             items_for_meeting = items_for_meeting[:item_budget_remaining]
             item_budget_remaining -= len(items_for_meeting)
@@ -156,7 +214,22 @@ def collect_raw_relation_harvest(
             meeting_item_id = _as_source_id(item.get("id"))
             if meeting_item_id is None:
                 continue
-            documents_for_item = connector.fetch_meeting_item_documents(meeting_item_id)
+
+            try:
+                documents_for_item = connector.fetch_meeting_item_documents(meeting_item_id)
+            except Exception as exc:
+                if not _is_relation_fetch_error(exc):
+                    raise
+                relation_errors.append(
+                    {
+                        "scope": "meeting_item_documents",
+                        "meeting_id": meeting_id,
+                        "meeting_item_id": meeting_item_id,
+                        "error": _short_error(exc),
+                    }
+                )
+                continue
+
             for document in documents_for_item:
                 meeting_item_documents.append(
                     {
@@ -170,6 +243,7 @@ def collect_raw_relation_harvest(
         "meeting_sessions": meeting_sessions,
         "candidate_meeting_ids": candidate_meeting_ids,
         "skipped_meeting_ids": skipped_meeting_ids,
+        "relation_errors": relation_errors,
         "meetings": meetings,
         "meeting_items": meeting_items,
         "meeting_documents": meeting_documents,
@@ -179,6 +253,7 @@ def collect_raw_relation_harvest(
             "candidate_meetings_seen": len(candidate_meeting_ids),
             "meetings_seen": len(meetings),
             "meetings_skipped": len(skipped_meeting_ids),
+            "relation_errors_seen": len(relation_errors),
             "meeting_items_seen": len(meeting_items),
             "meeting_document_relations_seen": len(meeting_documents),
             "meeting_item_document_relations_seen": len(meeting_item_documents),
