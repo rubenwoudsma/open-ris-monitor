@@ -1,109 +1,27 @@
 {
-  "documents_total": 250,
-  "generated_at": "2026-06-03T12:40:21.951125+00:00",
+  "documents_total": 10,
+  "generated_at": "2026-06-03T13:04:17.716854+00:00",
   "mapping": {
     "Agenda": {
-      "count": 12,
+      "count": 1,
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda"
     },
-    "Besluit": {
-      "count": 1,
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    "Besluitenlijst raad": {
-      "count": 1,
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    "Bijlage": {
-      "count": 60,
-      "normalized_document_type": "attachment",
-      "normalized_document_type_label": "Bijlage"
-    },
-    "Collegevoorstel (BBV)": {
-      "count": 23,
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel"
-    },
-    "Financiële overzichten commissie": {
-      "count": 1,
-      "normalized_document_type": "report",
-      "normalized_document_type_label": "Rapportage of evaluatie"
-    },
     "Ingekomen stuk": {
-      "count": 33,
+      "count": 4,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
-    "Kennisgeving": {
-      "count": 1,
-      "normalized_document_type": "notice",
-      "normalized_document_type_label": "Kennisgeving of ter kennisname"
-    },
-    "Mededelingen": {
-      "count": 28,
-      "normalized_document_type": "announcement",
-      "normalized_document_type_label": "Mededeling"
-    },
-    "Moties": {
-      "count": 10,
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie"
-    },
     "Overig": {
-      "count": 44,
+      "count": 5,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
-    },
-    "Overzicht stand van zaken": {
-      "count": 2,
-      "normalized_document_type": "report",
-      "normalized_document_type_label": "Rapportage of evaluatie"
-    },
-    "Raadsvoorstel": {
-      "count": 22,
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel"
-    },
-    "Resumés": {
-      "count": 1,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    "Toezeggingen": {
-      "count": 4,
-      "normalized_document_type": "commitment",
-      "normalized_document_type_label": "Toezegging"
-    },
-    "Vragen van raadsleden": {
-      "count": 7,
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag"
     }
   },
-  "normalized_document_type_count": 13,
+  "normalized_document_type_count": 3,
   "normalized_document_types": [
     {
-      "count": 60,
-      "normalized_document_type": "attachment",
-      "normalized_document_type_label": "Bijlage",
-      "source_document_types": [
-        "Bijlage"
-      ]
-    },
-    {
-      "count": 45,
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel",
-      "source_document_types": [
-        "Collegevoorstel (BBV)",
-        "Raadsvoorstel"
-      ]
-    },
-    {
-      "count": 44,
+      "count": 5,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -111,7 +29,7 @@
       ]
     },
     {
-      "count": 33,
+      "count": 4,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -119,77 +37,11 @@
       ]
     },
     {
-      "count": 28,
-      "normalized_document_type": "announcement",
-      "normalized_document_type_label": "Mededeling",
-      "source_document_types": [
-        "Mededelingen"
-      ]
-    },
-    {
-      "count": 12,
+      "count": 1,
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda",
       "source_document_types": [
         "Agenda"
-      ]
-    },
-    {
-      "count": 10,
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie",
-      "source_document_types": [
-        "Moties"
-      ]
-    },
-    {
-      "count": 7,
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag",
-      "source_document_types": [
-        "Vragen van raadsleden"
-      ]
-    },
-    {
-      "count": 4,
-      "normalized_document_type": "commitment",
-      "normalized_document_type_label": "Toezegging",
-      "source_document_types": [
-        "Toezeggingen"
-      ]
-    },
-    {
-      "count": 3,
-      "normalized_document_type": "report",
-      "normalized_document_type_label": "Rapportage of evaluatie",
-      "source_document_types": [
-        "Financiële overzichten commissie",
-        "Overzicht stand van zaken"
-      ]
-    },
-    {
-      "count": 2,
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit",
-      "source_document_types": [
-        "Besluit",
-        "Besluitenlijst raad"
-      ]
-    },
-    {
-      "count": 1,
-      "normalized_document_type": "notice",
-      "normalized_document_type_label": "Kennisgeving of ter kennisname",
-      "source_document_types": [
-        "Kennisgeving"
-      ]
-    },
-    {
-      "count": 1,
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting",
-      "source_document_types": [
-        "Resumés"
       ]
     }
   ],
@@ -198,103 +50,25 @@
     "normalized_document_type is now part of the canonical Document export.",
     "Unknown should be reserved for genuinely missing or explicitly unknown source values."
   ],
-  "source_document_type_count": 16,
+  "source_document_type_count": 3,
   "source_document_types": [
     {
-      "count": 60,
-      "document_type": "Bijlage",
-      "normalized_document_type": "attachment",
-      "normalized_document_type_label": "Bijlage"
-    },
-    {
-      "count": 44,
+      "count": 5,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 33,
+      "count": 4,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
     {
-      "count": 28,
-      "document_type": "Mededelingen",
-      "normalized_document_type": "announcement",
-      "normalized_document_type_label": "Mededeling"
-    },
-    {
-      "count": 23,
-      "document_type": "Collegevoorstel (BBV)",
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel"
-    },
-    {
-      "count": 22,
-      "document_type": "Raadsvoorstel",
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel"
-    },
-    {
-      "count": 12,
+      "count": 1,
       "document_type": "Agenda",
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda"
-    },
-    {
-      "count": 10,
-      "document_type": "Moties",
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie"
-    },
-    {
-      "count": 7,
-      "document_type": "Vragen van raadsleden",
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag"
-    },
-    {
-      "count": 4,
-      "document_type": "Toezeggingen",
-      "normalized_document_type": "commitment",
-      "normalized_document_type_label": "Toezegging"
-    },
-    {
-      "count": 2,
-      "document_type": "Overzicht stand van zaken",
-      "normalized_document_type": "report",
-      "normalized_document_type_label": "Rapportage of evaluatie"
-    },
-    {
-      "count": 1,
-      "document_type": "Besluit",
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
-    },
-    {
-      "count": 1,
-      "document_type": "Financiële overzichten commissie",
-      "normalized_document_type": "report",
-      "normalized_document_type_label": "Rapportage of evaluatie"
-    },
-    {
-      "count": 1,
-      "document_type": "Kennisgeving",
-      "normalized_document_type": "notice",
-      "normalized_document_type_label": "Kennisgeving of ter kennisname"
-    },
-    {
-      "count": 1,
-      "document_type": "Resumés",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    {
-      "count": 1,
-      "document_type": "Besluitenlijst raad",
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit"
     }
   ],
   "unknown_document_type_count": 0,
