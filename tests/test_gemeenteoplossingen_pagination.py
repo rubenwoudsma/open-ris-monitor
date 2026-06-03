@@ -35,3 +35,12 @@ def test_fetch_all_documents_respects_max_documents() -> None:
 
     assert [document["id"] for document in documents] == [1, 2, 3]
     assert connector.pages == [(2, 0), (1, 2)]
+
+
+def test_fetch_latest_documents_uses_tail_offset() -> None:
+    connector = FakeConnector()
+
+    documents = connector.fetch_latest_documents(limit=2)
+
+    assert [document["id"] for document in documents] == [4, 5]
+    assert connector.pages == [(2, 3)]

@@ -12,11 +12,12 @@ def test_quick_profile_is_bounded_and_relation_enabled() -> None:
     assert options["meeting_item_limit"] == 200
 
 
-def test_public_profile_uses_full_bounded_publication_defaults() -> None:
+def test_public_profile_prefers_recent_bounded_publication_defaults() -> None:
     options = resolve_harvest_options("public")
 
-    assert options["mode"] == "full"
-    assert options["max_documents"] == 250
+    assert options["mode"] == "latest"
+    assert options["limit"] == 250
+    assert options["max_documents"] is None
     assert options["include_relations"] is True
     assert options["meeting_scan_limit"] == 250
     assert options["meeting_item_limit"] == 1000
@@ -46,18 +47,18 @@ def test_explicit_overrides_win_over_profile_defaults() -> None:
     options = resolve_harvest_options(
         "public",
         {
-            "mode": "latest",
+            "mode": "full",
             "limit": 42,
-            "max_documents": None,
+            "max_documents": 42,
             "include_relations": False,
             "meeting_scan_limit": 12,
             "meeting_item_limit": 34,
         },
     )
 
-    assert options["mode"] == "latest"
+    assert options["mode"] == "full"
     assert options["limit"] == 42
-    assert options["max_documents"] is None
+    assert options["max_documents"] == 42
     assert options["include_relations"] is False
     assert options["meeting_scan_limit"] == 12
     assert options["meeting_item_limit"] == 34

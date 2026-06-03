@@ -3,9 +3,9 @@
   "documents_normalized": 250,
   "documents_seen": 250,
   "documents_versioned": 0,
-  "generated_at": "2026-06-03T06:41:50.063403+00:00",
-  "harvest_run_id": "harvest-huizen-20260603T063653Z",
-  "mode": "full",
+  "generated_at": "2026-06-03T12:22:17.049881+00:00",
+  "harvest_run_id": "harvest-huizen-20260603T121718Z",
+  "mode": "latest",
   "municipality": "huizen",
   "municipality_id": "gm0406",
   "outputs": {
@@ -23,11 +23,12 @@
   "relations_summary": {
     "candidate_meetings_seen": 250,
     "meeting_document_relations_seen": 188,
-    "meeting_item_document_relations_seen": 819,
+    "meeting_item_document_relations_seen": 818,
     "meeting_items_seen": 1000,
     "meeting_sessions_seen": 250,
     "meetings_seen": 187,
-    "meetings_skipped": 63
+    "meetings_skipped": 63,
+    "relation_errors_seen": 1
   },
   "source_system_id": "huizen-gemeenteoplossingen"
 }
