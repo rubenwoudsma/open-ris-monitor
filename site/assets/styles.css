@@ -194,6 +194,7 @@ td {
   text-align: left;
   vertical-align: top;
   border-bottom: 1px solid var(--line);
+  min-width: 0;
 }
 
 th {
@@ -241,8 +242,19 @@ tr:last-child td {
 
 .filename-cell {
   color: var(--muted);
+  max-width: 0;
+  white-space: normal;
   overflow-wrap: anywhere;
   word-break: break-word;
+  hyphens: auto;
+}
+
+.filename-cell .filename-text {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
 }
 
 .link-row {

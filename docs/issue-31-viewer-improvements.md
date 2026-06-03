@@ -20,3 +20,10 @@ Deze PR houdt de viewerwijziging bewust klein. De relationele public exports wor
 - Verdere documenttype-normalisatie, issue 21.
 - Kwaliteitsrapportage, issue 13.
 - Aanpassing aan de harveststrategie of public exports.
+
+
+## Follow-up fix in v3
+
+Long technical filenames from source systems can contain underscores and other separators without spaces. The viewer now inserts safe soft break opportunities in the rendered filename and applies defensive wrapping to the file column so filenames cannot force the other table columns to shrink.
+
+The observation that the current public harvest mostly shows 2018 documents is not changed here. That is likely caused by bounded harvesting using the source system's default document order and should be handled in a separate harvest/data selection issue.
