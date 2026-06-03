@@ -7,6 +7,7 @@ class FakeConnector(GemeenteOplossingenConnector):
     def __init__(self) -> None:
         super().__init__(base_url="https://example.test/api/v2/")
         self.pages: list[tuple[int, int]] = []
+        self.meeting_session_pages: list[tuple[int, int]] = []
 
     def fetch_document_count(self) -> int:
         return 5
@@ -16,6 +17,16 @@ class FakeConnector(GemeenteOplossingenConnector):
         records = []
         for document_id in range(offset + 1, min(offset + limit, 5) + 1):
             records.append({"id": document_id, "description": f"Document {document_id}"})
+        return records
+
+    def fetch_meeting_session_count(self) -> int:
+        return 9
+
+    def fetch_meeting_sessions_page(self, *, limit: int, offset: int):
+        self.meeting_session_pages.append((limit, offset))
+        records = []
+        for session_id in range(offset + 1, min(offset + limit, 9) + 1):
+            records.append({"id": session_id, "container": {"meeting": {"id": session_id}}})
         return records
 
 
@@ -44,3 +55,12 @@ def test_fetch_latest_documents_uses_tail_offset() -> None:
 
     assert [document["id"] for document in documents] == [4, 5]
     assert connector.pages == [(2, 3)]
+
+
+def test_fetch_latest_meeting_sessions_uses_tail_offset() -> None:
+    connector = FakeConnector()
+
+    sessions = connector.fetch_latest_meeting_sessions(limit=3)
+
+    assert [session["id"] for session in sessions] == [7, 8, 9]
+    assert connector.meeting_session_pages == [(3, 6)]

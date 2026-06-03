@@ -11,8 +11,8 @@ class GemeenteOplossingenConnector:
 
     The constructor intentionally accepts both positional and keyword usage:
 
-        GemeenteOplossingenConnector("https://example/api/v2/")
-        GemeenteOplossingenConnector(base_url="https://example/api/v2/")
+    GemeenteOplossingenConnector("https://example/api/v2/")
+    GemeenteOplossingenConnector(base_url="https://example/api/v2/")
 
     It also accepts request_delay_seconds, which is used by the paginated
     full-harvest flow to avoid hammering the RIS API with back-to-back requests.
@@ -50,9 +50,9 @@ class GemeenteOplossingenConnector:
     ) -> dict[str, Any] | None:
         """Fetch JSON but treat 404 as an absent resource.
 
-        Some meeting IDs discovered through meetingsessions do not resolve through
-        /meetings/{meeting_id}. That is expected source-system behaviour and should
-        not fail the relational harvest.
+        Some meeting IDs discovered through meetingsessions do not resolve
+        through /meetings/{meeting_id}. That is expected source-system
+        behaviour and should not fail the relational harvest.
         """
 
         try:
@@ -98,6 +98,7 @@ class GemeenteOplossingenConnector:
     def fetch_latest_documents(self, limit: int) -> list[dict[str, Any]]:
         if limit <= 0:
             raise ValueError("limit must be greater than 0")
+
         total_count = self.fetch_document_count()
         offset = max(0, total_count - limit)
         return self.fetch_documents_page(limit=limit, offset=offset)
@@ -115,9 +116,9 @@ class GemeenteOplossingenConnector:
 
         total_count = self.fetch_document_count()
         target_count = min(total_count, max_documents) if max_documents is not None else total_count
+
         documents: list[dict[str, Any]] = []
         offset = 0
-
         while offset < target_count:
             limit = min(batch_size, target_count - offset)
             page = self.fetch_documents_page(limit=limit, offset=offset)
@@ -130,6 +131,12 @@ class GemeenteOplossingenConnector:
 
         return documents
 
+    def fetch_meeting_session_count(self) -> int:
+        payload = self._get_json("meetingsessions", params={"limit": 1, "offset": 0})
+        result = self._result(payload)
+        total_count = result.get("totalCount", 0)
+        return int(total_count)
+
     def fetch_meeting_sessions_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
         """Fetch one page from /meetingsessions."""
 
@@ -141,13 +148,20 @@ class GemeenteOplossingenConnector:
         payload = self._get_json("meetingsessions", params={"limit": limit, "offset": offset})
         return self._result_list(payload, "meetingsessions")
 
+    def fetch_latest_meeting_sessions(self, limit: int) -> list[dict[str, Any]]:
+        if limit <= 0:
+            raise ValueError("limit must be greater than 0")
+
+        total_count = self.fetch_meeting_session_count()
+        offset = max(0, total_count - limit)
+        return self.fetch_meeting_sessions_page(limit=limit, offset=offset)
+
     def fetch_meeting(self, meeting_id: int | str) -> dict[str, Any] | None:
         """Fetch /meetings/{meeting_id}, returning None for 404 responses."""
 
         payload = self._get_json_or_none_on_404(f"meetings/{meeting_id}")
         if payload is None:
             return None
-
         result = self._result(payload)
         meeting = result.get("meeting", result)
         if not isinstance(meeting, dict):

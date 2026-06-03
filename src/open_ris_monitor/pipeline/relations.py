@@ -2,15 +2,20 @@
 
 from __future__ import annotations
 
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
 import requests
+
+
+RelationScanMode = Literal["full", "latest"]
 
 
 class RelationConnector(Protocol):
     """Connector methods needed by the raw relation harvest."""
 
     def fetch_meeting_sessions_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]: ...
+
+    def fetch_latest_meeting_sessions(self, limit: int) -> list[dict[str, Any]]: ...
 
     def fetch_meeting(self, meeting_id: int | str) -> dict[str, Any] | None: ...
 
@@ -82,13 +87,24 @@ def fetch_meeting_sessions(
     *,
     scan_limit: int,
     batch_size: int = 100,
+    scan_mode: RelationScanMode = "full",
 ) -> list[dict[str, Any]]:
-    """Fetch a bounded number of meetingsession records."""
+    """Fetch a bounded number of meetingsession records.
+
+    In latest mode the helper mirrors the document latest harvest and reads the
+    tail of the meetingsession endpoint. This keeps relation exports closer to
+    the latest documents that are published by the public profile.
+    """
 
     if scan_limit <= 0:
         raise ValueError("scan_limit must be greater than 0")
     if batch_size <= 0:
         raise ValueError("batch_size must be greater than 0")
+    if scan_mode not in {"full", "latest"}:
+        raise ValueError("scan_mode must be 'full' or 'latest'")
+
+    if scan_mode == "latest":
+        return connector.fetch_latest_meeting_sessions(scan_limit)
 
     sessions: list[dict[str, Any]] = []
     offset = 0
@@ -112,6 +128,7 @@ def collect_raw_relation_harvest(
     meeting_scan_limit: int,
     meeting_session_batch_size: int = 100,
     meeting_item_limit: int | None = None,
+    meeting_session_scan_mode: RelationScanMode = "full",
 ) -> dict[str, Any]:
     """Collect raw meetings, meeting items and document relation records.
 
@@ -128,6 +145,7 @@ def collect_raw_relation_harvest(
         connector,
         scan_limit=meeting_scan_limit,
         batch_size=meeting_session_batch_size,
+        scan_mode=meeting_session_scan_mode,
     )
     candidate_meeting_ids = stable_unique(
         [
@@ -249,6 +267,7 @@ def collect_raw_relation_harvest(
         "meeting_documents": meeting_documents,
         "meeting_item_documents": meeting_item_documents,
         "summary": {
+            "meeting_session_scan_mode": meeting_session_scan_mode,
             "meeting_sessions_seen": len(meeting_sessions),
             "candidate_meetings_seen": len(candidate_meeting_ids),
             "meetings_seen": len(meetings),
