@@ -14,21 +14,13 @@
         Een open, reproduceerbare viewer op publieke RIS-data, opgebouwd uit
         canonieke JSONL-exportbestanden.
       </p>
-      <nav class="link-row" aria-label="Databestanden">
-        <a href="../data/public/latest.json">latest.json</a>
-        <a href="../data/public/documents.jsonl">documents.jsonl</a>
-        <a href="../data/public/document_versions.jsonl">document_versions.jsonl</a>
-        <a href="../data/public/quality/document_types.json">documenttypenrapport</a>
-        <a href="../README.md">README</a>
-        <a href="#agenda-browser-title">Vergaderingen</a>
-      </nav>
     </header>
 
     <main>
       <section class="panel" aria-labelledby="latest-title">
         <h2 id="latest-title">Laatste export</h2>
         <p id="status-message">Data wordt geladen...</p>
-        <dl class="summary-grid">
+        <dl class="summary-grid" aria-label="Samenvatting van de laatste export">
           <div>
             <dt>Gemeente</dt>
             <dd id="municipality">-</dd>
@@ -98,7 +90,16 @@
         </div>
 
         <div class="table-scroll" role="region" aria-label="Documenttabel" tabindex="0">
-          <table>
+          <table class="documents-table">
+            <colgroup>
+              <col class="col-date" />
+              <col class="col-compact" />
+              <col class="col-source" />
+              <col class="col-title" />
+              <col class="col-filename" />
+              <col class="col-size" />
+              <col class="col-download" />
+            </colgroup>
             <thead>
               <tr>
                 <th>Datum</th>
@@ -163,14 +164,24 @@
       </section>
 
       <section class="panel muted" aria-labelledby="about-title">
-        <h2 id="about-title">Over deze versie</h2>
+        <h2 id="about-title">Metadata en databestanden</h2>
         <p>
-          Deze website gebruikt de publieke exportbestanden in <code>data/public</code>.
+          Deze site gebruikt de publieke exportbestanden in <code>data/public</code>.
           De originele RIS-documenttypen blijven bewaard als bronwaarde. Daarnaast
           toont de viewer compacte genormaliseerde documenttypen voor betere filtering
-          en analyse. De vergaderbrowser gebruikt dezelfde publieke exports om
-          documenten aan vergaderingen en agendapunten te koppelen.
+          en analyse.
         </p>
+        <div class="link-grid" aria-label="Databestanden">
+          <a href="../data/public/latest.json">latest.json</a>
+          <a href="../data/public/documents.jsonl">documents.jsonl</a>
+          <a href="../data/public/document_versions.jsonl">document_versions.jsonl</a>
+          <a href="../data/public/meeting_documents.jsonl">meeting_documents.jsonl</a>
+          <a href="../data/public/meeting_item_documents.jsonl">meeting_item_documents.jsonl</a>
+          <a href="../data/public/meetings.jsonl">meetings.jsonl</a>
+          <a href="../data/public/meeting_items.jsonl">meeting_items.jsonl</a>
+          <a href="../data/public/quality/document_types.json">documenttypenrapport</a>
+          <a href="../README.md">README</a>
+        </div>
       </section>
     </main>
 

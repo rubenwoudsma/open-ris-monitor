@@ -1,5 +1,6 @@
 (() => {
   const DATA_BASE = "../data/public";
+
   const elements = {
     status: document.querySelector("#agenda-browser-status"),
     count: document.querySelector("#agenda-browser-count"),
@@ -41,8 +42,7 @@
     const trimmed = String(text || "").trim();
     if (!trimmed) return [];
 
-    const lines = trimmed.split(/?
-/).map((line) => line.trim()).filter(Boolean);
+    const lines = trimmed.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
     if (lines.length > 1) {
       try {
         return lines.map((line) => JSON.parse(line));
@@ -56,22 +56,25 @@
     let inString = false;
     let escaped = false;
     let start = -1;
+
     for (let index = 0; index < trimmed.length; index += 1) {
       const char = trimmed[index];
       if (inString) {
         if (escaped) {
           escaped = false;
-        } else if (char === "\") {
+        } else if (char === "\\") {
           escaped = true;
         } else if (char === '"') {
           inString = false;
         }
         continue;
       }
+
       if (char === '"') {
         inString = true;
         continue;
       }
+
       if (char === "{") {
         if (depth === 0) start = index;
         depth += 1;
@@ -115,11 +118,23 @@
   }
 
   function pick(...values) {
-    return values.find((value) => value !== undefined && value !== null && String(value).trim() !== "") ?? "";
+    for (const value of values) {
+      if (value === undefined || value === null) continue;
+      const asText = String(value).trim();
+      if (asText) return value;
+    }
+    return "";
   }
 
   function toId(record) {
     return String(pick(record?.id, record?.meeting_id, record?.meeting_item_id, record?.document_id, record?.source_id, record?.source_object_id));
+  }
+
+  function normalizeDateKey(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value).slice(0, 10);
+    return date.toISOString().slice(0, 10);
   }
 
   function formatDate(value) {
@@ -146,19 +161,23 @@
     }).format(date);
   }
 
-  function normalizeDateKey(value) {
-    if (!value) return "";
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return String(value).slice(0, 10);
-    return date.toISOString().slice(0, 10);
-  }
-
   function formatOrg(meeting) {
-    return pick(meeting?.dmu_name, meeting?.organ_name, meeting?.organization_name, meeting?.committee_name, meeting?.description, "Onbekend bestuursorgaan");
+    return text(pick(
+      meeting?.dmu_name,
+      meeting?.organ_name,
+      meeting?.organization_name,
+      meeting?.committee_name,
+      meeting?.description,
+      "Onbekend bestuursorgaan",
+    ));
   }
 
   function formatMeetingLabel(meeting) {
-    const parts = [formatDate(pick(meeting?.date, meeting?.meeting_date, meeting?.start_date, meeting?.start_time)), pick(meeting?.start_time, meeting?.start), pick(meeting?.location)].filter(Boolean);
+    const parts = [
+      formatDate(pick(meeting?.date, meeting?.meeting_date, meeting?.start_date, meeting?.start_time)),
+      pick(meeting?.start_time, meeting?.start),
+      pick(meeting?.location),
+    ].filter(Boolean);
     return parts.join(" • ");
   }
 
@@ -167,11 +186,13 @@
   }
 
   function formatDocumentLabel(documentRecord) {
-    return pick(documentRecord?.title, documentRecord?.description, documentRecord?.filename, `Document ${documentRecord?.id || documentRecord?.source_id || "onbekend"}`);
+    return text(pick(documentRecord?.title, documentRecord?.description, documentRecord?.filename, `Document ${documentRecord?.id || documentRecord?.source_id || "onbekend"}`));
   }
 
   function getDocumentSearchTerm(documentRecord) {
-    return [documentRecord?.title, documentRecord?.filename, documentRecord?.source_id, documentRecord?.source_object_id, documentRecord?.id].filter(Boolean).join(" ");
+    return [documentRecord?.title, documentRecord?.filename, documentRecord?.source_id, documentRecord?.source_object_id, documentRecord?.id]
+      .filter(Boolean)
+      .join(" ");
   }
 
   function createLookup(items, keyFn) {
@@ -207,11 +228,12 @@
 
     for (const meeting of state.meetings) {
       const normalized = { ...meeting, id: toId(meeting), items: [], documents: [], agendaSearchBlob: "" };
-      meetingsById.set(normalized.id, normalized);
+      if (normalized.id) meetingsById.set(normalized.id, normalized);
     }
 
     for (const item of state.meetingItems) {
       const normalized = { ...item, id: toId(item), documents: [] };
+      if (!normalized.id) continue;
       itemsById.set(normalized.id, normalized);
       const meetingId = String(pick(item?.meeting_id, item?.meetingId, item?.session_id, item?.sessionId));
       const meeting = meetingsById.get(meetingId);
@@ -233,9 +255,11 @@
       const documentId = String(pick(relation?.document_id, relation?.documentId));
       const item = itemsById.get(itemId);
       const documentRecord = documentsById.get(documentId);
+
       if (item && documentRecord) {
         item.documents.push(documentRecord);
       }
+
       if (documentRecord) {
         const meetingId = String(pick(relation?.meeting_id, relation?.meetingId));
         const meeting = meetingsById.get(meetingId) || (item ? meetingsById.get(String(pick(item?.meeting_id, item?.meetingId, item?.session_id, item?.sessionId))) : null);
@@ -247,7 +271,7 @@
 
     const meetings = [...meetingsById.values()].map((meeting) => {
       meeting.items.sort((a, b) => compareMaybeNumeric(pick(a?.number, a?.item_number, a?.agenda_number), pick(b?.number, b?.item_number, b?.agenda_number)));
-      meeting.documents.sort((a, b) => String(formatDocumentLabel(a)).localeCompare(String(formatDocumentLabel(b)), "nl"));
+      meeting.documents.sort((a, b) => formatDocumentLabel(a).localeCompare(formatDocumentLabel(b), "nl"));
       meeting.agendaSearchBlob = [
         meeting.description,
         meeting.dmu_name,
@@ -269,19 +293,15 @@
       return bKey.localeCompare(aKey, "nl");
     });
 
+    state.meetings = meetings;
     state.filteredMeetings = meetings;
   }
 
   function syncOrgFilter() {
     const selected = elements.org.value;
-    const orgMap = new Map();
-    for (const meeting of state.meetings) {
-      orgMap.set(formatOrg(meeting), true);
-    }
+    const orgs = [...new Set(state.meetings.map((meeting) => formatOrg(meeting)))].sort((a, b) => a.localeCompare(b, "nl"));
 
-    const orgs = [...orgMap.keys()].sort((a, b) => a.localeCompare(b, "nl"));
     elements.org.replaceChildren();
-
     const allOption = document.createElement("option");
     allOption.value = "";
     allOption.textContent = "Alle bestuursorganen";
@@ -334,7 +354,11 @@
     });
 
     const totalItems = state.filteredMeetings.reduce((count, meeting) => count + meeting.items.length, 0);
-    const totalDocs = state.filteredMeetings.reduce((count, meeting) => count + meeting.documents.length + meeting.items.reduce((sum, item) => sum + item.documents.length, 0), 0);
+    const totalDocs = state.filteredMeetings.reduce(
+      (count, meeting) => count + meeting.documents.length + meeting.items.reduce((sum, item) => sum + item.documents.length, 0),
+      0,
+    );
+
     elements.count.textContent = `${state.filteredMeetings.length} vergaderingen, ${totalItems} agendapunten, ${totalDocs} documentkoppelingen`;
 
     if (state.filteredMeetings.length === 0) {
@@ -377,13 +401,17 @@
         const itemList = document.createElement("ol");
         for (const itemRecord of meeting.items) {
           const item = document.createElement("li");
+
           const title = document.createElement("strong");
           title.textContent = formatItemLabel(itemRecord) || "Agendapunt zonder titel";
           item.appendChild(title);
 
-          const info = document.createElement("p");
-          info.textContent = [pick(itemRecord?.status, itemRecord?.phase, itemRecord?.resolution)].filter(Boolean).join(" • ");
-          if (info.textContent) item.appendChild(info);
+          const infoText = [pick(itemRecord?.status, itemRecord?.phase, itemRecord?.resolution)].filter(Boolean).join(" • ");
+          if (infoText) {
+            const info = document.createElement("p");
+            info.textContent = infoText;
+            item.appendChild(info);
+          }
 
           if (itemRecord.documents.length > 0) {
             const docsLabel = document.createElement("p");
@@ -413,11 +441,18 @@
   async function loadData() {
     state.latest = await fetchJson(`${DATA_BASE}/latest.json`);
     const outputs = state.latest.outputs || {};
-    state.meetings = await fetchOptionalJsonl(outputs.meetings ? `${DATA_BASE}/${outputs.meetings}` : null);
-    state.meetingItems = await fetchOptionalJsonl(outputs.meeting_items ? `${DATA_BASE}/${outputs.meeting_items}` : null);
-    state.meetingDocuments = await fetchOptionalJsonl(outputs.meeting_documents ? `${DATA_BASE}/${outputs.meeting_documents}` : null);
-    state.meetingItemDocuments = await fetchOptionalJsonl(outputs.meeting_item_documents ? `${DATA_BASE}/${outputs.meeting_item_documents}` : null);
-    state.documents = await fetchOptionalJsonl(outputs.documents ? `${DATA_BASE}/${outputs.documents}` : null);
+
+    const meetingsPath = outputs.meetings ? `${DATA_BASE}/${outputs.meetings}` : null;
+    const meetingItemsPath = outputs.meeting_items ? `${DATA_BASE}/${outputs.meeting_items}` : null;
+    const meetingDocumentsPath = outputs.meeting_documents ? `${DATA_BASE}/${outputs.meeting_documents}` : null;
+    const meetingItemDocumentsPath = outputs.meeting_item_documents ? `${DATA_BASE}/${outputs.meeting_item_documents}` : null;
+    const documentsPath = outputs.documents ? `${DATA_BASE}/${outputs.documents}` : null;
+
+    state.meetings = await fetchOptionalJsonl(meetingsPath);
+    state.meetingItems = await fetchOptionalJsonl(meetingItemsPath);
+    state.meetingDocuments = await fetchOptionalJsonl(meetingDocumentsPath);
+    state.meetingItemDocuments = await fetchOptionalJsonl(meetingItemDocumentsPath);
+    state.documents = await fetchOptionalJsonl(documentsPath);
   }
 
   function wireEvents() {
@@ -450,5 +485,9 @@
     }
   }
 
-  init();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
 })();
