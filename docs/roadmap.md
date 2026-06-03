@@ -1,106 +1,138 @@
 # Roadmap
 
-## Completed
+Open RIS Monitor is een kleine, reproduceerbare open-data-pipeline voor publieke raadsinformatie. De huidige focus ligt op compacte public exports, een statische GitHub Pages viewer en een relationele laag voor vergaderingen, agendapunten en documentkoppelingen.
 
-- Document-first harvest for Huizen
-- Canonical document exports
-- GitHub Pages viewer
-- Automatic `data/public` updates after harvest
-- Paginated full document harvest with `latest` and `full` modes
-- Document versions and checksum metadata
-- #14 Research meetings and agenda-items endpoints
-- #15 Step 1: GemeenteOplossingen meeting relation endpoints
-- #15 Step 2: Optional raw meeting relation harvest
-- #15 Step 3: Canonical meeting relation normalization
-- #15 Step 4: Public meeting relation exports
+## Uitgangspunten
 
-## Current milestone, issue #15
+- Geen PDF-bestanden in Git.
+- Geen grote raw dumps in Git.
+- Raw data alleen tijdelijk, bijvoorbeeld als GitHub Actions artifact.
+- `data/public/` blijft de compacte, commitbare public export.
+- De viewer blijft statisch, frameworkloos en geschikt voor GitHub Pages.
+- De public exports blijven zo stabiel mogelijk voor hergebruikers en forks.
+- Gemeente Huizen blijft de eerste implementatie, maar de opzet moet overdraagbaar blijven naar andere gemeenten en RIS-leveranciers.
 
-Link documents to meetings and agenda items.
+## Afgerond
 
-Implemented foundation:
+- Document-first harvest voor Huizen.
+- Canonieke documentexports.
+- GitHub Pages viewer.
+- Automatische publicatie van `data/public/` na harvest.
+- Gepagineerde documentharvest met `latest` en `full` modes.
+- Documentversies en checksummetadata.
+- #14 Research naar meetings- en agenda-item-endpoints.
+- #15 Documenten koppelen aan vergaderingen en agendapunten.
+- #31 Viewer verbeteren na relationele exports.
+- #32 Harveststrategie en backfill operationaliseren.
+- #33 Relationele dekking verbeteren en valideren via quick en public runs.
+- #37 Public harvest prefereert recente documenten via het public profiel met latest mode.
 
-- meeting harvest based on `/meetingsessions` and `/meetings/{meetingId}`
-- meeting item harvest based on `/meetings/{meetingId}/meetingitems`
-- meeting-level document relations based on `/meetings/{meetingId}/documents`
-- meeting-item-level document relations based on `/meetingitems/{meetingItemId}/documents`
-- canonical `Meeting` records
-- canonical `MeetingItem` records
-- canonical `MeetingDocumentRelation` records
-- canonical `MeetingItemDocumentRelation` records
-- public exports for meetings, meeting items and relations
-- `latest.json` pointers to relation exports
-- relation harvest summary counters
+## Huidige stand
 
-Remaining within issue #15:
+De CLI ondersteunt drie harvestprofielen:
 
-- update documentation and operational guidance
-- decide whether temporary smoke workflows should be removed before merge
-- optionally add minimal viewer support for relation context
-- open PR with clear scope and validation notes
+- `quick` voor snelle smoke tests.
+- `public` voor de handmatige publicatie van de live dataset.
+- `backfill` voor gecontroleerde historische aanvulling.
 
-Out of scope for this milestone:
+De handmatige workflow voor publieke RIS-data gebruikt standaard het profiel `public`. Dat profiel publiceert compacte JSONL-bestanden in `data/public/` en schrijft geen PDF's of raw dumps naar Git.
 
-- PDF archiving
-- OCR
-- text extraction
-- AI summaries
-- full agenda viewer redesign
-- complete support for all RIS vendors
-- perfect historical completeness in a single workflow run
+De public export bestaat momenteel uit:
 
-## Upcoming
+- `documents.jsonl`
+- `harvest_runs.jsonl`
+- `meetings.jsonl`
+- `meeting_items.jsonl`
+- `meeting_documents.jsonl`
+- `meeting_item_documents.jsonl`
+- `latest.json`
 
-### #13 Add quality reporting
+`latest.json` is het publicatiecontract. Het bevat de outputpaden, relationele status, relationele samenvatting en publicatie-informatie over de overlap tussen gepubliceerde documenten en relationele koppelingen.
 
-Quality reporting should use the relation layer. Examples:
+De viewer toont documentmetadata, compacte documenttypen en relationele context bij documenten waar die koppeling beschikbaar is. De volgende stap is niet nog meer relationele data verzamelen, maar de relationele laag beter navigeerbaar maken.
 
-- document without meeting relation
-- meeting without meeting items
-- meeting item without documents
-- relation pointing to a missing document
-- relation pointing to a missing meeting item
-- suspicious duplicate relation
-- confidential source records that leak into public exports
+## Eerstvolgende volgorde
 
-### #21 Normalize document types
+### 1. Roadmap actualiseren
 
-Document type normalization should use both the source document type and relation context. For example, a document labelled `Bijlage` may be more meaningful when attached to a specific agenda item.
+Deze stap is bewust klein en documentatiegericht. Doel is om de roadmap gelijk te trekken met de afgeronde relationele mijlpalen en de geplande volgorde van de komende issues.
 
-### Viewer improvement
+Resultaat:
 
-Short-term viewer goal:
+- verouderde #15-focus verwijderen;
+- afgeronde relationele en operationele issues markeren als afgerond;
+- komende issues in de gewenste volgorde zetten;
+- duidelijke scopegrens houden tussen documentatie, viewerfunctionaliteit en kwaliteitsrapportage.
 
-- show linked meeting context on a document detail row or panel
-- show linked meeting item context where available
-- keep the viewer static and frameworkless
+### 2. #34 Eenvoudige agenda- en vergaderingbrowser
 
-Later viewer goals:
+Doel: een eenvoudige statische browser toevoegen voor vergaderingen en agendapunten op basis van de bestaande relationele public exports.
 
-- meeting browser
-- agenda item browser
-- relation-aware filters
-- downloadable subsets
-- search index generated from public JSONL
+Scope voor een eerste kleine implementatie:
 
-### Operational harvest strategy
+- vergaderingen tonen uit `meetings.jsonl`;
+- filteren op datum en bestuursorgaan of vergaderingstype, voor zover beschikbaar in de export;
+- agendapunten per vergadering tonen uit `meeting_items.jsonl`;
+- documenten per agendapunt tonen via `meeting_item_documents.jsonl`;
+- teruglink of verwijzing naar documentrecords in de bestaande documententabel;
+- geen backend, geen zoekindex, geen PDF-preview en geen framework.
 
-Build toward full historical coverage through bounded, resumable harvests:
+Aanpak:
 
-- small daily latest harvests
-- scheduled relation refreshes
-- bounded full harvest windows
-- backfill by meeting session range or offset window
-- no raw or PDF archive in Git
-- compact public JSONL exports only
+- hergebruik de bestaande JSONL-loader en relationele lookups in `site/assets/app.js`;
+- voeg een compacte sectie toe in `site/index.html`, bijvoorbeeld boven of onder de documententabel;
+- houd de eerste versie read-only en client-side;
+- toon graceful fallback wanneer relationele exports ontbreken of leeg zijn.
 
-See `docs/operations-harvest-strategy.md`.
+### 3. #21 Documenttypen normaliseren
 
-### Multi-source support
+Doel: documenttypen verder normaliseren voor filtering, analyse en hergebruik.
 
-After the GemeenteOplossingen implementation stabilizes:
+Richting:
 
-- document a connector interface for other RIS suppliers
-- add supplier capability flags
-- distinguish source endpoints from canonical output
-- keep public exports stable across suppliers
+- originele RIS-bronwaarde behouden;
+- genormaliseerde documenttypewaarde blijven publiceren;
+- mapping centraal documenteren;
+- relationele context gebruiken voor betere duiding, bijvoorbeeld bij bijlagen bij agendapunten;
+- onbekende of niet-mappende waarden expliciet laten terugvallen op `unknown` of `other`.
+
+### 4. #13 Kwaliteitsrapportage toevoegen
+
+Doel: kwaliteitsrapportage uitbreiden op basis van de documentlaag en de relationele laag.
+
+Mogelijke checks:
+
+- documenten zonder gepubliceerde relationele koppeling;
+- relationele koppelingen naar ontbrekende documenten;
+- vergaderingen zonder agendapunten;
+- agendapunten zonder documenten;
+- dubbele of verdachte relationele koppelingen;
+- verschillen tussen raw relationele tellingen en gepubliceerde relationele overlap;
+- signalering wanneer public exports ontbreken of leeg zijn.
+
+### 5. Docs cleanup
+
+Later volgt een aparte cleanup om tijdelijke issue-documentatie te consolideren in `docs/`. Dit is bewust geen onderdeel van de komende kleine PR's, zodat functionele stappen klein en goed reviewbaar blijven.
+
+## Operationele harveststrategie
+
+De operationele lijn blijft:
+
+- kleine `quick` runs voor smoke tests;
+- `public` runs voor de live dataset;
+- begrensde `backfill` runs voor historische dekking;
+- raw output alleen tijdelijk bewaren;
+- alleen compacte public JSONL committen;
+- geen PDF-archief in Git.
+
+Zie ook `docs/operations-harvest-strategy.md`.
+
+## Latere richting
+
+Na stabilisatie van Huizen:
+
+- connectorinterface documenteren voor andere RIS-leveranciers;
+- leverancier-capabilities expliciet maken;
+- bron-endpoints scheiden van canonieke outputmodellen;
+- public exportcontract stabiel houden over leveranciers heen;
+- viewer uitbreidbaar houden zonder zware frameworkkeuze.
