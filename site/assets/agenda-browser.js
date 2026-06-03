@@ -19,6 +19,9 @@
     meetingItemDocuments: [],
     documents: [],
     filteredMeetings: [],
+    meetingsById: new Map(),
+    itemsById: new Map(),
+    documentsByKey: new Map(),
   };
 
   function requireElements() {
@@ -74,7 +77,6 @@
         inString = true;
         continue;
       }
-
       if (char === "{") {
         if (depth === 0) start = index;
         depth += 1;
@@ -90,7 +92,6 @@
     if (records.length === 0) {
       throw new Error("JSONL-bestand bevat geen parsebare records");
     }
-
     return records;
   }
 
@@ -126,10 +127,6 @@
     return "";
   }
 
-  function toId(record) {
-    return String(pick(record?.id, record?.meeting_id, record?.meeting_item_id, record?.document_id, record?.source_id, record?.source_object_id));
-  }
-
   function normalizeDateKey(value) {
     if (!value) return "";
     const date = new Date(value);
@@ -141,11 +138,7 @@
     if (!value) return "-";
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return String(value).slice(0, 10);
-    return new Intl.DateTimeFormat("nl-NL", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(date);
+    return new Intl.DateTimeFormat("nl-NL", { year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
   }
 
   function formatDateTime(value) {
@@ -161,140 +154,176 @@
     }).format(date);
   }
 
-  function formatOrg(meeting) {
-    return text(pick(
-      meeting?.dmu_name,
-      meeting?.organ_name,
-      meeting?.organization_name,
-      meeting?.committee_name,
-      meeting?.description,
-      "Onbekend bestuursorgaan",
-    ));
+  function addIdentifier(result, value) {
+    if (value === null || value === undefined) return;
+    const textValue = String(value).trim();
+    if (textValue) result.add(textValue);
   }
 
-  function formatMeetingLabel(meeting) {
-    const parts = [
-      formatDate(pick(meeting?.date, meeting?.meeting_date, meeting?.start_date, meeting?.start_time)),
-      pick(meeting?.start_time, meeting?.start),
-      pick(meeting?.location),
-    ].filter(Boolean);
-    return parts.join(" • ");
+  function documentKey(documentRecord) {
+    const identifiers = new Set();
+    addIdentifier(identifiers, documentRecord?.id);
+    addIdentifier(identifiers, documentRecord?.source_id);
+    addIdentifier(identifiers, documentRecord?.source_object_id);
+    addIdentifier(identifiers, documentRecord?.download_url);
+    addIdentifier(identifiers, documentRecord?.source_url);
+    return [...identifiers][0] || String(documentRecord?.title || documentRecord?.filename || "");
+  }
+
+  function getDocumentIdentifiers(documentRecord) {
+    const identifiers = new Set();
+    addIdentifier(identifiers, documentRecord?.id);
+    addIdentifier(identifiers, documentRecord?.source_id);
+    addIdentifier(identifiers, documentRecord?.source_object_id);
+    addIdentifier(identifiers, documentRecord?.download_url);
+    addIdentifier(identifiers, documentRecord?.source_url);
+    if (documentRecord?.raw && typeof documentRecord.raw === "object") {
+      addIdentifier(identifiers, documentRecord.raw.id);
+      addIdentifier(identifiers, documentRecord.raw.objectId);
+      addIdentifier(identifiers, documentRecord.raw.object_id);
+      addIdentifier(identifiers, documentRecord.raw.downloadUrl);
+      addIdentifier(identifiers, documentRecord.raw.download_url);
+    }
+    if (documentRecord?.id && documentRecord?.source_id && String(documentRecord.id).includes("-document-")) {
+      const prefix = String(documentRecord.id).split("-document-")[0];
+      addIdentifier(identifiers, `${prefix}-document-${documentRecord.source_id}`);
+    }
+    return [...identifiers];
+  }
+
+  function documentTitle(documentRecord) {
+    return documentRecord?.title || documentRecord?.description || documentRecord?.filename || "Geen titel";
+  }
+
+  function formatOrg(meeting) {
+    return text(
+      pick(
+        meeting?.dmu_name,
+        meeting?.organ_name,
+        meeting?.organization_name,
+        meeting?.committee_name,
+        meeting?.description,
+        "Onbekend bestuursorgaan",
+      ),
+    );
+  }
+
+  function formatMeetingHeadline(meeting) {
+    return text(pick(meeting?.title, meeting?.description, formatOrg(meeting)));
+  }
+
+  function formatMeetingMeta(meeting) {
+    return [formatDate(pick(meeting?.date, meeting?.meeting_date, meeting?.start_date, meeting?.start_time)), pick(meeting?.start_time, meeting?.start), pick(meeting?.location), formatOrg(meeting)]
+      .filter(Boolean)
+      .join(" • ");
   }
 
   function formatItemLabel(item) {
     return [pick(item?.number, item?.item_number, item?.agenda_number), pick(item?.title, item?.description)].filter(Boolean).join(" ");
   }
 
-  function formatDocumentLabel(documentRecord) {
-    return text(pick(documentRecord?.title, documentRecord?.description, documentRecord?.filename, `Document ${documentRecord?.id || documentRecord?.source_id || "onbekend"}`));
-  }
-
-  function getDocumentSearchTerm(documentRecord) {
-    return [documentRecord?.title, documentRecord?.filename, documentRecord?.source_id, documentRecord?.source_object_id, documentRecord?.id]
+  function buildSearchBlob(meeting) {
+    return [
+      meeting?.title,
+      meeting?.description,
+      meeting?.date,
+      meeting?.start_time,
+      meeting?.location,
+      formatOrg(meeting),
+      meeting.items.map((item) => [item.number, item.title, item.description].filter(Boolean).join(" ")).join(" "),
+      meeting.documents.map((doc) => [documentTitle(doc), doc.filename, doc.source_id, doc.source_object_id].filter(Boolean).join(" ")).join(" "),
+    ]
       .filter(Boolean)
-      .join(" ");
+      .join(" ")
+      .toLowerCase();
   }
 
-  function createLookup(items, keyFn) {
-    const map = new Map();
-    for (const item of items) {
-      const key = keyFn(item);
-      if (!key) continue;
-      const list = map.get(key) || [];
-      list.push(item);
-      map.set(key, list);
-    }
-    return map;
-  }
-
-  function compareMaybeNumeric(a, b) {
-    const aNum = Number.parseFloat(String(a).replace(",", "."));
-    const bNum = Number.parseFloat(String(b).replace(",", "."));
-    const aValid = Number.isFinite(aNum);
-    const bValid = Number.isFinite(bNum);
-    if (aValid && bValid && aNum !== bNum) return aNum - bNum;
-    return String(a || "").localeCompare(String(b || ""), "nl");
+  function addUniqueDocument(list, documentRecord) {
+    const key = documentKey(documentRecord);
+    if (!key) return;
+    if (list.some((existing) => documentKey(existing) === key)) return;
+    list.push(documentRecord);
   }
 
   function buildModel() {
-    const meetingsById = new Map();
-    const itemsById = new Map();
-    const documentsById = new Map();
-
-    for (const documentRecord of state.documents) {
-      const id = toId(documentRecord);
-      if (id) documentsById.set(id, documentRecord);
-    }
+    state.meetingsById = new Map();
+    state.itemsById = new Map();
 
     for (const meeting of state.meetings) {
-      const normalized = { ...meeting, id: toId(meeting), items: [], documents: [], agendaSearchBlob: "" };
-      if (normalized.id) meetingsById.set(normalized.id, normalized);
+      meeting.id = String(pick(meeting.id, meeting.meeting_id, meeting.source_id));
+      meeting.items = [];
+      meeting.documents = [];
+      meeting.searchBlob = "";
+      state.meetingsById.set(meeting.id, meeting);
     }
 
     for (const item of state.meetingItems) {
-      const normalized = { ...item, id: toId(item), documents: [] };
-      if (!normalized.id) continue;
-      itemsById.set(normalized.id, normalized);
-      const meetingId = String(pick(item?.meeting_id, item?.meetingId, item?.session_id, item?.sessionId));
-      const meeting = meetingsById.get(meetingId);
-      if (meeting) meeting.items.push(normalized);
+      item.id = String(pick(item.id, item.meeting_item_id, item.source_id));
+      item.documents = [];
+      state.itemsById.set(item.id, item);
+      const meetingId = String(pick(item.meeting_id, item.meetingId, item.session_id, item.sessionId));
+      const meeting = state.meetingsById.get(meetingId);
+      if (meeting) {
+        meeting.items.push(item);
+      }
+    }
+
+    state.documentsByKey = new Map();
+    for (const doc of state.documents) {
+      for (const identifier of getDocumentIdentifiers(doc)) {
+        state.documentsByKey.set(String(identifier), doc);
+      }
     }
 
     for (const relation of state.meetingDocuments) {
-      const meetingId = String(pick(relation?.meeting_id, relation?.meetingId));
-      const documentId = String(pick(relation?.document_id, relation?.documentId));
-      const meeting = meetingsById.get(meetingId);
-      const documentRecord = documentsById.get(documentId);
-      if (meeting && documentRecord) {
-        meeting.documents.push(documentRecord);
-      }
+      const meeting = state.meetingsById.get(String(pick(relation.meeting_id, relation.meetingId)));
+      const relationIdentifiers = [
+        relation.document_id,
+        relation.documentId,
+        relation.document_source_id,
+        relation.document_object_id,
+        relation.document_url,
+        relation.download_url,
+        relation.source_url,
+      ].filter(Boolean).map(String);
+      const doc = relationIdentifiers.map((identifier) => state.documentsByKey.get(identifier)).find(Boolean) || null;
+      if (meeting && doc) addUniqueDocument(meeting.documents, doc);
     }
 
     for (const relation of state.meetingItemDocuments) {
-      const itemId = String(pick(relation?.meeting_item_id, relation?.meetingItemId, relation?.item_id));
-      const documentId = String(pick(relation?.document_id, relation?.documentId));
-      const item = itemsById.get(itemId);
-      const documentRecord = documentsById.get(documentId);
+      const itemId = String(pick(relation.meeting_item_id, relation.meetingItemId, relation.item_id));
+      const item = state.itemsById.get(itemId);
+      const relationIdentifiers = [
+        relation.document_id,
+        relation.documentId,
+        relation.document_source_id,
+        relation.document_object_id,
+        relation.document_url,
+        relation.download_url,
+        relation.source_url,
+      ].filter(Boolean).map(String);
+      const doc = relationIdentifiers.map((identifier) => state.documentsByKey.get(identifier)).find(Boolean) || null;
+      if (item && doc) addUniqueDocument(item.documents, doc);
 
-      if (item && documentRecord) {
-        item.documents.push(documentRecord);
-      }
-
-      if (documentRecord) {
-        const meetingId = String(pick(relation?.meeting_id, relation?.meetingId));
-        const meeting = meetingsById.get(meetingId) || (item ? meetingsById.get(String(pick(item?.meeting_id, item?.meetingId, item?.session_id, item?.sessionId))) : null);
-        if (meeting && !meeting.documents.includes(documentRecord)) {
-          meeting.documents.push(documentRecord);
-        }
-      }
+      const meetingId = String(pick(relation.meeting_id, relation.meetingId));
+      const meeting = state.meetingsById.get(meetingId) || (item ? state.meetingsById.get(String(pick(item.meeting_id, item.meetingId, item.session_id, item.sessionId))) : null);
+      if (meeting && doc) addUniqueDocument(meeting.documents, doc);
     }
 
-    const meetings = [...meetingsById.values()].map((meeting) => {
-      meeting.items.sort((a, b) => compareMaybeNumeric(pick(a?.number, a?.item_number, a?.agenda_number), pick(b?.number, b?.item_number, b?.agenda_number)));
-      meeting.documents.sort((a, b) => formatDocumentLabel(a).localeCompare(formatDocumentLabel(b), "nl"));
-      meeting.agendaSearchBlob = [
-        meeting.description,
-        meeting.dmu_name,
-        meeting.organ_name,
-        meeting.organization_name,
-        meeting.title,
-        meeting.location,
-        meeting.date,
-        meeting.start_time,
-        meeting.items.map((item) => [item.number, item.title, item.description].filter(Boolean).join(" ")).join(" "),
-        meeting.documents.map((doc) => [doc.title, doc.filename, doc.source_id].filter(Boolean).join(" ")).join(" "),
-      ].filter(Boolean).join(" ").toLowerCase();
+    state.meetings = [...state.meetingsById.values()].map((meeting) => {
+      meeting.items.sort((a, b) => String(pick(a.number, a.item_number, a.agenda_number)).localeCompare(String(pick(b.number, b.item_number, b.agenda_number)), "nl", { numeric: true }));
+      meeting.documents.sort((a, b) => documentTitle(a).localeCompare(documentTitle(b), "nl"));
+      meeting.searchBlob = buildSearchBlob(meeting);
       return meeting;
     });
 
-    meetings.sort((a, b) => {
-      const aKey = `${normalizeDateKey(pick(a?.date, a?.meeting_date, a?.start_time))} ${pick(a?.start_time, a?.start)}`.trim();
-      const bKey = `${normalizeDateKey(pick(b?.date, b?.meeting_date, b?.start_time))} ${pick(b?.start_time, b?.start)}`.trim();
+    state.meetings.sort((a, b) => {
+      const aKey = `${normalizeDateKey(pick(a.date, a.meeting_date, a.start_time))} ${pick(a.start_time, a.start)}`.trim();
+      const bKey = `${normalizeDateKey(pick(b.date, b.meeting_date, b.start_time))} ${pick(b.start_time, b.start)}`.trim();
       return bKey.localeCompare(aKey, "nl");
     });
 
-    state.meetings = meetings;
-    state.filteredMeetings = meetings;
+    state.filteredMeetings = state.meetings;
   }
 
   function syncOrgFilter() {
@@ -317,25 +346,132 @@
     elements.org.value = orgs.includes(selected) ? selected : "";
   }
 
-  function linkToDocumentRecord(documentRecord) {
-    const searchInput = document.querySelector("#search-input");
-    if (searchInput) {
-      searchInput.value = getDocumentSearchTerm(documentRecord);
-      searchInput.dispatchEvent(new Event("input", { bubbles: true }));
-    }
-    document.querySelector("#documents-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function createDocumentLink(documentRecord) {
+  function makeDocLink(documentRecord) {
     const link = document.createElement("a");
-    link.href = "#documents-title";
-    link.textContent = formatDocumentLabel(documentRecord);
-    link.title = "Filter de documentenlijst op dit document";
+    link.href = `#documents-title`;
+    link.textContent = documentTitle(documentRecord);
+    link.title = "Toon dit document in de documentenlijst";
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      linkToDocumentRecord(documentRecord);
+      if (window.OpenRISMonitor?.focusDocument) {
+        window.OpenRISMonitor.focusDocument(documentRecord, { searchText: documentTitle(documentRecord) });
+      } else if (window.OpenRISMonitor?.focusDocumentByText) {
+        window.OpenRISMonitor.focusDocumentByText(documentTitle(documentRecord));
+      }
     });
     return link;
+  }
+
+  function renderMeetingCard(meeting, expanded = false) {
+    const card = document.createElement("article");
+    card.className = "meeting-card";
+
+    const details = document.createElement("details");
+    details.className = "meeting-details";
+    details.open = expanded;
+
+    const summary = document.createElement("summary");
+    summary.className = "meeting-summary";
+
+    const title = document.createElement("span");
+    title.className = "meeting-summary-title";
+    title.textContent = formatMeetingHeadline(meeting);
+    summary.appendChild(title);
+
+    const meta = document.createElement("span");
+    meta.className = "meeting-summary-meta";
+    meta.textContent = formatMeetingMeta(meeting);
+    summary.appendChild(meta);
+
+    details.appendChild(summary);
+
+    const body = document.createElement("div");
+    body.className = "meeting-body";
+
+    const counts = document.createElement("p");
+    counts.className = "meeting-counts";
+    const documentCount = meeting.documents.length + meeting.items.reduce((sum, item) => sum + item.documents.length, 0);
+    counts.textContent = `${meeting.items.length} agendapunten, ${documentCount} documentkoppelingen`;
+    body.appendChild(counts);
+
+    if (meeting.documents.length > 0) {
+      const docsTitle = document.createElement("p");
+      docsTitle.className = "meeting-section-label";
+      docsTitle.textContent = `Koppelingen op vergaderniveau: ${meeting.documents.length}`;
+      body.appendChild(docsTitle);
+
+      const docs = document.createElement("div");
+      docs.className = "doc-chip-list";
+      for (const doc of meeting.documents) {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "doc-chip";
+        chip.textContent = documentTitle(doc);
+        chip.addEventListener("click", () => {
+          if (window.OpenRISMonitor?.focusDocument) {
+            window.OpenRISMonitor.focusDocument(doc, { searchText: documentTitle(doc) });
+          } else if (window.OpenRISMonitor?.focusDocumentByText) {
+            window.OpenRISMonitor.focusDocumentByText(documentTitle(doc));
+          }
+        });
+        docs.appendChild(chip);
+      }
+      body.appendChild(docs);
+    }
+
+    if (meeting.items.length > 0) {
+      const itemsTitle = document.createElement("p");
+      itemsTitle.className = "meeting-section-label";
+      itemsTitle.textContent = "Agendapunten";
+      body.appendChild(itemsTitle);
+
+      const list = document.createElement("ol");
+      list.className = "meeting-item-list";
+
+      for (const item of meeting.items) {
+        const li = document.createElement("li");
+        li.className = "meeting-item";
+
+        const headline = document.createElement("div");
+        headline.className = "meeting-item-headline";
+        headline.textContent = formatItemLabel(item) || "Agendapunt zonder titel";
+        li.appendChild(headline);
+
+        const itemDocsCount = item.documents.length;
+        if (itemDocsCount > 0) {
+          const itemDocsLabel = document.createElement("p");
+          itemDocsLabel.className = "meeting-item-docs-label";
+          itemDocsLabel.textContent = `Documenten: ${itemDocsCount}`;
+          li.appendChild(itemDocsLabel);
+
+          const itemDocs = document.createElement("div");
+          itemDocs.className = "doc-chip-list";
+          for (const doc of item.documents) {
+            const chip = document.createElement("button");
+            chip.type = "button";
+            chip.className = "doc-chip doc-chip-small";
+            chip.textContent = documentTitle(doc);
+            chip.addEventListener("click", () => {
+              if (window.OpenRISMonitor?.focusDocument) {
+                window.OpenRISMonitor.focusDocument(doc, { searchText: documentTitle(doc) });
+              } else if (window.OpenRISMonitor?.focusDocumentByText) {
+                window.OpenRISMonitor.focusDocumentByText(documentTitle(doc));
+              }
+            });
+            itemDocs.appendChild(chip);
+          }
+          li.appendChild(itemDocs);
+        }
+
+        list.appendChild(li);
+      }
+
+      body.appendChild(list);
+    }
+
+    details.appendChild(body);
+    card.appendChild(details);
+    return card;
   }
 
   function renderMeetingList() {
@@ -346,7 +482,7 @@
 
     state.filteredMeetings = state.meetings.filter((meeting) => {
       const meetingDate = normalizeDateKey(pick(meeting.date, meeting.meeting_date, meeting.start_time));
-      const matchesQuery = !query || meeting.agendaSearchBlob.includes(query);
+      const matchesQuery = !query || meeting.searchBlob.includes(query);
       const matchesFrom = !from || (meetingDate && meetingDate >= from);
       const matchesTo = !to || (meetingDate && meetingDate <= to);
       const matchesOrg = !org || formatOrg(meeting) === org;
@@ -361,8 +497,8 @@
 
     elements.count.textContent = `${state.filteredMeetings.length} vergaderingen, ${totalItems} agendapunten, ${totalDocs} documentkoppelingen`;
 
+    elements.list.replaceChildren();
     if (state.filteredMeetings.length === 0) {
-      elements.list.replaceChildren();
       const empty = document.createElement("p");
       empty.textContent = "Geen vergaderingen gevonden voor deze filter.";
       elements.list.appendChild(empty);
@@ -370,77 +506,15 @@
     }
 
     const fragment = document.createDocumentFragment();
-
-    for (const meeting of state.filteredMeetings) {
-      const card = document.createElement("article");
-      card.className = "meeting-card";
-
-      const heading = document.createElement("h3");
-      heading.textContent = pick(meeting.title, meeting.description, formatOrg(meeting));
-      card.appendChild(heading);
-
-      const meta = document.createElement("p");
-      meta.textContent = `${formatMeetingLabel(meeting)} • ${formatOrg(meeting)}`;
-      card.appendChild(meta);
-
-      if (meeting.documents.length > 0) {
-        const docsIntro = document.createElement("p");
-        docsIntro.textContent = `Koppelingen op vergaderniveau: ${meeting.documents.length}`;
-        card.appendChild(docsIntro);
-
-        const meetingDocs = document.createElement("ul");
-        for (const documentRecord of meeting.documents) {
-          const item = document.createElement("li");
-          item.appendChild(createDocumentLink(documentRecord));
-          meetingDocs.appendChild(item);
-        }
-        card.appendChild(meetingDocs);
-      }
-
-      if (meeting.items.length > 0) {
-        const itemList = document.createElement("ol");
-        for (const itemRecord of meeting.items) {
-          const item = document.createElement("li");
-
-          const title = document.createElement("strong");
-          title.textContent = formatItemLabel(itemRecord) || "Agendapunt zonder titel";
-          item.appendChild(title);
-
-          const infoText = [pick(itemRecord?.status, itemRecord?.phase, itemRecord?.resolution)].filter(Boolean).join(" • ");
-          if (infoText) {
-            const info = document.createElement("p");
-            info.textContent = infoText;
-            item.appendChild(info);
-          }
-
-          if (itemRecord.documents.length > 0) {
-            const docsLabel = document.createElement("p");
-            docsLabel.textContent = `Documenten: ${itemRecord.documents.length}`;
-            item.appendChild(docsLabel);
-
-            const docs = document.createElement("ul");
-            for (const documentRecord of itemRecord.documents) {
-              const docItem = document.createElement("li");
-              docItem.appendChild(createDocumentLink(documentRecord));
-              docs.appendChild(docItem);
-            }
-            item.appendChild(docs);
-          }
-
-          itemList.appendChild(item);
-        }
-        card.appendChild(itemList);
-      }
-
-      fragment.appendChild(card);
-    }
-
-    elements.list.replaceChildren(fragment);
+    state.filteredMeetings.forEach((meeting, index) => {
+      fragment.appendChild(renderMeetingCard(meeting, index === 0));
+    });
+    elements.list.appendChild(fragment);
   }
 
   async function loadData() {
     state.latest = await fetchJson(`${DATA_BASE}/latest.json`);
-    const outputs = state.latest.outputs || {};
+    const outputs = state.latest.outputs || state.latest.exports || {};
 
     const meetingsPath = outputs.meetings ? `${DATA_BASE}/${outputs.meetings}` : null;
     const meetingItemsPath = outputs.meeting_items ? `${DATA_BASE}/${outputs.meeting_items}` : null;

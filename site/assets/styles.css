@@ -260,6 +260,40 @@ button:disabled {
   width: 6%;
 }
 
+.filename-cell {
+  font-size: 0.95rem;
+}
+
+.filename-text {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.title-cell {
+  display: grid;
+  gap: 6px;
+}
+
+.document-title {
+  font-weight: 700;
+}
+
+.relation-context {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.relation-context ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.relation-context li + li {
+  margin-top: 2px;
+}
+
 .meeting-browser-list {
   display: grid;
   gap: 14px;
@@ -268,29 +302,96 @@ button:disabled {
 .meeting-card {
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 16px;
   background: #fff;
+  overflow: hidden;
 }
 
-.meeting-card h3 {
-  margin: 0 0 6px;
-  font-size: 1.05rem;
-}
-
-.meeting-card > p,
-.meeting-card li > p {
-  margin: 6px 0 0;
-  color: var(--muted);
-}
-
-.meeting-card ul,
-.meeting-card ol {
-  margin: 10px 0 0 20px;
+.meeting-details {
   padding: 0;
 }
 
-.meeting-card li + li {
+.meeting-details > summary {
+  list-style: none;
+}
+
+.meeting-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.meeting-summary {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.meeting-summary:hover {
+  background: #fbfcfe;
+}
+
+.meeting-summary-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.meeting-summary-meta {
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.meeting-body {
+  padding: 0 16px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.meeting-counts,
+.meeting-section-label,
+.meeting-item-docs-label {
+  margin: 10px 0 0;
+  color: var(--muted);
+}
+
+.meeting-section-label {
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.doc-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 8px;
+}
+
+.doc-chip {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.88rem;
+  color: var(--text);
+  text-align: left;
+}
+
+.doc-chip-small {
+  min-height: 30px;
+}
+
+.meeting-item-list {
+  margin: 10px 0 0;
+  padding-left: 20px;
+}
+
+.meeting-item + .meeting-item {
+  margin-top: 12px;
+}
+
+.meeting-item-headline {
+  font-weight: 700;
 }
 
 .link-grid {
