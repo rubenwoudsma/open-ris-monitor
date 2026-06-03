@@ -1,307 +1,87 @@
 # Operationele harveststrategie
 
-## Doel
+Open RIS Monitor publiceert compacte JSONL-bestanden voor hergebruik en voor de statische GitHub Pages viewer. De operationele harvest moet daarom begrensd blijven: geen PDF's in Git, geen grote raw dumps in Git en alleen `data/public/` als commitbare output.
 
-Open RIS Monitor moet kunnen doorgroeien naar een volledige operationele versie zonder dat de GitHub-repository te groot wordt, workflows te lang lopen of ruwe data onnodig in Git terechtkomt.
+## Profielen
 
-De strategie is daarom:
+De CLI ondersteunt drie harvestprofielen via `--profile`.
 
-```text
-kleine herhaalbare stappen + compacte public exports + raw artifacts buiten Git
-```
+| Profiel | Gebruik | Documentlimiet | Relationele limieten |
+| --- | --- | ---: | --- |
+| `quick` | Snelle controle van de pipeline en relationele exports | 10 latest documenten | 50 meetingsessies, batch 50, 200 agendapunten |
+| `public` | Standaard handmatige publicatie naar `data/public/` | 250 documenten | 250 meetingsessies, batch 100, 1000 agendapunten |
+| `backfill` | Grotere gecontroleerde aanvulling van historische dekking | standaard geen documentcap, met CLI override configureerbaar | 1000 meetingsessies, batch 100, 5000 agendapunten |
 
-## Uitgangspunten
-
-1. `data/public/` is het publieke contract.
-2. `data/raw/` is tijdelijk en artifact-only.
-3. PDF-bestanden worden niet in Git opgeslagen.
-4. Full harvests zijn begrensd, hervatbaar en controleerbaar.
-5. Relationele harvests zijn optioneel en configureerbaar.
-6. Backfills worden in vensters uitgevoerd, niet als een onbeperkte alles-in-een-run.
-7. Elke run moet kunnen rapporteren wat wel en niet is verwerkt.
-
-## Huidige operationele basis
-
-De huidige pipeline ondersteunt:
+Alle profielen zetten relationele harvesting aan. Daardoor worden naast `documents.jsonl` en `harvest_runs.jsonl` ook de relationele public exports geschreven:
 
 ```text
-latest mode
-full mode
-limit
-batch_size
-max_documents
-include_relations
-meeting_scan_limit
-meeting_session_batch_size
-meeting_item_limit
+data/public/meetings.jsonl
+data/public/meeting_items.jsonl
+data/public/meeting_documents.jsonl
+data/public/meeting_item_documents.jsonl
 ```
 
-De relationele smoke-test toont aan dat een kleine live-run werkt met:
+`latest.json` blijft het publicatiecontract. Het bestand bevat de `outputs`, `relations_enabled` en `relations_summary` van de laatste run.
+
+## CLI-gebruik
+
+Snelle smoke test:
+
+```bash
+python -m open_ris_monitor.pipeline.run --municipality huizen --profile quick
+```
+
+Standaard publieke publicatie:
+
+```bash
+python -m open_ris_monitor.pipeline.run --municipality huizen --profile public
+```
+
+Grotere backfill, maar alsnog begrensd via expliciete override:
+
+```bash
+python -m open_ris_monitor.pipeline.run \
+  --municipality huizen \
+  --profile backfill \
+  --max-documents 1000 \
+  --meeting-scan-limit 1000 \
+  --meeting-item-limit 5000
+```
+
+Expliciete CLI-parameters winnen altijd van profielwaarden. Bijvoorbeeld:
+
+```bash
+python -m open_ris_monitor.pipeline.run \
+  --municipality huizen \
+  --profile public \
+  --max-documents 100 \
+  --meeting-scan-limit 100
+```
+
+Gebruik `--no-include-relations` alleen voor diagnose. De publicatieworkflow verwacht relationele exports.
+
+## GitHub Actions
+
+De handmatige workflow `.github/workflows/publish-public-data.yml` gebruikt standaard:
 
 ```text
-10 documents seen
-50 meeting sessions seen
-33 meetings seen
-200 meeting items seen
-34 meeting-document relations seen
-251 meeting-item-document relations seen
-17 meetings skipped
+municipality: huizen
+profile: public
 ```
 
-## Aanbevolen harvestlagen
+De workflow doet vier dingen:
 
-### 1. Snelle latest harvest
+1. draait de bounded harvest met het gekozen profiel;
+2. schrijft raw output naar `data/raw/latest/`;
+3. uploadt raw output alleen als GitHub Actions artifact;
+4. commit uitsluitend `data/public/` terug naar de branch.
 
-Doel: dagelijkse of handmatige controle.
+De workflow commit geen `data/raw/` en geen PDF's. Voor forks kan dezelfde workflow worden gebruikt met een andere gemeenteconfiguratie, zolang de connectorconfiguratie en RIS-endpoints beschikbaar zijn.
 
-```text
-mode: latest
-limit: 25
-include_relations: false
-```
+## Wanneer welk profiel gebruiken
 
-Gebruik dit voor:
+Gebruik `quick` voor een smoke test na codewijzigingen of als de RIS-koppeling gecontroleerd moet worden zonder veel data op te halen.
 
-- snelle smoke tests
-- nieuwe documenten signaleren
-- viewer actueel houden
-- lage workflowduur
+Gebruik `public` voor de normale handmatige publicatie van de live dataset. Dit is de standaard voor de workflow en de aanbevolen keuze voor de eerste operationele runs.
 
-### 2. Latest harvest met relationele context
-
-Doel: recente documenten met vergadercontext publiceren.
-
-```text
-mode: latest
-limit: 25
-include_relations: true
-meeting_scan_limit: 50
-meeting_item_limit: 200
-```
-
-Gebruik dit voor:
-
-- controleren dat de relationele keten gezond blijft
-- recente vergaderingen en agenda-items verversen
-- public exports bijwerken zonder volledige backfill
-
-### 3. Bounded full harvest
-
-Doel: dataset gecontroleerd uitbreiden.
-
-```text
-mode: full
-batch_size: 100
-max_documents: 500
-include_relations: false
-```
-
-Gebruik dit voor:
-
-- historische documentdekking uitbreiden
-- repositorygroei monitoren
-- verwerkingstijd meten
-
-### 4. Relationele backfill in vensters
-
-Doel: historische vergadercontext stapsgewijs uitbreiden.
-
-```text
-mode: latest
-include_relations: true
-meeting_scan_limit: 250
-meeting_session_batch_size: 100
-meeting_item_limit: 1000
-```
-
-Later kan dit beter worden gemaakt met expliciete vensters:
-
-```text
-meeting_session_offset
-meeting_session_limit
-from_date
-to_date
-```
-
-## Waarom geen onbeperkte full harvest in een keer
-
-Een onbeperkte full harvest is kwetsbaar:
-
-- meer kans op API-timeouts
-- meer kans op workflow-timeouts
-- grotere commits
-- grotere JSONL-bestanden
-- moeilijker te debuggen
-- lastiger te hervatten
-
-Een operationeel systeem moet daarom per run klein genoeg blijven om betrouwbaar te zijn.
-
-## GitHub-repositorybeleid
-
-De repository moet klein en gezond blijven.
-
-Wel in Git:
-
-```text
-data/public/*.jsonl
-data/public/latest.json
-data/public/quality/*.json
-site/*
-docs/*
-src/*
-tests/*
-```
-
-Niet in Git:
-
-```text
-data/raw/*
-PDF-bestanden
-volledige API-dumps
-workflow artifacts
-OCR-output
-tekstextracties van alle PDF's
-```
-
-Mogelijk later extern opslaan:
-
-```text
-PDF-cache
-full raw archive
-large search index
-full text index
-```
-
-## Public export compact houden
-
-Public JSONL-bestanden moeten compact blijven:
-
-- geen volledige raw API-records in public JSONL
-- geen PDF-inhoud
-- geen base64
-- geen grote nested blobs
-- alleen canonieke velden en noodzakelijke bron-ID's
-
-Voor debugbaarheid blijft raw output beschikbaar als artifact tijdens tests en smoke-runs.
-
-## Commitstrategie
-
-Automatische commits naar `data/public/` moeten voorspelbaar blijven:
-
-```text
-1. generate public exports
-2. compare with existing public exports
-3. commit only when changed
-4. keep commit message machine-readable
-5. avoid committing raw data
-```
-
-Voor grote backfills is het beter om tijdelijke branches te gebruiken:
-
-```text
-backfill/huizen-documents-0000-0500
-backfill/huizen-relations-2018-q3
-```
-
-Na controle kunnen de public outputs naar `main`.
-
-## Resume-strategie
-
-Voor volledige dekking is een checkpoint-mechanisme wenselijk.
-
-Mogelijke opties:
-
-```text
-data/public/harvest_state.json
-```
-
-of:
-
-```text
-data/public/harvest_runs.jsonl
-```
-
-Met velden zoals:
-
-```json
-{
-  "municipality_slug": "huizen",
-  "source_system_id": "huizen-gemeenteoplossingen",
-  "resource_type": "meeting_sessions",
-  "last_successful_offset": 250,
-  "last_successful_date": "2019-01-31",
-  "updated_at": "2026-06-02T13:00:00Z"
-}
-```
-
-## Kwaliteitschecks voor operationele runs
-
-Minimale checks:
-
-```text
-- latest.json bestaat
-- documents.jsonl bestaat
-- harvest_runs.jsonl bestaat
-- relation exports bestaan wanneer relations_enabled true is
-- line counts zijn groter dan nul voor geactiveerde exports
-- manifest verwijst naar bestaande bestanden
-- JSONL is parsebaar
-- relation IDs zijn uniek
-- relation targets hebben het verwachte ID-patroon
-```
-
-Relationele checks:
-
-```text
-- meeting item verwijst naar bestaande meeting
-- meeting-documentrelatie verwijst naar bestaande meeting
-- meeting-item-documentrelatie verwijst naar bestaande meeting item
-- documentrelatie verwijst naar canonieke document-ID
-- skipped meetings worden geteld
-```
-
-## Pad naar operationele versie
-
-### Fase 1, huidige MVP stabiliseren
-
-- issue #15 afronden
-- docs bijwerken
-- tijdelijke smoke workflows opruimen of ombouwen
-- PR naar `main`
-- viewer minimaal relation-aware maken
-
-### Fase 2, gecontroleerde historische dekking
-
-- full document harvest in batches
-- relationele backfill in vensters
-- line counts en bestandsgroei monitoren
-- kwaliteitsrapportage toevoegen
-
-### Fase 3, publieke bruikbaarheid
-
-- viewer uitbreiden met documentcontext
-- downloadbare datasets beter documenteren
-- datamodel versie geven
-- voorbeeldqueries toevoegen
-
-### Fase 4, bredere Open RIS-basis
-
-- connector capability model
-- tweede gemeente of tweede RIS-leverancier onderzoeken
-- algemene documenttype-taxonomie
-- relationele kwaliteitschecks
-- externe opslagstrategie voor grote artefacten
-
-## Beslissing voor nu
-
-Voor issue #15 is het voldoende dat:
-
-```text
-- relationele harvest optioneel werkt
-- public relation exports bestaan
-- latest.json de relationele outputs beschrijft
-- docs de nieuwe architectuur uitleggen
-- operationele risico's expliciet zijn benoemd
-```
-
-Een volledige historische backfill hoeft niet in issue #15 te worden opgelost.
+Gebruik `backfill` alleen bewust. Start liever met een expliciete `--max-documents` override en verhoog daarna stap voor stap. Daarmee blijft de GitHub Actions-runtime voorspelbaar en blijft `data/public/` compact.

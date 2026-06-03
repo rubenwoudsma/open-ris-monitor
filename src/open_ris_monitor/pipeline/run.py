@@ -19,6 +19,7 @@ from open_ris_monitor.exporters.json_exporter import write_json, write_jsonl
 from open_ris_monitor.models.harvest_run import HarvestRun
 from open_ris_monitor.normalizers.gemeenteoplossingen import normalize_documents
 from open_ris_monitor.normalizers.relations import normalize_relation_harvest
+from open_ris_monitor.pipeline.profiles import HARVEST_PROFILE_NAMES, resolve_harvest_options
 from open_ris_monitor.pipeline.relations import collect_raw_relation_harvest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -54,9 +55,11 @@ def parse_max_documents(value: Any) -> int | None:
 
     if value is None or value == "":
         return None
+
     parsed = int(value)
     if parsed <= 0:
         return None
+
     return parsed
 
 
@@ -229,6 +232,7 @@ def run_harvest(
 
     finished_at = datetime.now(timezone.utc)
     relation_summary = relation_harvest["summary"] if relation_harvest is not None else {}
+
     harvest_run = HarvestRun(
         id=f"harvest-{municipality}-{started_at.strftime('%Y%m%dT%H%M%SZ')}",
         municipality_id=municipality_config["id"],
@@ -284,14 +288,20 @@ def run_harvest(
     return harvest_run
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse command-line arguments."""
 
     parser = argparse.ArgumentParser(description="Run Open RIS Monitor harvest.")
     parser.add_argument("--municipality", default="huizen", help="Municipality config slug")
-    parser.add_argument("--mode", choices=["latest", "full"], default="latest", help="Harvest mode")
-    parser.add_argument("--limit", type=int, default=25, help="Number of latest documents to fetch")
-    parser.add_argument("--batch-size", type=int, default=100, help="Batch size for full harvest")
+    parser.add_argument(
+        "--profile",
+        choices=HARVEST_PROFILE_NAMES,
+        default=None,
+        help="Bounded harvest profile. Explicit CLI options override profile defaults.",
+    )
+    parser.add_argument("--mode", choices=["latest", "full"], default=None, help="Harvest mode")
+    parser.add_argument("--limit", type=int, default=None, help="Number of latest documents to fetch")
+    parser.add_argument("--batch-size", type=int, default=None, help="Batch size for full harvest")
     parser.add_argument("--max-documents", default=None, help="Maximum documents for full harvest")
     parser.add_argument(
         "--enrich-checksums",
@@ -306,46 +316,74 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--include-relations",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
+        default=None,
         help="Also collect raw meeting, meeting-item and document relation data",
     )
     parser.add_argument(
         "--meeting-scan-limit",
         type=int,
-        default=250,
+        default=None,
         help="Maximum number of meetingsession records to scan when relations are enabled",
     )
     parser.add_argument(
         "--meeting-session-batch-size",
         type=int,
-        default=100,
+        default=None,
         help="Batch size for meetingsession scanning when relations are enabled",
     )
     parser.add_argument(
         "--meeting-item-limit",
-        default="1000",
+        default=None,
         help="Maximum number of meeting items to inspect when relations are enabled. Use 0 for no limit.",
     )
-    return parser.parse_args()
+    return parser.parse_args(argv)
+
+
+def resolve_cli_harvest_options(args: argparse.Namespace) -> dict[str, Any]:
+    """Resolve profile defaults and explicit CLI overrides into run_harvest options."""
+
+    overrides: dict[str, Any] = {}
+    if args.mode is not None:
+        overrides["mode"] = args.mode
+    if args.limit is not None:
+        overrides["limit"] = args.limit
+    if args.batch_size is not None:
+        overrides["batch_size"] = args.batch_size
+    if args.max_documents is not None:
+        overrides["max_documents"] = parse_max_documents(args.max_documents)
+    if args.include_relations is not None:
+        overrides["include_relations"] = args.include_relations
+    if args.meeting_scan_limit is not None:
+        overrides["meeting_scan_limit"] = args.meeting_scan_limit
+    if args.meeting_session_batch_size is not None:
+        overrides["meeting_session_batch_size"] = args.meeting_session_batch_size
+    if args.meeting_item_limit is not None:
+        overrides["meeting_item_limit"] = parse_max_documents(args.meeting_item_limit)
+
+    return resolve_harvest_options(args.profile, overrides)
 
 
 def main() -> None:
     """CLI entrypoint."""
 
     args = parse_args()
+    harvest_options = resolve_cli_harvest_options(args)
+
     harvest_run = run_harvest(
         municipality=args.municipality,
-        mode=args.mode,
-        limit=args.limit,
-        batch_size=args.batch_size,
-        max_documents=parse_max_documents(args.max_documents),
+        mode=harvest_options["mode"],
+        limit=harvest_options["limit"],
+        batch_size=harvest_options["batch_size"],
+        max_documents=harvest_options["max_documents"],
         enrich_checksums=args.enrich_checksums,
         checksum_max_documents=args.checksum_max_documents,
-        include_relations=args.include_relations,
-        meeting_scan_limit=args.meeting_scan_limit,
-        meeting_session_batch_size=args.meeting_session_batch_size,
-        meeting_item_limit=parse_max_documents(args.meeting_item_limit),
+        include_relations=harvest_options["include_relations"],
+        meeting_scan_limit=harvest_options["meeting_scan_limit"],
+        meeting_session_batch_size=harvest_options["meeting_session_batch_size"],
+        meeting_item_limit=harvest_options["meeting_item_limit"],
     )
+
     print(
         f"Harvest {harvest_run.id} completed: "
         f"{harvest_run.documents_seen} documents seen, "
