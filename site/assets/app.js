@@ -55,6 +55,65 @@ async function fetchJson(path) {
   return response.json();
 }
 
+function parseJsonObjects(text) {
+  const lines = String(text || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (lines.length > 0) {
+    try {
+      return lines.map((line) => JSON.parse(line));
+    } catch (error) {
+      console.warn("JSONL kon niet regel voor regel worden gelezen, probeer concatenated JSON objects.", error);
+    }
+  }
+
+  // Fallback voor concatenated JSON objects zonder newline tussen records.
+  const records = [];
+  let depth = 0;
+  let start = -1;
+  let inString = false;
+  let escaped = false;
+
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (character === "\\") {
+        escaped = true;
+      } else if (character === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (character === '"') {
+      inString = true;
+      continue;
+    }
+
+    if (character === "{") {
+      if (depth === 0) start = index;
+      depth += 1;
+    } else if (character === "}") {
+      depth -= 1;
+      if (depth === 0 && start >= 0) {
+        records.push(JSON.parse(text.slice(start, index + 1)));
+        start = -1;
+      }
+    }
+  }
+
+  if (records.length === 0) {
+    throw new Error("JSONL-bestand bevat geen parsebare records");
+  }
+
+  return records;
+}
+
 async function fetchJsonl(path) {
   const response = await fetch(path, { cache: "no-store" });
   if (!response.ok) {
@@ -62,11 +121,7 @@ async function fetchJsonl(path) {
   }
 
   const text = await response.text();
-  return text
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => JSON.parse(line));
+  return parseJsonObjects(text);
 }
 
 async function fetchOptionalJsonl(path) {
@@ -258,8 +313,11 @@ function renderSummary() {
   elements.documentsNormalized.textContent = latest.documents_normalized ?? "-";
   elements.generatedAt.textContent = formatDateTime(latest.generated_at);
 
+  const documentsWithRelations = state.documents.filter((documentRecord) => {
+    return getDocumentRelationContext(documentRecord).length > 0;
+  }).length;
   const relationText = latest.relations_enabled
-    ? ` Relationele context: ${latest.relations_summary?.meetings_seen ?? 0} vergaderingen, ${latest.relations_summary?.meeting_items_seen ?? 0} agendapunten.`
+    ? ` Relationele context: ${latest.relations_summary?.meetings_seen ?? 0} vergaderingen, ${latest.relations_summary?.meeting_items_seen ?? 0} agendapunten. ${documentsWithRelations} getoonde documenten hebben een koppeling.`
     : "";
   elements.statusMessage.textContent = `${state.documents.length} documenten geladen.${relationText}`;
 }
@@ -319,6 +377,55 @@ function sortDocuments(documents) {
   });
 }
 
+function appendTextCell(row, className, value) {
+  const cell = document.createElement("td");
+  cell.className = className;
+  cell.textContent = value;
+  row.appendChild(cell);
+  return cell;
+}
+
+function createRelationContextElement(documentRecord) {
+  const contexts = getDocumentRelationContext(documentRecord);
+  if (contexts.length === 0) return null;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "relation-context";
+  wrapper.setAttribute("aria-label", "Relationele context");
+
+  const list = document.createElement("ul");
+  const visible = contexts.slice(0, 2);
+  const extraCount = contexts.length - visible.length;
+
+  for (const { meeting, item } of visible) {
+    const listItem = document.createElement("li");
+    const meetingLabel = formatMeetingLabel(meeting);
+    const itemLabel = formatMeetingItemLabel(item);
+    const itemText = itemLabel ? `, agendapunt: ${itemLabel}` : "";
+    listItem.textContent = `${meetingLabel}${itemText}`;
+    list.appendChild(listItem);
+  }
+
+  if (extraCount > 0) {
+    const extraItem = document.createElement("li");
+    extraItem.textContent = `+ ${extraCount} extra koppeling(en)`;
+    list.appendChild(extraItem);
+  }
+
+  wrapper.appendChild(list);
+  return wrapper;
+}
+
+function renderEmptyRow(message) {
+  elements.tableBody.replaceChildren();
+  const row = document.createElement("tr");
+  const cell = document.createElement("td");
+  cell.colSpan = 7;
+  cell.textContent = message;
+  row.appendChild(cell);
+  elements.tableBody.appendChild(row);
+}
+
 function updatePagination(totalPages) {
   const pageText = `Pagina ${state.currentPage} van ${totalPages}`;
   elements.pageInfoTop.textContent = pageText;
@@ -344,32 +451,50 @@ function renderDocuments() {
   updatePagination(totalPages);
 
   if (pageDocuments.length === 0) {
-    elements.tableBody.innerHTML = '<tr><td colspan="7">Geen documenten gevonden.</td></tr>';
+    renderEmptyRow("Geen documenten gevonden.");
     return;
   }
 
-  elements.tableBody.innerHTML = pageDocuments
-    .map((documentRecord) => {
-      const downloadUrl = documentRecord.download_url || documentRecord.source_url;
-      const downloadLink = downloadUrl
-        ? `<a href="${escapeHtml(downloadUrl)}" rel="noopener noreferrer">PDF</a>`
-        : "-";
-      const title = escapeHtml(getDocumentTitle(documentRecord));
-      const relationContext = renderRelationContext(documentRecord);
-      const filename = escapeHtml(documentRecord.filename || "-");
+  elements.tableBody.replaceChildren();
 
-      return `<tr>
-        <td class="date-cell">${escapeHtml(formatDate(getDocumentDate(documentRecord)))}</td>
-        <td class="type-cell">${escapeHtml(getCompactTypeLabel(documentRecord))}</td>
-        <td class="source-type-cell">${escapeHtml(documentRecord.document_type || "Onbekend")}</td>
-        <td class="title-cell"><div class="document-title">${title}</div>${relationContext}</td>
-        <td class="filename-cell">${filename}</td>
-        <td class="size-cell">${escapeHtml(formatBytes(documentRecord.file_size_bytes))}</td>
-        <td class="download-cell">${downloadLink}</td>
-      </tr>`;
-    })
-    .join("");
+  for (const documentRecord of pageDocuments) {
+    const row = document.createElement("tr");
+    const downloadUrl = documentRecord.download_url || documentRecord.source_url;
+
+    appendTextCell(row, "date-cell", formatDate(getDocumentDate(documentRecord)));
+    appendTextCell(row, "type-cell", getCompactTypeLabel(documentRecord));
+    appendTextCell(row, "source-type-cell", documentRecord.document_type || "Onbekend");
+
+    const titleCell = document.createElement("td");
+    titleCell.className = "title-cell";
+    const title = document.createElement("div");
+    title.className = "document-title";
+    title.textContent = getDocumentTitle(documentRecord);
+    titleCell.appendChild(title);
+    const relationContext = createRelationContextElement(documentRecord);
+    if (relationContext) titleCell.appendChild(relationContext);
+    row.appendChild(titleCell);
+
+    appendTextCell(row, "filename-cell", documentRecord.filename || "-");
+    appendTextCell(row, "size-cell", formatBytes(documentRecord.file_size_bytes));
+
+    const downloadCell = document.createElement("td");
+    downloadCell.className = "download-cell";
+    if (downloadUrl) {
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.rel = "noopener noreferrer";
+      link.textContent = "PDF";
+      downloadCell.appendChild(link);
+    } else {
+      downloadCell.textContent = "-";
+    }
+    row.appendChild(downloadCell);
+
+    elements.tableBody.appendChild(row);
+  }
 }
+
 
 function applyFilters() {
   const query = elements.searchInput.value.trim().toLowerCase();
@@ -451,7 +576,8 @@ async function init() {
   try {
     requireElements();
     state.latest = await fetchJson(`${DATA_BASE}/latest.json`);
-    const outputs = state.latest.outputs || {};
+    const latest = state.latest;
+    const outputs = latest.outputs || latest.exports || {};
     const documentsPath = outputs.documents || "documents.jsonl";
     state.documents = await fetchJsonl(`${DATA_BASE}/${documentsPath}`);
     await loadRelationData(outputs);
@@ -466,7 +592,7 @@ async function init() {
       elements.statusMessage.textContent = "De publieke data kon niet worden geladen.";
     }
     if (elements.tableBody) {
-      elements.tableBody.innerHTML = `<tr><td colspan="7">${escapeHtml(error.message)}</td></tr>`;
+      renderEmptyRow(error.message);
     }
   }
 }
