@@ -43,10 +43,10 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         meeting_item_limit=200,
     ),
     "public": HarvestProfile(
-        mode="full",
+        mode="latest",
         limit=250,
         batch_size=100,
-        max_documents=250,
+        max_documents=None,
         include_relations=True,
         meeting_scan_limit=250,
         meeting_session_batch_size=100,
@@ -74,9 +74,9 @@ def resolve_harvest_options(
 ) -> dict[str, Any]:
     """Resolve a harvest profile and apply explicit CLI overrides.
 
-    When no profile is selected, the previous CLI defaults are returned. Overrides
-    are applied by key presence, so values such as ``None`` are valid explicit
-    overrides for unbounded backfill-style runs.
+    When no profile is selected, the previous CLI defaults are returned.
+    Overrides are applied by key presence, so values such as ``None`` are
+    valid explicit overrides for unbounded backfill-style runs.
     """
 
     if profile_name is None:
@@ -86,7 +86,9 @@ def resolve_harvest_options(
             resolved = asdict(HARVEST_PROFILES[profile_name])
         except KeyError as exc:
             valid_names = ", ".join(HARVEST_PROFILE_NAMES)
-            raise ValueError(f"Unknown harvest profile: {profile_name}. Valid profiles: {valid_names}") from exc
+            raise ValueError(
+                f"Unknown harvest profile: {profile_name}. Valid profiles: {valid_names}"
+            ) from exc
 
     for key, value in (overrides or {}).items():
         if key not in PROFILE_OPTION_KEYS:
