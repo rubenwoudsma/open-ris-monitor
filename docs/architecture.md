@@ -4,7 +4,7 @@
 
 Open RIS Monitor is opgezet als een kleine open-data-infrastructuur voor gemeentelijke raadsinformatie. De kern is niet de viewer, maar de dataketen.
 
-De pipeline moet brondata uit een RIS ophalen, normaliseren naar een canoniek model, publiceren als gewone bestanden en tonen in een statische viewer.
+De pipeline haalt brondata uit een RIS op, normaliseert die naar een canoniek model, verrijkt de data met kwaliteit en relaties, publiceert alles als gewone bestanden en toont dat in een statische viewer.
 
 ## Lagen
 
@@ -17,7 +17,7 @@ De pipeline moet brondata uit een RIS ophalen, normaliseren naar een canoniek mo
                           v
 +------------------------------------------------------+
 | Publicatielaag                                       |
-| JSONL, JSON, zoekindexen, rapportages                |
+| JSONL, JSON, rapportages, zoek- en hulpexporten      |
 +------------------------------------------------------+
                           |
                           v
@@ -54,9 +54,9 @@ De pipeline moet brondata uit een RIS ophalen, normaliseren naar een canoniek mo
 5. PDF's worden niet standaard in Git opgeslagen.
 6. Elke run is herleidbaar via `HarvestRun` en `latest.json`.
 7. Datakwaliteit wordt expliciet zichtbaar gemaakt.
-8. Grotere datasets worden stapsgewijs ondersteund met paginering en begrenzing.
-9. Relationele context wordt apart gepubliceerd, niet hard in documentrecords ingebakken.
-10. De repository moet forkable blijven zonder database, backend of externe zoekmachine.
+8. Relationele context wordt apart gepubliceerd, niet hard in documentrecords ingebakken.
+9. De repository moet forkable blijven zonder database, backend of externe zoekmachine.
+10. Raw output blijft tijdelijk en hoort niet in de publieke Git-laag thuis.
 
 ## Huidige pipeline
 
@@ -68,9 +68,10 @@ De pipeline moet brondata uit een RIS ophalen, normaliseren naar een canoniek mo
 5. Documenten normaliseren naar canonieke objecten
 6. Optioneel relationele data ophalen
 7. Meetings, meeting items en documentrelaties normaliseren
-8. Public exports genereren
-9. data/public optioneel terugcommitten
-10. GitHub Pages-site leest data/public
+8. Quality signals en documenttypeanalyses schrijven
+9. Public exports genereren
+10. data/public optioneel terugcommitten
+11. GitHub Pages-site leest data/public
 ```
 
 ## Document harvest
@@ -90,11 +91,11 @@ Documentversies en checksums worden apart gepubliceerd in:
 data/public/document_versions.jsonl
 ```
 
-PDF-bestanden worden niet structureel in Git opgeslagen.
+PDF-bestanden worden niet structureel in Git opgeslagen. Tijdens workflow-runs mogen ze alleen tijdelijk bestaan als artifact of tussenbestand.
 
 ## Relationele harvest
 
-Issue #15 voegt een optionele relationele harvest toe. De GemeenteOplossingen-route is:
+De relationele route voor Huizen is:
 
 ```text
 /meetingsessions
@@ -105,7 +106,7 @@ Issue #15 voegt een optionele relationele harvest toe. De GemeenteOplossingen-ro
   -> /meetingitems/{meetingItemId}/documents
 ```
 
-Deze route wordt bewust optioneel gehouden via `--include-relations`, zodat snelle documentharvests klein blijven.
+Deze route wordt bewust optioneel gehouden via relationele harvesting, zodat snelle documentharvests klein blijven.
 
 ## Bronconnectors
 
@@ -144,6 +145,7 @@ MeetingItem
 MeetingDocumentRelation
 MeetingItemDocumentRelation
 HarvestRun
+QualityIssue
 ```
 
 Bron-ID's blijven altijd bewaard. Canonieke identifiers zijn stabiel en volgen het patroon:
@@ -166,7 +168,7 @@ huizen-meeting-item-142-document-158
 
 De publicatielaag levert stabiele bestanden op.
 
-Geimplementeerd:
+Geïmplementeerd:
 
 ```text
 data/public/documents.jsonl
@@ -179,7 +181,7 @@ data/public/meeting_item_documents.jsonl
 data/public/latest.json
 ```
 
-Gepland:
+Gepland of aanvullend:
 
 ```text
 data/public/quality_issues.jsonl
@@ -197,7 +199,7 @@ De huidige viewer draait op:
 https://rubenwoudsma.github.io/open-ris-monitor/site/index.html
 ```
 
-De volgende viewerstap is relationele context tonen bij documenten:
+De volgende stap is relationele context tonen bij documenten:
 
 ```text
 Document
@@ -220,4 +222,4 @@ Voor volledige historische dekking moet de harvest incrementeel blijven:
 6. PDF's buiten Git houden
 ```
 
-Zie `docs/operations-harvest-strategy.md` voor het operationele ontwerp.
+Zie `docs/harvesting.md` voor het operationele ontwerp en de concrete bronstrategie.

@@ -4,7 +4,7 @@
 
 Het canonieke datamodel zorgt ervoor dat data uit verschillende RIS-bronnen op dezelfde manier kan worden verwerkt, gepubliceerd en getoond. De brondata mag per leverancier verschillen. Vanaf de normalisatielaag werkt het project met dezelfde entiteiten, velden en relaties.
 
-De MVP is begonnen als document-first implementatie. Vanaf issue #15 bevat het model ook de eerste relationele laag met vergaderingen, agendapunten en documentrelaties.
+De MVP is begonnen als document-first implementatie. De huidige lijn voegt daar vergaderingen, agendapunten, documentrelaties, kwaliteits-signalen en documenttype-normalisatie aan toe.
 
 ## Status van het model
 
@@ -12,7 +12,7 @@ De MVP is begonnen als document-first implementatie. Vanaf issue #15 bevat het m
 |---|---|---|
 | Municipality | conceptueel aanwezig | via gemeenteconfiguratie |
 | SourceSystem | conceptueel aanwezig | via gemeenteconfiguratie |
-| Document | geimplementeerd | eerste canonieke model |
+| Document | geimplementeerd | eerste canonieke model, inclusief documenttype-velden |
 | DocumentVersion | geimplementeerd | checksums en documentobservaties |
 | HarvestRun | geimplementeerd | vastlegging van harvest-resultaten |
 | Meeting | geimplementeerd voor GemeenteOplossingen | via `/meetingsessions` en `/meetings/{id}` |
@@ -20,8 +20,6 @@ De MVP is begonnen als document-first implementatie. Vanaf issue #15 bevat het m
 | MeetingDocumentRelation | geimplementeerd | koppeling tussen vergadering en document |
 | MeetingItemDocumentRelation | geimplementeerd | koppeling tussen agendapunt en document |
 | QualityIssue | gepland | nodig voor datakwaliteitsrapportage |
-| DocumentTypeMapping | gepland | nodig voor documenttypenormalisatie |
-| Person, Organization, Topic, Decision | later | buiten MVP-scope |
 
 ## Kernentiteiten
 
@@ -148,6 +146,8 @@ Status: geimplementeerd.
 
 Doel: een leveranciersneutrale representatie van een RIS-document.
 
+Het canonieke Document-model bewaart zowel de bronwaarde als de geanalyseerde type-velden:
+
 ```json
 {
   "id": "huizen-document-25892",
@@ -159,6 +159,8 @@ Doel: een leveranciersneutrale representatie van een RIS-document.
   "title": "Verzoek commissiebehandeling",
   "description": "Verzoek commissiebehandeling",
   "document_type": "Overig",
+  "normalized_document_type": "other",
+  "normalized_document_type_label": "Overig",
   "filename": "Verzoek commissiebehandeling.pdf",
   "mime_type": "application/pdf",
   "file_size_bytes": 62118,

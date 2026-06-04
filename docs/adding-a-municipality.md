@@ -156,13 +156,9 @@ Controleer of de site de nieuwe gemeentegegevens en documenten toont.
 
 ## Stap 10, documenteer afwijkingen
 
-Elke RIS-leverancier kan net andere velden of endpoints gebruiken. Leg afwijkingen vast in:
+Elke RIS-leverancier kan net andere velden of endpoints gebruiken. Leg afwijkingen vast in de harvestdocumentatie en in de kwaliteitsrapportage.
 
-```text
-docs/source-analysis-<leverancier>.md
-```
-
-Voorbeelden van belangrijke vragen:
+Belangrijke vragen:
 
 - Welk endpoint levert documenten?
 - Is er `totalCount` of andere paginering?
@@ -175,20 +171,20 @@ Voorbeelden van belangrijke vragen:
 
 Een nieuwe gemeente is minimaal bruikbaar als:
 
-- er een configuratiebestand bestaat
-- de harvest workflow documenten kan ophalen
-- `documents.jsonl` wordt gemaakt
-- `latest.json` wordt gemaakt
-- de GitHub Pages-site de documenten kan tonen
-- PDF's niet in Git worden opgeslagen
+- er een configuratiebestand bestaat,
+- de harvest workflow documenten kan ophalen,
+- `documents.jsonl` wordt gemaakt,
+- `latest.json` wordt gemaakt,
+- de GitHub Pages-site de documenten kan tonen,
+- PDF's niet in Git worden opgeslagen.
 
 ## Richting voor verdere uitbreiding
 
 Na een werkende document-first MVP kan de gemeente-uitbreiding doorgroeien naar:
 
-- volledige harvest met paginering
-- checksums en documentversies
-- kwaliteitsrapportage
-- meetings en agenda-items
-- relaties tussen documenten en agendapunten
-- JSON-LD of linked data exports
+- volledige harvest met paginering,
+- checksums en documentversies,
+- kwaliteitsrapportage,
+- meetings en agenda-items,
+- relaties tussen documenten en agendapunten,
+- JSON-LD of linked data exports.
