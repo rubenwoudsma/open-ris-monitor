@@ -1,11 +1,16 @@
 {
   "documents_total": 250,
-  "generated_at": "2026-06-03T13:10:26.858167+00:00",
+  "generated_at": "2026-06-04T13:40:17.960547+00:00",
   "mapping": {
     "Agenda": {
       "count": 12,
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda"
+    },
+    "Amendementen": {
+      "count": 3,
+      "normalized_document_type": "amendment",
+      "normalized_document_type_label": "Amendement"
     },
     "Besluit": {
       "count": 1,
@@ -18,7 +23,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Bijlage": {
-      "count": 60,
+      "count": 56,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
     },
@@ -33,7 +38,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 33,
+      "count": 25,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -43,12 +48,12 @@
       "normalized_document_type_label": "Kennisgeving of ter kennisname"
     },
     "Mededelingen": {
-      "count": 28,
+      "count": 29,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
     "Moties": {
-      "count": 10,
+      "count": 13,
       "normalized_document_type": "motion",
       "normalized_document_type_label": "Motie"
     },
@@ -78,15 +83,15 @@
       "normalized_document_type_label": "Toezegging"
     },
     "Vragen van raadsleden": {
-      "count": 7,
+      "count": 12,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
     }
   },
-  "normalized_document_type_count": 13,
+  "normalized_document_type_count": 14,
   "normalized_document_types": [
     {
-      "count": 60,
+      "count": 56,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage",
       "source_document_types": [
@@ -111,7 +116,15 @@
       ]
     },
     {
-      "count": 33,
+      "count": 29,
+      "normalized_document_type": "announcement",
+      "normalized_document_type_label": "Mededeling",
+      "source_document_types": [
+        "Mededelingen"
+      ]
+    },
+    {
+      "count": 25,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -119,11 +132,19 @@
       ]
     },
     {
-      "count": 28,
-      "normalized_document_type": "announcement",
-      "normalized_document_type_label": "Mededeling",
+      "count": 13,
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie",
       "source_document_types": [
-        "Mededelingen"
+        "Moties"
+      ]
+    },
+    {
+      "count": 12,
+      "normalized_document_type": "question",
+      "normalized_document_type_label": "Vraag",
+      "source_document_types": [
+        "Vragen van raadsleden"
       ]
     },
     {
@@ -132,22 +153,6 @@
       "normalized_document_type_label": "Agenda",
       "source_document_types": [
         "Agenda"
-      ]
-    },
-    {
-      "count": 10,
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie",
-      "source_document_types": [
-        "Moties"
-      ]
-    },
-    {
-      "count": 7,
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag",
-      "source_document_types": [
-        "Vragen van raadsleden"
       ]
     },
     {
@@ -165,6 +170,14 @@
       "source_document_types": [
         "Financiële overzichten commissie",
         "Overzicht stand van zaken"
+      ]
+    },
+    {
+      "count": 3,
+      "normalized_document_type": "amendment",
+      "normalized_document_type_label": "Amendement",
+      "source_document_types": [
+        "Amendementen"
       ]
     },
     {
@@ -198,10 +211,10 @@
     "normalized_document_type is now part of the canonical Document export.",
     "Unknown should be reserved for genuinely missing or explicitly unknown source values."
   ],
-  "source_document_type_count": 16,
+  "source_document_type_count": 17,
   "source_document_types": [
     {
-      "count": 60,
+      "count": 56,
       "document_type": "Bijlage",
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
@@ -213,16 +226,16 @@
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 33,
-      "document_type": "Ingekomen stuk",
-      "normalized_document_type": "incoming_document",
-      "normalized_document_type_label": "Ingekomen stuk"
-    },
-    {
-      "count": 28,
+      "count": 29,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
+    },
+    {
+      "count": 25,
+      "document_type": "Ingekomen stuk",
+      "normalized_document_type": "incoming_document",
+      "normalized_document_type_label": "Ingekomen stuk"
     },
     {
       "count": 23,
@@ -237,28 +250,34 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
+      "count": 13,
+      "document_type": "Moties",
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie"
+    },
+    {
+      "count": 12,
+      "document_type": "Vragen van raadsleden",
+      "normalized_document_type": "question",
+      "normalized_document_type_label": "Vraag"
+    },
+    {
       "count": 12,
       "document_type": "Agenda",
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda"
     },
     {
-      "count": 10,
-      "document_type": "Moties",
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie"
-    },
-    {
-      "count": 7,
-      "document_type": "Vragen van raadsleden",
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag"
-    },
-    {
       "count": 4,
       "document_type": "Toezeggingen",
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging"
+    },
+    {
+      "count": 3,
+      "document_type": "Amendementen",
+      "normalized_document_type": "amendment",
+      "normalized_document_type_label": "Amendement"
     },
     {
       "count": 2,
