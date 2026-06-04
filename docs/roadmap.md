@@ -22,10 +22,13 @@ Open RIS Monitor is een kleine, reproduceerbare open-data-pipeline voor publieke
 - Documentversies en checksummetadata.
 - #14 Research naar meetings- en agenda-item-endpoints.
 - #15 Documenten koppelen aan vergaderingen en agendapunten.
+- #21 Documenttypen normaliseren.
 - #31 Viewer verbeteren na relationele exports.
 - #32 Harveststrategie en backfill operationaliseren.
 - #33 Relationele dekking verbeteren en valideren via quick en public runs.
+- #34 Eenvoudige agenda- en vergaderingbrowser.
 - #37 Public harvest prefereert recente documenten via het public profiel met latest mode.
+- #40 Roadmap actualiseren.
 
 ## Huidige stand
 
@@ -40,6 +43,7 @@ De handmatige workflow voor publieke RIS-data gebruikt standaard het profiel `pu
 De public export bestaat momenteel uit:
 
 - `documents.jsonl`
+- `document_versions.jsonl`
 - `harvest_runs.jsonl`
 - `meetings.jsonl`
 - `meeting_items.jsonl`
@@ -53,50 +57,7 @@ De viewer toont documentmetadata, compacte documenttypen en relationele context 
 
 ## Eerstvolgende volgorde
 
-### 1. Roadmap actualiseren
-
-Deze stap is bewust klein en documentatiegericht. Doel is om de roadmap gelijk te trekken met de afgeronde relationele mijlpalen en de geplande volgorde van de komende issues.
-
-Resultaat:
-
-- verouderde #15-focus verwijderen;
-- afgeronde relationele en operationele issues markeren als afgerond;
-- komende issues in de gewenste volgorde zetten;
-- duidelijke scopegrens houden tussen documentatie, viewerfunctionaliteit en kwaliteitsrapportage.
-
-### 2. #34 Eenvoudige agenda- en vergaderingbrowser
-
-Doel: een eenvoudige statische browser toevoegen voor vergaderingen en agendapunten op basis van de bestaande relationele public exports.
-
-Scope voor een eerste kleine implementatie:
-
-- vergaderingen tonen uit `meetings.jsonl`;
-- filteren op datum en bestuursorgaan of vergaderingstype, voor zover beschikbaar in de export;
-- agendapunten per vergadering tonen uit `meeting_items.jsonl`;
-- documenten per agendapunt tonen via `meeting_item_documents.jsonl`;
-- teruglink of verwijzing naar documentrecords in de bestaande documententabel;
-- geen backend, geen zoekindex, geen PDF-preview en geen framework.
-
-Aanpak:
-
-- hergebruik de bestaande JSONL-loader en relationele lookups in `site/assets/app.js`;
-- voeg een compacte sectie toe in `site/index.html`, bijvoorbeeld boven of onder de documententabel;
-- houd de eerste versie read-only en client-side;
-- toon graceful fallback wanneer relationele exports ontbreken of leeg zijn.
-
-### 3. #21 Documenttypen normaliseren
-
-Doel: documenttypen verder normaliseren voor filtering, analyse en hergebruik.
-
-Richting:
-
-- originele RIS-bronwaarde behouden;
-- genormaliseerde documenttypewaarde blijven publiceren;
-- mapping centraal documenteren;
-- relationele context gebruiken voor betere duiding, bijvoorbeeld bij bijlagen bij agendapunten;
-- onbekende of niet-mappende waarden expliciet laten terugvallen op `unknown` of `other`.
-
-### 4. #13 Kwaliteitsrapportage toevoegen
+### 1. #13 Kwaliteitsrapportage toevoegen
 
 Doel: kwaliteitsrapportage uitbreiden op basis van de documentlaag en de relationele laag.
 
@@ -110,9 +71,26 @@ Mogelijke checks:
 - verschillen tussen raw relationele tellingen en gepubliceerde relationele overlap;
 - signalering wanneer public exports ontbreken of leeg zijn.
 
-### 5. Docs cleanup
+### 2. #41 Documentatie opschonen en consolidatie afmaken
 
-Later volgt een aparte cleanup om tijdelijke issue-documentatie te consolideren in `docs/`. Dit is bewust geen onderdeel van de komende kleine PR's, zodat functionele stappen klein en goed reviewbaar blijven.
+Doel: tijdelijke documentatie consolideren in stabiele projectdocs, zodat de repository beter leest als open source project.
+
+Resultaat:
+
+- README als hoofdingang;
+- compacte vaste docs voor architectuur, data model, harvesting, kwaliteit, development en municipality onboarding;
+- geen losse issue-notities meer als hoofdbron voor projectuitleg.
+
+### 3. #43 UI redesign: GitHub-achtige layout en TypeScript frontend
+
+Doel: een rustige GitHub-achtige layout met een TypeScript frontend.
+
+Scope:
+
+- document-first interface behouden;
+- betere navigatie tussen documenten, vergaderingen en relaties;
+- rustige, leesbare layout;
+- geen verlies van de statische en compacte publicatie-aanpak.
 
 ## Operationele harveststrategie
 
@@ -125,7 +103,7 @@ De operationele lijn blijft:
 - alleen compacte public JSONL committen;
 - geen PDF-archief in Git.
 
-Zie ook `docs/operations-harvest-strategy.md`.
+Zie ook `docs/harvesting.md`.
 
 ## Latere richting
 

@@ -1,6 +1,6 @@
 # Open RIS Monitor
 
-Open RIS Monitor is een kleine, reproduceerbare open-data-pipeline voor publieke raadsinformatie. De eerste implementatie gebruikt de GemeenteOplossingen API van de gemeente Huizen.
+Open RIS Monitor is a small, reproducible open-data pipeline for public council information. The first implementation uses the GemeenteOplossingen API of the municipality of Huizen.
 
 Live viewer:
 
@@ -8,83 +8,94 @@ Live viewer:
 https://rubenwoudsma.github.io/open-ris-monitor/site/index.html
 ```
 
-## Huidige status
+## What this project is
 
-De MVP is uitgebreid van document-first naar relationele publicatie:
+Open RIS Monitor turns RIS data into a small static public dataset that is easy to inspect, reuse and fork for another municipality.
 
-1. GitHub Actions haalt documentmetadata op uit het RIS.
-2. De ruwe harvest wordt bewaard als tijdelijk artifact.
-3. Documenten worden genormaliseerd naar een canoniek `Document` model.
-4. Optioneel worden vergaderingen, agendapunten en documentrelaties opgehaald.
-5. Relationele data wordt genormaliseerd naar `Meeting`, `MeetingItem`, `MeetingDocumentRelation` en `MeetingItemDocumentRelation`.
-6. `data/public/` wordt gegenereerd met JSONL en metadata.
-7. GitHub Pages leest de bestanden uit `data/public/`.
+The project is designed around a simple idea:
 
-## Public exports
+1. fetch source data from a RIS,
+2. normalize it to a canonical model,
+3. publish compact JSONL exports,
+4. show the result in a static GitHub Pages viewer.
 
-De publieke dataset bestaat uit statische bestanden. Deze bestanden vormen het contract voor de viewer en voor hergebruikers.
+## Why it exists
 
-```text
-data/public/documents.jsonl
-data/public/document_versions.jsonl
-data/public/harvest_runs.jsonl
-data/public/meetings.jsonl
-data/public/meeting_items.jsonl
-data/public/meeting_documents.jsonl
-data/public/meeting_item_documents.jsonl
-data/public/latest.json
-```
+The repository is meant to stay small, transparent and reusable.
 
-`latest.json` verwijst naar de actuele outputs en bevat, wanneer relationele harvesting actief is, ook `relations_enabled` en `relations_summary`.
+It avoids the usual pile-up of raw dumps, PDFs and hidden intermediate data. Instead, it keeps the public output compact and explicit, so another municipality can reuse the same approach with minimal friction.
 
-## Harvest modes
+## Example use
 
-De Harvest workflow ondersteunt twee hoofdmodi.
+For Huizen, the workflow harvests documents and, where available, relations to meetings and agenda items. The public exports are published as plain files in `data/public/`, which the static viewer reads directly.
 
-### Latest mode
+A typical public run uses the manual GitHub Actions workflow with the `public` profile.
 
-Haalt de meest recente documenten op. Gebruik dit voor snelle controles en kleine updates.
+## How it fits together
 
-```text
-mode: latest
-limit: 25
-```
+The core pipeline is:
 
-Met relationele context:
+- RIS source connector
+- normalization to a canonical model
+- enrichment with checksums, quality and relations
+- publication as JSONL and JSON files
+- static viewer on GitHub Pages
 
-```text
-mode: latest
-limit: 25
-include_relations: true
-meeting_scan_limit: 50
-meeting_item_limit: 200
-```
+The architecture and data model are documented in `docs/architecture.md` and `docs/data-model.md`.
 
-### Full mode
+## Public outputs
 
-Haalt documenten in batches op met `limit` en `offset`. Gebruik dit om de public dataset gecontroleerd uit te breiden.
+The durable public layer is `data/public/`.
 
-```text
-mode: full
-batch_size: 100
-max_documents: 500
-```
+Current exports include:
 
-`max_documents` is een veiligheidslimiet. Gebruik `0` alleen wanneer je bewust zonder expliciete cap wilt harvesten.
+- `documents.jsonl`
+- `document_versions.jsonl`
+- `harvest_runs.jsonl`
+- `meetings.jsonl`
+- `meeting_items.jsonl`
+- `meeting_documents.jsonl`
+- `meeting_item_documents.jsonl`
+- `latest.json`
 
-## Publicatiebeleid
+## Using this for another municipality
 
-- `data/public/` mag automatisch worden gecommit door de Harvest workflow.
-- `data/raw/` blijft artifact-only en wordt niet automatisch gecommit.
-- PDF-bestanden worden niet opgeslagen in Git.
-- Relationele harvest-output wordt als kleine JSONL-bestanden gepubliceerd.
-- Grote of langdurige harvests moeten incrementeel en begrensd worden uitgevoerd.
-- De eerste publieke viewer is bewust statisch en frameworkloos.
+The repository is meant to be forkable.
 
-## Volgende milestones
+For a new municipality, the usual path is:
 
-- Relationele data tonen in de viewer.
-- Kwaliteitsrapportage uitbreiden met relationele checks.
-- Documenttypen normaliseren met behulp van relationele context.
-- Harveststrategie verder operationaliseren voor volledige historische dekking.
-- Onderzoek naar ondersteuning voor andere RIS-leveranciers.
+1. copy the municipality configuration,
+2. point it at the right RIS source,
+3. test a small harvest,
+4. inspect the public exports,
+5. publish only `data/public/`.
+
+If the municipality uses another RIS vendor, a new connector may be needed.
+
+See `docs/adding-a-municipality.md`.
+
+## Roadmap
+
+The current focus is on:
+
+- quality reporting,
+- documentation cleanup and consolidation,
+- a cleaner GitHub-like UI,
+- better navigation between documents, meetings and relations.
+
+See `docs/roadmap.md`.
+
+## Development
+
+The repository is intentionally small and reviewable.
+
+A few guiding rules:
+
+- no PDFs in Git,
+- no raw dumps in Git,
+- raw output only as temporary workflow artifact,
+- keep the viewer static,
+- keep public exports compact and stable,
+- prefer small, uploadable changes.
+
+See `docs/development.md` for the working conventions.
