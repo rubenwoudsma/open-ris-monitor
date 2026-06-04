@@ -10,6 +10,7 @@ from open_ris_monitor.analysis.document_identity import (
     analyze_document_types,
 )
 from open_ris_monitor.exporters.json_exporter import write_json
+from open_ris_monitor.quality.report import write_quality_report
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -62,11 +63,17 @@ def generate_reports(public_dir: Path) -> dict[str, Any]:
     write_json(identity_path, identity_report)
     write_json(type_path, type_report)
 
+    quality_report = write_quality_report(public_dir)
+    summary_path = quality_dir / "summary.json"
+    issues_path = quality_dir / "issues.jsonl"
+
     update_latest(
         public_dir,
         {
             "id_stability": "quality/id_stability.json",
             "document_types": "quality/document_types.json",
+            "quality_summary": "quality/summary.json",
+            "quality_issues": "quality/issues.jsonl",
         },
     )
 
@@ -74,6 +81,9 @@ def generate_reports(public_dir: Path) -> dict[str, Any]:
         "documents_total": len(documents),
         "id_stability": str(identity_path),
         "document_types": str(type_path),
+        "quality_summary": str(summary_path),
+        "quality_issues": str(issues_path),
+        "quality_issues_count": len(quality_report["issues"]),
     }
 
 
