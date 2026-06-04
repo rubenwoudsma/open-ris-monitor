@@ -8,7 +8,9 @@ from open_ris_monitor.quality.report import build_quality_report, write_quality_
 
 
 def _write_jsonl(path: Path, rows: list[dict]) -> None:
-    path.write_text("\n".join(json.dumps(row) for row in rows) + "\n", encoding="utf-8")
+    path.write_text("
+".join(json.dumps(row) for row in rows) + "
+", encoding="utf-8")
 
 
 def test_build_quality_report_counts_and_coverage(tmp_path: Path) -> None:
