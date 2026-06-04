@@ -294,6 +294,21 @@ button:disabled {
   margin-top: 2px;
 }
 
+.relation-link {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: inherit;
+  text-align: left;
+}
+
+.relation-link:hover {
+  text-decoration: underline;
+}
+
 .meeting-browser-list {
   display: grid;
   gap: 14px;
@@ -338,6 +353,10 @@ button:disabled {
 .meeting-summary-meta {
   font-size: 0.92rem;
   color: var(--muted);
+}
+
+.meeting-summary-actions {
+  margin-top: 4px;
 }
 
 .meeting-body {
@@ -390,8 +409,31 @@ button:disabled {
   margin-top: 12px;
 }
 
+.meeting-item-headline-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .meeting-item-headline {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
   font-weight: 700;
+  text-align: left;
+}
+
+.meeting-item-headline:hover {
+  color: var(--accent);
+}
+
+.meeting-item-docs-count {
+  font-size: 0.84rem;
+  color: var(--muted);
 }
 
 .link-grid {

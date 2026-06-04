@@ -13,6 +13,8 @@
     meetingItemsById: new Map(),
     meetingRelationsByDocumentId: new Map(),
     meetingItemRelationsByDocumentId: new Map(),
+    meetingDocumentsByMeetingId: new Map(),
+    meetingItemDocumentsByMeetingItemId: new Map(),
     currentPage: 1,
     pageSize: 50,
     sortMode: "date-desc",
@@ -283,11 +285,28 @@
     return documentRecord.title || documentRecord.description || documentRecord.filename || "Geen titel";
   }
 
-  function updateUrlForDocument(documentRecord) {
-    const primaryId = getDocumentId(documentRecord);
-    if (!primaryId || !window.history?.replaceState) return;
+  function updateUrlForSelection(selection = {}) {
+    if (!window.history?.replaceState) return;
     const url = new URL(window.location.href);
-    url.searchParams.set("documentId", primaryId);
+
+    if (selection.documentId) {
+      url.searchParams.set("documentId", String(selection.documentId));
+    } else {
+      url.searchParams.delete("documentId");
+    }
+
+    if (selection.meetingId) {
+      url.searchParams.set("meetingId", String(selection.meetingId));
+    } else {
+      url.searchParams.delete("meetingId");
+    }
+
+    if (selection.agendaItemId) {
+      url.searchParams.set("agendaItemId", String(selection.agendaItemId));
+    } else {
+      url.searchParams.delete("agendaItemId");
+    }
+
     window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
   }
 
@@ -320,21 +339,152 @@
     map.set(key, list);
   }
 
+  function addUniqueDocumentToLookup(map, key, documentRecord) {
+    if (!key || !documentRecord) return;
+    const list = map.get(key) || [];
+    const documentKeyValue = getDocumentId(documentRecord) || getDocumentTitle(documentRecord);
+    if (list.some((existing) => (getDocumentId(existing) || getDocumentTitle(existing)) === documentKeyValue)) {
+      return;
+    }
+    list.push(documentRecord);
+    map.set(key, list);
+  }
+
+  function getDocumentsForMeeting(meetingId) {
+    const meeting = state.meetingsById.get(String(meetingId || "").trim());
+    if (!meeting) return [];
+    const documents = [...(state.meetingDocumentsByMeetingId.get(meeting.id) || [])];
+    for (const item of meeting.items || []) {
+      for (const doc of state.meetingItemDocumentsByMeetingItemId.get(item.id) || []) {
+        addUniqueDocumentToLookup(new Map([["docs", documents]]), "docs", doc);
+      }
+    }
+    return documents;
+  }
+
+  function getDocumentsForMeetingItem(meetingItemId) {
+    return [...(state.meetingItemDocumentsByMeetingItemId.get(String(meetingItemId || "").trim()) || [])];
+  }
+
+  function focusDocuments(documentRecords, options = {}) {
+    const records = Array.isArray(documentRecords) ? documentRecords.filter(Boolean) : [];
+    const identifiers = new Set();
+
+    if (records.length === 0) {
+      identifiers.add("__no_documents__");
+    } else {
+      for (const documentRecord of records) {
+        for (const identifier of getDocumentIdentifiers(documentRecord)) {
+          addIdentifier(identifiers, identifier);
+        }
+        addIdentifier(identifiers, getDocumentTitle(documentRecord));
+        addIdentifier(identifiers, documentRecord.filename);
+      }
+    }
+
+    state.pinnedDocumentKeys = identifiers;
+    if (options.query !== false) {
+      elements.searchInput.value = options.searchText || (records[0] ? getDocumentTitle(records[0]) : "");
+    }
+    updateUrlForSelection({
+      documentId: options.documentId,
+      meetingId: options.meetingId,
+      agendaItemId: options.agendaItemId,
+    });
+    state.currentPage = 1;
+    applyFilters();
+    document.querySelector("#documents-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function focusMeetingById(meetingId) {
+    const meeting = state.meetingsById.get(String(meetingId || "").trim());
+    if (!meeting) return;
+    const documents = getDocumentsForMeeting(meeting.id);
+    focusDocuments(documents, {
+      searchText: formatMeetingLabel(meeting),
+      meetingId: meeting.id,
+      query: true,
+    });
+  }
+
+  function focusMeetingItemById(meetingItemId) {
+    const item = state.meetingItemsById.get(String(meetingItemId || "").trim());
+    if (!item) return;
+    const documents = getDocumentsForMeetingItem(item.id);
+    const meeting = state.meetingsById.get(String(item.meeting_id || item.meetingId || "").trim());
+    focusDocuments(documents, {
+      searchText: formatMeetingItemLabel(item) || "Agendapunt",
+      meetingId: meeting?.id,
+      agendaItemId: item.id,
+      query: true,
+    });
+  }
+
   function buildRelationLookups() {
     state.meetingsById = new Map(state.meetings.map((meeting) => [meeting.id, meeting]));
     state.meetingItemsById = new Map(state.meetingItems.map((item) => [item.id, item]));
     state.meetingRelationsByDocumentId = new Map();
     state.meetingItemRelationsByDocumentId = new Map();
+    state.meetingDocumentsByMeetingId = new Map();
+    state.meetingItemDocumentsByMeetingItemId = new Map();
+
+    for (const meeting of state.meetings) {
+      meeting.items = [];
+    }
+    for (const item of state.meetingItems) {
+      const meetingId = String(pick(item.meeting_id, item.meetingId, item.session_id, item.sessionId)).trim();
+      const meeting = state.meetingsById.get(meetingId);
+      if (meeting) {
+        meeting.items.push(item);
+      }
+    }
+
+    const documentsById = new Map();
+    for (const documentRecord of state.documents) {
+      for (const identifier of getDocumentIdentifiers(documentRecord)) {
+        documentsById.set(identifier, documentRecord);
+      }
+    }
+
+    const resolveDocument = (relation) => {
+      const identifiers = getRelationDocumentIdentifiers(relation);
+      for (const identifier of identifiers) {
+        const documentRecord = documentsById.get(identifier);
+        if (documentRecord) return documentRecord;
+      }
+      return null;
+    };
 
     for (const relation of state.meetingDocumentRelations) {
       for (const identifier of getRelationDocumentIdentifiers(relation)) {
         addToLookupList(state.meetingRelationsByDocumentId, identifier, relation);
+      }
+      const meetingId = String(pick(relation.meeting_id, relation.meetingId)).trim();
+      const documentRecord = resolveDocument(relation);
+      if (meetingId && documentRecord) {
+        addUniqueDocumentToLookup(state.meetingDocumentsByMeetingId, meetingId, documentRecord);
       }
     }
 
     for (const relation of state.meetingItemDocumentRelations) {
       for (const identifier of getRelationDocumentIdentifiers(relation)) {
         addToLookupList(state.meetingItemRelationsByDocumentId, identifier, relation);
+      }
+      const itemId = String(pick(relation.meeting_item_id, relation.meetingItemId, relation.item_id)).trim();
+      const meetingId = String(pick(relation.meeting_id, relation.meetingId)).trim();
+      const documentRecord = resolveDocument(relation);
+      if (itemId && documentRecord) {
+        addUniqueDocumentToLookup(state.meetingItemDocumentsByMeetingItemId, itemId, documentRecord);
+      }
+      if (meetingId && documentRecord) {
+        addUniqueDocumentToLookup(state.meetingDocumentsByMeetingId, meetingId, documentRecord);
+      }
+      if (!meetingId && itemId && documentRecord) {
+        const item = state.meetingItemsById.get(itemId);
+        const resolvedMeetingId = item ? String(pick(item.meeting_id, item.meetingId, item.session_id, item.sessionId)).trim() : "";
+        if (resolvedMeetingId) {
+          addUniqueDocumentToLookup(state.meetingDocumentsByMeetingId, resolvedMeetingId, documentRecord);
+        }
       }
     }
   }
@@ -425,8 +575,36 @@
       const listItem = document.createElement("li");
       const meetingLabel = formatMeetingLabel(meeting);
       const itemLabel = formatMeetingItemLabel(item);
-      const itemText = itemLabel ? `, agendapunt: ${itemLabel}` : "";
-      listItem.textContent = `${meetingLabel}${itemText}`;
+
+      const meetingButton = document.createElement("button");
+      meetingButton.type = "button";
+      meetingButton.className = "relation-link";
+      meetingButton.textContent = meetingLabel;
+      meetingButton.title = "Toon documenten van deze vergadering";
+      meetingButton.addEventListener("click", () => {
+        if (meeting?.id && window.OpenRisMonitor?.focusMeetingById) {
+          window.OpenRisMonitor.focusMeetingById(meeting.id);
+        }
+      });
+      listItem.appendChild(meetingButton);
+
+      if (item) {
+        const separator = document.createTextNode(" • ");
+        listItem.appendChild(separator);
+
+        const itemButton = document.createElement("button");
+        itemButton.type = "button";
+        itemButton.className = "relation-link";
+        itemButton.textContent = itemLabel || "Agendapunt";
+        itemButton.title = "Toon documenten van dit agendapunt";
+        itemButton.addEventListener("click", () => {
+          if (item?.id && window.OpenRisMonitor?.focusMeetingItemById) {
+            window.OpenRisMonitor.focusMeetingItemById(item.id);
+          }
+        });
+        listItem.appendChild(itemButton);
+      }
+
       list.appendChild(listItem);
     }
 
@@ -656,22 +834,13 @@
 
   function focusDocument(documentRecord, options = {}) {
     if (!documentRecord) return;
-
-    const identifiers = new Set();
-    for (const identifier of getDocumentIdentifiers(documentRecord)) {
-      addIdentifier(identifiers, identifier);
-    }
-    addIdentifier(identifiers, getDocumentTitle(documentRecord));
-    addIdentifier(identifiers, documentRecord.filename);
-
-    state.pinnedDocumentKeys = identifiers;
-    if (options.query !== false) {
-      elements.searchInput.value = options.searchText || getDocumentTitle(documentRecord);
-    }
-    updateUrlForDocument(documentRecord);
-    state.currentPage = 1;
-    applyFilters();
-    document.querySelector("#documents-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    focusDocuments([documentRecord], {
+      searchText: options.searchText || getDocumentTitle(documentRecord),
+      documentId: getDocumentId(documentRecord),
+      meetingId: options.meetingId,
+      agendaItemId: options.agendaItemId,
+      query: options.query,
+    });
   }
 
   function focusDocumentById(documentId) {
@@ -736,9 +905,13 @@
     elements.nextBottom.addEventListener("click", () => changePage(1));
   }
 
-  function readInitialDocumentTarget() {
+  function readInitialNavigationTarget() {
     const params = new URLSearchParams(window.location.search);
-    return params.get("documentId") || params.get("document_id") || params.get("q") || "";
+    return {
+      documentId: params.get("documentId") || params.get("document_id") || params.get("q") || "",
+      meetingId: params.get("meetingId") || "",
+      agendaItemId: params.get("agendaItemId") || "",
+    };
   }
 
   async function init() {
@@ -759,9 +932,13 @@
       state.pageSize = Number(elements.pageSizeSelect.value);
       renderDocuments();
 
-      const initialTarget = readInitialDocumentTarget();
-      if (initialTarget) {
-        focusDocumentByText(initialTarget);
+      const initialTarget = readInitialNavigationTarget();
+      if (initialTarget.documentId) {
+        focusDocumentById(initialTarget.documentId);
+      } else if (initialTarget.agendaItemId) {
+        focusMeetingItemById(initialTarget.agendaItemId);
+      } else if (initialTarget.meetingId) {
+        focusMeetingById(initialTarget.meetingId);
       }
     } catch (error) {
       console.error(error);
@@ -778,6 +955,9 @@
     focusDocument,
     focusDocumentById,
     focusDocumentByText,
+    focusDocuments,
+    focusMeetingById,
+    focusMeetingItemById,
     clearDocumentFocus,
     applyDocumentFilters: applyFilters,
     getDocumentById(documentId) {
