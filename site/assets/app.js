@@ -19,6 +19,7 @@
     pageSize: 50,
     sortMode: "date-desc",
     pinnedDocumentKeys: null,
+    currentDocumentContext: null,
   };
 
   const elements = {
@@ -32,6 +33,7 @@
     sortSelect: document.querySelector("#sort-select"),
     pageSizeSelect: document.querySelector("#page-size-select"),
     resultCount: document.querySelector("#result-count"),
+    documentContext: document.querySelector("#document-context"),
     tableBody: document.querySelector("#documents-table-body"),
     previousTop: document.querySelector("#previous-page-top"),
     nextTop: document.querySelector("#next-page-top"),
@@ -310,6 +312,102 @@
     window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
   }
 
+  function formatMeetingContext(meeting) {
+    if (!meeting) return null;
+    return [meeting.description, meeting.date, meeting.start_time].filter(Boolean).join(", ");
+  }
+
+  function formatMeetingItemContext(item) {
+    if (!item) return null;
+    return [item.number, item.title].filter(Boolean).join(" ");
+  }
+
+  function renderDocumentContext() {
+    if (!elements.documentContext) return;
+
+    const context = state.currentDocumentContext;
+    if (!context) {
+      elements.documentContext.hidden = true;
+      elements.documentContext.replaceChildren();
+      return;
+    }
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "document-context-body";
+
+    const heading = document.createElement("p");
+    heading.className = "document-context-heading";
+    heading.textContent = `Context, ${context.documentCount} document(en) in deze selectie`;
+    wrapper.appendChild(heading);
+
+    if (context.meetingLabel) {
+      const meetingRow = document.createElement("p");
+      meetingRow.className = "document-context-row";
+      const label = document.createElement("strong");
+      label.textContent = "Vergadering:";
+      meetingRow.appendChild(label);
+      meetingRow.appendChild(document.createTextNode(` ${context.meetingLabel}`));
+      wrapper.appendChild(meetingRow);
+    }
+
+    if (context.itemLabel) {
+      const itemRow = document.createElement("p");
+      itemRow.className = "document-context-row";
+      const label = document.createElement("strong");
+      label.textContent = "Agendapunt:";
+      itemRow.appendChild(label);
+      itemRow.appendChild(document.createTextNode(` ${context.itemLabel}`));
+      wrapper.appendChild(itemRow);
+    }
+
+    if (context.documentLabel) {
+      const docRow = document.createElement("p");
+      docRow.className = "document-context-row";
+      const label = document.createElement("strong");
+      label.textContent = "Document:";
+      docRow.appendChild(label);
+      docRow.appendChild(document.createTextNode(` ${context.documentLabel}`));
+      wrapper.appendChild(docRow);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "document-context-actions";
+
+    const clearButton = document.createElement("button");
+    clearButton.type = "button";
+    clearButton.className = "document-context-clear";
+    clearButton.textContent = "Wis context";
+    clearButton.addEventListener("click", () => {
+      clearDocumentFocus();
+      elements.searchInput.value = "";
+      state.currentPage = 1;
+      applyFilters();
+    });
+    actions.appendChild(clearButton);
+
+    if (context.meetingId && window.OpenRISMonitor?.focusMeetingById) {
+      const meetingButton = document.createElement("button");
+      meetingButton.type = "button";
+      meetingButton.className = "document-context-link";
+      meetingButton.textContent = "Naar vergadering";
+      meetingButton.addEventListener("click", () => window.OpenRISMonitor.focusMeetingById(context.meetingId, { query: false }));
+      actions.appendChild(meetingButton);
+    }
+
+    if (context.agendaItemId && window.OpenRISMonitor?.focusMeetingItemById) {
+      const itemButton = document.createElement("button");
+      itemButton.type = "button";
+      itemButton.className = "document-context-link";
+      itemButton.textContent = "Naar agendapunt";
+      itemButton.addEventListener("click", () => window.OpenRISMonitor.focusMeetingItemById(context.agendaItemId, { query: false }));
+      actions.appendChild(itemButton);
+    }
+
+    wrapper.appendChild(actions);
+    elements.documentContext.replaceChildren(wrapper);
+    elements.documentContext.hidden = false;
+  }
+
   function getDocumentSearchBlob(documentRecord) {
     const relationContext = getDocumentRelationContext(documentRecord)
       .map(({ meeting, item }) => [meeting?.description, meeting?.date, meeting?.dmu_name, item?.number, item?.title].filter(Boolean).join(" "))
@@ -388,6 +486,15 @@
     } else {
       elements.searchInput.value = options.searchText || (records[0] ? getDocumentTitle(records[0]) : "");
     }
+    state.currentDocumentContext = {
+      documentCount: records.length,
+      meetingId: options.meetingId || null,
+      agendaItemId: options.agendaItemId || null,
+      documentId: options.documentId || getDocumentId(records[0]) || null,
+      meetingLabel: formatMeetingContext(options.meetingId ? state.meetingsById.get(String(options.meetingId).trim()) : null),
+      itemLabel: formatMeetingItemContext(options.agendaItemId ? state.meetingItemsById.get(String(options.agendaItemId).trim()) : null),
+      documentLabel: records[0] ? getDocumentTitle(records[0]) : null,
+    };
     updateUrlForSelection({
       documentId: options.documentId,
       meetingId: options.meetingId,
@@ -395,6 +502,7 @@
     });
     state.currentPage = 1;
     applyFilters();
+    renderDocumentContext();
     document.querySelector("#documents-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
@@ -830,6 +938,9 @@
 
   function clearDocumentFocus() {
     state.pinnedDocumentKeys = null;
+    state.currentDocumentContext = null;
+    updateUrlForSelection({});
+    renderDocumentContext();
   }
 
   function focusDocument(documentRecord, options = {}) {
@@ -931,6 +1042,7 @@
       state.sortMode = elements.sortSelect.value;
       state.pageSize = Number(elements.pageSizeSelect.value);
       renderDocuments();
+      renderDocumentContext();
 
       const initialTarget = readInitialNavigationTarget();
       if (initialTarget.documentId) {
