@@ -346,20 +346,44 @@
     elements.org.value = orgs.includes(selected) ? selected : "";
   }
 
-  function makeDocLink(documentRecord) {
+  function openDocument(documentRecord, context = {}) {
+    if (window.OpenRISMonitor?.focusDocument) {
+      window.OpenRISMonitor.focusDocument(documentRecord, {
+        searchText: documentTitle(documentRecord),
+        meetingId: context.meetingId,
+        agendaItemId: context.agendaItemId,
+      });
+      return;
+    }
+    if (window.OpenRISMonitor?.focusDocumentById && documentRecord?.id) {
+      window.OpenRISMonitor.focusDocumentById(documentRecord.id);
+      return;
+    }
+    if (window.OpenRISMonitor?.focusDocumentByText) {
+      window.OpenRISMonitor.focusDocumentByText(documentTitle(documentRecord));
+    }
+  }
+
+  function makeDocLink(documentRecord, context = {}) {
     const link = document.createElement("a");
     link.href = `#documents-title`;
     link.textContent = documentTitle(documentRecord);
     link.title = "Toon dit document in de documentenlijst";
     link.addEventListener("click", (event) => {
       event.preventDefault();
-      if (window.OpenRISMonitor?.focusDocument) {
-        window.OpenRISMonitor.focusDocument(documentRecord, { searchText: documentTitle(documentRecord) });
-      } else if (window.OpenRISMonitor?.focusDocumentByText) {
-        window.OpenRISMonitor.focusDocumentByText(documentTitle(documentRecord));
-      }
+      openDocument(documentRecord, context);
     });
     return link;
+  }
+
+  function makeNavigationButton(label, title, onClick) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "meeting-action";
+    button.textContent = label;
+    button.title = title;
+    button.addEventListener("click", onClick);
+    return button;
   }
 
   function renderMeetingCard(meeting, expanded = false) {
@@ -382,6 +406,23 @@
     meta.className = "meeting-summary-meta";
     meta.textContent = formatMeetingMeta(meeting);
     summary.appendChild(meta);
+
+    const summaryActions = document.createElement("div");
+    summaryActions.className = "meeting-summary-actions";
+    summaryActions.appendChild(
+      makeNavigationButton(
+        "Vergadering",
+        "Toon alle documenten uit deze vergadering",
+        (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (window.OpenRISMonitor?.focusMeetingById) {
+            window.OpenRISMonitor.focusMeetingById(meeting.id);
+          }
+        },
+      ),
+    );
+    summary.appendChild(summaryActions);
 
     details.appendChild(summary);
 
@@ -407,13 +448,7 @@
         chip.type = "button";
         chip.className = "doc-chip";
         chip.textContent = documentTitle(doc);
-        chip.addEventListener("click", () => {
-          if (window.OpenRISMonitor?.focusDocument) {
-            window.OpenRISMonitor.focusDocument(doc, { searchText: documentTitle(doc) });
-          } else if (window.OpenRISMonitor?.focusDocumentByText) {
-            window.OpenRISMonitor.focusDocumentByText(documentTitle(doc));
-          }
-        });
+        chip.addEventListener("click", () => openDocument(doc, { meetingId: meeting.id }));
         docs.appendChild(chip);
       }
       body.appendChild(docs);
@@ -432,18 +467,32 @@
         const li = document.createElement("li");
         li.className = "meeting-item";
 
-        const headline = document.createElement("div");
+        const headlineRow = document.createElement("div");
+        headlineRow.className = "meeting-item-headline-row";
+
+        const headline = document.createElement("button");
+        headline.type = "button";
         headline.className = "meeting-item-headline";
         headline.textContent = formatItemLabel(item) || "Agendapunt zonder titel";
-        li.appendChild(headline);
+        headline.title = "Toon documenten van dit agendapunt";
+        headline.addEventListener("click", () => {
+          if (window.OpenRISMonitor?.focusMeetingItemById) {
+            window.OpenRISMonitor.focusMeetingItemById(item.id);
+          }
+        });
+        headlineRow.appendChild(headline);
+
+        if (item.documents.length > 0) {
+          const itemDocsCount = document.createElement("span");
+          itemDocsCount.className = "meeting-item-docs-count";
+          itemDocsCount.textContent = `Documenten: ${item.documents.length}`;
+          headlineRow.appendChild(itemDocsCount);
+        }
+
+        li.appendChild(headlineRow);
 
         const itemDocsCount = item.documents.length;
         if (itemDocsCount > 0) {
-          const itemDocsLabel = document.createElement("p");
-          itemDocsLabel.className = "meeting-item-docs-label";
-          itemDocsLabel.textContent = `Documenten: ${itemDocsCount}`;
-          li.appendChild(itemDocsLabel);
-
           const itemDocs = document.createElement("div");
           itemDocs.className = "doc-chip-list";
           for (const doc of item.documents) {
@@ -451,13 +500,7 @@
             chip.type = "button";
             chip.className = "doc-chip doc-chip-small";
             chip.textContent = documentTitle(doc);
-            chip.addEventListener("click", () => {
-              if (window.OpenRISMonitor?.focusDocument) {
-                window.OpenRISMonitor.focusDocument(doc, { searchText: documentTitle(doc) });
-              } else if (window.OpenRISMonitor?.focusDocumentByText) {
-                window.OpenRISMonitor.focusDocumentByText(documentTitle(doc));
-              }
-            });
+            chip.addEventListener("click", () => openDocument(doc, { meetingId: meeting.id, agendaItemId: item.id }));
             itemDocs.appendChild(chip);
           }
           li.appendChild(itemDocs);
