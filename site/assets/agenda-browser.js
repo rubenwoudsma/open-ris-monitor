@@ -347,16 +347,16 @@
   }
 
   function openDocument(documentRecord, context = {}) {
+    if (window.OpenRISMonitor?.focusDocumentById && documentRecord?.id) {
+      window.OpenRISMonitor.focusDocumentById(documentRecord.id);
+      return;
+    }
     if (window.OpenRISMonitor?.focusDocument) {
       window.OpenRISMonitor.focusDocument(documentRecord, {
         searchText: documentTitle(documentRecord),
         meetingId: context.meetingId,
         agendaItemId: context.agendaItemId,
       });
-      return;
-    }
-    if (window.OpenRISMonitor?.focusDocumentById && documentRecord?.id) {
-      window.OpenRISMonitor.focusDocumentById(documentRecord.id);
       return;
     }
     if (window.OpenRISMonitor?.focusDocumentByText) {

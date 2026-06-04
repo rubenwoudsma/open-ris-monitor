@@ -383,7 +383,9 @@
     }
 
     state.pinnedDocumentKeys = identifiers;
-    if (options.query !== false) {
+    if (options.query === false) {
+      elements.searchInput.value = "";
+    } else {
       elements.searchInput.value = options.searchText || (records[0] ? getDocumentTitle(records[0]) : "");
     }
     updateUrlForSelection({
@@ -396,27 +398,25 @@
     document.querySelector("#documents-title")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function focusMeetingById(meetingId) {
+  function focusMeetingById(meetingId, options = {}) {
     const meeting = state.meetingsById.get(String(meetingId || "").trim());
     if (!meeting) return;
     const documents = getDocumentsForMeeting(meeting.id);
     focusDocuments(documents, {
-      searchText: formatMeetingLabel(meeting),
       meetingId: meeting.id,
-      query: true,
+      query: false,
     });
   }
 
-  function focusMeetingItemById(meetingItemId) {
+  function focusMeetingItemById(meetingItemId, options = {}) {
     const item = state.meetingItemsById.get(String(meetingItemId || "").trim());
     if (!item) return;
     const documents = getDocumentsForMeetingItem(item.id);
     const meeting = state.meetingsById.get(String(item.meeting_id || item.meetingId || "").trim());
     focusDocuments(documents, {
-      searchText: formatMeetingItemLabel(item) || "Agendapunt",
       meetingId: meeting?.id,
       agendaItemId: item.id,
-      query: true,
+      query: false,
     });
   }
 
@@ -583,7 +583,7 @@
       meetingButton.title = "Toon documenten van deze vergadering";
       meetingButton.addEventListener("click", () => {
         if (meeting?.id && window.OpenRisMonitor?.focusMeetingById) {
-          window.OpenRisMonitor.focusMeetingById(meeting.id);
+          window.OpenRisMonitor.focusMeetingById(meeting.id, { query: false });
         }
       });
       listItem.appendChild(meetingButton);
@@ -599,7 +599,7 @@
         itemButton.title = "Toon documenten van dit agendapunt";
         itemButton.addEventListener("click", () => {
           if (item?.id && window.OpenRisMonitor?.focusMeetingItemById) {
-            window.OpenRisMonitor.focusMeetingItemById(item.id);
+            window.OpenRisMonitor.focusMeetingItemById(item.id, { query: false });
           }
         });
         listItem.appendChild(itemButton);
@@ -848,7 +848,7 @@
     const normalizedId = String(documentId).trim();
     const directMatch = state.documents.find((documentRecord) => getDocumentIdentifiers(documentRecord).some((identifier) => String(identifier).trim() === normalizedId));
     if (directMatch) {
-      focusDocument(directMatch, { searchText: getDocumentTitle(directMatch) });
+      focusDocument(directMatch, { query: false });
       return;
     }
     state.pinnedDocumentKeys = new Set([normalizeSearchText(normalizedId)]);
