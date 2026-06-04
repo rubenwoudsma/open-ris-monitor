@@ -198,14 +198,12 @@ def write_quality_report(public_dir: Path) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     (output_dir / "summary.json").write_text(
-        json.dumps(summary, indent=2, ensure_ascii=False) + "
-",
+        json.dumps(summary, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
 
     with (output_dir / "issues.jsonl").open("w", encoding="utf-8") as fh:
         for issue in summary["issues"]:
-            fh.write(json.dumps(issue, ensure_ascii=False) + "
-")
+            fh.write(json.dumps(issue, ensure_ascii=False) + "\n")
 
     return summary
