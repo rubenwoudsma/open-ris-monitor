@@ -309,6 +309,51 @@ button:disabled {
   text-decoration: underline;
 }
 
+
+.document-context {
+  margin: 10px 0 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fbfbfc;
+}
+
+.document-context-body {
+  display: grid;
+  gap: 8px;
+}
+
+.document-context-heading {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.document-context-row {
+  margin: 0;
+  color: var(--text);
+}
+
+.document-context-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.document-context-clear,
+.document-context-link {
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+}
+
+.document-context-link {
+  color: var(--accent);
+}
 .meeting-browser-list {
   display: grid;
   gap: 14px;
