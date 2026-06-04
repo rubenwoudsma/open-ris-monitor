@@ -1,159 +1,82 @@
 # Kwaliteitsrapportage
 
-## Doel
+Open RIS Monitor publiceert een compacte kwaliteitslaag naast de publieke dataset. Het doel is om snel te zien of de actuele export bruikbaar, consistent en voldoende volledig is voor hergebruik.
 
-Open RIS Monitor moet niet alleen data publiceren, maar ook laten zien hoe compleet en betrouwbaar die data is.
+## Doel van de rapportage
 
-Kwaliteitsrapportage hoort daarom tot de kern van het project, niet tot een losse bijzaak.
+De kwaliteitsrapportage controleert vooral de publieke dataset, niet de code zelf. De focus ligt op:
 
-## Huidige rapporten
+- volledigheid van de export
+- relatiedekking tussen documenten, vergaderingen en agendapunten
+- verwijzingsintegriteit
+- documenttypenormalisatie
+- signalen over recente harvests
 
-De huidige kwaliteits- en analyse-uitvoer zit in `data/public/quality/`.
+## Public output
 
-### Identiteit en stabiliteit
-
-Bestand:
-
-```text
-data/public/quality/id_stability.json
-```
-
-Deze analyse kijkt onder andere naar:
-
-- canonical document ids
-- source ids
-- source object ids
-- composite source keys, `source_id + source_object_id`
-- duplicate values
-- missing values
-
-De bedoeling is om te zien of een bron-id voldoende stabiel en traceerbaar is over meerdere harvests.
-
-### Documenttypen
-
-Bestand:
-
-```text
-data/public/quality/document_types.json
-```
-
-Deze analyse bewaart de originele RIS-documenttypewaarde en koppelt die aan een compacte analytische categorie.
-
-Belangrijke principes:
-
-- de bronwaarde blijft altijd zichtbaar,
-- `unknown` gebruik je alleen als de bronwaarde ontbreekt of expliciet onbekend is,
-- filters en dashboards mogen de compacte categorie gebruiken,
-- de bronwaarde blijft nodig voor herleidbaarheid.
-
-Voorbeeldcategorieën:
-
-| Bronlabel | Compacte categorie |
-|---|---|
-| Raadsvoorstel | proposal |
-| Collegevoorstel (Intern) | proposal |
-| Bijlage | attachment |
-| Document ter kennisname (Inkomend) | notice |
-| Kennisgeving (Inkomend) | notice |
-| Rapportage (Intern) | report |
-| Toezeggingenlijst (Intern) | commitment |
-| Uitnodigingen (Intern) | invitation |
-| Verzoek om informatie (Inkomend) | request |
-| Zienswijze (Inkomend) | objection_or_response |
-| Onbekend | unknown |
-
-## Verhouding tot het canonieke model
-
-Het canonieke `Document`-model bewaart zowel de bronwaarde als de genormaliseerde documenttypevelden. De kwaliteitsrapportage helpt om te controleren of die mapping nog klopt en of nieuwe waarden niet stilletjes wegvallen naar `unknown`.
-
-## Richting voor issue #13
-
-De volgende stap is een expliciete kwaliteitsrapportage over volledigheid en relatie-dekking.
-
-Waarschijnlijke checks:
-
-- documenten zonder gepubliceerde relationele koppeling,
-- relationele koppelingen naar ontbrekende documenten,
-- vergaderingen zonder agendapunten,
-- agendapunten zonder documenten,
-- dubbele of verdachte relationele koppelingen,
-- verschillen tussen raw relationele tellingen en gepubliceerde overlap,
-- lege of ontbrekende public exports,
-- plotselinge veranderingen in documenttypeverdeling,
-- onverwachte groei van `unknown`.
-
-## Praktisch gebruik
-
-Kwaliteitsrapportage moet helpen om drie vragen snel te beantwoorden:
-
-1. Is de harvest nog gezond?
-2. Is de publicatie nog compleet?
-3. Is de bronvariant nog goed genoeg begrepen om veilig te publiceren?
-
-## Identiteitscontrole
-
-Open RIS Monitor publiceert een identiteitsanalyse via:
+De rapportage schrijft resultaten weg naar:
 
 ```text
 data/public/quality/id_stability.json
-```
-
-De analyse controleert:
-
-- ontbrekende identifiers
-- dubbele identifiers
-- source_id gebruik
-- source_object_id gebruik
-- samengestelde sleutels
-
-Doel is vroegtijdig signaleren wanneer een bronleverancier identifiergedrag wijzigt.
-
-Werkelijke stabiliteit kan alleen worden vastgesteld door meerdere harvests over tijd te vergelijken.
-
-## Documenttypekwaliteit
-
-Open RIS Monitor publiceert een documenttyperapport via:
-
-```text
 data/public/quality/document_types.json
+data/public/quality/summary.json
+data/public/quality/issues.jsonl
 ```
 
-Dit rapport helpt controleren:
+De summary is bedoeld voor snelle weergave in viewer of README. De issues-file bevat losse bevindingen per regel zodat die later eenvoudig te filteren of te tonen is.
 
-- welke bronwaarden voorkomen
-- hoe deze worden gemapt
-- hoeveel documenten in iedere categorie vallen
-- hoeveel documenten als `unknown` worden geclassificeerd
+## Handmatig gebruik
 
-Het doel is een stabiele set documentcategorieën te behouden zonder de oorspronkelijke RIS-waarde te verliezen.
+De bestaande analyseworkflow blijft het entrypoint:
 
-## Mappingbeleid
+```bash
+python -m open_ris_monitor.analysis.generate_public_reports --public-dir data/public
+```
 
-De documenttypemapping moet:
+De nieuwe quality package wordt daaronder aangeroepen en schrijft de bredere rapportage weg.
 
-- bruikbaar zijn voor gebruikers
-- bruikbaar zijn voor analyses
-- leveranciersneutraal blijven
-- herleidbaar blijven naar de bron
+## Wat wordt gecontroleerd
 
-Voorbeelden:
+### Datasetstatistieken
 
-| Bronwaarde | Genormaliseerd |
-|---|---|
-| Raadsvoorstel | proposal |
-| Collegevoorstel (Intern) | proposal |
-| Bijlage | attachment |
-| Rapportage (Intern) | report |
-| Toezeggingenlijst | commitment |
-| Uitnodigingen | invitation |
-| Verzoek om informatie | request |
-| Onbekend | unknown |
+Minimaal worden geteld:
 
-`unknown` wordt uitsluitend gebruikt wanneer een bronwaarde ontbreekt of expliciet onbekend is.
+- documenten
+- documentversies
+- harvest runs
+- vergaderingen
+- agendapunten
+- document-vergaderrelaties
+- document-agendapuntrelaties
 
+### Relatiedekking
 
-## Verder lezen
+De rapportage berekent hoeveel documenten aan ten minste één relatie gekoppeld zijn.
 
-- `docs/data-model.md`
-- `docs/harvesting.md`
-- `docs/roadmap.md`
+### Verwijzingsintegriteit
+
+De rapportage controleert of relaties verwijzen naar bestaande documenten, vergaderingen en agendapunten.
+
+### Vergader- en agendapuntkwaliteit
+
+De rapportage signaleert:
+
+- vergaderingen zonder agendapunten
+- agendapunten zonder documenten
+
+### Documenttypekwaliteit
+
+De rapportage telt documenttypen en signaleert wanneer `unknown` voorkomt.
+
+### Harvestkwaliteit
+
+De rapportage vermeldt de laatste harveststatus en de belangrijkste tellingen uit `harvest_runs.jsonl`.
+
+## Interpretatie
+
+Een rapport is niet automatisch foutloos omdat er waarschuwingen zijn. Sommige bevindingen zijn informatief, bijvoorbeeld documenten zonder relatie. Een storing is vooral relevant wanneer:
+
+- het aantal documenten onverwacht sterk daalt
+- relaties verwijzen naar ontbrekende records
+- `unknown` documenttypen oplopen
+- de laatste harvest geen successtatus heeft
