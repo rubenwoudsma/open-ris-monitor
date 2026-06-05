@@ -1,4 +1,4 @@
-"""JSON and JSONL exporters with strict schema contract transformation."""
+"""JSON and JSONL exporters with target-aware schema contract transformation."""
 
 from __future__ import annotations
 
@@ -64,7 +64,6 @@ def _apply_export_contracts(filename: str, data: dict[str, Any]) -> dict[str, An
 
     # 4. CONTRACT VOOR: meeting_documents.jsonl / meeting_item_documents.jsonl (relation.schema.json)
     elif "document" in filename and "relation" in filename or "meeting_documents" in filename or "meeting_item_documents" in filename:
-        # Bepaal het eenduidige relatietype op basis van de aanwezige velden of bestandsnaam
         if "item" in filename or "meeting_item_id" in data:
             export_type = "document_to_agenda_item"
             target_id = str(data.get("meeting_item_id") or data.get("target_id", ""))
@@ -85,8 +84,8 @@ def _apply_export_contracts(filename: str, data: dict[str, Any]) -> dict[str, An
     return data
 
 
-def _to_jsonable(record: Any, filename: str = "") -> Any:
-    """Convert supported model objects to JSON-serializable structures and apply contract formatting."""
+def _to_jsonable(record: Any, filename: str = "", is_public_export: bool = False) -> Any:
+    """Convert supported model objects to JSON-serializable structures and conditionally apply contracts."""
     raw_data = record
     if isinstance(record, BaseModel):
         raw_data = record.model_dump(mode="json")
@@ -95,8 +94,8 @@ def _to_jsonable(record: Any, filename: str = "") -> Any:
     elif is_dataclass(record) and not isinstance(record, type):
         raw_data = asdict(record)
     
-    # Als het een dictionary is en we kennen de context (bestandsnaam), dwing het contract af
-    if isinstance(raw_data, dict) and filename:
+    # Pas de contractfiltering ENKEL toe als we expliciet naar de publieke distributiemap schrijven
+    if isinstance(raw_data, dict) and filename and is_public_export:
         return _apply_export_contracts(filename, raw_data)
         
     return raw_data
@@ -106,8 +105,12 @@ def write_json(path: Path, payload: Any) -> None:
     """Write a JSON document with stable formatting."""
     path.parent.mkdir(parents=True, exist_ok=True)
     filename = path.name.lower()
+    
+    # Controleer of het exportpad naar de publieke productiedata leidt
+    is_public_export = "data/public" in path.as_posix()
+    
     with path.open("w", encoding="utf-8") as file:
-        json.dump(_to_jsonable(payload, filename), file, ensure_ascii=False, indent=2, sort_keys=True, default=str)
+        json.dump(_to_jsonable(payload, filename, is_public_export), file, ensure_ascii=False, indent=2, sort_keys=True, default=str)
         file.write("\n")
 
 
@@ -115,7 +118,11 @@ def write_jsonl(path: Path, records: Iterable[Any]) -> None:
     """Write records as newline-delimited JSON."""
     path.parent.mkdir(parents=True, exist_ok=True)
     filename = path.name.lower()
+    
+    # Controleer of het exportpad naar de publieke productiedata leidt
+    is_public_export = "data/public" in path.as_posix()
+    
     with path.open("w", encoding="utf-8") as file:
         for record in records:
-            json.dump(_to_jsonable(record, filename), file, ensure_ascii=False, sort_keys=True, default=str)
+            json.dump(_to_jsonable(record, filename, is_public_export), file, ensure_ascii=False, sort_keys=True, default=str)
             file.write("\n")
