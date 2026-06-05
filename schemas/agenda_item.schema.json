@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rubenwoudsma/open-ris-monitor/schemas/agenda_item.schema.json",
+  "title": "Agenda Item Schema",
+  "description": "Schema for specific discussion entries associated with a parent meeting agenda.",
+  "type": "object",
+  "required": [
+    "id",
+    "meeting_id",
+    "schema_version",
+    "title"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique deterministic string identifier for the agenda item."
+    },
+    "meeting_id": {
+      "type": "string",
+      "description": "Reference ID matching the corresponding record in meetings.jsonl."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic versioning string (e.g., 1.0.0) mapping to this contract."
+    },
+    "title": {
+      "type": "string",
+      "description": "The title or subject statement of the agenda item."
+    },
+    "number": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The official sequence index designator (e.g., '07.a', 'B.3')."
+    },
+    "sequence": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Zero-indexed integer order for rendering layout sorts cleanly."
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rubenwoudsma/open-ris-monitor/schemas/relation.schema.json",
+  "title": "Relation Schema",
+  "description": "Maintains an explicit unidirectional map connecting entity IDs to preserve a document-first architecture without relational databases.",
+  "type": "object",
+  "required": [
+    "id",
+    "schema_version",
+    "source_id",
+    "target_id",
+    "type"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique deterministic identifier for the relationship record."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic versioning string (e.g., 1.0.0) mapping to this contract."
+    },
+    "source_id": {
+      "type": "string",
+      "description": "The origin element ID (e.g., a specific document_id)."
+    },
+    "target_id": {
+      "type": "string",
+      "description": "The destination element ID (e.g., a meeting_id or agenda_item_id)."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "document_to_meeting",
+        "document_to_agenda_item",
+        "agenda_item_to_meeting"
+      ],
+      "description": "The functional context of the structural link."
+    }
+  }
+}

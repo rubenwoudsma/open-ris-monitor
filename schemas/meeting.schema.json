@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rubenwoudsma/open-ris-monitor/schemas/meeting.schema.json",
+  "title": "Meeting Schema",
+  "description": "Schema for public municipal council or committee meetings.",
+  "type": "object",
+  "required": [
+    "id",
+    "schema_version",
+    "title",
+    "date"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique deterministic string identifier for the meeting instance."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic versioning string (e.g., 1.0.0) mapping to this contract."
+    },
+    "title": {
+      "type": "string",
+      "description": "The name or category of the meeting (e.g., Raadsvergadering)."
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The date of the meeting in YYYY-MM-DD format."
+    },
+    "start_time": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The scheduled local start time of the session (e.g., 19:30)."
+    },
+    "location": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Physical chamber room description or digital video streaming URL."
+    },
+    "url": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri",
+      "description": "Source portal URL linking directly back to the original meeting view."
+    }
+  }
+}
