@@ -31,3 +31,6 @@ jobs:
 
       - name: Run Ruff
         run: ruff check .
+
+      - name: Validate Export Integrity
+        run: python -m open_ris_monitor.exporters.validate_exports
