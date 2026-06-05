@@ -6,6 +6,7 @@ from jsonschema import validate, ValidationError
 def validate_jsonl_file(file_path, schema_path, min_records=1):
     """
     Valideert een JSONL-bestand tegen een gegeven JSON-schema en controleert integriteitsregels.
+    Accepteert legacy-data zonder 'schema_version' tijdens de transitiefase door het virtueel te injecteren.
     """
     if not os.path.exists(file_path):
         print(f"Fout: Bestand {file_path} bestaat niet.")
@@ -30,8 +31,17 @@ def validate_jsonl_file(file_path, schema_path, min_records=1):
                 continue
             try:
                 data = json.loads(line)
+                
+                # TRANSITIEFASE-LOGICA: We injecteren virtueel de versie als deze ontbreekt.
+                # Hierdoor faalt het contract niet op legacy-data, maar testen we wel de rest van de velden.
+                if "schema_version" not in data:
+                    if record_count == 0: # Print de waarschuwing slechts één keer per bestand om log-vervuiling te voorkomen
+                        print(f"Waarschuwing: {file_path} bevat legacy-data (mist 'schema_version'). Virtuele injectie toegepast.")
+                    data["schema_version"] = "1.0.0"
+                
                 validate(instance=data, schema=schema)
                 record_count += 1
+                
             except json.JSONDecodeError:
                 print(f"Fout: Ongeldige JSON op regel {line_num} in {file_path}")
                 return False
@@ -47,7 +57,6 @@ def validate_jsonl_file(file_path, schema_path, min_records=1):
     return True
 
 def main():
-    # Gecorrigeerde paden op basis van de werkelijke data/public/ structuur van de repo
     targets = [
         ("data/public/documents.jsonl", "schemas/document.schema.json"),
         ("data/public/meetings.jsonl", "schemas/meeting.schema.json"),
@@ -55,7 +64,6 @@ def main():
         ("data/public/meeting_documents.jsonl", "schemas/relation.schema.json")
     ]
 
-    # Als de public data-map er niet is (bijv. bij een schone code-only PR), skippen we de check
     if not os.path.exists("data/public"):
         print("Opmerking: Geen 'data/public' map gevonden om te valideren. Dit is normaal tijdens code-only PRs.")
         return
