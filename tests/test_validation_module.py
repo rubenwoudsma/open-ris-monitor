@@ -34,6 +34,8 @@ def test_validate_empty_jsonl(setup_temp_files):
 def test_validate_invalid_schema_jsonl(setup_temp_files):
     tmp_path, schema_file = setup_temp_files
     jsonl_file = tmp_path / "invalid.jsonl"
-    jsonl_file.write_text('{"id": "1"}\n')  # schema_version ontbreekt
+    # 'schema_version' mag nu ontbreken (wordt virtueel geïnjecteerd), 
+    # maar 'id' is verplicht. Als 'id' ontbreekt, moet het script keihard falen (is False).
+    jsonl_file.write_text('{"schema_version": "1.0.0"}\n')  # id ontbreekt volledig
     
     assert validate_jsonl_file(str(jsonl_file), str(schema_file)) is False
