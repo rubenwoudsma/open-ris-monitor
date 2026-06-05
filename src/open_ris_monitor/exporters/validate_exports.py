@@ -1,7 +1,7 @@
 import os
 import json
 import sys
-from jsonschema import Draft7Validator, ValidationError
+from jsonschema import Draft7Validator
 
 def validate_jsonl_file(file_path, schema_path, min_records=1):
     """
@@ -46,7 +46,6 @@ def validate_jsonl_file(file_path, schema_path, min_records=1):
                     # We loggen alleen de fout van de allereerste regel om de GitHub Actions logs compact te houden
                     if schema_errors_found <= 5:
                         for error in errors:
-                            # We filteren de bekende schema_version eruit als die ontbreekt, de rest printen we netjes
                             if "schema_version" in str(error.message):
                                 print(f"Waarschuwing: Regel {line_num} in {file_path} mist 'schema_version' (Legacy data).")
                             else:
@@ -83,8 +82,6 @@ def main():
     success = True
     for file_path, schema_path in targets:
         if os.path.exists(file_path):
-            # Kritieke checks (bestaat het bestand? is het corrupt/0 bytes?) moeten True blijven.
-            # Schema-afwijkingen vallen nu onder waarschuwingen, dus die laten het script niet falen.
             if not validate_jsonl_file(file_path, schema_path, min_records=1):
                 success = False
         else:
