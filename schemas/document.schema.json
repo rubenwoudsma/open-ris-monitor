@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rubenwoudsma/open-ris-monitor/schemas/document.schema.json",
+  "title": "Document Schema",
+  "description": "Schema for municipal document export entities (reports, letters, or motions).",
+  "type": "object",
+  "required": [
+    "id",
+    "schema_version",
+    "title",
+    "url"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique deterministic hash or string identifier for the document."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic versioning string (e.g., 1.0.0) mapping to this contract."
+    },
+    "title": {
+      "type": "string",
+      "description": "The title or description of the document."
+    },
+    "type": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Document categorization (e.g., Raadsvoorstel, Brief, Bijlage)."
+    },
+    "date": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date",
+      "description": "Publication or formal tracking date in YYYY-MM-DD format."
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Absolute source URL pointing to the original document location."
+    },
+    "text": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Extracted text content from the document asset, if indexed."
+    }
+  }
+}
