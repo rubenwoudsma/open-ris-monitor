@@ -1,4 +1,3 @@
-import os
 import json
 import pytest
 from open_ris_monitor.exporters.validate_exports import validate_jsonl_file
