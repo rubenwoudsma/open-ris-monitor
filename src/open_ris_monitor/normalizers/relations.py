@@ -5,7 +5,6 @@ from __future__ import annotations
 import re
 from html import unescape
 from typing import Any, Iterable, TypeVar
-from dataclasses import dataclass, asdict
 
 from open_ris_monitor.models.relations import (
     Meeting,
