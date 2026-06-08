@@ -132,7 +132,17 @@
             </form>
           </section>
 
-          <section id="document-context" class="panel document-context" hidden></section>
+          <section id="document-detail" class="panel document-detail" aria-labelledby="document-detail-title" hidden>
+            <div class="panel__header panel__header--split">
+              <div>
+                <p class="eyebrow">Documentdetail</p>
+                <h2 id="document-detail-title">Documentdetails</h2>
+                <p class="panel__subtitle">Metadata, gekoppelde vergaderingen, agendapunten en versies.</p>
+              </div>
+              <button id="clear-document-selection" type="button">Sluit details</button>
+            </div>
+            <div id="document-detail-body" class="document-detail-body"></div>
+          </section>
 
           <section class="panel" aria-labelledby="documents-title">
             <div class="panel__header panel__header--split">
@@ -157,7 +167,7 @@
                     <th scope="col">Titel en context</th>
                     <th scope="col">Bestand</th>
                     <th scope="col">Grootte</th>
-                    <th scope="col">Download</th>
+                    <th scope="col">Acties</th>
                   </tr>
                 </thead>
                 <tbody id="documents-table-body">

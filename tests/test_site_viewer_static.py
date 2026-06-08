@@ -57,3 +57,36 @@ def test_github_like_shell_layout_exists() -> None:
         "@media",
     ]:
         assert marker in styles
+
+
+def test_document_first_detail_view_exists() -> None:
+    index = Path("site/index.html").read_text(encoding="utf-8")
+    source = Path("site/src/main.ts").read_text(encoding="utf-8")
+    styles = Path("site/assets/styles.css").read_text(encoding="utf-8")
+
+    for marker in [
+        "document-detail",
+        "document-detail-title",
+        "document-detail-body",
+        "clear-document-selection",
+        "Acties",
+    ]:
+        assert marker in index
+
+    for marker in [
+        "renderDocumentDetail",
+        "relatedMeetingIds",
+        "relatedAgendaItemIds",
+        "relatedVersions",
+        "selectDocument",
+        "doc",
+    ]:
+        assert marker in source
+
+    for marker in [
+        ".document-detail",
+        ".relation-card",
+        ".document-actions",
+        ".is-selected",
+    ]:
+        assert marker in styles
