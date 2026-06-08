@@ -54,297 +54,169 @@ def _strip_html(value: Any) -> str | None:
     return text or None
 
 
-def _stable_unique(records: Iterable[T], key_fn) -> list[T]:
-    seen: set[str] = set()
-    result: list[T] = []
-    for record in records:
-        key = key_fn(record)
-        if key in seen:
-            continue
-        seen.add(key)
-        result.append(record)
+def _stable_unique(records: Iterable[T], key_fn: lambda r: str) -> list[T]:
+    seen = set()
+    result = []
+    for r in records:
+        k = key_fn(r)
+        if k not in seen:
+            seen.add(k)
+            result.append(r)
     return result
 
 
-def _canonical_id(municipality_slug: str, resource_type: str, source_id: str) -> str:
-    return f"{municipality_slug}-{resource_type}-{source_id}"
-
-
-def _document_source_id(document: dict[str, Any]) -> str | None:
-    return _as_text(document.get("id"))
-
-
-def _document_object_id(document: dict[str, Any]) -> str | None:
-    return _as_text(document.get("objectId")) or _as_text(document.get("object_id"))
-
-
-def _meeting_source_id_from_item(raw: dict[str, Any]) -> str | None:
-    direct = _as_text(raw.get("meeting_id"))
-    if direct is not None:
-        return direct
-
-    meeting = raw.get("meeting")
-    if isinstance(meeting, dict):
-        return _as_text(meeting.get("id"))
-
-    return None
-
-
-def normalize_meeting(
-    raw: dict[str, Any],
-    *,
-    municipality_slug: str,
-    source_system_id: str,
-) -> Meeting | None:
-    """Normalize one raw meeting record.
-
-    Records without source ID are skipped by returning None.
-    """
-
+def normalize_meeting(raw: dict[str, Any], *, municipality_slug: str, source_system_id: str) -> Meeting | None:
     source_id = _as_text(raw.get("id"))
-    if source_id is None:
+    if not source_id:
         return None
 
-    dmu = raw.get("dmu")
-    if not isinstance(dmu, dict):
-        dmu = {}
-
     return Meeting(
-        id=_canonical_id(municipality_slug, "meeting", source_id),
+        id=f"{municipality_slug}-meeting-{source_id}",
         source_id=source_id,
         municipality_slug=municipality_slug,
         source_system_id=source_system_id,
+        schema_version="1.0.0",
+        title=_as_text(raw.get("displayName") or raw.get("title")),
         date=_as_text(raw.get("date")),
-        start_time=_as_text(raw.get("startTime")) or _as_text(raw.get("start_time")),
+        start_time=_as_text(raw.get("startTime")),
         description=_strip_html(raw.get("description")),
         location=_as_text(raw.get("location")),
-        dmu_id=_as_text(dmu.get("id")),
-        dmu_name=_as_text(dmu.get("name")),
-        dmu_sort_order=_as_int(dmu.get("sortOrder")),
+        dmu_id=_as_text(raw.get("dmuId")),
+        dmu_name=_as_text(raw.get("dmuName")),
+        dmu_sort_order=_as_int(raw.get("dmuSortOrder")),
         url=_as_text(raw.get("url")),
         is_confidential=_as_bool(raw.get("confidential")),
     )
 
 
-def normalize_meetings(
-    raw_meetings: Iterable[dict[str, Any]],
-    *,
-    municipality_slug: str,
-    source_system_id: str,
-) -> list[Meeting]:
+def normalize_meetings(raw_meetings: list[dict[str, Any]], *, municipality_slug: str, source_system_id: str) -> list[Meeting]:
     records = [
         record
         for raw in raw_meetings
-        if (
-            record := normalize_meeting(
-                raw,
-                municipality_slug=municipality_slug,
-                source_system_id=source_system_id,
-            )
-        )
-        is not None
+        if (record := normalize_meeting(raw, municipality_slug=municipality_slug, source_system_id=source_system_id)) is not None
     ]
     return _stable_unique(records, lambda record: record.id)
 
 
-def normalize_meeting_item(
-    raw: dict[str, Any],
-    *,
-    municipality_slug: str,
-    source_system_id: str,
-) -> MeetingItem | None:
-    """Normalize one raw meeting item record."""
-
+def normalize_meeting_item(raw: dict[str, Any], *, municipality_slug: str, source_system_id: str) -> MeetingItem | None:
     source_id = _as_text(raw.get("id"))
-    meeting_source_id = _meeting_source_id_from_item(raw)
-    if source_id is None or meeting_source_id is None:
+    meeting_source_id = _as_text(raw.get("meetingId"))
+    if not source_id or not meeting_source_id:
         return None
 
-    status = raw.get("status")
-    if not isinstance(status, dict):
-        status = {}
+    sort_order = _as_int(raw.get("sortOrder"))
 
     return MeetingItem(
-        id=_canonical_id(municipality_slug, "meeting-item", source_id),
+        id=f"{municipality_slug}-meetingitem-{source_id}",
         source_id=source_id,
-        meeting_id=_canonical_id(municipality_slug, "meeting", meeting_source_id),
+        meeting_id=f"{municipality_slug}-meeting-{meeting_source_id}",
         meeting_source_id=meeting_source_id,
         municipality_slug=municipality_slug,
         source_system_id=source_system_id,
+        schema_version="1.0.0",
+        title=_as_text(raw.get("title")),
         number=_as_text(raw.get("number")),
-        sort_order=_as_int(raw.get("sortOrder")) or _as_int(raw.get("sort_order")),
-        title=_strip_html(raw.get("title")),
+        sort_order=sort_order,
+        sequence=sort_order,  # Direct mappen voor v1.0.0 contract
         description=_strip_html(raw.get("description")),
-        status_id=_as_text(status.get("id")),
-        status_description=_strip_html(status.get("description")),
-        status_abbreviation=_as_text(status.get("abbreviation")),
-        is_heading=_as_bool(raw.get("isHeading") or raw.get("is_heading")),
+        status_id=_as_text(raw.get("statusId")),
+        status_description=_as_text(raw.get("statusDescription")),
+        status_abbreviation=_as_text(raw.get("statusAbbreviation")),
+        is_heading=_as_bool(raw.get("explanation")),
         is_confidential=_as_bool(raw.get("confidential")),
     )
 
 
-def normalize_meeting_items(
-    raw_items: Iterable[dict[str, Any]],
-    *,
-    municipality_slug: str,
-    source_system_id: str,
-) -> list[MeetingItem]:
+def normalize_meeting_items(raw_meeting_items: list[dict[str, Any]], *, municipality_slug: str, source_system_id: str) -> list[MeetingItem]:
     records = [
         record
-        for raw in raw_items
-        if (
-            record := normalize_meeting_item(
-                raw,
-                municipality_slug=municipality_slug,
-                source_system_id=source_system_id,
-            )
-        )
-        is not None
+        for raw in raw_meeting_items
+        if (record := normalize_meeting_item(raw, municipality_slug=municipality_slug, source_system_id=source_system_id)) is not None
     ]
     return _stable_unique(records, lambda record: record.id)
 
 
-def normalize_meeting_document_relation(
-    raw: dict[str, Any],
-    *,
-    municipality_slug: str,
-    source_system_id: str,
-) -> MeetingDocumentRelation | None:
-    """Normalize one meeting-document relation from the raw harvest shape."""
-
-    meeting_source_id = _as_text(raw.get("meeting_id"))
-    document = raw.get("document")
-    if not isinstance(document, dict):
-        document = {}
-    document_source_id = _document_source_id(document)
-
-    if meeting_source_id is None or document_source_id is None:
+def normalize_meeting_document_relation(raw: dict[str, Any], *, municipality_slug: str, source_system_id: str) -> MeetingDocumentRelation | None:
+    meeting_source_id = _as_text(raw.get("meetingId"))
+    document_source_id = _as_text(raw.get("documentId"))
+    if not meeting_source_id or not document_source_id:
         return None
 
-    meeting_id = _canonical_id(municipality_slug, "meeting", meeting_source_id)
-    document_id = _canonical_id(municipality_slug, "document", document_source_id)
+    m_id = f"{municipality_slug}-meeting-{meeting_source_id}"
+    d_id = f"{municipality_slug}-document-{document_source_id}"
+    rel_id = f"{m_id}-rel-{d_id}"
 
     return MeetingDocumentRelation(
-        id=f"{meeting_id}-document-{document_source_id}",
-        meeting_id=meeting_id,
+        id=rel_id,
+        meeting_id=m_id,
         meeting_source_id=meeting_source_id,
-        document_id=document_id,
+        document_id=d_id,
         document_source_id=document_source_id,
-        document_object_id=_document_object_id(document),
         municipality_slug=municipality_slug,
         source_system_id=source_system_id,
         relation_type="meeting_document",
-        source_path=f"/meetings/{meeting_source_id}/documents",
+        source_path="meetingDocuments",
+        schema_version="1.0.0",
+        source_id=d_id,
+        target_id=m_id,
+        type="document_to_meeting",
     )
 
 
-def normalize_meeting_document_relations(
-    raw_relations: Iterable[dict[str, Any]],
-    *,
-    municipality_slug: str,
-    source_system_id: str,
-) -> list[MeetingDocumentRelation]:
+def normalize_meeting_document_relations(raw_relations: list[dict[str, Any]], *, municipality_slug: str, source_system_id: str) -> list[MeetingDocumentRelation]:
     records = [
         record
         for raw in raw_relations
-        if (
-            record := normalize_meeting_document_relation(
-                raw,
-                municipality_slug=municipality_slug,
-                source_system_id=source_system_id,
-            )
-        )
-        is not None
+        if (record := normalize_meeting_document_relation(raw, municipality_slug=municipality_slug, source_system_id=source_system_id)) is not None
     ]
     return _stable_unique(records, lambda record: record.id)
 
 
-def normalize_meeting_item_document_relation(
-    raw: dict[str, Any],
-    *,
-    municipality_slug: str,
-    source_system_id: str,
-) -> MeetingItemDocumentRelation | None:
-    """Normalize one meeting-item-document relation from the raw harvest shape."""
-
-    meeting_source_id = _as_text(raw.get("meeting_id"))
-    meeting_item_source_id = _as_text(raw.get("meeting_item_id"))
-    document = raw.get("document")
-    if not isinstance(document, dict):
-        document = {}
-    document_source_id = _document_source_id(document)
-
-    if meeting_source_id is None or meeting_item_source_id is None or document_source_id is None:
+def normalize_meeting_item_document_relation(raw: dict[str, Any], *, municipality_slug: str, source_system_id: str) -> MeetingItemDocumentRelation | None:
+    meeting_item_source_id = _as_text(raw.get("meetingItemId"))
+    meeting_source_id = _as_text(raw.get("meetingId"))
+    document_source_id = _as_text(raw.get("documentId"))
+    if not meeting_item_source_id or not document_source_id or not meeting_source_id:
         return None
 
-    meeting_id = _canonical_id(municipality_slug, "meeting", meeting_source_id)
-    meeting_item_id = _canonical_id(municipality_slug, "meeting-item", meeting_item_source_id)
-    document_id = _canonical_id(municipality_slug, "document", document_source_id)
+    mi_id = f"{municipality_slug}-meetingitem-{meeting_item_source_id}"
+    m_id = f"{municipality_slug}-meeting-{meeting_source_id}"
+    d_id = f"{municipality_slug}-document-{document_source_id}"
+    rel_id = f"{mi_id}-rel-{d_id}"
 
     return MeetingItemDocumentRelation(
-        id=f"{meeting_item_id}-document-{document_source_id}",
-        meeting_item_id=meeting_item_id,
+        id=rel_id,
+        meeting_item_id=mi_id,
         meeting_item_source_id=meeting_item_source_id,
-        meeting_id=meeting_id,
+        meeting_id=m_id,
         meeting_source_id=meeting_source_id,
-        document_id=document_id,
+        document_id=d_id,
         document_source_id=document_source_id,
-        document_object_id=_document_object_id(document),
         municipality_slug=municipality_slug,
         source_system_id=source_system_id,
         relation_type="meeting_item_document",
-        source_path=f"/meetingitems/{meeting_item_source_id}/documents",
+        source_path="meetingItemDocuments",
+        schema_version="1.0.0",
+        source_id=d_id,
+        target_id=mi_id,
+        type="document_to_agenda_item",
     )
 
 
-def normalize_meeting_item_document_relations(
-    raw_relations: Iterable[dict[str, Any]],
-    *,
-    municipality_slug: str,
-    source_system_id: str,
-) -> list[MeetingItemDocumentRelation]:
+def normalize_meeting_item_document_relations(raw_relations: list[dict[str, Any]], *, municipality_slug: str, source_system_id: str) -> list[MeetingItemDocumentRelation]:
     records = [
         record
         for raw in raw_relations
-        if (
-            record := normalize_meeting_item_document_relation(
-                raw,
-                municipality_slug=municipality_slug,
-                source_system_id=source_system_id,
-            )
-        )
-        is not None
+        if (record := normalize_meeting_item_document_relation(raw, municipality_slug=municipality_slug, source_system_id=source_system_id)) is not None
     ]
     return _stable_unique(records, lambda record: record.id)
 
 
-def normalize_relation_harvest(
-    relation_harvest: dict[str, Any],
-    *,
-    municipality_slug: str,
-    source_system_id: str,
-) -> dict[str, list[Any]]:
+def normalize_relation_harvest(relation_harvest: dict[str, Any], *, municipality_slug: str, source_system_id: str) -> dict[str, list[Any]]:
     """Normalize the raw relation harvest returned by collect_raw_relation_harvest."""
-
     return {
-        "meetings": normalize_meetings(
-            relation_harvest.get("meetings", []),
-            municipality_slug=municipality_slug,
-            source_system_id=source_system_id,
-        ),
-        "meeting_items": normalize_meeting_items(
-            relation_harvest.get("meeting_items", []),
-            municipality_slug=municipality_slug,
-            source_system_id=source_system_id,
-        ),
-        "meeting_documents": normalize_meeting_document_relations(
-            relation_harvest.get("meeting_documents", []),
-            municipality_slug=municipality_slug,
-            source_system_id=source_system_id,
-        ),
-        "meeting_item_documents": normalize_meeting_item_document_relations(
-            relation_harvest.get("meeting_item_documents", []),
-            municipality_slug=municipality_slug,
-            source_system_id=source_system_id,
-        ),
+        "meetings": normalize_meetings(relation_harvest.get("meetings", []), municipality_slug=municipality_slug, source_system_id=source_system_id),
+        "meeting_items": normalize_meeting_items(relation_harvest.get("meeting_items", []), municipality_slug=municipality_slug, source_system_id=source_system_id),
+        "meeting_documents": normalize_meeting_document_relations(relation_harvest.get("meeting_documents", []), municipality_slug=municipality_slug, source_system_id=source_system_id),
+        "meeting_item_documents": normalize_meeting_item_document_relations(relation_harvest.get("meeting_item_documents", []), municipality_slug=municipality_slug, source_system_id=source_system_id),
     }
