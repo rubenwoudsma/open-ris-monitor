@@ -46,7 +46,6 @@ def _resolve_download_url_builder(
         return build_download_url
     if connector is not None and hasattr(connector, "build_download_url"):
         return connector.build_download_url
-    # Fallback-generator voor tests waar de connector de methode mist
     return lambda source_id: f"https://mock-download-url/api/v2/documents/{source_id}/download"
 
 
@@ -72,9 +71,13 @@ def normalize_document(
         raw_document.get("publicationDate")
     )
 
+    # Ondersteun zowel camelCase (live data) als snake_case / test_fixtures data structuren
     source_document_type = raw_document.get("documentType") or raw_document.get("document_type")
     description = raw_document.get("description")
     normalized_type = normalize_document_type(source_document_type)
+    
+    source_obj_id = raw_document.get("objectId") or raw_document.get("source_object_id")
+    source_object_id_str = str(source_obj_id) if source_obj_id is not None else None
 
     return Document(
         id=f"{municipality_slug}-document-{source_id}",
@@ -82,6 +85,7 @@ def normalize_document(
         municipality_id=municipality_id,
         source_system_id=source_system_id,
         source_id=source_id,
+        source_object_id=source_object_id_str,
         title=str(raw_document.get("title", "")).strip(),
         description=str(description).strip() if description else None,
         document_type=str(source_document_type).strip() if source_document_type else None,
@@ -95,7 +99,6 @@ def normalize_document(
         is_tabsign_document=bool(raw_document.get("isTabsignDocument") or raw_document.get("is_tabsign_document")),
         source_url=download_url,
         download_url=download_url,
-        url=download_url,
         retrieved_at=retrieved_at,
         raw=raw_document,
     )
