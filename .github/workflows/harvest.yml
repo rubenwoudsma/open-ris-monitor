@@ -43,11 +43,41 @@ concurrency:
 jobs:
   harvest:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+
+      - name: Resolve harvest options
+        id: options
+        run: |
+          MUNICIPALITY="${{ inputs.municipality }}"
+          PROFILE="${{ inputs.profile }}"
+          ENRICH_CHECKSUMS="${{ inputs.enrich_checksums }}"
+          CHECKSUM_MAX_DOCUMENTS="${{ inputs.checksum_max_documents }}"
+
+          if [ -z "$MUNICIPALITY" ]; then
+            MUNICIPALITY="huizen"
+          fi
+
+          if [ -z "$PROFILE" ]; then
+            PROFILE="public"
+          fi
+
+          if [ -z "$ENRICH_CHECKSUMS" ]; then
+            ENRICH_CHECKSUMS="false"
+          fi
+
+          if [ -z "$CHECKSUM_MAX_DOCUMENTS" ]; then
+            CHECKSUM_MAX_DOCUMENTS="50"
+          fi
+
+          echo "municipality=$MUNICIPALITY" >> "$GITHUB_OUTPUT"
+          echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
+          echo "enrich_checksums=$ENRICH_CHECKSUMS" >> "$GITHUB_OUTPUT"
+          echo "checksum_max_documents=$CHECKSUM_MAX_DOCUMENTS" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -61,10 +91,10 @@ jobs:
 
       - name: Run harvest and public export
         env:
-          MUNICIPALITY: ${{ inputs.municipality || 'huizen' }}
-          PROFILE: ${{ inputs.profile || 'public' }}
-          ENRICH_CHECKSUMS: ${{ inputs.enrich_checksums || false }}
-          CHECKSUM_MAX_DOCUMENTS: ${{ inputs.checksum_max_documents || '50' }}
+          MUNICIPALITY: ${{ steps.options.outputs.municipality }}
+          PROFILE: ${{ steps.options.outputs.profile }}
+          ENRICH_CHECKSUMS: ${{ steps.options.outputs.enrich_checksums }}
+          CHECKSUM_MAX_DOCUMENTS: ${{ steps.options.outputs.checksum_max_documents }}
         run: |
           CHECKSUM_ARG=""
           if [ "$ENRICH_CHECKSUMS" = "true" ]; then
@@ -94,7 +124,7 @@ jobs:
       - name: Upload raw harvest output
         uses: actions/upload-artifact@v4
         with:
-          name: raw-harvest-${{ inputs.municipality || 'huizen' }}
+          name: raw-harvest-${{ steps.options.outputs.municipality }}
           path: data/raw/latest/
           if-no-files-found: error
           retention-days: 7
@@ -102,16 +132,29 @@ jobs:
       - name: Upload public export output
         uses: actions/upload-artifact@v4
         with:
-          name: public-export-${{ inputs.municipality || 'huizen' }}
+          name: public-export-${{ steps.options.outputs.municipality }}
           path: data/public/
           if-no-files-found: error
           retention-days: 7
 
       - name: Commit public export output
-        if: ${{ inputs.commit_public == true }}
+        if: ${{ github.event_name == 'schedule' || inputs.commit_public == true }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/public/
-          git diff --cached --quiet || git commit -m "Update public RIS data for ${{ inputs.municipality || 'huizen' }}"
+          git diff --cached --quiet || git commit -m "Update public RIS data for ${{ steps.options.outputs.municipality }}"
           git push
+
+      - name: Write workflow summary
+        if: always()
+        run: |
+          {
+            echo "## Harvest run"
+            echo ""
+            echo "- Event: ${{ github.event_name }}"
+            echo "- Municipality: ${{ steps.options.outputs.municipality }}"
+            echo "- Profile: ${{ steps.options.outputs.profile }}"
+            echo "- Commit public output: ${{ github.event_name == 'schedule' || inputs.commit_public == true }}"
+            echo "- Checksum enrichment: ${{ steps.options.outputs.enrich_checksums }}"
+          } >> "$GITHUB_STEP_SUMMARY"
