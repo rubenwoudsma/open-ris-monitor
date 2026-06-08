@@ -21,37 +21,23 @@
         <h2 id="latest-title">Laatste export</h2>
         <p id="status-message">Data wordt geladen...</p>
         <dl class="summary-grid" aria-label="Samenvatting van de laatste export">
-          <div>
-            <dt>Gemeente</dt>
-            <dd id="municipality">-</dd>
-          </div>
-          <div>
-            <dt>Documenten gezien</dt>
-            <dd id="documents-seen">-</dd>
-          </div>
-          <div>
-            <dt>Genormaliseerd</dt>
-            <dd id="documents-normalized">-</dd>
-          </div>
-          <div>
-            <dt>Gegenereerd</dt>
-            <dd id="generated-at">-</dd>
-          </div>
+          <div><dt>Gemeente</dt><dd id="municipality">-</dd></div>
+          <div><dt>Documenten gezien</dt><dd id="documents-seen">-</dd></div>
+          <div><dt>Genormaliseerd</dt><dd id="documents-normalized">-</dd></div>
+          <div><dt>Gegenereerd</dt><dd id="generated-at">-</dd></div>
         </dl>
       </section>
 
       <section class="panel" aria-labelledby="filters-title">
         <h2 id="filters-title">Zoeken en filteren</h2>
-        <div class="controls">
+        <form class="controls" id="viewer-controls">
           <label>
             Zoeken
-            <input id="search-input" type="search" placeholder="Zoek op titel, bestand, type of id" />
+            <input id="search-input" type="search" autocomplete="off" placeholder="Zoek op titel, type, vergadering of agendapunt" />
           </label>
           <label>
             Compact documenttype
-            <select id="type-filter">
-              <option value="">Alle compacte documenttypen</option>
-            </select>
+            <select id="type-filter"><option value="">Alle compacte documenttypen</option></select>
           </label>
           <label>
             Sorteer
@@ -68,129 +54,72 @@
           <label>
             Per pagina
             <select id="page-size-select">
-              <option value="25">25</option>
-              <option value="50" selected>50</option>
-              <option value="100">100</option>
+              <option>25</option>
+              <option selected>50</option>
+              <option>100</option>
             </select>
           </label>
-        </div>
+        </form>
       </section>
 
-      <section class="panel" aria-labelledby="documents-title">
-        <div class="section-heading">
-          <div>
-            <h2 id="documents-title">Documenten</h2>
-            <p id="result-count">-</p>
-          </div>
-          <div id="document-context" class="document-context" hidden></div>
-          <div class="pagination">
-            <button id="previous-page-top" type="button">Vorige</button>
-            <span id="page-info-top">Pagina 1 van 1</span>
-            <button id="next-page-top" type="button">Volgende</button>
-          </div>
-        </div>
+      <section id="document-context" class="panel document-context" hidden></section>
 
-        <div class="table-scroll" role="region" aria-label="Documenttabel" tabindex="0">
-          <table class="documents-table">
-            <colgroup>
-              <col class="col-date" />
-              <col class="col-compact" />
-              <col class="col-source" />
-              <col class="col-title" />
-              <col class="col-filename" />
-              <col class="col-size" />
-              <col class="col-download" />
-            </colgroup>
+      <section class="panel" aria-labelledby="documents-title">
+        <div class="list-header">
+          <h2 id="documents-title">Documenten</h2>
+          <p id="result-count">-</p>
+        </div>
+        <nav class="pagination" aria-label="Paginering boven documenten">
+          <button id="previous-page-top" type="button">Vorige</button>
+          <span id="page-info-top">Pagina 1 van 1</span>
+          <button id="next-page-top" type="button">Volgende</button>
+        </nav>
+        <div class="table-wrapper">
+          <table>
             <thead>
               <tr>
-                <th>Datum</th>
-                <th>Compact type</th>
-                <th>Bron type</th>
-                <th>Titel</th>
-                <th>Bestand</th>
-                <th>Grootte</th>
-                <th>Download</th>
+                <th scope="col">Datum</th>
+                <th scope="col">Compact type</th>
+                <th scope="col">Bron type</th>
+                <th scope="col">Titel</th>
+                <th scope="col">Bestand</th>
+                <th scope="col">Grootte</th>
+                <th scope="col">Download</th>
               </tr>
             </thead>
             <tbody id="documents-table-body">
-              <tr>
-                <td colspan="7">Documenten worden geladen...</td>
-              </tr>
+              <tr><td colspan="7">Documenten worden geladen...</td></tr>
             </tbody>
           </table>
         </div>
-
-        <div class="pagination pagination-bottom">
+        <nav class="pagination" aria-label="Paginering onder documenten">
           <button id="previous-page-bottom" type="button">Vorige</button>
           <span id="page-info-bottom">Pagina 1 van 1</span>
           <button id="next-page-bottom" type="button">Volgende</button>
-        </div>
+        </nav>
       </section>
 
-      <section class="panel" aria-labelledby="agenda-browser-title">
-        <div class="section-heading">
-          <div>
-            <h2 id="agenda-browser-title">Vergaderingen en agendapunten</h2>
-            <p id="agenda-browser-status">Relationele export wordt geladen...</p>
-          </div>
-          <div>
-            <p id="agenda-browser-count">-</p>
-          </div>
-        </div>
-
-        <div class="controls">
-          <label>
-            Zoeken
-            <input id="meeting-search" type="search" placeholder="Zoek op vergadering, agendapunt of document" />
-          </label>
-          <label>
-            Datum vanaf
-            <input id="meeting-date-from" type="date" />
-          </label>
-          <label>
-            Datum tot
-            <input id="meeting-date-to" type="date" />
-          </label>
-          <label>
-            Bestuursorgaan
-            <select id="meeting-org-filter">
-              <option value="">Alle bestuursorganen</option>
-            </select>
-          </label>
-        </div>
-
-        <div id="meeting-browser-list" class="meeting-browser-list">
-          <p>Vergaderingen worden geladen...</p>
-        </div>
-      </section>
-
-      <section class="panel muted" aria-labelledby="about-title">
-        <h2 id="about-title">Metadata en databestanden</h2>
+      <section class="panel" aria-labelledby="metadata-title">
+        <h2 id="metadata-title">Metadata en databestanden</h2>
         <p>
-          Deze site gebruikt de publieke exportbestanden in <code>data/public</code>.
-          De originele RIS-documenttypen blijven bewaard als bronwaarde. Daarnaast
-          toont de viewer compacte genormaliseerde documenttypen voor betere filtering
-          en analyse.
+          Laatste export: <span id="generated-at-copy">-</span>.
+          Gemeente: <span id="municipality-copy">-</span>.
         </p>
-        <div class="link-grid" aria-label="Databestanden">
+        <p class="resource-links">
           <a href="../data/public/latest.json">latest.json</a>
           <a href="../data/public/documents.jsonl">documents.jsonl</a>
           <a href="../data/public/document_versions.jsonl">document_versions.jsonl</a>
           <a href="../data/public/meeting_documents.jsonl">meeting_documents.jsonl</a>
           <a href="../data/public/meeting_item_documents.jsonl">meeting_item_documents.jsonl</a>
-          <a href="../data/public/meetings.jsonl">meetings.jsonl</a>
-          <a href="../data/public/meeting_items.jsonl">meeting_items.jsonl</a>
           <a href="../data/public/quality/document_types.json">documenttypenrapport</a>
           <a href="../README.md">README</a>
-        </div>
+        </p>
       </section>
     </main>
 
-    <footer>
-      <p>Open RIS Monitor, metadata-only MVP. Brondata blijft afkomstig uit het Raadsinformatiesysteem van gemeente Huizen.</p>
+    <footer class="site-footer">
+      Open RIS Monitor, metadata-only MVP. Brondata blijft afkomstig uit het Raadsinformatiesysteem van gemeente Huizen.
     </footer>
-
-    <script src="assets/app.js"></script>
-    <script src="assets/agenda-browser.js"></script>
+    <script type="module" src="assets/build/main.js"></script>
   </body>
 </html>
