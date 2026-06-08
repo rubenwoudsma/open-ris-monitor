@@ -1,21 +1,25 @@
 from __future__ import annotations
 
+import logging
 import time
+from collections.abc import Callable
+from email.utils import parsedate_to_datetime
 from typing import Any
 
 import requests
+
+LOGGER = logging.getLogger(__name__)
+
+DEFAULT_RETRY_STATUS_CODES = frozenset({408, 429, 500, 502, 503, 504})
 
 
 class GemeenteOplossingenConnector:
     """Connector for the GemeenteOplossingen RIS API.
 
-    The constructor intentionally accepts both positional and keyword usage:
-
-    GemeenteOplossingenConnector("https://example/api/v2/")
-    GemeenteOplossingenConnector(base_url="https://example/api/v2/")
-
-    It also accepts request_delay_seconds, which is used by the paginated
-    full-harvest flow to avoid hammering the RIS API with back-to-back requests.
+    The connector keeps the public pipeline lightweight, but is defensive about
+    transient upstream failures. Temporary network problems and common overload
+    statuses are retried with exponential back-off. Permanent client errors such
+    as 400, 401, 403 and 404 are not retried.
     """
 
     def __init__(
@@ -24,35 +28,97 @@ class GemeenteOplossingenConnector:
         *,
         timeout_seconds: int = 30,
         request_delay_seconds: float = 0.0,
+        retry_attempts: int = 3,
+        retry_backoff_seconds: float = 1.0,
+        retry_status_codes: set[int] | frozenset[int] | None = None,
         session: requests.Session | None = None,
+        sleep_func: Callable[[float], None] = time.sleep,
     ) -> None:
         self.base_url = base_url.rstrip("/") + "/"
         self.timeout_seconds = timeout_seconds
         self.request_delay_seconds = max(0.0, float(request_delay_seconds))
+        self.retry_attempts = max(0, int(retry_attempts))
+        self.retry_backoff_seconds = max(0.0, float(retry_backoff_seconds))
+        self.retry_status_codes = frozenset(retry_status_codes or DEFAULT_RETRY_STATUS_CODES)
         self.session = session or requests.Session()
+        self._sleep = sleep_func
 
     def _sleep_if_needed(self) -> None:
         if self.request_delay_seconds > 0:
-            time.sleep(self.request_delay_seconds)
+            self._sleep(self.request_delay_seconds)
 
-    def _get_json(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+    def _retry_delay(self, attempt: int, response: requests.Response | None = None) -> float:
+        retry_after = _parse_retry_after_seconds(response)
+        if retry_after is not None:
+            return retry_after
+        return self.retry_backoff_seconds * (2 ** max(0, attempt - 1))
+
+    def _request(self, path: str, params: dict[str, Any] | None = None) -> requests.Response:
         self._sleep_if_needed()
         url = self.base_url + path.lstrip("/")
-        response = self.session.get(url, params=params, timeout=self.timeout_seconds)
-        response.raise_for_status()
+        max_attempts = self.retry_attempts + 1
+        last_exc: requests.RequestException | None = None
+
+        for attempt in range(1, max_attempts + 1):
+            try:
+                response = self.session.get(url, params=params, timeout=self.timeout_seconds)
+            except (requests.Timeout, requests.ConnectionError) as exc:
+                last_exc = exc
+                if attempt >= max_attempts:
+                    raise
+                delay = self._retry_delay(attempt)
+                LOGGER.warning(
+                    "Temporary GemeenteOplossingen request failure for %s, attempt %s/%s. "
+                    "Retrying in %.2fs: %s",
+                    url,
+                    attempt,
+                    max_attempts,
+                    delay,
+                    exc,
+                )
+                self._sleep(delay)
+                continue
+
+            if response.status_code in self.retry_status_codes and attempt < max_attempts:
+                delay = self._retry_delay(attempt, response=response)
+                LOGGER.warning(
+                    "Temporary GemeenteOplossingen HTTP %s for %s, attempt %s/%s. "
+                    "Retrying in %.2fs.",
+                    response.status_code,
+                    url,
+                    attempt,
+                    max_attempts,
+                    delay,
+                )
+                self._sleep(delay)
+                continue
+
+            response.raise_for_status()
+            return response
+
+        if last_exc is not None:
+            raise last_exc
+        raise RuntimeError(f"Failed to fetch {url}")
+
+    def _get_json(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        response = self._request(path, params=params)
         data = response.json()
         if not isinstance(data, dict):
-            raise ValueError(f"Expected JSON object from {url}, got {type(data).__name__}")
+            raise ValueError(
+                f"Expected JSON object from {response.url}, got {type(data).__name__}"
+            )
         return data
 
     def _get_json_or_none_on_404(
-        self, path: str, params: dict[str, Any] | None = None
+        self,
+        path: str,
+        params: dict[str, Any] | None = None,
     ) -> dict[str, Any] | None:
         """Fetch JSON but treat 404 as an absent resource.
 
         Some meeting IDs discovered through meetingsessions do not resolve
-        through /meetings/{meeting_id}. That is expected source-system
-        behaviour and should not fail the relational harvest.
+        through /meetings/{meeting_id}. That is expected source-system behaviour
+        and should not fail the relational harvest.
         """
 
         try:
@@ -91,14 +157,12 @@ class GemeenteOplossingenConnector:
             raise ValueError("limit must be greater than 0")
         if offset < 0:
             raise ValueError("offset must be 0 or greater")
-
         payload = self._get_json("documents", params={"limit": limit, "offset": offset})
         return self._result_list(payload, "documents")
 
     def fetch_latest_documents(self, limit: int) -> list[dict[str, Any]]:
         if limit <= 0:
             raise ValueError("limit must be greater than 0")
-
         total_count = self.fetch_document_count()
         offset = max(0, total_count - limit)
         return self.fetch_documents_page(limit=limit, offset=offset)
@@ -116,7 +180,6 @@ class GemeenteOplossingenConnector:
 
         total_count = self.fetch_document_count()
         target_count = min(total_count, max_documents) if max_documents is not None else total_count
-
         documents: list[dict[str, Any]] = []
         offset = 0
         while offset < target_count:
@@ -128,7 +191,6 @@ class GemeenteOplossingenConnector:
             offset += len(page)
             if len(page) < limit:
                 break
-
         return documents
 
     def fetch_meeting_session_count(self) -> int:
@@ -144,14 +206,12 @@ class GemeenteOplossingenConnector:
             raise ValueError("limit must be greater than 0")
         if offset < 0:
             raise ValueError("offset must be 0 or greater")
-
         payload = self._get_json("meetingsessions", params={"limit": limit, "offset": offset})
         return self._result_list(payload, "meetingsessions")
 
     def fetch_latest_meeting_sessions(self, limit: int) -> list[dict[str, Any]]:
         if limit <= 0:
             raise ValueError("limit must be greater than 0")
-
         total_count = self.fetch_meeting_session_count()
         offset = max(0, total_count - limit)
         return self.fetch_meeting_sessions_page(limit=limit, offset=offset)
@@ -188,3 +248,23 @@ class GemeenteOplossingenConnector:
 
     def build_document_download_url(self, document_id: int | str) -> str:
         return f"{self.base_url}documents/{document_id}/download"
+
+    def download_document(self, document_id: int | str) -> bytes:
+        response = self._request(f"documents/{document_id}/download")
+        return response.content
+
+
+def _parse_retry_after_seconds(response: requests.Response | None) -> float | None:
+    if response is None:
+        return None
+    value = response.headers.get("Retry-After")
+    if not value:
+        return None
+    try:
+        return max(0.0, float(value))
+    except ValueError:
+        try:
+            retry_at = parsedate_to_datetime(value)
+        except (TypeError, ValueError):
+            return None
+        return max(0.0, retry_at.timestamp() - time.time())

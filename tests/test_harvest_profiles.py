@@ -1,3 +1,6 @@
+import pytest
+
+from open_ris_monitor.core.config import resolve_harvest_options as resolve_core_harvest_options
 from open_ris_monitor.pipeline.profiles import resolve_harvest_options
 
 
@@ -62,3 +65,12 @@ def test_explicit_overrides_win_over_profile_defaults() -> None:
     assert options["include_relations"] is False
     assert options["meeting_scan_limit"] == 12
     assert options["meeting_item_limit"] == 34
+
+
+def test_unknown_profile_fails_with_valid_names() -> None:
+    with pytest.raises(ValueError, match="Unknown harvest profile"):
+        resolve_harvest_options("hourly")
+
+
+def test_core_config_is_canonical_profile_source() -> None:
+    assert resolve_core_harvest_options("public") == resolve_harvest_options("public")

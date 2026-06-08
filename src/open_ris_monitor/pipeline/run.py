@@ -32,10 +32,8 @@ def load_municipality_config(slug: str) -> dict[str, Any]:
     config_path = REPO_ROOT / "config" / "municipalities" / f"{slug}.yml"
     if not config_path.exists():
         raise FileNotFoundError(f"Municipality config not found: {config_path}")
-
     with config_path.open("r", encoding="utf-8") as file:
         payload = yaml.safe_load(file)
-
     if not isinstance(payload, dict):
         raise ValueError(f"Expected YAML object in {config_path}")
     return payload
@@ -68,11 +66,12 @@ def build_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
     connector_name = source_system["connector"]
     if connector_name != "gemeenteoplossingen":
         raise ValueError(f"Unsupported connector: {connector_name}")
-
     return GemeenteOplossingenConnector(
         base_url=source_system["base_url"],
         timeout_seconds=int(source_system.get("timeout_seconds", 30)),
         request_delay_seconds=_as_float(source_system.get("request_delay_seconds"), 0.0),
+        retry_attempts=int(source_system.get("retry_attempts", 3)),
+        retry_backoff_seconds=_as_float(source_system.get("retry_backoff_seconds"), 1.0),
     )
 
 
@@ -102,7 +101,6 @@ def _write_public_relation_exports(
         "meeting_documents": "meeting_documents.jsonl",
         "meeting_item_documents": "meeting_item_documents.jsonl",
     }
-
     write_jsonl(
         public_dir / relation_outputs["meetings"],
         _to_public_dicts(normalized_relations.get("meetings", [])),
@@ -119,7 +117,6 @@ def _write_public_relation_exports(
         public_dir / relation_outputs["meeting_item_documents"],
         _to_public_dicts(normalized_relations.get("meeting_item_documents", [])),
     )
-
     return relation_outputs
 
 
@@ -152,7 +149,6 @@ def _write_raw_relation_harvest(raw_dir: Path, relation_harvest: dict[str, Any])
     write_json(raw_dir / "relation_harvest_summary.json", relation_harvest["summary"])
 
 
-
 def run_harvest(
     *,
     municipality: str,
@@ -183,12 +179,18 @@ def run_harvest(
     else:
         raise ValueError("mode must be 'latest' or 'full'")
 
+    if not raw_documents:
+        raise RuntimeError(
+            "Harvest returned zero documents. Refusing to overwrite public exports. "
+            "Check the upstream RIS API or run a manual recovery/backfill."
+        )
+
     raw_dir = REPO_ROOT / "data" / "raw" / "latest"
     public_dir = REPO_ROOT / "data" / "public"
-
     municipality_config = config["municipality"]
     source_system_config = config["source_system"]
     retrieved_at = datetime.now(timezone.utc)
+
     documents = normalize_documents(
         raw_documents,
         municipality_id=municipality_config["id"],
@@ -223,7 +225,6 @@ def run_harvest(
     existing_versions = load_previous_versions(previous_versions_path)
     new_versions: list[Any] = []
     merged_versions: list[Any] = existing_versions
-
     if enrich_checksums:
         new_versions = enrich_document_versions(
             documents,
@@ -289,7 +290,6 @@ def run_harvest(
         ),
     }
     write_json(public_dir / "latest.json", latest_payload)
-
     return harvest_run
 
 
@@ -365,7 +365,6 @@ def resolve_cli_harvest_options(args: argparse.Namespace) -> dict[str, Any]:
         overrides["meeting_session_batch_size"] = args.meeting_session_batch_size
     if args.meeting_item_limit is not None:
         overrides["meeting_item_limit"] = parse_max_documents(args.meeting_item_limit)
-
     return resolve_harvest_options(args.profile, overrides)
 
 
@@ -387,7 +386,6 @@ def main() -> None:
         meeting_session_batch_size=harvest_options["meeting_session_batch_size"],
         meeting_item_limit=harvest_options["meeting_item_limit"],
     )
-
     print(
         f"Harvest {harvest_run.id} completed: "
         f"{harvest_run.documents_seen} documents seen, "
