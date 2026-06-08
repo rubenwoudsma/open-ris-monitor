@@ -1,4 +1,4 @@
-import { pick } from "../ui/format";
+import { pick } from "../ui/format.js";
 function addValue(set, value) {
     const text = pick(value);
     if (text)
