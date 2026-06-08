@@ -1,32 +1,23 @@
 name: Harvest
 
 on:
+  schedule:
+    - cron: "23 3 * * *"
   workflow_dispatch:
     inputs:
       municipality:
         description: Municipality config slug
         required: true
         default: huizen
-      mode:
-        description: Harvest mode, latest or full
+      profile:
+        description: Harvest profile
         required: true
-        default: latest
+        default: public
         type: choice
         options:
-          - latest
-          - full
-      limit:
-        description: Number of latest documents to fetch in latest mode
-        required: true
-        default: "25"
-      batch_size:
-        description: Batch size for full harvest
-        required: true
-        default: "100"
-      max_documents:
-        description: Maximum documents for full harvest, leave empty for all
-        required: false
-        default: ""
+          - quick
+          - public
+          - backfill
       enrich_checksums:
         description: Temporarily download selected PDFs and calculate SHA-256 checksums
         required: true
@@ -45,10 +36,13 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: harvest-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   harvest:
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -66,25 +60,22 @@ jobs:
           python -m pip install -e .
 
       - name: Run harvest and public export
+        env:
+          MUNICIPALITY: ${{ inputs.municipality || 'huizen' }}
+          PROFILE: ${{ inputs.profile || 'public' }}
+          ENRICH_CHECKSUMS: ${{ inputs.enrich_checksums || false }}
+          CHECKSUM_MAX_DOCUMENTS: ${{ inputs.checksum_max_documents || '50' }}
         run: |
-          MAX_DOCUMENTS_ARG=""
-          if [ -n "${{ inputs.max_documents }}" ]; then
-            MAX_DOCUMENTS_ARG="--max-documents ${{ inputs.max_documents }}"
-          fi
-
           CHECKSUM_ARG=""
-          if [ "${{ inputs.enrich_checksums }}" = "true" ]; then
+          if [ "$ENRICH_CHECKSUMS" = "true" ]; then
             CHECKSUM_ARG="--enrich-checksums"
           fi
 
           python -m open_ris_monitor.pipeline.run \
-            --municipality "${{ inputs.municipality }}" \
-            --mode "${{ inputs.mode }}" \
-            --limit "${{ inputs.limit }}" \
-            --batch-size "${{ inputs.batch_size }}" \
-            $MAX_DOCUMENTS_ARG \
+            --municipality "$MUNICIPALITY" \
+            --profile "$PROFILE" \
             $CHECKSUM_ARG \
-            --checksum-max-documents "${{ inputs.checksum_max_documents }}"
+            --checksum-max-documents "$CHECKSUM_MAX_DOCUMENTS"
 
       - name: Generate public quality reports
         run: |
@@ -103,7 +94,7 @@ jobs:
       - name: Upload raw harvest output
         uses: actions/upload-artifact@v4
         with:
-          name: raw-harvest-${{ inputs.municipality }}
+          name: raw-harvest-${{ inputs.municipality || 'huizen' }}
           path: data/raw/latest/
           if-no-files-found: error
           retention-days: 7
@@ -111,7 +102,7 @@ jobs:
       - name: Upload public export output
         uses: actions/upload-artifact@v4
         with:
-          name: public-export-${{ inputs.municipality }}
+          name: public-export-${{ inputs.municipality || 'huizen' }}
           path: data/public/
           if-no-files-found: error
           retention-days: 7
@@ -122,5 +113,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/public/
-          git diff --cached --quiet || git commit -m "Update public RIS data for ${{ inputs.municipality }}"
+          git diff --cached --quiet || git commit -m "Update public RIS data for ${{ inputs.municipality || 'huizen' }}"
           git push
