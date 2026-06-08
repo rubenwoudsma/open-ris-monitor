@@ -68,12 +68,23 @@ def normalize_document(
     download_url = url_builder(source_id)
 
     publication_datetime, publication_timezone = _parse_publication_datetime(
-        raw_document.get("publicationDate")
+        raw_document.get("publicationDate") or raw_document.get("publication_date")
     )
 
-    # Ondersteun zowel camelCase (live data) als snake_case / test_fixtures data structuren
-    source_document_type = raw_document.get("documentType") or raw_document.get("document_type")
-    description = raw_document.get("description")
+    # Bepaal de titel: als 'title' leeg/afwezig is, gebruik 'description' van de fixture
+    title_value = raw_document.get("title") or raw_document.get("description") or ""
+    
+    # Bepaal de omschrijving/beschrijving
+    description_value = raw_document.get("description")
+
+    # Ondersteun alle mogelijke varianten van het documenttype uit live data en test-fixtures
+    source_document_type = (
+        raw_document.get("documentTypeLabel")
+        or raw_document.get("document_type_label")
+        or raw_document.get("documentType")
+        or raw_document.get("document_type")
+    )
+    
     normalized_type = normalize_document_type(source_document_type)
     
     source_obj_id = raw_document.get("objectId") or raw_document.get("source_object_id")
@@ -86,8 +97,8 @@ def normalize_document(
         source_system_id=source_system_id,
         source_id=source_id,
         source_object_id=source_object_id_str,
-        title=str(raw_document.get("title", "")).strip(),
-        description=str(description).strip() if description else None,
+        title=str(title_value).strip(),
+        description=str(description_value).strip() if description_value else None,
         document_type=str(source_document_type).strip() if source_document_type else None,
         normalized_document_type=normalized_type.value,
         normalized_document_type_label=normalized_type.label,
