@@ -1,6 +1,6 @@
 import { loadPublicData } from "./data/loaders";
 import { buildRelationIndexes, getDocumentIdentifiers, getRecordId } from "./data/relations";
-import type { DocumentRecord, PublicDataSet, RelationIndexes } from "./data/types";
+import type { AgendaItemRecord, DocumentRecord, DocumentVersionRecord, MeetingRecord, PublicDataSet, RelationIndexes } from "./data/types";
 import { formatBytes, formatDate, formatDateTime, pick, safeUrl, text, timestamp } from "./ui/format";
 
 interface ViewerState {
@@ -10,7 +10,7 @@ interface ViewerState {
   currentPage: number;
   pageSize: number;
   sortMode: string;
-  pinnedDocumentIds: Set<string> | null;
+  selectedDocumentId: string | null;
 }
 
 type RequiredElements = {
@@ -26,7 +26,10 @@ type RequiredElements = {
   sortSelect: HTMLSelectElement;
   pageSizeSelect: HTMLSelectElement;
   resultCount: HTMLElement;
-  documentContext: HTMLElement;
+  documentDetail: HTMLElement;
+  documentDetailTitle: HTMLElement;
+  documentDetailBody: HTMLElement;
+  clearDocumentSelection: HTMLButtonElement;
   meetingsCount: HTMLElement;
   agendaItemsCount: HTMLElement;
   linkedDocumentsCount: HTMLElement;
@@ -47,7 +50,7 @@ const state: ViewerState = {
   currentPage: 1,
   pageSize: 50,
   sortMode: "date-desc",
-  pinnedDocumentIds: null,
+  selectedDocumentId: null,
 };
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -69,7 +72,10 @@ const elements: RequiredElements = {
   sortSelect: byId("sort-select"),
   pageSizeSelect: byId("page-size-select"),
   resultCount: byId("result-count"),
-  documentContext: byId("document-context"),
+  documentDetail: byId("document-detail"),
+  documentDetailTitle: byId("document-detail-title"),
+  documentDetailBody: byId("document-detail-body"),
+  clearDocumentSelection: byId("clear-document-selection"),
   meetingsCount: byId("meetings-count"),
   agendaItemsCount: byId("agenda-items-count"),
   linkedDocumentsCount: byId("linked-documents-count"),
@@ -102,6 +108,16 @@ function getDocumentDate(documentRecord: DocumentRecord): string {
   );
 }
 
+function getMeetingTitle(meeting: MeetingRecord | undefined): string {
+  return pick(meeting?.description, meeting?.title, meeting?.dmu_name) || "Vergadering zonder titel";
+}
+
+function getAgendaItemTitle(item: AgendaItemRecord | undefined): string {
+  const number = pick(item?.number);
+  const title = pick(item?.title, item?.description) || "Agendapunt zonder titel";
+  return number ? `${number}. ${title}` : title;
+}
+
 function getCompactType(documentRecord: DocumentRecord): string {
   return pick(documentRecord.normalized_document_type) || "unknown";
 }
@@ -110,24 +126,47 @@ function getCompactTypeLabel(documentRecord: DocumentRecord): string {
   return pick(documentRecord.normalized_document_type_label, documentRecord.normalized_document_type) || "Onbekend";
 }
 
+function uniqueValues(values: string[]): string[] {
+  return [...new Set(values.filter(Boolean))];
+}
+
+function documentIds(documentRecord: DocumentRecord): string[] {
+  return uniqueValues(getDocumentIdentifiers(documentRecord));
+}
+
+function relatedMeetingIds(documentRecord: DocumentRecord): string[] {
+  if (!state.indexes) return [];
+  return uniqueValues(documentIds(documentRecord).flatMap((id) => state.indexes?.meetingIdsByDocumentId.get(id) ?? []));
+}
+
+function relatedAgendaItemIds(documentRecord: DocumentRecord): string[] {
+  if (!state.indexes) return [];
+  return uniqueValues(documentIds(documentRecord).flatMap((id) => state.indexes?.agendaItemIdsByDocumentId.get(id) ?? []));
+}
+
 function relationLabelsForDocument(documentRecord: DocumentRecord): string[] {
   if (!state.indexes) return [];
   const labels: string[] = [];
-  const identifiers = getDocumentIdentifiers(documentRecord);
 
-  for (const id of identifiers) {
-    for (const meetingId of state.indexes.meetingIdsByDocumentId.get(id) ?? []) {
-      const meeting = state.indexes.meetingsById.get(meetingId);
-      labels.push([pick(meeting?.description, meeting?.title), meeting?.date].filter(Boolean).join(", "));
-    }
-
-    for (const itemId of state.indexes.agendaItemIdsByDocumentId.get(id) ?? []) {
-      const item = state.indexes.agendaItemsById.get(itemId);
-      labels.push([item?.number, item?.title].filter(Boolean).join(" "));
-    }
+  for (const meetingId of relatedMeetingIds(documentRecord)) {
+    const meeting = state.indexes.meetingsById.get(meetingId);
+    labels.push([getMeetingTitle(meeting), formatDate(pick(meeting?.date, meeting?.start_time))].filter(Boolean).join(", "));
   }
 
-  return [...new Set(labels.filter(Boolean))];
+  for (const itemId of relatedAgendaItemIds(documentRecord)) {
+    const item = state.indexes.agendaItemsById.get(itemId);
+    labels.push(getAgendaItemTitle(item));
+  }
+
+  return uniqueValues(labels);
+}
+
+function relatedVersions(documentRecord: DocumentRecord): DocumentVersionRecord[] {
+  const ids = new Set(documentIds(documentRecord));
+  return (state.data?.documentVersions ?? []).filter((version) => {
+    const versionDocumentId = pick(version.document_id, version.source_id);
+    return versionDocumentId ? ids.has(versionDocumentId) : false;
+  });
 }
 
 function searchBlob(documentRecord: DocumentRecord): string {
@@ -216,8 +255,6 @@ function applyFilters(): void {
   const allDocuments = state.data?.documents ?? [];
 
   let records = allDocuments.filter((documentRecord) => {
-    const documentId = getDocumentId(documentRecord);
-    if (state.pinnedDocumentIds && !state.pinnedDocumentIds.has(documentId)) return false;
     if (type && getCompactType(documentRecord) !== type) return false;
     if (query && !searchBlob(documentRecord).includes(query)) return false;
     return true;
@@ -234,11 +271,24 @@ function createCell(value: string): HTMLTableCellElement {
   return cell;
 }
 
-function createTitleCell(documentRecord: DocumentRecord): HTMLTableCellElement {
+function appendDefinition(list: HTMLDListElement, label: string, value: string): void {
+  const wrapper = document.createElement("div");
+  const term = document.createElement("dt");
+  const description = document.createElement("dd");
+  term.textContent = label;
+  description.textContent = value;
+  wrapper.append(term, description);
+  list.appendChild(wrapper);
+}
+
+function createDocumentTitleCell(documentRecord: DocumentRecord): HTMLTableCellElement {
   const cell = document.createElement("td");
-  const title = document.createElement("strong");
-  title.textContent = getDocumentTitle(documentRecord);
-  cell.appendChild(title);
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "link-button document-title-button";
+  button.textContent = getDocumentTitle(documentRecord);
+  button.addEventListener("click", () => selectDocument(documentRecord, true));
+  cell.appendChild(button);
 
   const labels = relationLabelsForDocument(documentRecord).slice(0, 3);
   if (labels.length > 0) {
@@ -253,6 +303,37 @@ function createTitleCell(documentRecord: DocumentRecord): HTMLTableCellElement {
   }
 
   return cell;
+}
+
+function createDocumentActionsCell(documentRecord: DocumentRecord): HTMLTableCellElement {
+  const cell = document.createElement("td");
+  const actionList = document.createElement("div");
+  actionList.className = "document-actions";
+
+  const detailButton = document.createElement("button");
+  detailButton.type = "button";
+  detailButton.className = "secondary-button";
+  detailButton.textContent = "Details";
+  detailButton.addEventListener("click", () => selectDocument(documentRecord, true));
+  actionList.appendChild(detailButton);
+
+  const href = safeUrl(pick(documentRecord.download_url, documentRecord.source_url));
+  if (href) {
+    const link = document.createElement("a");
+    link.href = href;
+    link.textContent = "Open";
+    link.rel = "noopener noreferrer";
+    link.target = "_blank";
+    actionList.appendChild(link);
+  }
+
+  cell.appendChild(actionList);
+  return cell;
+}
+
+function findDocumentById(documentId: string): DocumentRecord | undefined {
+  if (!documentId) return undefined;
+  return state.data?.documents.find((documentRecord) => documentIds(documentRecord).includes(documentId));
 }
 
 function renderDocuments(): void {
@@ -276,26 +357,17 @@ function renderDocuments(): void {
 
   for (const documentRecord of pageRecords) {
     const row = document.createElement("tr");
+    const documentId = getDocumentId(documentRecord);
+    if (state.selectedDocumentId && documentIds(documentRecord).includes(state.selectedDocumentId)) row.className = "is-selected";
+
     row.appendChild(createCell(formatDate(getDocumentDate(documentRecord))));
     row.appendChild(createCell(getCompactTypeLabel(documentRecord)));
     row.appendChild(createCell(text(documentRecord.document_type)));
-    row.appendChild(createTitleCell(documentRecord));
+    row.appendChild(createDocumentTitleCell(documentRecord));
     row.appendChild(createCell(text(documentRecord.filename)));
     row.appendChild(createCell(formatBytes(documentRecord.size_bytes)));
-
-    const linkCell = document.createElement("td");
-    const href = safeUrl(pick(documentRecord.download_url, documentRecord.source_url));
-    if (href) {
-      const link = document.createElement("a");
-      link.href = href;
-      link.textContent = "Open";
-      link.rel = "noopener noreferrer";
-      link.target = "_blank";
-      linkCell.appendChild(link);
-    } else {
-      linkCell.textContent = "-";
-    }
-    row.appendChild(linkCell);
+    row.appendChild(createDocumentActionsCell(documentRecord));
+    row.dataset.documentId = documentId;
     elements.tableBody.appendChild(row);
   }
 
@@ -306,6 +378,158 @@ function renderDocuments(): void {
   for (const button of [elements.nextTop, elements.nextBottom]) button.disabled = state.currentPage >= totalPages;
 }
 
+function createRelationCard(title: string, meta: string, body?: string): HTMLElement {
+  const article = document.createElement("article");
+  article.className = "relation-card";
+  const heading = document.createElement("h4");
+  heading.textContent = title;
+  const subtitle = document.createElement("p");
+  subtitle.className = "muted";
+  subtitle.textContent = meta;
+  article.append(heading, subtitle);
+  if (body) {
+    const paragraph = document.createElement("p");
+    paragraph.textContent = body;
+    article.appendChild(paragraph);
+  }
+  return article;
+}
+
+function renderEmptyRelation(label: string): HTMLElement {
+  const paragraph = document.createElement("p");
+  paragraph.className = "empty-state";
+  paragraph.textContent = label;
+  return paragraph;
+}
+
+function renderDocumentDetail(documentRecord: DocumentRecord): void {
+  const ids = documentIds(documentRecord);
+  const primaryId = ids[0] ?? "";
+  const meetingIds = relatedMeetingIds(documentRecord);
+  const itemIds = relatedAgendaItemIds(documentRecord);
+  const versions = relatedVersions(documentRecord);
+  const title = getDocumentTitle(documentRecord);
+
+  elements.documentDetail.hidden = false;
+  elements.documentDetailTitle.textContent = title;
+  elements.documentDetailBody.replaceChildren();
+
+  const grid = document.createElement("div");
+  grid.className = "document-detail-grid";
+  const meta = document.createElement("dl");
+  meta.className = "summary-list document-detail-meta";
+  appendDefinition(meta, "Datum", formatDate(getDocumentDate(documentRecord)));
+  appendDefinition(meta, "Compact type", getCompactTypeLabel(documentRecord));
+  appendDefinition(meta, "Bron type", text(documentRecord.document_type));
+  appendDefinition(meta, "Bestand", text(documentRecord.filename));
+  appendDefinition(meta, "Grootte", formatBytes(documentRecord.size_bytes));
+  appendDefinition(meta, "Document ID", text(primaryId));
+  grid.appendChild(meta);
+
+  const actions = document.createElement("div");
+  actions.className = "document-detail-actions";
+  const downloadHref = safeUrl(pick(documentRecord.download_url, documentRecord.source_url));
+  if (downloadHref) {
+    const link = document.createElement("a");
+    link.className = "primary-link";
+    link.href = downloadHref;
+    link.rel = "noopener noreferrer";
+    link.target = "_blank";
+    link.textContent = "Open document";
+    actions.appendChild(link);
+  } else {
+    const fallback = document.createElement("p");
+    fallback.className = "empty-state";
+    fallback.textContent = "Geen veilige documentlink beschikbaar in de metadata.";
+    actions.appendChild(fallback);
+  }
+  grid.appendChild(actions);
+  elements.documentDetailBody.appendChild(grid);
+
+  if (pick(documentRecord.description) && pick(documentRecord.description) !== title) {
+    const description = document.createElement("p");
+    description.className = "document-description";
+    description.textContent = text(documentRecord.description);
+    elements.documentDetailBody.appendChild(description);
+  }
+
+  const relations = document.createElement("div");
+  relations.className = "detail-sections";
+
+  const meetingsSection = document.createElement("section");
+  meetingsSection.className = "detail-section";
+  meetingsSection.innerHTML = "<h3>Gekoppelde vergaderingen</h3>";
+  if (meetingIds.length === 0) {
+    meetingsSection.appendChild(renderEmptyRelation("Geen gekoppelde vergadering gevonden."));
+  } else {
+    for (const meetingId of meetingIds) {
+      const meeting = state.indexes?.meetingsById.get(meetingId);
+      const meta = [formatDate(pick(meeting?.date, meeting?.start_time)), pick(meeting?.dmu_name), meetingId].filter(Boolean).join(" · ");
+      meetingsSection.appendChild(createRelationCard(getMeetingTitle(meeting), meta || "Vergadering", text(meeting?.description, "")));
+    }
+  }
+  relations.appendChild(meetingsSection);
+
+  const agendaSection = document.createElement("section");
+  agendaSection.className = "detail-section";
+  agendaSection.innerHTML = "<h3>Gekoppelde agendapunten</h3>";
+  if (itemIds.length === 0) {
+    agendaSection.appendChild(renderEmptyRelation("Geen gekoppeld agendapunt gevonden."));
+  } else {
+    for (const itemId of itemIds) {
+      const item = state.indexes?.agendaItemsById.get(itemId);
+      const meeting = state.indexes?.meetingsById.get(pick(item?.meeting_id, item?.meetingId, item?.session_id, item?.sessionId));
+      const meta = [getMeetingTitle(meeting), itemId].filter(Boolean).join(" · ");
+      agendaSection.appendChild(createRelationCard(getAgendaItemTitle(item), meta || "Agendapunt", text(item?.description, "")));
+    }
+  }
+  relations.appendChild(agendaSection);
+
+  const versionsSection = document.createElement("section");
+  versionsSection.className = "detail-section";
+  versionsSection.innerHTML = "<h3>Versies</h3>";
+  if (versions.length === 0) {
+    versionsSection.appendChild(renderEmptyRelation("Geen aparte versiehistorie gevonden."));
+  } else {
+    for (const version of versions.slice(0, 10)) {
+      const meta = [formatDateTime(version.retrieved_at), pick(version.id, version.source_id)].filter(Boolean).join(" · ");
+      versionsSection.appendChild(createRelationCard("Documentversie", meta || "Versie", ""));
+    }
+  }
+  relations.appendChild(versionsSection);
+
+  elements.documentDetailBody.appendChild(relations);
+}
+
+function updateUrlForDocument(documentId: string | null): void {
+  const url = new URL(window.location.href);
+  if (documentId) {
+    url.searchParams.set("doc", documentId);
+  } else {
+    url.searchParams.delete("doc");
+    url.searchParams.delete("documentId");
+  }
+  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+}
+
+function selectDocument(documentRecord: DocumentRecord, updateUrl = false): void {
+  const documentId = getDocumentId(documentRecord);
+  state.selectedDocumentId = documentId || null;
+  renderDocumentDetail(documentRecord);
+  renderDocuments();
+  if (updateUrl) updateUrlForDocument(documentId);
+  elements.documentDetail.scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
+function clearDocumentSelection(updateUrl = false): void {
+  state.selectedDocumentId = null;
+  elements.documentDetail.hidden = true;
+  elements.documentDetailTitle.textContent = "Documentdetails";
+  elements.documentDetailBody.replaceChildren();
+  renderDocuments();
+  if (updateUrl) updateUrlForDocument(null);
+}
+
 function restoreDeepLink(): void {
   const params = new URLSearchParams(window.location.search);
   const query = params.get("q") ?? "";
@@ -313,15 +537,20 @@ function restoreDeepLink(): void {
 
   if (query) elements.searchInput.value = query;
   if (documentId) {
-    state.pinnedDocumentIds = new Set([documentId]);
-    elements.documentContext.hidden = false;
-    elements.documentContext.textContent = `Gedeelde documentselectie: ${documentId}`;
+    const documentRecord = findDocumentById(documentId);
+    if (documentRecord) {
+      state.selectedDocumentId = getDocumentId(documentRecord);
+      renderDocumentDetail(documentRecord);
+    } else {
+      elements.documentDetail.hidden = false;
+      elements.documentDetailTitle.textContent = "Document niet gevonden";
+      elements.documentDetailBody.textContent = `De gedeelde documentlink kon niet worden gevonden: ${documentId}`;
+    }
   }
 }
 
 function attachEvents(): void {
   elements.searchInput.addEventListener("input", () => {
-    state.pinnedDocumentIds = null;
     state.currentPage = 1;
     applyFilters();
   });
@@ -338,6 +567,7 @@ function attachEvents(): void {
     state.currentPage = 1;
     applyFilters();
   });
+  elements.clearDocumentSelection.addEventListener("click", () => clearDocumentSelection(true));
 
   for (const button of [elements.previousTop, elements.previousBottom]) {
     button.addEventListener("click", () => {
@@ -364,17 +594,16 @@ async function init(): Promise<void> {
     state.data.meetingItemDocumentRelations,
   );
 
-  restoreDeepLink();
   populateTypeFilter();
   renderSummary();
+  restoreDeepLink();
   applyFilters();
 
   window.OpenRISMonitor = {
     indexes: state.indexes,
     focusDocumentById(documentId: string) {
-      state.pinnedDocumentIds = new Set([documentId]);
-      state.currentPage = 1;
-      applyFilters();
+      const documentRecord = findDocumentById(documentId);
+      if (documentRecord) selectDocument(documentRecord, true);
     },
   };
 }
