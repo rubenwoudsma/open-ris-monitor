@@ -1,5 +1,5 @@
-import type { AgendaItemRecord, DocumentRecord, DocumentVersionRecord, LatestExport, MeetingRecord, PublicDataSet, RelationRecord } from "./types";
-import { loadJson, loadJsonl, loadOptionalJsonl } from "./jsonl";
+import type { AgendaItemRecord, DocumentRecord, DocumentVersionRecord, LatestExport, MeetingRecord, PublicDataSet, RelationRecord } from "./types.js";
+import { loadJson, loadJsonl, loadOptionalJsonl } from "./jsonl.js";
 
 export const DATA_BASE = "../data/public";
 

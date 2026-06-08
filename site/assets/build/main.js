@@ -1,6 +1,6 @@
-import { loadPublicData } from "./data/loaders";
-import { buildRelationIndexes, getDocumentIdentifiers } from "./data/relations";
-import { formatBytes, formatDate, formatDateTime, pick, safeUrl, text, timestamp } from "./ui/format";
+import { loadPublicData } from "./data/loaders.js";
+import { buildRelationIndexes, getDocumentIdentifiers } from "./data/relations.js";
+import { formatBytes, formatDate, formatDateTime, pick, safeUrl, text, timestamp } from "./ui/format.js";
 const state = {
     data: null,
     indexes: null,

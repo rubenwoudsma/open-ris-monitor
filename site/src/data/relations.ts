@@ -1,5 +1,5 @@
-import type { AgendaItemRecord, DocumentRecord, MeetingRecord, RelationIndexes, RelationRecord } from "./types";
-import { pick } from "../ui/format";
+import type { AgendaItemRecord, DocumentRecord, MeetingRecord, RelationIndexes, RelationRecord } from "./types.js";
+import { pick } from "../ui/format.js";
 
 function addValue(set: Set<string>, value: unknown): void {
   const text = pick(value);

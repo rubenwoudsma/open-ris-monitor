@@ -1,7 +1,7 @@
-import { loadPublicData } from "./data/loaders";
-import { buildRelationIndexes, getDocumentIdentifiers, getRecordId } from "./data/relations";
-import type { AgendaItemRecord, DocumentRecord, DocumentVersionRecord, MeetingRecord, PublicDataSet, RelationIndexes } from "./data/types";
-import { formatBytes, formatDate, formatDateTime, pick, safeUrl, text, timestamp } from "./ui/format";
+import { loadPublicData } from "./data/loaders.js";
+import { buildRelationIndexes, getDocumentIdentifiers, getRecordId } from "./data/relations.js";
+import type { AgendaItemRecord, DocumentRecord, DocumentVersionRecord, MeetingRecord, PublicDataSet, RelationIndexes } from "./data/types.js";
+import { formatBytes, formatDate, formatDateTime, pick, safeUrl, text, timestamp } from "./ui/format.js";
 
 interface ViewerState {
   data: PublicDataSet | null;
