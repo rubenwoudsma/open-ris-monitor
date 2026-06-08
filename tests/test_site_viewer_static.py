@@ -33,3 +33,27 @@ def test_relation_indexes_are_named_in_relations_module() -> None:
         "agendaItemIdsByMeetingId",
     ]:
         assert name in source
+
+
+def test_github_like_shell_layout_exists() -> None:
+    index = Path("site/index.html").read_text(encoding="utf-8")
+    styles = Path("site/assets/styles.css").read_text(encoding="utf-8")
+
+    for marker in [
+        "skip-link",
+        "site-header__inner",
+        "top-nav",
+        "content-layout",
+        "sidebar",
+        "main-column",
+        "relation-summary-title",
+    ]:
+        assert marker in index
+
+    for marker in [
+        ".content-layout",
+        ".sidebar",
+        ".top-nav__link--active",
+        "@media",
+    ]:
+        assert marker in styles

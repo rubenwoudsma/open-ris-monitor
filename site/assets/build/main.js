@@ -30,6 +30,10 @@ const elements = {
     pageSizeSelect: byId("page-size-select"),
     resultCount: byId("result-count"),
     documentContext: byId("document-context"),
+    meetingsCount: byId("meetings-count"),
+    agendaItemsCount: byId("agenda-items-count"),
+    linkedDocumentsCount: byId("linked-documents-count"),
+    visibleDocumentsCount: byId("visible-documents-count"),
     tableBody: byId("documents-table-body"),
     previousTop: byId("previous-page-top"),
     nextTop: byId("next-page-top"),
@@ -96,7 +100,10 @@ function renderSummary() {
     elements.documentsNormalized.textContent = text(latest.documents_normalized);
     elements.generatedAt.textContent = generatedAt;
     elements.generatedAtCopy.textContent = generatedAt;
+    elements.meetingsCount.textContent = text(state.data?.meetings.length);
+    elements.agendaItemsCount.textContent = text(state.data?.agendaItems.length);
     const linkedDocumentCount = (state.data?.documents ?? []).filter((record) => relationLabelsForDocument(record).length > 0).length;
+    elements.linkedDocumentsCount.textContent = text(linkedDocumentCount);
     const relationText = latest.relations_enabled
         ? ` Relationele context: ${latest.relations_summary?.meetings_seen ?? 0} vergaderingen, ${latest.relations_summary?.meeting_items_seen ?? 0} agendapunten. ${linkedDocumentCount} documenten hebben een koppeling.`
         : "";
@@ -187,6 +194,7 @@ function renderDocuments() {
     const start = (state.currentPage - 1) * state.pageSize;
     const pageRecords = state.filteredDocuments.slice(start, start + state.pageSize);
     elements.resultCount.textContent = `${total} document(en)`;
+    elements.visibleDocumentsCount.textContent = `${total} zichtbaar`;
     elements.tableBody.replaceChildren();
     if (pageRecords.length === 0) {
         const row = document.createElement("tr");
