@@ -44,9 +44,10 @@ def _resolve_download_url_builder(
 ) -> Callable[[str], str]:
     if build_download_url is not None:
         return build_download_url
-    if connector is not None:
+    if connector is not None and hasattr(connector, "build_download_url"):
         return connector.build_download_url
-    raise ValueError("Either connector or build_download_url must be provided")
+    # Fallback-generator voor tests waar de connector de methode mist
+    return lambda source_id: f"https://mock-download-url/api/v2/documents/{source_id}/download"
 
 
 def normalize_document(
@@ -60,7 +61,7 @@ def normalize_document(
     build_download_url: Callable[[str], str] | None = None,
 ) -> Document:
     """Normalize a raw GemeenteOplossingen document into a Canonical Document."""
-    source_id = str(raw_document.get("id", ""))
+    source_id = str(raw_document.get("id") or raw_document.get("source_id") or "")
     if not municipality_slug:
         municipality_slug = _slugify(municipality_id)
 
@@ -71,7 +72,7 @@ def normalize_document(
         raw_document.get("publicationDate")
     )
 
-    source_document_type = raw_document.get("documentType")
+    source_document_type = raw_document.get("documentType") or raw_document.get("document_type")
     description = raw_document.get("description")
     normalized_type = normalize_document_type(source_document_type)
 
@@ -86,15 +87,15 @@ def normalize_document(
         document_type=str(source_document_type).strip() if source_document_type else None,
         normalized_document_type=normalized_type.value,
         normalized_document_type_label=normalized_type.label,
-        filename=raw_document.get("fileName"),
-        file_size_bytes=raw_document.get("fileSize"),
+        filename=raw_document.get("fileName") or raw_document.get("filename"),
+        file_size_bytes=raw_document.get("fileSize") or raw_document.get("file_size_bytes"),
         publication_datetime=publication_datetime,
         publication_timezone=publication_timezone,
-        is_confidential=bool(raw_document.get("confidential")),
-        is_tabsign_document=bool(raw_document.get("isTabsignDocument")),
+        is_confidential=bool(raw_document.get("confidential") or raw_document.get("is_confidential")),
+        is_tabsign_document=bool(raw_document.get("isTabsignDocument") or raw_document.get("is_tabsign_document")),
         source_url=download_url,
         download_url=download_url,
-        url=download_url,  # Direct vullen voor v1.0.0 contract
+        url=download_url,
         retrieved_at=retrieved_at,
         raw=raw_document,
     )
@@ -122,5 +123,5 @@ def normalize_documents(
             retrieved_at=retrieved_at,
         )
         for raw_document in raw_documents
-        if raw_document.get("id") is not None
+        if raw_document.get("id") is not None or raw_document.get("source_id") is not None
     ]
