@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "pytest"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
