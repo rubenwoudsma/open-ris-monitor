@@ -20,7 +20,6 @@ def _slugify(value: str) -> str:
 
 def _parse_publication_datetime(raw_value: Any) -> tuple[datetime | None, str | None]:
     """Parse the GemeenteOplossingen publicationDate object."""
-
     if not isinstance(raw_value, dict):
         return None, None
 
@@ -43,12 +42,10 @@ def _resolve_download_url_builder(
     connector: GemeenteOplossingenConnector | None = None,
     build_download_url: Callable[[str], str] | None = None,
 ) -> Callable[[str], str]:
-    """Return a download URL builder from either the old or new call style."""
-
     if build_download_url is not None:
         return build_download_url
     if connector is not None:
-        return connector.build_document_download_url
+        return connector.build_download_url
     raise ValueError("Either connector or build_download_url must be provided")
 
 
@@ -62,35 +59,29 @@ def normalize_document(
     connector: GemeenteOplossingenConnector | None = None,
     build_download_url: Callable[[str], str] | None = None,
 ) -> Document:
-    """Convert one raw GemeenteOplossingen document into a canonical Document."""
+    """Normalize a raw GemeenteOplossingen document into a Canonical Document."""
+    source_id = str(raw_document.get("id", ""))
+    if not municipality_slug:
+        municipality_slug = _slugify(municipality_id)
 
-    url_builder = _resolve_download_url_builder(
-        connector=connector,
-        build_download_url=build_download_url,
-    )
-    source_id = str(raw_document["id"])
-    source_object_id = raw_document.get("objectId")
+    url_builder = _resolve_download_url_builder(connector=connector, build_download_url=build_download_url)
+    download_url = url_builder(source_id)
+
     publication_datetime, publication_timezone = _parse_publication_datetime(
         raw_document.get("publicationDate")
     )
+
+    source_document_type = raw_document.get("documentType")
     description = raw_document.get("description")
-    filename = raw_document.get("fileName")
-    title = str(description or filename or f"Document {source_id}").strip()
-    id_prefix = municipality_slug or municipality_id
-    canonical_id = f"{_slugify(id_prefix)}-document-{source_id}"
-    download_url = url_builder(source_id)
-    source_document_type = raw_document.get("documentTypeLabel")
-    normalized_type = normalize_document_type(
-        str(source_document_type) if source_document_type is not None else None
-    )
+    normalized_type = normalize_document_type(source_document_type)
 
     return Document(
-        id=canonical_id,
+        id=f"{municipality_slug}-document-{source_id}",
+        schema_version="1.0.0",
         municipality_id=municipality_id,
         source_system_id=source_system_id,
         source_id=source_id,
-        source_object_id=str(source_object_id) if source_object_id is not None else None,
-        title=title,
+        title=str(raw_document.get("title", "")).strip(),
         description=str(description).strip() if description else None,
         document_type=str(source_document_type).strip() if source_document_type else None,
         normalized_document_type=normalized_type.value,
@@ -103,6 +94,7 @@ def normalize_document(
         is_tabsign_document=bool(raw_document.get("isTabsignDocument")),
         source_url=download_url,
         download_url=download_url,
+        url=download_url,  # Direct vullen voor v1.0.0 contract
         retrieved_at=retrieved_at,
         raw=raw_document,
     )
@@ -119,7 +111,6 @@ def normalize_documents(
     build_download_url: Callable[[str], str] | None = None,
 ) -> list[Document]:
     """Normalize a list of raw GemeenteOplossingen documents."""
-
     return [
         normalize_document(
             raw_document,
@@ -131,4 +122,5 @@ def normalize_documents(
             retrieved_at=retrieved_at,
         )
         for raw_document in raw_documents
+        if raw_document.get("id") is not None
     ]
