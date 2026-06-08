@@ -16,6 +16,7 @@ class Document(BaseModel):
     """
 
     id: str
+    schema_version: str = "1.0.0"
     municipality_id: str
     source_system_id: str
     source_id: str
@@ -33,5 +34,6 @@ class Document(BaseModel):
     is_tabsign_document: bool = False
     source_url: HttpUrl | None = None
     download_url: HttpUrl | None = None
+    url: str | None = None  # Contractveld v1.0.0
     retrieved_at: datetime
     raw: dict[str, Any] = Field(default_factory=dict)

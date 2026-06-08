@@ -8,26 +8,23 @@ from typing import Any
 
 @dataclass(frozen=True)
 class Meeting:
-    """Canonical meeting record.
-
-    A meeting is a source-system meeting, normalized into stable identifiers and
-    reusable public fields. The model intentionally keeps the source meeting ID
-    next to the project-level ID.
-    """
+    """Canonical meeting record."""
 
     id: str
     source_id: str
     municipality_slug: str
     source_system_id: str
     date: str | None
-    start_time: str | None
-    description: str | None
-    location: str | None
-    dmu_id: str | None
-    dmu_name: str | None
-    dmu_sort_order: int | None
-    url: str | None
-    is_confidential: bool
+    schema_version: str = "1.0.0"
+    title: str | None = None
+    start_time: str | None = None
+    description: str | None = None
+    location: str | None = None
+    dmu_id: str | None = None
+    dmu_name: str | None = None
+    dmu_sort_order: int | None = None
+    url: str | None = None
+    is_confidential: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -35,11 +32,7 @@ class Meeting:
 
 @dataclass(frozen=True)
 class MeetingItem:
-    """Canonical agenda item record.
-
-    GemeenteOplossingen names these records `meetingitems`. In the public data
-    model they represent agenda items within a meeting.
-    """
+    """Canonical agenda item record."""
 
     id: str
     source_id: str
@@ -47,15 +40,17 @@ class MeetingItem:
     meeting_source_id: str
     municipality_slug: str
     source_system_id: str
-    number: str | None
-    sort_order: int | None
-    title: str | None
-    description: str | None
-    status_id: str | None
-    status_description: str | None
-    status_abbreviation: str | None
-    is_heading: bool
-    is_confidential: bool
+    schema_version: str = "1.0.0"
+    title: str | None = None
+    number: str | None = None
+    sort_order: int | None = None
+    sequence: int | None = None  # Contractveld v1.0.0
+    description: str | None = None
+    status_id: str | None = None
+    status_description: str | None = None
+    status_abbreviation: str | None = None
+    is_heading: bool = False
+    is_confidential: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -70,11 +65,15 @@ class MeetingDocumentRelation:
     meeting_source_id: str
     document_id: str
     document_source_id: str
-    document_object_id: str | None
     municipality_slug: str
     source_system_id: str
     relation_type: str
     source_path: str
+    schema_version: str = "1.0.0"
+    source_id: str | None = None  # Contractveld v1.0.0
+    target_id: str | None = None  # Contractveld v1.0.0
+    type: str = "document_to_meeting"  # Contractveld v1.0.0
+    document_object_id: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -91,11 +90,15 @@ class MeetingItemDocumentRelation:
     meeting_source_id: str
     document_id: str
     document_source_id: str
-    document_object_id: str | None
     municipality_slug: str
     source_system_id: str
     relation_type: str
     source_path: str
+    schema_version: str = "1.0.0"
+    source_id: str | None = None  # Contractveld v1.0.0
+    target_id: str | None = None  # Contractveld v1.0.0
+    type: str = "document_to_agenda_item"  # Contractveld v1.0.0
+    document_object_id: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
