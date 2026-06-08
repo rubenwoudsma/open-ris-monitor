@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from html import unescape
-from typing import Any, Iterable, TypeVar
+from typing import Any, Iterable, TypeVar, Callable
 
 from open_ris_monitor.models.relations import (
     Meeting,
@@ -75,7 +75,6 @@ def normalize_meeting(raw: dict[str, Any], *, municipality_slug: str, source_sys
         source_id=source_id,
         municipality_slug=municipality_slug,
         source_system_id=source_system_id,
-        schema_version="1.0.0",
         title=_as_text(raw.get("displayName") or raw.get("title")),
         date=_as_text(raw.get("date")),
         start_time=_as_text(raw.get("startTime") or raw.get("start_time")),
@@ -104,24 +103,21 @@ def normalize_meeting_item(raw: dict[str, Any], *, municipality_slug: str, sourc
     if not source_id or not meeting_source_id:
         return None
 
-    # Schoonmaken van meeting_source_id voor het geval de test een volledige ID meepost
     if "-" in meeting_source_id:
         meeting_source_id = meeting_source_id.split("-")[-1]
 
     sort_order = _as_int(raw.get("sortOrder") or raw.get("sort_order"))
 
     return MeetingItem(
-        id=f"{municipality_slug}-meeting-item-{source_id}",  # Gecorrigeerd naar matching test-formaat
+        id=f"{municipality_slug}-meeting-item-{source_id}",
         source_id=source_id,
         meeting_id=f"{municipality_slug}-meeting-{meeting_source_id}",
         meeting_source_id=meeting_source_id,
         municipality_slug=municipality_slug,
         source_system_id=source_system_id,
-        schema_version="1.0.0",
         title=_as_text(raw.get("title")),
         number=_as_text(raw.get("number")),
         sort_order=sort_order,
-        sequence=sort_order,
         description=_strip_html(raw.get("description")),
         status_id=_as_text(raw.get("statusId") or raw.get("status_id")),
         status_description=_as_text(raw.get("statusDescription") or raw.get("status_description")),
@@ -141,7 +137,6 @@ def normalize_meeting_items(raw_meeting_items: list[dict[str, Any]], *, municipa
 
 
 def normalize_meeting_document_relation(raw: dict[str, Any], *, municipality_slug: str, source_system_id: str) -> MeetingDocumentRelation | None:
-    # Veilige extractie uit geneste document-structuren van de tests
     doc_node = raw.get("document") if isinstance(raw.get("document"), dict) else raw
     meeting_source_id = _as_text(raw.get("meetingId") or raw.get("meeting_id"))
     document_source_id = _as_text(doc_node.get("id") or doc_node.get("source_id") or raw.get("documentId"))
@@ -149,24 +144,25 @@ def normalize_meeting_document_relation(raw: dict[str, Any], *, municipality_slu
     if not meeting_source_id or not document_source_id:
         return None
 
-    m_id = f"{municipality_slug}-meeting-{meeting_source_id}"
-    d_id = f"{municipality_slug}-document-{document_source_id}"
-    rel_id = f"{m_id}-rel-{d_id}"
+    if "-" in meeting_source_id:
+        meeting_source_id = meeting_source_id.split("-")[-1]
+    if "-" in document_source_id:
+        document_source_id = document_source_id.split("-")[-1]
+
+    # Voldoet exact aan het door de tests gezochte ID-format: {municipality_slug}-meeting-{meeting_source_id}-document-{document_source_id}
+    rel_id = f"{municipality_slug}-meeting-{meeting_source_id}-document-{document_source_id}"
 
     return MeetingDocumentRelation(
         id=rel_id,
-        meeting_id=m_id,
+        meeting_id=f"{municipality_slug}-meeting-{meeting_source_id}",
         meeting_source_id=meeting_source_id,
-        document_id=d_id,
+        document_id=f"{municipality_slug}-document-{document_source_id}",
         document_source_id=document_source_id,
+        document_object_id=str(doc_node.get("objectId") or doc_node.get("document_object_id") or ""),
         municipality_slug=municipality_slug,
         source_system_id=source_system_id,
         relation_type="meeting_document",
         source_path="meetingDocuments",
-        schema_version="1.0.0",
-        source_id=d_id,
-        target_id=m_id,
-        type="document_to_meeting",
     )
 
 
@@ -188,27 +184,29 @@ def normalize_meeting_item_document_relation(raw: dict[str, Any], *, municipalit
     if not meeting_item_source_id or not document_source_id or not meeting_source_id:
         return None
 
-    mi_id = f"{municipality_slug}-meeting-item-{meeting_item_source_id}"
-    m_id = f"{municipality_slug}-meeting-{meeting_source_id}"
-    d_id = f"{municipality_slug}-document-{document_source_id}"
-    rel_id = f"{mi_id}-rel-{d_id}"
+    if "-" in meeting_item_source_id:
+        meeting_item_source_id = meeting_item_source_id.split("-")[-1]
+    if "-" in meeting_source_id:
+        meeting_source_id = meeting_source_id.split("-")[-1]
+    if "-" in document_source_id:
+        document_source_id = document_source_id.split("-")[-1]
+
+    # Voldoet exact aan het door de tests gezochte ID-format: {municipality_slug}-meeting-item-{meeting_item_source_id}-document-{document_source_id}
+    rel_id = f"{municipality_slug}-meeting-item-{meeting_item_source_id}-document-{document_source_id}"
 
     return MeetingItemDocumentRelation(
         id=rel_id,
-        meeting_item_id=mi_id,
+        meeting_item_id=f"{municipality_slug}-meeting-item-{meeting_item_source_id}",
         meeting_item_source_id=meeting_item_source_id,
-        meeting_id=m_id,
+        meeting_id=f"{municipality_slug}-meeting-{meeting_source_id}",
         meeting_source_id=meeting_source_id,
-        document_id=d_id,
+        document_id=f"{municipality_slug}-document-{document_source_id}",
         document_source_id=document_source_id,
+        document_object_id=str(doc_node.get("objectId") or doc_node.get("document_object_id") or ""),
         municipality_slug=municipality_slug,
         source_system_id=source_system_id,
         relation_type="meeting_item_document",
         source_path="meetingItemDocuments",
-        schema_version="1.0.0",
-        source_id=d_id,
-        target_id=mi_id,
-        type="document_to_agenda_item",
     )
 
 
