@@ -99,7 +99,17 @@ def normalize_meetings(raw_meetings: list[dict[str, Any]], *, municipality_slug:
 
 def normalize_meeting_item(raw: dict[str, Any], *, municipality_slug: str, source_system_id: str) -> MeetingItem | None:
     source_id = _as_text(raw.get("id") or raw.get("source_id"))
-    meeting_source_id = _as_text(raw.get("meetingId") or raw.get("meeting_source_id") or raw.get("meeting_id"))
+    
+    # Uitgebreide en robuuste extractie voor de gekoppelde meeting ID (inclusief geneste objecten uit de tests)
+    meeting_node = raw.get("meeting") if isinstance(raw.get("meeting"), dict) else {}
+    meeting_source_id = _as_text(
+        raw.get("meetingId")
+        or raw.get("meeting_id")
+        or raw.get("meeting_source_id")
+        or meeting_node.get("id")
+        or meeting_node.get("source_id")
+    )
+    
     if not source_id or not meeting_source_id:
         return None
 
@@ -113,7 +123,7 @@ def normalize_meeting_item(raw: dict[str, Any], *, municipality_slug: str, sourc
         source_id=source_id,
         meeting_id=f"{municipality_slug}-meeting-{meeting_source_id}",
         meeting_source_id=meeting_source_id,
-        municipality_slug=municipality_slug,
+        municipality_slug=municipslug_value := municipality_slug,
         source_system_id=source_system_id,
         title=_as_text(raw.get("title")),
         number=_as_text(raw.get("number")),
@@ -139,7 +149,7 @@ def normalize_meeting_items(raw_meeting_items: list[dict[str, Any]], *, municipa
 def normalize_meeting_document_relation(raw: dict[str, Any], *, municipality_slug: str, source_system_id: str) -> MeetingDocumentRelation | None:
     doc_node = raw.get("document") if isinstance(raw.get("document"), dict) else raw
     meeting_source_id = _as_text(raw.get("meetingId") or raw.get("meeting_id"))
-    document_source_id = _as_text(doc_node.get("id") or doc_node.get("source_id") or raw.get("documentId"))
+    document_source_id = _as_text(doc_node.get("id") or doc_node.get("source_id") or raw.get("documentId") or raw.get("document_id"))
     
     if not meeting_source_id or not document_source_id:
         return None
@@ -149,7 +159,6 @@ def normalize_meeting_document_relation(raw: dict[str, Any], *, municipality_slu
     if "-" in document_source_id:
         document_source_id = document_source_id.split("-")[-1]
 
-    # Voldoet exact aan het door de tests gezochte ID-format: {municipality_slug}-meeting-{meeting_source_id}-document-{document_source_id}
     rel_id = f"{municipality_slug}-meeting-{meeting_source_id}-document-{document_source_id}"
 
     return MeetingDocumentRelation(
@@ -158,11 +167,11 @@ def normalize_meeting_document_relation(raw: dict[str, Any], *, municipality_slu
         meeting_source_id=meeting_source_id,
         document_id=f"{municipality_slug}-document-{document_source_id}",
         document_source_id=document_source_id,
-        document_object_id=str(doc_node.get("objectId") or doc_node.get("document_object_id") or ""),
+        document_object_id=str(doc_node.get("objectId") or doc_node.get("source_object_id") or doc_node.get("document_object_id") or ""),
         municipality_slug=municipality_slug,
         source_system_id=source_system_id,
         relation_type="meeting_document",
-        source_path="meetingDocuments",
+        source_path=f"/meetings/{meeting_source_id}/documents",
     )
 
 
@@ -179,7 +188,7 @@ def normalize_meeting_item_document_relation(raw: dict[str, Any], *, municipalit
     doc_node = raw.get("document") if isinstance(raw.get("document"), dict) else raw
     meeting_item_source_id = _as_text(raw.get("meetingItemId") or raw.get("meeting_item_id"))
     meeting_source_id = _as_text(raw.get("meetingId") or raw.get("meeting_id"))
-    document_source_id = _as_text(doc_node.get("id") or doc_node.get("source_id") or raw.get("documentId"))
+    document_source_id = _as_text(doc_node.get("id") or doc_node.get("source_id") or raw.get("documentId") or raw.get("document_id"))
     
     if not meeting_item_source_id or not document_source_id or not meeting_source_id:
         return None
@@ -191,7 +200,6 @@ def normalize_meeting_item_document_relation(raw: dict[str, Any], *, municipalit
     if "-" in document_source_id:
         document_source_id = document_source_id.split("-")[-1]
 
-    # Voldoet exact aan het door de tests gezochte ID-format: {municipality_slug}-meeting-item-{meeting_item_source_id}-document-{document_source_id}
     rel_id = f"{municipality_slug}-meeting-item-{meeting_item_source_id}-document-{document_source_id}"
 
     return MeetingItemDocumentRelation(
@@ -202,11 +210,11 @@ def normalize_meeting_item_document_relation(raw: dict[str, Any], *, municipalit
         meeting_source_id=meeting_source_id,
         document_id=f"{municipality_slug}-document-{document_source_id}",
         document_source_id=document_source_id,
-        document_object_id=str(doc_node.get("objectId") or doc_node.get("document_object_id") or ""),
+        document_object_id=str(doc_node.get("objectId") or doc_node.get("source_object_id") or doc_node.get("document_object_id") or ""),
         municipality_slug=municipality_slug,
         source_system_id=source_system_id,
         relation_type="meeting_item_document",
-        source_path="meetingItemDocuments",
+        source_path=f"/meetingitems/{meeting_item_source_id}/documents",
     )
 
 
