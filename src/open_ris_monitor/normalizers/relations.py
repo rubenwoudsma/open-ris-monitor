@@ -217,7 +217,8 @@ def normalize_meetings(
     municipality_slug: str,
     source_system_id: str,
 ) -> list[Meeting]:
-    return [
+    """Normalize a list of raw meeting records."""
+    records = [
         record
         for raw in raw_meetings
         if (
@@ -229,6 +230,8 @@ def normalize_meetings(
         )
         is not None
     ]
+    # Zorg voor unieke records op basis van het stabiele ID
+    return _stable_unique(records, lambda record: record.id)
 
 
 def normalize_meeting_items(
@@ -237,7 +240,8 @@ def normalize_meeting_items(
     municipality_slug: str,
     source_system_id: str,
 ) -> list[MeetingItem]:
-    return [
+    """Normalize a list of raw meeting item records."""
+    records = [
         record
         for raw in raw_meeting_items
         if (
@@ -249,7 +253,8 @@ def normalize_meeting_items(
         )
         is not None
     ]
-
+    # Zorg voor unieke records op basis van het stabiele ID
+    return _stable_unique(records, lambda record: record.id)
 
 def normalize_meeting_document_relations(
     raw_relations: list[dict[str, Any]],
