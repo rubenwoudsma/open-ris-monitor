@@ -123,7 +123,7 @@ def normalize_meeting_item(raw: dict[str, Any], *, municipality_slug: str, sourc
         source_id=source_id,
         meeting_id=f"{municipality_slug}-meeting-{meeting_source_id}",
         meeting_source_id=meeting_source_id,
-        municipality_slug=municipslug_value := municipality_slug,
+        municipality_slug=municipality_slug,
         source_system_id=source_system_id,
         title=_as_text(raw.get("title")),
         number=_as_text(raw.get("number")),
