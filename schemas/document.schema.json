@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/rubenwoudsma/open-ris-monitor/schemas/document.schema.json",
   "title": "Document Schema",
-  "description": "Schema for municipal document export entities (reports, letters, or motions).",
+  "description": "Schema for municipal document export entities (reports, letters, motions, attachments and other RIS documents).",
   "type": "object",
   "required": [
     "id",
@@ -30,7 +30,28 @@
         "string",
         "null"
       ],
-      "description": "Document categorization (e.g., Raadsvoorstel, Brief, Bijlage)."
+      "description": "Compact normalized document type for filtering. Kept for backward compatibility."
+    },
+    "document_type": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Original document type label or value from the source RIS."
+    },
+    "normalized_document_type": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Compact normalized document type for filtering."
+    },
+    "normalized_document_type_label": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Human-readable Dutch label for the normalized document type."
     },
     "date": {
       "type": [
@@ -43,7 +64,52 @@
     "url": {
       "type": "string",
       "format": "uri",
-      "description": "Absolute source URL pointing to the original document location."
+      "description": "Absolute source or download URL pointing to the original document location."
+    },
+    "download_url": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uri",
+      "description": "Absolute download URL for the document asset."
+    },
+    "retrieved_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp at which this document metadata was retrieved from the source RIS."
+    },
+    "source_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Document identifier from the source RIS."
+    },
+    "source_object_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Object identifier from the source RIS, when available."
+    },
+    "filename": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Filename supplied by the source RIS."
+    },
+    "file_size_bytes": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "description": "File size in bytes supplied by the source RIS."
     },
     "text": {
       "type": [
