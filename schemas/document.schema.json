@@ -74,6 +74,14 @@
       "format": "uri",
       "description": "Absolute download URL for the document asset."
     },
+    "retrieved_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "description": "Timestamp at which this document metadata was retrieved from the source RIS."
+    },
     "source_id": {
       "type": [
         "string",

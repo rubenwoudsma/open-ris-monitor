@@ -83,6 +83,7 @@ def _public_document_record(record: Any) -> dict[str, Any]:
         "date": publication_date,
         "url": download_url or "",
         "download_url": download_url,
+        "retrieved_at": _as_public_string(data.get("retrieved_at")),
         "source_id": _as_public_string(data.get("source_id")),
         "source_object_id": _as_public_string(data.get("source_object_id")),
         "filename": _as_public_string(data.get("filename")),

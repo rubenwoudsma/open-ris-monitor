@@ -54,6 +54,7 @@ def test_public_document_export_preserves_source_metadata(tmp_path: Path) -> Non
         "date": "2026-05-19",
         "url": "https://ris.gemeenteraadhuizen.nl/api/v2/documents/25892/download",
         "download_url": "https://ris.gemeenteraadhuizen.nl/api/v2/documents/25892/download",
+        "retrieved_at": "2026-06-09T00:00:00Z",
         "source_id": "25892",
         "source_object_id": "43243",
         "filename": "Verzoek commissiebehandeling.pdf",
