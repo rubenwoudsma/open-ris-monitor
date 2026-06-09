@@ -226,6 +226,33 @@ function formatDocumentSize(documentRecord: DocumentRecord): string {
   return formatted === "-" ? unavailable("Geen bestandsgrootte beschikbaar") : formatted;
 }
 
+function hasDocumentFilenameMetadata(documentRecord: DocumentRecord): boolean {
+  return Boolean(getDocumentFilename(documentRecord));
+}
+
+function hasDocumentSizeMetadata(documentRecord: DocumentRecord): boolean {
+  return Boolean(getDocumentSize(documentRecord));
+}
+
+function hasAnyDocumentFilenameMetadata(records: DocumentRecord[]): boolean {
+  return records.some(hasDocumentFilenameMetadata);
+}
+
+function hasAnyDocumentSizeMetadata(records: DocumentRecord[]): boolean {
+  return records.some(hasDocumentSizeMetadata);
+}
+
+function getVisibleDocumentColumnCount(showFilenameColumn: boolean, showSizeColumn: boolean): number {
+  return 5 + Number(showFilenameColumn) + Number(showSizeColumn);
+}
+
+function setTableColumnVisibility(headerLabel: string, visible: boolean): void {
+  const table = elements.tableBody.closest("table");
+  const headers = Array.from(table?.querySelectorAll("thead th") ?? []);
+  const header = headers.find((cell) => cell.textContent?.trim() === headerLabel);
+  if (header) header.hidden = !visible;
+}
+
 function getDocumentUrl(documentRecord: DocumentRecord): string | null {
   return safeUrl(
     pick(
@@ -462,6 +489,12 @@ function renderDocuments(): void {
   state.currentPage = Math.min(Math.max(state.currentPage, 1), totalPages);
   const start = (state.currentPage - 1) * state.pageSize;
   const pageRecords = state.filteredDocuments.slice(start, start + state.pageSize);
+  const allDocuments = state.data?.documents ?? [];
+  const showFilenameColumn = hasAnyDocumentFilenameMetadata(allDocuments);
+  const showSizeColumn = hasAnyDocumentSizeMetadata(allDocuments);
+
+  setTableColumnVisibility("Bestand", showFilenameColumn);
+  setTableColumnVisibility("Grootte", showSizeColumn);
 
   elements.resultCount.textContent = `${total} document(en)`;
   elements.visibleDocumentsCount.textContent = `${total} zichtbaar`;
@@ -470,7 +503,7 @@ function renderDocuments(): void {
   if (pageRecords.length === 0) {
     const row = document.createElement("tr");
     const cell = createCell("Geen documenten gevonden.");
-    cell.colSpan = 7;
+    cell.colSpan = getVisibleDocumentColumnCount(showFilenameColumn, showSizeColumn);
     row.appendChild(cell);
     elements.tableBody.appendChild(row);
   }
@@ -483,8 +516,8 @@ function renderDocuments(): void {
     row.appendChild(createCell(getCompactTypeLabel(documentRecord)));
     row.appendChild(createCell(text(getSourceDocumentType(documentRecord), unavailable())));
     row.appendChild(createDocumentTitleCell(documentRecord));
-    row.appendChild(createCell(text(getDocumentFilename(documentRecord), unavailable("Geen bestandsmetadata"))));
-    row.appendChild(createCell(formatDocumentSize(documentRecord)));
+    if (showFilenameColumn) row.appendChild(createCell(text(getDocumentFilename(documentRecord), unavailable("Geen bestandsmetadata"))));
+    if (showSizeColumn) row.appendChild(createCell(formatDocumentSize(documentRecord)));
     row.appendChild(createDocumentActionsCell(documentRecord));
     row.dataset.documentId = documentId;
     elements.tableBody.appendChild(row);
@@ -546,8 +579,10 @@ function renderDocumentDetail(documentRecord: DocumentRecord): void {
   appendDefinition(meta, "Datum", formatDate(getDocumentDate(documentRecord)));
   appendDefinition(meta, "Compact type", getCompactTypeLabel(documentRecord));
   appendDefinition(meta, "Bron type", text(getSourceDocumentType(documentRecord), unavailable()));
-  appendDefinition(meta, "Bestand", text(getDocumentFilename(documentRecord), unavailable("Geen bestandsmetadata")));
-  appendDefinition(meta, "Grootte", formatDocumentSize(documentRecord));
+  const filename = getDocumentFilename(documentRecord);
+  if (filename) appendDefinition(meta, "Bestand", filename);
+  const size = formatDocumentSize(documentRecord);
+  if (size !== "Geen bestandsgrootte beschikbaar") appendDefinition(meta, "Grootte", size);
   appendDefinition(meta, "Document ID", text(primaryId, unavailable("Geen document-ID")));
   appendDefinition(meta, "Bron-ID", text(pick(documentRecord.source_id, documentRecord.source_object_id), unavailable()));
   appendDefinition(meta, "Schema", text(documentRecord.schema_version, unavailable()));
@@ -576,7 +611,7 @@ function renderDocumentDetail(documentRecord: DocumentRecord): void {
   const metadataIssues = [
     isUnknownType(pick(documentRecord.normalized_document_type, documentRecord.normalized_document_type_label, documentRecord.type)) ? "compact documenttype ontbreekt" : "",
     getDocumentFilename(documentRecord) ? "" : "bestandsnaam ontbreekt",
-    formatDocumentSize(documentRecord) === "Geen bestandsgrootte beschikbaar" ? "bestandsgrootte ontbreekt" : "",
+    hasDocumentSizeMetadata(documentRecord) ? "" : "bestandsgrootte ontbreekt",
     downloadHref ? "" : "documentlink ontbreekt",
   ].filter(Boolean);
   if (metadataIssues.length > 0) {

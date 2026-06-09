@@ -142,6 +142,28 @@ function formatDocumentSize(documentRecord) {
     const formatted = formatBytes(getDocumentSize(documentRecord));
     return formatted === "-" ? unavailable("Geen bestandsgrootte beschikbaar") : formatted;
 }
+function hasDocumentFilenameMetadata(documentRecord) {
+    return Boolean(getDocumentFilename(documentRecord));
+}
+function hasDocumentSizeMetadata(documentRecord) {
+    return Boolean(getDocumentSize(documentRecord));
+}
+function hasAnyDocumentFilenameMetadata(records) {
+    return records.some(hasDocumentFilenameMetadata);
+}
+function hasAnyDocumentSizeMetadata(records) {
+    return records.some(hasDocumentSizeMetadata);
+}
+function getVisibleDocumentColumnCount(showFilenameColumn, showSizeColumn) {
+    return 5 + Number(showFilenameColumn) + Number(showSizeColumn);
+}
+function setTableColumnVisibility(headerLabel, visible) {
+    const table = elements.tableBody.closest("table");
+    const headers = Array.from(table?.querySelectorAll("thead th") ?? []);
+    const header = headers.find((cell) => cell.textContent?.trim() === headerLabel);
+    if (header)
+        header.hidden = !visible;
+}
 function getDocumentUrl(documentRecord) {
     return safeUrl(pick(documentRecord.download_url, documentRecord.source_url, documentRecord.url, documentRecord.file_url, documentRecord.document_url, documentRecord.web_url, documentRecord.external_url, pickFromRaw(documentRecord, "download_url", "downloadUrl", "source_url", "sourceUrl", "url", "fileUrl", "documentUrl", "webUrl"), pickNestedRaw(documentRecord, "file", "url", "downloadUrl", "download_url", "href")));
 }
@@ -349,13 +371,18 @@ function renderDocuments() {
     state.currentPage = Math.min(Math.max(state.currentPage, 1), totalPages);
     const start = (state.currentPage - 1) * state.pageSize;
     const pageRecords = state.filteredDocuments.slice(start, start + state.pageSize);
+    const allDocuments = state.data?.documents ?? [];
+    const showFilenameColumn = hasAnyDocumentFilenameMetadata(allDocuments);
+    const showSizeColumn = hasAnyDocumentSizeMetadata(allDocuments);
+    setTableColumnVisibility("Bestand", showFilenameColumn);
+    setTableColumnVisibility("Grootte", showSizeColumn);
     elements.resultCount.textContent = `${total} document(en)`;
     elements.visibleDocumentsCount.textContent = `${total} zichtbaar`;
     elements.tableBody.replaceChildren();
     if (pageRecords.length === 0) {
         const row = document.createElement("tr");
         const cell = createCell("Geen documenten gevonden.");
-        cell.colSpan = 7;
+        cell.colSpan = getVisibleDocumentColumnCount(showFilenameColumn, showSizeColumn);
         row.appendChild(cell);
         elements.tableBody.appendChild(row);
     }
@@ -368,8 +395,10 @@ function renderDocuments() {
         row.appendChild(createCell(getCompactTypeLabel(documentRecord)));
         row.appendChild(createCell(text(getSourceDocumentType(documentRecord), unavailable())));
         row.appendChild(createDocumentTitleCell(documentRecord));
-        row.appendChild(createCell(text(getDocumentFilename(documentRecord), unavailable("Geen bestandsmetadata"))));
-        row.appendChild(createCell(formatDocumentSize(documentRecord)));
+        if (showFilenameColumn)
+            row.appendChild(createCell(text(getDocumentFilename(documentRecord), unavailable("Geen bestandsmetadata"))));
+        if (showSizeColumn)
+            row.appendChild(createCell(formatDocumentSize(documentRecord)));
         row.appendChild(createDocumentActionsCell(documentRecord));
         row.dataset.documentId = documentId;
         elements.tableBody.appendChild(row);
@@ -426,8 +455,12 @@ function renderDocumentDetail(documentRecord) {
     appendDefinition(meta, "Datum", formatDate(getDocumentDate(documentRecord)));
     appendDefinition(meta, "Compact type", getCompactTypeLabel(documentRecord));
     appendDefinition(meta, "Bron type", text(getSourceDocumentType(documentRecord), unavailable()));
-    appendDefinition(meta, "Bestand", text(getDocumentFilename(documentRecord), unavailable("Geen bestandsmetadata")));
-    appendDefinition(meta, "Grootte", formatDocumentSize(documentRecord));
+    const filename = getDocumentFilename(documentRecord);
+    if (filename)
+        appendDefinition(meta, "Bestand", filename);
+    const size = formatDocumentSize(documentRecord);
+    if (size !== "Geen bestandsgrootte beschikbaar")
+        appendDefinition(meta, "Grootte", size);
     appendDefinition(meta, "Document ID", text(primaryId, unavailable("Geen document-ID")));
     appendDefinition(meta, "Bron-ID", text(pick(documentRecord.source_id, documentRecord.source_object_id), unavailable()));
     appendDefinition(meta, "Schema", text(documentRecord.schema_version, unavailable()));
@@ -455,7 +488,7 @@ function renderDocumentDetail(documentRecord) {
     const metadataIssues = [
         isUnknownType(pick(documentRecord.normalized_document_type, documentRecord.normalized_document_type_label, documentRecord.type)) ? "compact documenttype ontbreekt" : "",
         getDocumentFilename(documentRecord) ? "" : "bestandsnaam ontbreekt",
-        formatDocumentSize(documentRecord) === "Geen bestandsgrootte beschikbaar" ? "bestandsgrootte ontbreekt" : "",
+        hasDocumentSizeMetadata(documentRecord) ? "" : "bestandsgrootte ontbreekt",
         downloadHref ? "" : "documentlink ontbreekt",
     ].filter(Boolean);
     if (metadataIssues.length > 0) {
