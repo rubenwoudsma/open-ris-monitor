@@ -18,9 +18,10 @@ def test_compact_type_label_prefers_human_readable_export_label() -> None:
     source = read_viewer_source()
     function = extract_function(source, "getCompactTypeLabel")
 
-    assert "normalized_document_type_label" in function
-    assert "normalized_document_type" in function
-    assert function.index("normalized_document_type_label") < function.index("normalized_document_type")
+    label_position = function.index("documentRecord.normalized_document_type_label")
+    normalized_type_position = function.index("documentRecord.normalized_document_type,")
+
+    assert label_position < normalized_type_position
     assert "Bron:" not in function
 
 
