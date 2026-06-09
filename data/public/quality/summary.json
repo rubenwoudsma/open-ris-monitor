@@ -1,64 +1,33 @@
 {
-  "generated_at": "2026-06-04T13:40:17.965916+00:00",
+  "generated_at": "2026-06-09T07:06:16.579842+00:00",
   "counts": {
     "documents": 250,
     "document_versions": 25,
     "harvest_runs": 1,
-    "meetings": 12,
-    "meeting_items": 33,
-    "meeting_documents": 1,
+    "meetings": 14,
+    "meeting_items": 39,
+    "meeting_documents": 4,
     "meeting_item_documents": 77
   },
   "coverage": {
-    "documents_with_relations": 76,
-    "documents_without_relations": 174,
-    "coverage_pct": 30.4
+    "documents_with_relations": 0,
+    "documents_without_relations": 250,
+    "coverage_pct": 0.0
   },
   "integrity": {
-    "orphan_meeting_document_relations": 0,
-    "orphan_meeting_item_document_relations": 0
+    "orphan_meeting_document_relations": 4,
+    "orphan_meeting_item_document_relations": 77
   },
   "activity": {
-    "meetings_without_items": 0,
-    "items_without_documents": 0
+    "meetings_without_items": 1,
+    "items_without_documents": 39
   },
   "document_types": {
-    "source": {
-      "Agenda": 12,
-      "Amendementen": 3,
-      "Besluit": 1,
-      "Besluitenlijst raad": 1,
-      "Bijlage": 56,
-      "Collegevoorstel (BBV)": 23,
-      "Financiële overzichten commissie": 1,
-      "Ingekomen stuk": 25,
-      "Kennisgeving": 1,
-      "Mededelingen": 29,
-      "Moties": 13,
-      "Overig": 44,
-      "Overzicht stand van zaken": 2,
-      "Raadsvoorstel": 22,
-      "Resumés": 1,
-      "Toezeggingen": 4,
-      "Vragen van raadsleden": 12
-    },
+    "source": {},
     "normalized": {
-      "agenda": 12,
-      "amendment": 3,
-      "announcement": 29,
-      "attachment": 56,
-      "commitment": 4,
-      "decision": 2,
-      "incoming_document": 25,
-      "minutes_or_summary": 1,
-      "motion": 13,
-      "notice": 1,
-      "other": 44,
-      "proposal": 45,
-      "question": 12,
-      "report": 3
+      "unknown": 250
     },
-    "unknown_count": 0
+    "unknown_count": 250
   },
   "harvest": {
     "latest_run_status": "success",
@@ -69,17 +38,36 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-06-04T13:40:17.689051+00:00",
-      "id": "harvest-huizen-20260604T133421Z",
+      "finished_at": "2026-06-09T07:06:16.322373+00:00",
+      "id": "harvest-huizen-20260609T070106Z",
       "max_documents": null,
       "meetings_seen": 204,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-06-04T13:34:21.794109+00:00",
+      "started_at": "2026-06-09T07:01:06.234211+00:00",
       "status": "success"
     }
   },
-  "issues": []
+  "issues": [
+    {
+      "severity": "warning",
+      "code": "orphan_meeting_document_relations",
+      "count": 4,
+      "message": "Meeting-document relations reference missing records."
+    },
+    {
+      "severity": "warning",
+      "code": "orphan_meeting_item_document_relations",
+      "count": 77,
+      "message": "Meeting-item-document relations reference missing records."
+    },
+    {
+      "severity": "info",
+      "code": "unknown_document_types",
+      "count": 250,
+      "message": "Some documents are not mapped to a normalized document type."
+    }
+  ]
 }
