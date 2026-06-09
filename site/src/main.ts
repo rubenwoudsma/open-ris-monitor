@@ -1,6 +1,14 @@
 import { loadPublicData } from "./data/loaders.js";
-import { buildRelationIndexes, getDocumentIdentifiers, getRecordId } from "./data/relations.js";
-import type { AgendaItemRecord, DocumentRecord, DocumentVersionRecord, MeetingRecord, PublicDataSet, RelationIndexes } from "./data/types.js";
+import { buildRelationIndexes, getDocumentIdentifiers } from "./data/relations.js";
+import type {
+  AgendaItemRecord,
+  DocumentRecord,
+  DocumentVersionRecord,
+  MeetingRecord,
+  PublicDataSet,
+  RelationIndexes,
+  UnknownRecord,
+} from "./data/types.js";
 import { formatBytes, formatDate, formatDateTime, pick, safeUrl, text, timestamp } from "./ui/format.js";
 
 interface ViewerState {
@@ -121,7 +129,8 @@ function getAgendaItemTitle(item: AgendaItemRecord | undefined): string {
 }
 
 function isUnknownType(value: string): boolean {
-  return !value || value.toLowerCase() === "unknown" || value.toLowerCase() === "onbekend";
+  const normalized = value.trim().toLowerCase();
+  return !normalized || normalized === "unknown" || normalized === "onbekend";
 }
 
 function unavailable(reason = "Niet beschikbaar in export"): string {
@@ -141,7 +150,7 @@ function pickFromRaw(record: DocumentRecord, ...keys: string[]): string {
 function pickNestedRaw(record: DocumentRecord, objectKey: string, ...keys: string[]): string {
   const nested = record.raw?.[objectKey];
   if (!nested || typeof nested !== "object") return "";
-  const nestedRecord = nested as Record<string, unknown>;
+  const nestedRecord = nested as UnknownRecord;
   for (const key of keys) {
     const picked = pick(nestedRecord[key]);
     if (picked) return picked;
@@ -150,30 +159,34 @@ function pickNestedRaw(record: DocumentRecord, objectKey: string, ...keys: strin
 }
 
 function getCompactType(documentRecord: DocumentRecord): string {
-  const normalized = pick(documentRecord.normalized_document_type);
+  const normalized = pick(documentRecord.normalized_document_type, documentRecord.type);
   if (!isUnknownType(normalized)) return normalized;
   return "unknown";
 }
 
 function getCompactTypeLabel(documentRecord: DocumentRecord): string {
   const normalizedLabel = pick(documentRecord.normalized_document_type_label);
-  const normalizedType = pick(documentRecord.normalized_document_type);
-  const sourceType = getSourceDocumentType(documentRecord);
-
   if (!isUnknownType(normalizedLabel)) return normalizedLabel;
+
+  const normalizedType = pick(documentRecord.normalized_document_type, documentRecord.type);
   if (!isUnknownType(normalizedType)) return normalizedType;
-  if (sourceType) return `Bron: ${sourceType}`;
+
   return unavailable();
 }
 
 function getSourceDocumentType(documentRecord: DocumentRecord): string {
-  return pick(
+  const sourceType = pick(
     documentRecord.document_type,
-    documentRecord.type,
-    documentRecord.category,
-    documentRecord.kind,
-    pickFromRaw(documentRecord, "document_type", "documentType", "type", "category", "kind"),
+    pickFromRaw(documentRecord, "document_type", "documentTypeLabel", "documentType", "category", "kind"),
   );
+
+  if (!sourceType) return "";
+
+  const compactType = getCompactType(documentRecord);
+  const compactTypeLabel = getCompactTypeLabel(documentRecord);
+  if (sourceType === compactType || sourceType === compactTypeLabel) return "";
+
+  return sourceType;
 }
 
 function getDocumentFilename(documentRecord: DocumentRecord): string {
@@ -191,16 +204,21 @@ function getDocumentFilename(documentRecord: DocumentRecord): string {
 
 function getDocumentSize(documentRecord: DocumentRecord): unknown {
   const values = [
+    documentRecord.file_size_bytes,
     documentRecord.size_bytes,
     documentRecord.file_size,
     documentRecord.filesize,
     documentRecord.size,
     documentRecord.bytes,
     documentRecord.content_length,
-    pickFromRaw(documentRecord, "size_bytes", "file_size", "fileSize", "filesize", "size", "bytes", "contentLength"),
+    pickFromRaw(recordDocumentForRaw(documentRecord), "file_size_bytes", "size_bytes", "file_size", "fileSize", "filesize", "size", "bytes", "contentLength"),
     pickNestedRaw(documentRecord, "file", "size", "bytes", "size_bytes", "fileSize"),
   ];
   return values.find((value) => pick(value));
+}
+
+function recordDocumentForRaw(documentRecord: DocumentRecord): DocumentRecord {
+  return documentRecord;
 }
 
 function formatDocumentSize(documentRecord: DocumentRecord): string {
@@ -245,17 +263,14 @@ function relatedAgendaItemIds(documentRecord: DocumentRecord): string[] {
 function relationLabelsForDocument(documentRecord: DocumentRecord): string[] {
   if (!state.indexes) return [];
   const labels: string[] = [];
-
   for (const meetingId of relatedMeetingIds(documentRecord)) {
     const meeting = state.indexes.meetingsById.get(meetingId);
     labels.push([getMeetingTitle(meeting), formatDate(pick(meeting?.date, meeting?.start_time))].filter(Boolean).join(", "));
   }
-
   for (const itemId of relatedAgendaItemIds(documentRecord)) {
     const item = state.indexes.agendaItemsById.get(itemId);
     labels.push(getAgendaItemTitle(item));
   }
-
   return uniqueValues(labels);
 }
 
@@ -299,10 +314,10 @@ function renderSummary(): void {
 
   const documents = state.data?.documents ?? [];
   const linkedDocumentCount = documents.filter((record) => relationLabelsForDocument(record).length > 0).length;
-  const unknownTypeCount = documents.filter((record) => isUnknownType(pick(record.normalized_document_type, record.normalized_document_type_label))).length;
+  const unknownTypeCount = documents.filter((record) => isUnknownType(pick(record.normalized_document_type, record.normalized_document_type_label, record.type))).length;
   const relationCount = (state.data?.meetingDocumentRelations.length ?? 0) + (state.data?.meetingItemDocumentRelations.length ?? 0);
-  elements.linkedDocumentsCount.textContent = text(linkedDocumentCount);
 
+  elements.linkedDocumentsCount.textContent = text(linkedDocumentCount);
   const notices: string[] = [];
   if (documents.length > 0 && linkedDocumentCount === 0 && relationCount > 0) {
     notices.push(`${relationCount} relationele records geladen, maar Geen bruikbare documentkoppelingen in deze export.`);
@@ -324,7 +339,6 @@ function populateTypeFilter(): void {
   for (const documentRecord of state.data?.documents ?? []) {
     options.set(getCompactType(documentRecord), getCompactTypeLabel(documentRecord));
   }
-
   for (const [value, label] of [...options.entries()].sort((a, b) => a[1].localeCompare(b[1], "nl"))) {
     const option = document.createElement("option");
     option.value = value;
@@ -364,13 +378,11 @@ function applyFilters(): void {
   const query = elements.searchInput.value.trim().toLowerCase();
   const type = elements.typeFilter.value;
   const allDocuments = state.data?.documents ?? [];
-
   let records = allDocuments.filter((documentRecord) => {
     if (type && getCompactType(documentRecord) !== type) return false;
     if (query && !searchBlob(documentRecord).includes(query)) return false;
     return true;
   });
-
   records = sortDocuments(records);
   state.filteredDocuments = records;
   renderDocuments();
@@ -412,7 +424,6 @@ function createDocumentTitleCell(documentRecord: DocumentRecord): HTMLTableCellE
     }
     cell.appendChild(list);
   }
-
   return cell;
 }
 
@@ -420,7 +431,6 @@ function createDocumentActionsCell(documentRecord: DocumentRecord): HTMLTableCel
   const cell = document.createElement("td");
   const actionList = document.createElement("div");
   actionList.className = "document-actions";
-
   const detailButton = document.createElement("button");
   detailButton.type = "button";
   detailButton.className = "secondary-button";
@@ -437,7 +447,6 @@ function createDocumentActionsCell(documentRecord: DocumentRecord): HTMLTableCel
     link.target = "_blank";
     actionList.appendChild(link);
   }
-
   cell.appendChild(actionList);
   return cell;
 }
@@ -470,7 +479,6 @@ function renderDocuments(): void {
     const row = document.createElement("tr");
     const documentId = getDocumentId(documentRecord);
     if (state.selectedDocumentId && documentIds(documentRecord).includes(state.selectedDocumentId)) row.className = "is-selected";
-
     row.appendChild(createCell(formatDate(getDocumentDate(documentRecord))));
     row.appendChild(createCell(getCompactTypeLabel(documentRecord)));
     row.appendChild(createCell(text(getSourceDocumentType(documentRecord), unavailable())));
@@ -511,6 +519,12 @@ function renderEmptyRelation(label: string): HTMLElement {
   paragraph.className = "empty-state";
   paragraph.textContent = label;
   return paragraph;
+}
+
+function appendSectionHeading(section: HTMLElement, label: string): void {
+  const heading = document.createElement("h3");
+  heading.textContent = label;
+  section.appendChild(heading);
 }
 
 function renderDocumentDetail(documentRecord: DocumentRecord): void {
@@ -560,12 +574,11 @@ function renderDocumentDetail(documentRecord: DocumentRecord): void {
   elements.documentDetailBody.appendChild(grid);
 
   const metadataIssues = [
-    isUnknownType(pick(documentRecord.normalized_document_type, documentRecord.normalized_document_type_label)) ? "compact documenttype ontbreekt" : "",
+    isUnknownType(pick(documentRecord.normalized_document_type, documentRecord.normalized_document_type_label, documentRecord.type)) ? "compact documenttype ontbreekt" : "",
     getDocumentFilename(documentRecord) ? "" : "bestandsnaam ontbreekt",
     formatDocumentSize(documentRecord) === "Geen bestandsgrootte beschikbaar" ? "bestandsgrootte ontbreekt" : "",
     downloadHref ? "" : "documentlink ontbreekt",
   ].filter(Boolean);
-
   if (metadataIssues.length > 0) {
     const notice = document.createElement("p");
     notice.className = "metadata-notice";
@@ -585,7 +598,7 @@ function renderDocumentDetail(documentRecord: DocumentRecord): void {
 
   const meetingsSection = document.createElement("section");
   meetingsSection.className = "detail-section";
-  meetingsSection.innerHTML = "<h3>Gekoppelde vergaderingen</h3>";
+  appendSectionHeading(meetingsSection, "Gekoppelde vergaderingen");
   if (meetingIds.length === 0) {
     meetingsSection.appendChild(renderEmptyRelation("Geen gekoppelde vergadering gevonden in de huidige public export."));
   } else {
@@ -599,7 +612,7 @@ function renderDocumentDetail(documentRecord: DocumentRecord): void {
 
   const agendaSection = document.createElement("section");
   agendaSection.className = "detail-section";
-  agendaSection.innerHTML = "<h3>Gekoppelde agendapunten</h3>";
+  appendSectionHeading(agendaSection, "Gekoppelde agendapunten");
   if (itemIds.length === 0) {
     agendaSection.appendChild(renderEmptyRelation("Geen gekoppeld agendapunt gevonden in de huidige public export."));
   } else {
@@ -614,7 +627,7 @@ function renderDocumentDetail(documentRecord: DocumentRecord): void {
 
   const versionsSection = document.createElement("section");
   versionsSection.className = "detail-section";
-  versionsSection.innerHTML = "<h3>Versies</h3>";
+  appendSectionHeading(versionsSection, "Versies");
   if (versions.length === 0) {
     versionsSection.appendChild(renderEmptyRelation("Geen aparte versiehistorie gevonden."));
   } else {
@@ -624,7 +637,6 @@ function renderDocumentDetail(documentRecord: DocumentRecord): void {
     }
   }
   relations.appendChild(versionsSection);
-
   elements.documentDetailBody.appendChild(relations);
 }
 
@@ -661,7 +673,6 @@ function restoreDeepLink(): void {
   const params = new URLSearchParams(window.location.search);
   const query = params.get("q") ?? "";
   const documentId = params.get("documentId") ?? params.get("doc") ?? "";
-
   if (query) elements.searchInput.value = query;
   if (documentId) {
     const documentRecord = findDocumentById(documentId);
@@ -695,7 +706,6 @@ function attachEvents(): void {
     applyFilters();
   });
   elements.clearDocumentSelection.addEventListener("click", () => clearDocumentSelection(true));
-
   for (const button of [elements.previousTop, elements.previousBottom]) {
     button.addEventListener("click", () => {
       state.currentPage -= 1;
@@ -720,12 +730,10 @@ async function init(): Promise<void> {
     state.data.meetingDocumentRelations,
     state.data.meetingItemDocumentRelations,
   );
-
   populateTypeFilter();
   renderSummary();
   restoreDeepLink();
   applyFilters();
-
   window.OpenRISMonitor = {
     indexes: state.indexes,
     focusDocumentById(documentId: string) {
