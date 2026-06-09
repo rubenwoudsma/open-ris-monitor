@@ -9,27 +9,27 @@
     "description": "source_id + source_object_id",
     "duplicate_count": 0,
     "duplicates": [],
-    "missing_count": 250,
-    "unique_count": 0
+    "missing_count": 0,
+    "unique_count": 250
   },
   "documents_total": 250,
-  "generated_at": "2026-06-09T07:06:16.576792+00:00",
+  "generated_at": "2026-06-09T18:58:34.168552+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
     "The original RIS identifiers remain source values; the canonical id should stay stable and traceable."
   ],
-  "recommended_identity_key": "municipality_id + source_system_id + source_id",
+  "recommended_identity_key": "municipality_id + source_system_id + source_id + source_object_id",
   "source_id": {
     "duplicate_count": 0,
     "duplicates": [],
-    "missing_count": 250,
-    "unique_count": 0
+    "missing_count": 0,
+    "unique_count": 250
   },
   "source_object_id": {
     "duplicate_count": 0,
     "duplicates": [],
-    "missing_count": 250,
-    "unique_count": 0
+    "missing_count": 0,
+    "unique_count": 250
   }
 }

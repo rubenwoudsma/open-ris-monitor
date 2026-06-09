@@ -1,21 +1,213 @@
 {
   "documents_total": 250,
-  "generated_at": "2026-06-09T07:06:16.577384+00:00",
+  "generated_at": "2026-06-09T18:58:34.169350+00:00",
   "mapping": {
-    "Onbekend": {
-      "count": 250,
-      "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+    "Agenda": {
+      "count": 9,
+      "normalized_document_type": "agenda",
+      "normalized_document_type_label": "Agenda"
+    },
+    "Amendementen": {
+      "count": 3,
+      "normalized_document_type": "amendment",
+      "normalized_document_type_label": "Amendement"
+    },
+    "Besluitenlijst raad": {
+      "count": 1,
+      "normalized_document_type": "decision",
+      "normalized_document_type_label": "Besluit"
+    },
+    "Besluitenlijsten": {
+      "count": 2,
+      "normalized_document_type": "decision",
+      "normalized_document_type_label": "Besluit"
+    },
+    "Bijlage": {
+      "count": 52,
+      "normalized_document_type": "attachment",
+      "normalized_document_type_label": "Bijlage"
+    },
+    "Collegevoorstel (BBV)": {
+      "count": 25,
+      "normalized_document_type": "proposal",
+      "normalized_document_type_label": "Voorstel"
+    },
+    "Financiële overzichten commissie": {
+      "count": 1,
+      "normalized_document_type": "report",
+      "normalized_document_type_label": "Rapportage of evaluatie"
+    },
+    "Ingekomen stuk": {
+      "count": 25,
+      "normalized_document_type": "incoming_document",
+      "normalized_document_type_label": "Ingekomen stuk"
+    },
+    "Mededelingen": {
+      "count": 23,
+      "normalized_document_type": "announcement",
+      "normalized_document_type_label": "Mededeling"
+    },
+    "Moties": {
+      "count": 13,
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie"
+    },
+    "Overig": {
+      "count": 46,
+      "normalized_document_type": "other",
+      "normalized_document_type_label": "Overig"
+    },
+    "Overzicht stand van zaken": {
+      "count": 2,
+      "normalized_document_type": "report",
+      "normalized_document_type_label": "Rapportage of evaluatie"
+    },
+    "Raadsvoorstel": {
+      "count": 27,
+      "normalized_document_type": "proposal",
+      "normalized_document_type_label": "Voorstel"
+    },
+    "Resumé ABM": {
+      "count": 1,
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+    },
+    "Resumé Fysiek Domein": {
+      "count": 1,
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+    },
+    "Resumé Sociaal Domein": {
+      "count": 1,
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+    },
+    "Resumés": {
+      "count": 3,
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+    },
+    "Toezeggingen": {
+      "count": 4,
+      "normalized_document_type": "commitment",
+      "normalized_document_type_label": "Toezegging"
+    },
+    "Vragen van raadsleden": {
+      "count": 11,
+      "normalized_document_type": "question",
+      "normalized_document_type_label": "Vraag"
     }
   },
-  "normalized_document_type_count": 1,
+  "normalized_document_type_count": 13,
   "normalized_document_types": [
     {
-      "count": 250,
-      "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend",
+      "count": 52,
+      "normalized_document_type": "proposal",
+      "normalized_document_type_label": "Voorstel",
       "source_document_types": [
-        "Onbekend"
+        "Collegevoorstel (BBV)",
+        "Raadsvoorstel"
+      ]
+    },
+    {
+      "count": 52,
+      "normalized_document_type": "attachment",
+      "normalized_document_type_label": "Bijlage",
+      "source_document_types": [
+        "Bijlage"
+      ]
+    },
+    {
+      "count": 46,
+      "normalized_document_type": "other",
+      "normalized_document_type_label": "Overig",
+      "source_document_types": [
+        "Overig"
+      ]
+    },
+    {
+      "count": 25,
+      "normalized_document_type": "incoming_document",
+      "normalized_document_type_label": "Ingekomen stuk",
+      "source_document_types": [
+        "Ingekomen stuk"
+      ]
+    },
+    {
+      "count": 23,
+      "normalized_document_type": "announcement",
+      "normalized_document_type_label": "Mededeling",
+      "source_document_types": [
+        "Mededelingen"
+      ]
+    },
+    {
+      "count": 13,
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie",
+      "source_document_types": [
+        "Moties"
+      ]
+    },
+    {
+      "count": 11,
+      "normalized_document_type": "question",
+      "normalized_document_type_label": "Vraag",
+      "source_document_types": [
+        "Vragen van raadsleden"
+      ]
+    },
+    {
+      "count": 9,
+      "normalized_document_type": "agenda",
+      "normalized_document_type_label": "Agenda",
+      "source_document_types": [
+        "Agenda"
+      ]
+    },
+    {
+      "count": 6,
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting",
+      "source_document_types": [
+        "Resumé ABM",
+        "Resumé Fysiek Domein",
+        "Resumé Sociaal Domein",
+        "Resumés"
+      ]
+    },
+    {
+      "count": 4,
+      "normalized_document_type": "commitment",
+      "normalized_document_type_label": "Toezegging",
+      "source_document_types": [
+        "Toezeggingen"
+      ]
+    },
+    {
+      "count": 3,
+      "normalized_document_type": "decision",
+      "normalized_document_type_label": "Besluit",
+      "source_document_types": [
+        "Besluitenlijst raad",
+        "Besluitenlijsten"
+      ]
+    },
+    {
+      "count": 3,
+      "normalized_document_type": "report",
+      "normalized_document_type_label": "Rapportage of evaluatie",
+      "source_document_types": [
+        "Financiële overzichten commissie",
+        "Overzicht stand van zaken"
+      ]
+    },
+    {
+      "count": 3,
+      "normalized_document_type": "amendment",
+      "normalized_document_type_label": "Amendement",
+      "source_document_types": [
+        "Amendementen"
       ]
     }
   ],
@@ -24,21 +216,124 @@
     "normalized_document_type is now part of the canonical Document export.",
     "Unknown should be reserved for genuinely missing or explicitly unknown source values."
   ],
-  "source_document_type_count": 1,
+  "source_document_type_count": 19,
   "source_document_types": [
     {
-      "count": 250,
-      "document_type": "Onbekend",
-      "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "count": 52,
+      "document_type": "Bijlage",
+      "normalized_document_type": "attachment",
+      "normalized_document_type_label": "Bijlage"
+    },
+    {
+      "count": 46,
+      "document_type": "Overig",
+      "normalized_document_type": "other",
+      "normalized_document_type_label": "Overig"
+    },
+    {
+      "count": 27,
+      "document_type": "Raadsvoorstel",
+      "normalized_document_type": "proposal",
+      "normalized_document_type_label": "Voorstel"
+    },
+    {
+      "count": 25,
+      "document_type": "Ingekomen stuk",
+      "normalized_document_type": "incoming_document",
+      "normalized_document_type_label": "Ingekomen stuk"
+    },
+    {
+      "count": 25,
+      "document_type": "Collegevoorstel (BBV)",
+      "normalized_document_type": "proposal",
+      "normalized_document_type_label": "Voorstel"
+    },
+    {
+      "count": 23,
+      "document_type": "Mededelingen",
+      "normalized_document_type": "announcement",
+      "normalized_document_type_label": "Mededeling"
+    },
+    {
+      "count": 13,
+      "document_type": "Moties",
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie"
+    },
+    {
+      "count": 11,
+      "document_type": "Vragen van raadsleden",
+      "normalized_document_type": "question",
+      "normalized_document_type_label": "Vraag"
+    },
+    {
+      "count": 9,
+      "document_type": "Agenda",
+      "normalized_document_type": "agenda",
+      "normalized_document_type_label": "Agenda"
+    },
+    {
+      "count": 4,
+      "document_type": "Toezeggingen",
+      "normalized_document_type": "commitment",
+      "normalized_document_type_label": "Toezegging"
+    },
+    {
+      "count": 3,
+      "document_type": "Resumés",
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+    },
+    {
+      "count": 3,
+      "document_type": "Amendementen",
+      "normalized_document_type": "amendment",
+      "normalized_document_type_label": "Amendement"
+    },
+    {
+      "count": 2,
+      "document_type": "Overzicht stand van zaken",
+      "normalized_document_type": "report",
+      "normalized_document_type_label": "Rapportage of evaluatie"
+    },
+    {
+      "count": 2,
+      "document_type": "Besluitenlijsten",
+      "normalized_document_type": "decision",
+      "normalized_document_type_label": "Besluit"
+    },
+    {
+      "count": 1,
+      "document_type": "Resumé Sociaal Domein",
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+    },
+    {
+      "count": 1,
+      "document_type": "Resumé Fysiek Domein",
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+    },
+    {
+      "count": 1,
+      "document_type": "Resumé ABM",
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+    },
+    {
+      "count": 1,
+      "document_type": "Besluitenlijst raad",
+      "normalized_document_type": "decision",
+      "normalized_document_type_label": "Besluit"
+    },
+    {
+      "count": 1,
+      "document_type": "Financiële overzichten commissie",
+      "normalized_document_type": "report",
+      "normalized_document_type_label": "Rapportage of evaluatie"
     }
   ],
-  "unknown_document_type_count": 250,
-  "unknown_document_type_percentage": 100.0,
-  "unknown_source_document_types": [
-    {
-      "count": 250,
-      "document_type": "Onbekend"
-    }
-  ]
+  "unknown_document_type_count": 0,
+  "unknown_document_type_percentage": 0.0,
+  "unknown_source_document_types": []
 }
