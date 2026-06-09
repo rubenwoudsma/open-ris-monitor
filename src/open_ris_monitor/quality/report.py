@@ -17,10 +17,29 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
             text = line.strip()
             if not text:
                 continue
+
             record = json.loads(text)
+
+            # Backward-compatible guard for older or malformed generated .jsonl files.
+            # A proper JSONL file contains one JSON object per line, but some public
+            # harvest metadata files can contain a single JSON array line. Treat that
+            # array as multiple JSONL records so quality reporting does not fail after
+            # a successful harvest.
+            if isinstance(record, list):
+                for index, item in enumerate(record, start=1):
+                    if not isinstance(item, dict):
+                        raise ValueError(
+                            f"Expected JSON object in array item {index} on line "
+                            f"{line_number} in {path}"
+                        )
+                    records.append(item)
+                continue
+
             if not isinstance(record, dict):
                 raise ValueError(f"Expected JSON object on line {line_number} in {path}")
+
             records.append(record)
+
     return records
 
 
@@ -47,12 +66,32 @@ def _collect_ids(rows: list[dict[str, Any]], key: str) -> set[str]:
 
 def build_quality_report(public_dir: Path) -> dict[str, Any]:
     documents = read_jsonl(public_dir / "documents.jsonl")
-    document_versions = read_jsonl(public_dir / "document_versions.jsonl") if (public_dir / "document_versions.jsonl").exists() else []
-    harvest_runs = read_jsonl(public_dir / "harvest_runs.jsonl") if (public_dir / "harvest_runs.jsonl").exists() else []
+    document_versions = (
+        read_jsonl(public_dir / "document_versions.jsonl")
+        if (public_dir / "document_versions.jsonl").exists()
+        else []
+    )
+    harvest_runs = (
+        read_jsonl(public_dir / "harvest_runs.jsonl")
+        if (public_dir / "harvest_runs.jsonl").exists()
+        else []
+    )
     meetings = read_jsonl(public_dir / "meetings.jsonl") if (public_dir / "meetings.jsonl").exists() else []
-    meeting_items = read_jsonl(public_dir / "meeting_items.jsonl") if (public_dir / "meeting_items.jsonl").exists() else []
-    meeting_documents = read_jsonl(public_dir / "meeting_documents.jsonl") if (public_dir / "meeting_documents.jsonl").exists() else []
-    meeting_item_documents = read_jsonl(public_dir / "meeting_item_documents.jsonl") if (public_dir / "meeting_item_documents.jsonl").exists() else []
+    meeting_items = (
+        read_jsonl(public_dir / "meeting_items.jsonl")
+        if (public_dir / "meeting_items.jsonl").exists()
+        else []
+    )
+    meeting_documents = (
+        read_jsonl(public_dir / "meeting_documents.jsonl")
+        if (public_dir / "meeting_documents.jsonl").exists()
+        else []
+    )
+    meeting_item_documents = (
+        read_jsonl(public_dir / "meeting_item_documents.jsonl")
+        if (public_dir / "meeting_item_documents.jsonl").exists()
+        else []
+    )
 
     document_ids = _collect_ids(documents, "id")
     meeting_ids = _collect_ids(meetings, "id")
@@ -63,7 +102,6 @@ def build_quality_report(public_dir: Path) -> dict[str, Any]:
         value = rel.get("document_id")
         if isinstance(value, str) and value:
             related_document_ids.add(value)
-
     for rel in meeting_item_documents:
         value = rel.get("document_id")
         if isinstance(value, str) and value:
@@ -98,11 +136,9 @@ def build_quality_report(public_dir: Path) -> dict[str, Any]:
 
     source_document_type_counter: Counter[str] = Counter()
     normalized_document_type_counter: Counter[str] = Counter()
-
     for doc in documents:
         source_type = doc.get("document_type")
         normalized_type = doc.get("normalized_document_type")
-
         if isinstance(source_type, str) and source_type:
             source_document_type_counter[source_type] += 1
         if isinstance(normalized_type, str) and normalized_type:
@@ -196,14 +232,11 @@ def write_quality_report(public_dir: Path) -> dict[str, Any]:
     summary = build_quality_report(public_dir)
     output_dir = public_dir / "quality"
     output_dir.mkdir(parents=True, exist_ok=True)
-
     (output_dir / "summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-
     with (output_dir / "issues.jsonl").open("w", encoding="utf-8") as fh:
         for issue in summary["issues"]:
             fh.write(json.dumps(issue, ensure_ascii=False) + "\n")
-
     return summary
