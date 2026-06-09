@@ -640,3 +640,19 @@ tbody tr.is-selected {
     grid-template-columns: 1fr;
   }
 }
+
+.quality-notice,
+.metadata-notice {
+  border: 1px solid var(--border-muted);
+  border-radius: 0.75rem;
+  background: var(--surface-muted);
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.8rem;
+}
+
+.metadata-notice {
+  margin-bottom: 1rem;
+}
