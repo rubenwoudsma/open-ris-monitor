@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict, is_dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
@@ -11,8 +12,19 @@ from pydantic import BaseModel
 
 
 def _to_jsonable(record: Any) -> Any:
+    """Convert supported model objects to JSON-serializable payloads."""
     if isinstance(record, BaseModel):
         return record.model_dump(mode="json")
+
+    to_dict = getattr(record, "to_dict", None)
+    if callable(to_dict):
+        payload = to_dict()
+        if isinstance(payload, dict):
+            return payload
+
+    if is_dataclass(record) and not isinstance(record, type):
+        return asdict(record)
+
     return record
 
 
@@ -43,11 +55,9 @@ def _as_public_date(value: Any) -> str | None:
         return None
     if isinstance(value, datetime):
         return value.date().isoformat()
-
     text = str(value).strip()
     if not text:
         return None
-
     # Pydantic model_dump(mode="json") serializes datetimes to ISO strings.
     # Public document exports keep only the date for backward compatibility.
     return text[:10]
@@ -56,8 +66,8 @@ def _as_public_date(value: Any) -> str | None:
 def _public_document_record(record: Any) -> dict[str, Any]:
     """Project a canonical document to the compact public export contract.
 
-    The public `documents.jsonl` stays small and stable, but keeps the source
-    metadata needed for traceability and clear UI rendering.
+    The public `documents.jsonl` stays small and stable, but keeps the source metadata
+    needed for traceability and clear UI rendering.
     """
     data = _to_jsonable(record)
     if not isinstance(data, dict):
