@@ -33,6 +33,9 @@ export interface DocumentRecord extends UnknownRecord {
   date?: string;
   retrieved_at?: string;
   size_bytes?: number | string;
+  file_size_bytes?: number | string;
+  file_size?: number | string;
+  file_name?: string;
   raw?: UnknownRecord;
 }
 

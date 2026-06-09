@@ -64,7 +64,8 @@ function getAgendaItemTitle(item) {
     return number ? `${number}. ${title}` : title;
 }
 function isUnknownType(value) {
-    return !value || value.toLowerCase() === "unknown" || value.toLowerCase() === "onbekend";
+    const normalized = value.trim().toLowerCase();
+    return !normalized || normalized === "unknown" || normalized === "onbekend";
 }
 function unavailable(reason = "Niet beschikbaar in export") {
     return reason;
@@ -93,41 +94,49 @@ function pickNestedRaw(record, objectKey, ...keys) {
     return "";
 }
 function getCompactType(documentRecord) {
-    const normalized = pick(documentRecord.normalized_document_type);
+    const normalized = pick(documentRecord.normalized_document_type, documentRecord.type);
     if (!isUnknownType(normalized))
         return normalized;
     return "unknown";
 }
 function getCompactTypeLabel(documentRecord) {
     const normalizedLabel = pick(documentRecord.normalized_document_type_label);
-    const normalizedType = pick(documentRecord.normalized_document_type);
-    const sourceType = getSourceDocumentType(documentRecord);
     if (!isUnknownType(normalizedLabel))
         return normalizedLabel;
+    const normalizedType = pick(documentRecord.normalized_document_type, documentRecord.type);
     if (!isUnknownType(normalizedType))
         return normalizedType;
-    if (sourceType)
-        return `Bron: ${sourceType}`;
     return unavailable();
 }
 function getSourceDocumentType(documentRecord) {
-    return pick(documentRecord.document_type, documentRecord.type, documentRecord.category, documentRecord.kind, pickFromRaw(documentRecord, "document_type", "documentType", "type", "category", "kind"));
+    const sourceType = pick(documentRecord.document_type, pickFromRaw(documentRecord, "document_type", "documentTypeLabel", "documentType", "category", "kind"));
+    if (!sourceType)
+        return "";
+    const compactType = getCompactType(documentRecord);
+    const compactTypeLabel = getCompactTypeLabel(documentRecord);
+    if (sourceType === compactType || sourceType === compactTypeLabel)
+        return "";
+    return sourceType;
 }
 function getDocumentFilename(documentRecord) {
     return pick(documentRecord.filename, documentRecord.file_name, documentRecord.fileName, documentRecord.name, documentRecord.display_name, documentRecord.original_filename, pickFromRaw(documentRecord, "filename", "file_name", "fileName", "name", "displayName", "originalFilename"), pickNestedRaw(documentRecord, "file", "filename", "fileName", "name"));
 }
 function getDocumentSize(documentRecord) {
     const values = [
+        documentRecord.file_size_bytes,
         documentRecord.size_bytes,
         documentRecord.file_size,
         documentRecord.filesize,
         documentRecord.size,
         documentRecord.bytes,
         documentRecord.content_length,
-        pickFromRaw(documentRecord, "size_bytes", "file_size", "fileSize", "filesize", "size", "bytes", "contentLength"),
+        pickFromRaw(recordDocumentForRaw(documentRecord), "file_size_bytes", "size_bytes", "file_size", "fileSize", "filesize", "size", "bytes", "contentLength"),
         pickNestedRaw(documentRecord, "file", "size", "bytes", "size_bytes", "fileSize"),
     ];
     return values.find((value) => pick(value));
+}
+function recordDocumentForRaw(documentRecord) {
+    return documentRecord;
 }
 function formatDocumentSize(documentRecord) {
     const formatted = formatBytes(getDocumentSize(documentRecord));
@@ -203,7 +212,7 @@ function renderSummary() {
     elements.agendaItemsCount.textContent = text(state.data?.agendaItems.length);
     const documents = state.data?.documents ?? [];
     const linkedDocumentCount = documents.filter((record) => relationLabelsForDocument(record).length > 0).length;
-    const unknownTypeCount = documents.filter((record) => isUnknownType(pick(record.normalized_document_type, record.normalized_document_type_label))).length;
+    const unknownTypeCount = documents.filter((record) => isUnknownType(pick(record.normalized_document_type, record.normalized_document_type_label, record.type))).length;
     const relationCount = (state.data?.meetingDocumentRelations.length ?? 0) + (state.data?.meetingItemDocumentRelations.length ?? 0);
     elements.linkedDocumentsCount.textContent = text(linkedDocumentCount);
     const notices = [];
@@ -395,6 +404,11 @@ function renderEmptyRelation(label) {
     paragraph.textContent = label;
     return paragraph;
 }
+function appendSectionHeading(section, label) {
+    const heading = document.createElement("h3");
+    heading.textContent = label;
+    section.appendChild(heading);
+}
 function renderDocumentDetail(documentRecord) {
     const ids = documentIds(documentRecord);
     const primaryId = ids[0] ?? "";
@@ -439,7 +453,7 @@ function renderDocumentDetail(documentRecord) {
     grid.appendChild(actions);
     elements.documentDetailBody.appendChild(grid);
     const metadataIssues = [
-        isUnknownType(pick(documentRecord.normalized_document_type, documentRecord.normalized_document_type_label)) ? "compact documenttype ontbreekt" : "",
+        isUnknownType(pick(documentRecord.normalized_document_type, documentRecord.normalized_document_type_label, documentRecord.type)) ? "compact documenttype ontbreekt" : "",
         getDocumentFilename(documentRecord) ? "" : "bestandsnaam ontbreekt",
         formatDocumentSize(documentRecord) === "Geen bestandsgrootte beschikbaar" ? "bestandsgrootte ontbreekt" : "",
         downloadHref ? "" : "documentlink ontbreekt",
@@ -460,7 +474,7 @@ function renderDocumentDetail(documentRecord) {
     relations.className = "detail-sections";
     const meetingsSection = document.createElement("section");
     meetingsSection.className = "detail-section";
-    meetingsSection.innerHTML = "<h3>Gekoppelde vergaderingen</h3>";
+    appendSectionHeading(meetingsSection, "Gekoppelde vergaderingen");
     if (meetingIds.length === 0) {
         meetingsSection.appendChild(renderEmptyRelation("Geen gekoppelde vergadering gevonden in de huidige public export."));
     }
@@ -474,7 +488,7 @@ function renderDocumentDetail(documentRecord) {
     relations.appendChild(meetingsSection);
     const agendaSection = document.createElement("section");
     agendaSection.className = "detail-section";
-    agendaSection.innerHTML = "<h3>Gekoppelde agendapunten</h3>";
+    appendSectionHeading(agendaSection, "Gekoppelde agendapunten");
     if (itemIds.length === 0) {
         agendaSection.appendChild(renderEmptyRelation("Geen gekoppeld agendapunt gevonden in de huidige public export."));
     }
@@ -489,7 +503,7 @@ function renderDocumentDetail(documentRecord) {
     relations.appendChild(agendaSection);
     const versionsSection = document.createElement("section");
     versionsSection.className = "detail-section";
-    versionsSection.innerHTML = "<h3>Versies</h3>";
+    appendSectionHeading(versionsSection, "Versies");
     if (versions.length === 0) {
         versionsSection.appendChild(renderEmptyRelation("Geen aparte versiehistorie gevonden."));
     }
