@@ -1,4 +1,4 @@
-name: Harvest
+name: Harvest and publish public RIS data
 
 on:
   schedule:
@@ -30,18 +30,18 @@ on:
       commit_public:
         description: Commit generated data/public output back to the branch
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:
   contents: write
 
 concurrency:
-  group: harvest-${{ github.ref }}
+  group: harvest-public-data-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  harvest:
+  harvest-and-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -57,6 +57,7 @@ jobs:
           PROFILE="${{ inputs.profile }}"
           ENRICH_CHECKSUMS="${{ inputs.enrich_checksums }}"
           CHECKSUM_MAX_DOCUMENTS="${{ inputs.checksum_max_documents }}"
+          COMMIT_PUBLIC="${{ inputs.commit_public }}"
 
           if [ -z "$MUNICIPALITY" ]; then
             MUNICIPALITY="huizen"
@@ -74,10 +75,15 @@ jobs:
             CHECKSUM_MAX_DOCUMENTS="50"
           fi
 
+          if [ -z "$COMMIT_PUBLIC" ]; then
+            COMMIT_PUBLIC="true"
+          fi
+
           echo "municipality=$MUNICIPALITY" >> "$GITHUB_OUTPUT"
           echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
           echo "enrich_checksums=$ENRICH_CHECKSUMS" >> "$GITHUB_OUTPUT"
           echo "checksum_max_documents=$CHECKSUM_MAX_DOCUMENTS" >> "$GITHUB_OUTPUT"
+          echo "commit_public=$COMMIT_PUBLIC" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -87,9 +93,9 @@ jobs:
       - name: Install package
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e .
+          python -m pip install -e .[dev]
 
-      - name: Run harvest and public export
+      - name: Run bounded harvest profile
         env:
           MUNICIPALITY: ${{ steps.options.outputs.municipality }}
           PROFILE: ${{ steps.options.outputs.profile }}
@@ -112,33 +118,68 @@ jobs:
           python -m open_ris_monitor.analysis.generate_public_reports \
             --public-dir data/public
 
+      - name: Validate generated public data
+        run: |
+          python -m json.tool data/public/latest.json > /tmp/latest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          required_outputs = [
+              "documents",
+              "harvest_runs",
+              "meetings",
+              "meeting_items",
+              "meeting_documents",
+              "meeting_item_documents",
+          ]
+          latest = json.loads(Path("data/public/latest.json").read_text(encoding="utf-8"))
+          outputs = latest.get("outputs", {})
+          missing = [key for key in required_outputs if not outputs.get(key)]
+          if missing:
+              raise SystemExit(f"latest.json mist relationele outputs: {missing}")
+          if latest.get("relations_enabled") is not True:
+              raise SystemExit("latest.json heeft relations_enabled niet op true")
+          for output_name in required_outputs:
+              output_path = Path("data/public") / outputs[output_name]
+              if not output_path.exists():
+                  raise SystemExit(f"Ontbrekend public exportbestand: {output_path}")
+              for line_number, line in enumerate(output_path.read_text(encoding="utf-8").splitlines(), 1):
+                  if line.strip():
+                      try:
+                          json.loads(line)
+                      except json.JSONDecodeError as exc:
+                          raise SystemExit(f"Ongeldige JSONL in {output_path} regel {line_number}: {exc}") from exc
+          print("Public exports en latest.json zijn consistent")
+          PY
+
       - name: Show generated output
         run: |
-          echo "Raw output:"
-          find data/raw/latest -maxdepth 1 -type f -print
-          echo "Public output:"
-          find data/public -maxdepth 1 -type f -print
+          echo "Raw output, artifact only:"
+          find data/raw/latest -maxdepth 1 -type f -print | sort
+          echo "Public output, commit candidate:"
+          find data/public -maxdepth 2 -type f -print | sort
           echo "Latest summary:"
           cat data/public/latest.json
 
-      - name: Upload raw harvest output
+      - name: Upload raw harvest artifact
         uses: actions/upload-artifact@v4
         with:
-          name: raw-harvest-${{ steps.options.outputs.municipality }}
+          name: raw-harvest-${{ steps.options.outputs.municipality }}-${{ steps.options.outputs.profile }}
           path: data/raw/latest/
           if-no-files-found: error
           retention-days: 7
 
-      - name: Upload public export output
+      - name: Upload public export artifact
         uses: actions/upload-artifact@v4
         with:
-          name: public-export-${{ steps.options.outputs.municipality }}
+          name: public-export-${{ steps.options.outputs.municipality }}-${{ steps.options.outputs.profile }}
           path: data/public/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 14
 
       - name: Commit public export output
-        if: ${{ github.event_name == 'schedule' || inputs.commit_public == true }}
+        if: ${{ github.event_name == 'schedule' || steps.options.outputs.commit_public == 'true' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -150,11 +191,11 @@ jobs:
         if: always()
         run: |
           {
-            echo "## Harvest run"
+            echo "## Harvest and public data publish run"
             echo ""
             echo "- Event: ${{ github.event_name }}"
             echo "- Municipality: ${{ steps.options.outputs.municipality }}"
             echo "- Profile: ${{ steps.options.outputs.profile }}"
-            echo "- Commit public output: ${{ github.event_name == 'schedule' || inputs.commit_public == true }}"
+            echo "- Commit public output: ${{ github.event_name == 'schedule' || steps.options.outputs.commit_public == 'true' }}"
             echo "- Checksum enrichment: ${{ steps.options.outputs.enrich_checksums }}"
           } >> "$GITHUB_STEP_SUMMARY"
