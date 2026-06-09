@@ -90,3 +90,22 @@ def test_document_first_detail_view_exists() -> None:
         ".is-selected",
     ]:
         assert marker in styles
+
+
+def test_document_metadata_fallbacks_are_visible() -> None:
+    index = Path("site/index.html").read_text(encoding="utf-8")
+    source = Path("site/src/main.ts").read_text(encoding="utf-8")
+    styles = Path("site/assets/styles.css").read_text(encoding="utf-8")
+
+    assert "data-quality-notice" in index
+    for marker in [
+        "Niet beschikbaar in export",
+        "Geen bestandsmetadata",
+        "Geen bestandsgrootte beschikbaar",
+        "Metadata beperkt in huidige export",
+        "Geen bruikbare documentkoppelingen",
+    ]:
+        assert marker in source
+
+    for marker in [".quality-notice", ".metadata-notice"]:
+        assert marker in styles
