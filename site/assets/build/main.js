@@ -138,7 +138,13 @@ function getCompactTypeLabel(documentRecord) {
     return unavailable();
 }
 function getSourceDocumentType(documentRecord) {
-    const documentTypeLabel = pick(documentRecord.document_type, pickFromRaw(documentRecord, "document_type", "documentType", "source_document_type", "sourceDocumentType"));
+    const sourceType = pick(documentRecord.document_type, pickFromRaw(documentRecord, "document_type", "documentType", "source_document_type", "sourceDocumentType"));
+    const compactType = getCompactType(documentRecord);
+    const compactTypeLabel = getCompactTypeLabel(documentRecord);
+    let documentTypeLabel = sourceType;
+    if (sourceType === compactType || sourceType === compactTypeLabel) {
+        documentTypeLabel = sourceType;
+    }
     return documentTypeLabel || unavailable("Geen bronmetadata");
 }
 function getDocumentFilename(documentRecord) {
