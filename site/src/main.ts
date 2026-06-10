@@ -220,10 +220,11 @@ function getCompactTypeLabel(documentRecord: DocumentRecord): string {
 }
 
 function getSourceDocumentType(documentRecord: DocumentRecord): string {
-  return pick(
+  const documentTypeLabel = pick(
     documentRecord.document_type,
     pickFromRaw(documentRecord, "document_type", "documentType", "source_document_type", "sourceDocumentType"),
-  ) || unavailable("Geen bronmetadata");
+  );
+  return documentTypeLabel || unavailable("Geen bronmetadata");
 }
 
 function getDocumentFilename(documentRecord: DocumentRecord): string {

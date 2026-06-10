@@ -138,7 +138,8 @@ function getCompactTypeLabel(documentRecord) {
     return unavailable();
 }
 function getSourceDocumentType(documentRecord) {
-    return pick(documentRecord.document_type, pickFromRaw(documentRecord, "document_type", "documentType", "source_document_type", "sourceDocumentType")) || unavailable("Geen bronmetadata");
+    const documentTypeLabel = pick(documentRecord.document_type, pickFromRaw(documentRecord, "document_type", "documentType", "source_document_type", "sourceDocumentType"));
+    return documentTypeLabel || unavailable("Geen bronmetadata");
 }
 function getDocumentFilename(documentRecord) {
     return pick(documentRecord.filename, documentRecord.file_name, documentRecord.name, documentRecord.display_name, documentRecord.original_filename, pickFromRaw(documentRecord, "filename", "file_name", "fileName", "name", "displayName", "originalFilename"), pickNestedRaw(documentRecord, "file", "filename", "fileName", "name"));
