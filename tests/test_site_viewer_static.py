@@ -44,15 +44,12 @@ def test_github_like_shell_layout_exists() -> None:
         "site-header__inner",
         "top-nav",
         "content-layout",
-        "sidebar",
         "main-column",
-        "relation-summary-title",
     ]:
         assert marker in index
 
     for marker in [
         ".content-layout",
-        ".sidebar",
         ".top-nav__link--active",
         "@media",
     ]:
@@ -138,9 +135,20 @@ def test_compact_meeting_list_view_exists() -> None:
         assert marker in source
 
     for marker in [
-        ".side-nav",
         ".meetings-table",
         ".technical-metadata",
         ".footer-metadata",
     ]:
         assert marker in styles
+
+
+def test_compact_layout_removes_sidebar_and_source_type_column() -> None:
+    index = Path("site/index.html").read_text(encoding="utf-8")
+    source = Path("site/src/main.ts").read_text(encoding="utf-8")
+
+    assert 'class="sidebar"' not in index
+    assert "Document-first overzicht" not in index
+    assert "Bron type" not in index
+    assert "source-type-asc" not in index
+    assert 'appendDefinition(meta, "Bron type"' not in source
+    assert "getVisibleDocumentColumnCount" in source

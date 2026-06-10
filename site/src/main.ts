@@ -327,7 +327,7 @@ function hasAnyDocumentSizeMetadata(records: DocumentRecord[]): boolean {
 }
 
 function getVisibleDocumentColumnCount(showFilenameColumn: boolean, showSizeColumn: boolean): number {
-  return 5 + Number(showFilenameColumn) + Number(showSizeColumn);
+  return 4 + Number(showFilenameColumn) + Number(showSizeColumn);
 }
 
 function setTableColumnVisibility(headerLabel: string, visible: boolean): void {
@@ -462,7 +462,6 @@ function sortDocuments(records: DocumentRecord[]): DocumentRecord[] {
   const sorted = [...records];
   const byTitle = (a: DocumentRecord, b: DocumentRecord) => getDocumentTitle(a).localeCompare(getDocumentTitle(b), "nl");
   const byType = (a: DocumentRecord, b: DocumentRecord) => getCompactTypeLabel(a).localeCompare(getCompactTypeLabel(b), "nl");
-  const bySourceType = (a: DocumentRecord, b: DocumentRecord) => text(getSourceDocumentType(a)).localeCompare(text(getSourceDocumentType(b)), "nl");
   const bySize = (a: DocumentRecord, b: DocumentRecord) => Number(getDocumentSize(a) ?? 0) - Number(getDocumentSize(b) ?? 0);
   const byDate = (a: DocumentRecord, b: DocumentRecord) => timestamp(getDocumentDate(a)) - timestamp(getDocumentDate(b));
 
@@ -473,8 +472,6 @@ function sortDocuments(records: DocumentRecord[]): DocumentRecord[] {
       return sorted.sort(byTitle);
     case "type-asc":
       return sorted.sort(byType);
-    case "source-type-asc":
-      return sorted.sort(bySourceType);
     case "size-desc":
       return sorted.sort((a, b) => bySize(b, a));
     case "size-asc":
@@ -598,7 +595,6 @@ function renderDocuments(): void {
     if (state.selectedDocumentId && documentIds(documentRecord).includes(state.selectedDocumentId)) row.className = "is-selected";
     row.appendChild(createCell(formatDate(getDocumentDate(documentRecord))));
     row.appendChild(createCell(getCompactTypeLabel(documentRecord)));
-    row.appendChild(createCell(text(getSourceDocumentType(documentRecord), unavailable())));
     row.appendChild(createDocumentTitleCell(documentRecord));
     if (showFilenameColumn) row.appendChild(createCell(text(getDocumentFilename(documentRecord), unavailable("Geen bestandsmetadata"))));
     if (showSizeColumn) row.appendChild(createCell(formatDocumentSize(documentRecord)));
@@ -662,7 +658,6 @@ function renderDocumentDetail(documentRecord: DocumentRecord): void {
   meta.className = "summary-list document-detail-meta";
   appendDefinition(meta, "Datum", formatDate(getDocumentDate(documentRecord)));
   appendDefinition(meta, "Compact type", getCompactTypeLabel(documentRecord));
-  appendDefinition(meta, "Bron type", text(getSourceDocumentType(documentRecord), unavailable()));
   const filename = getDocumentFilename(documentRecord);
   if (filename) appendDefinition(meta, "Bestand", filename);
   const size = formatDocumentSize(documentRecord);
