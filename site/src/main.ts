@@ -353,16 +353,106 @@ function appendDefinition(list: HTMLDListElement, label: string, value: string):
   list.appendChild(wrapper);
 }
 
-function createDocumentAction(documentRecord: DocumentRecord, label = "Details"): HTMLButtonElement {
+function createDocumentAction(documentRecord: DocumentRecord, label = "Details", fromMeetingDetail = false): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
   button.className = "secondary-button";
   button.textContent = label;
   button.addEventListener("click", () => {
-    setActiveView("documents");
+    if (fromMeetingDetail) {
+      focusDocumentFromMeetingDetail(documentRecord);
+      return;
+    }
     selectDocument(documentRecord, false);
   });
   return button;
+}
+
+function ensureDocumentVisible(documentRecord: DocumentRecord): void {
+  const documentId = getDocumentId(documentRecord);
+  let index = state.filteredDocuments.findIndex((record) => documentIds(record).includes(documentId));
+  if (index < 0) {
+    elements.searchInput.value = "";
+    elements.typeFilter.value = "";
+    state.currentPage = 1;
+    applyFilters();
+    index = state.filteredDocuments.findIndex((record) => documentIds(record).includes(documentId));
+  }
+  if (index >= 0) state.currentPage = Math.floor(index / state.pageSize) + 1;
+}
+
+function focusDocumentFromMeetingDetail(documentRecord: DocumentRecord): void {
+  setActiveView("documents", true, false);
+  ensureDocumentVisible(documentRecord);
+  state.selectedDocumentId = getDocumentId(documentRecord) || null;
+  renderDocumentDetail(documentRecord);
+  renderDocuments();
+  elements.documentDetail.scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
+function createInlineDocumentLinks(documentIdsToRender: string[], emptyLabel: string): HTMLElement {
+  const wrapper = document.createElement("div");
+  wrapper.className = "inline-document-links";
+  const documents = uniqueValues(documentIdsToRender)
+    .map((id) => findDocumentById(id))
+    .filter((record): record is DocumentRecord => Boolean(record));
+  if (documents.length === 0) return renderEmptyRelation(emptyLabel);
+  for (const documentRecord of documents) {
+    const button = createDocumentAction(documentRecord, getDocumentTitle(documentRecord), true);
+    button.classList.add("compact-document-link");
+    wrapper.appendChild(button);
+  }
+  return wrapper;
+}
+
+function createMeetingDocumentsTable(documentIdsToRender: string[], emptyLabel: string): HTMLElement {
+  const documents = uniqueValues(documentIdsToRender)
+    .map((id) => findDocumentById(id))
+    .filter((record): record is DocumentRecord => Boolean(record));
+  if (documents.length === 0) return renderEmptyRelation(emptyLabel);
+  const wrapper = document.createElement("div");
+  wrapper.className = "table-wrapper compact-detail-table-wrapper";
+  const table = document.createElement("table");
+  table.className = "compact-detail-table";
+  table.innerHTML = "<thead><tr><th>Datum</th><th>Document</th><th>Type</th><th>Actie</th></tr></thead>";
+  const body = document.createElement("tbody");
+  for (const documentRecord of documents) {
+    const row = document.createElement("tr");
+    row.appendChild(createCell(formatDate(getDocumentDate(documentRecord))));
+    row.appendChild(createCell(getDocumentTitle(documentRecord)));
+    row.appendChild(createCell(getCompactTypeLabel(documentRecord)));
+    const actionCell = document.createElement("td");
+    actionCell.appendChild(createDocumentAction(documentRecord, "Bekijk documentdetails", true));
+    row.appendChild(actionCell);
+    body.appendChild(row);
+  }
+  table.appendChild(body);
+  wrapper.appendChild(table);
+  return wrapper;
+}
+
+function createAgendaItemsTable(agendaIds: string[]): HTMLElement {
+  if (agendaIds.length === 0) return renderEmptyRelation("Geen agendapunten gevonden in meeting_items.jsonl voor deze vergadering.");
+  const wrapper = document.createElement("div");
+  wrapper.className = "table-wrapper compact-detail-table-wrapper";
+  const table = document.createElement("table");
+  table.className = "compact-detail-table agenda-detail-table";
+  table.innerHTML = "<thead><tr><th>Agendapunt</th><th>Omschrijving</th><th>Gekoppelde documenten</th></tr></thead>";
+  const body = document.createElement("tbody");
+  for (const itemId of agendaIds) {
+    const item = state.indexes?.agendaItemsById.get(itemId);
+    const itemDocumentIds = linkedDocumentIdsForAgendaItem(itemId);
+    const row = document.createElement("tr");
+    row.appendChild(createCell(getAgendaItemTitle(item)));
+    row.appendChild(createCell(text(item?.description, unavailable("Geen omschrijving"))));
+    const documentsCell = document.createElement("td");
+    documentsCell.appendChild(createInlineDocumentLinks(itemDocumentIds, "Geen gekoppelde documenten."));
+    row.appendChild(documentsCell);
+    body.appendChild(row);
+  }
+  table.appendChild(body);
+  wrapper.appendChild(table);
+  return wrapper;
 }
 
 function createDocumentList(documentIdsToRender: string[], emptyLabel: string): HTMLElement {
@@ -382,7 +472,7 @@ function createDocumentList(documentIdsToRender: string[], emptyLabel: string): 
     meta.textContent = [formatDate(getDocumentDate(documentRecord)), getCompactTypeLabel(documentRecord)].filter(Boolean).join(" · ");
     const actions = document.createElement("div");
     actions.className = "document-actions";
-    actions.appendChild(createDocumentAction(documentRecord, "Bekijk documentdetails"));
+    actions.appendChild(createDocumentAction(documentRecord, "Bekijk documentdetails", true));
     const href = getDocumentUrl(documentRecord);
     if (href) {
       const link = document.createElement("a");
@@ -804,38 +894,13 @@ function renderMeetingDetail(meeting: MeetingRecord): void {
   const agendaSection = document.createElement("section");
   agendaSection.className = "detail-section detail-section--wide";
   appendSectionHeading(agendaSection, "Agendapunten binnen deze vergadering");
-  if (agendaIds.length === 0) {
-    agendaSection.appendChild(renderEmptyRelation("Geen agendapunten gevonden in meeting_items.jsonl voor deze vergadering."));
-  } else {
-    const list = document.createElement("div");
-    list.className = "agenda-item-list";
-    for (const itemId of agendaIds) {
-      const item = state.indexes?.agendaItemsById.get(itemId);
-      const itemDocumentIds = linkedDocumentIdsForAgendaItem(itemId);
-      const article = document.createElement("article");
-      article.className = "agenda-item-card";
-      const heading = document.createElement("h4");
-      heading.textContent = getAgendaItemTitle(item);
-      const meta = document.createElement("p");
-      meta.className = "muted";
-      meta.textContent = `${itemDocumentIds.length} gekoppelde document(en)`;
-      article.append(heading, meta);
-      if (pick(item?.description) && pick(item?.description) !== getAgendaItemTitle(item)) {
-        const body = document.createElement("p");
-        body.textContent = text(item?.description);
-        article.appendChild(body);
-      }
-      article.appendChild(createDocumentList(itemDocumentIds, "Geen gekoppelde documenten bij dit agendapunt."));
-      list.appendChild(article);
-    }
-    agendaSection.appendChild(list);
-  }
+  agendaSection.appendChild(createAgendaItemsTable(agendaIds));
   sections.appendChild(agendaSection);
 
   const documentsSection = document.createElement("section");
   documentsSection.className = "detail-section detail-section--wide";
   appendSectionHeading(documentsSection, "Gekoppelde documenten bij de vergadering");
-  documentsSection.appendChild(createDocumentList(documentIdsForMeeting, "Geen gekoppelde documenten gevonden voor deze vergadering."));
+  documentsSection.appendChild(createMeetingDocumentsTable(documentIdsForMeeting, "Geen gekoppelde documenten gevonden voor deze vergadering."));
   sections.appendChild(documentsSection);
   elements.meetingDetailBody.appendChild(sections);
 }
@@ -855,10 +920,11 @@ function clearMeetingSelection(): void {
   renderMeetings();
 }
 
-function setActiveView(view: "documents" | "meetings", updateHash = false): void {
+function setActiveView(view: "documents" | "meetings", updateHash = false, scrollToView = true): void {
   state.activeView = view;
   elements.documentsView.hidden = view !== "documents";
   elements.meetingsView.hidden = view !== "meetings";
+  document.body.dataset.view = view;
   elements.navDocuments.classList.toggle("top-nav__link--active", view === "documents");
   elements.navMeetings.classList.toggle("top-nav__link--active", view === "meetings");
   elements.navDocuments.setAttribute("aria-current", view === "documents" ? "page" : "false");
@@ -866,7 +932,11 @@ function setActiveView(view: "documents" | "meetings", updateHash = false): void
 
   if (updateHash) {
     const nextHash = view === "meetings" ? "#meetings" : "#documents";
-    if (window.location.hash !== nextHash) window.location.hash = nextHash;
+    if (window.location.hash !== nextHash) history.pushState(null, "", nextHash);
+  }
+  if (scrollToView) {
+    const target = view === "meetings" ? elements.meetingsView : elements.documentsView;
+    target.scrollIntoView({ block: "start", behavior: "smooth" });
   }
 }
 
@@ -884,7 +954,7 @@ function attachEvents(): void {
     setActiveView("meetings", true);
     renderMeetings();
   });
-  window.addEventListener("hashchange", () => setActiveView(viewFromHash()));
+  window.addEventListener("hashchange", () => setActiveView(viewFromHash(), false, true));
   elements.searchInput.addEventListener("input", () => { state.currentPage = 1; applyFilters(); });
   elements.typeFilter.addEventListener("change", () => { state.currentPage = 1; applyFilters(); });
   elements.sortSelect.addEventListener("change", () => { state.sortMode = elements.sortSelect.value; applyFilters(); });
@@ -909,7 +979,7 @@ async function init(): Promise<void> {
   renderSummary();
   applyFilters();
   renderMeetings();
-  setActiveView(viewFromHash());
+  setActiveView(viewFromHash(), false, false);
   window.OpenRISMonitor = {
     indexes: state.indexes,
     focusDocumentById(documentId: string) {
