@@ -656,3 +656,71 @@ tbody tr.is-selected {
 .metadata-notice {
   margin-bottom: 1rem;
 }
+
+
+.side-nav {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.side-nav__link {
+  display: block;
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  padding: 0.55rem 0.65rem;
+  color: var(--text);
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+
+.side-nav__link:hover,
+.side-nav__link.is-active {
+  border-color: var(--accent);
+  background: var(--accent-muted);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.meetings-table {
+  min-width: 720px;
+}
+
+.meeting-title {
+  display: block;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.footer-metadata {
+  display: grid;
+  gap: 0.85rem;
+  border-top: 1px solid var(--border-muted);
+  padding-top: 1rem;
+}
+
+.footer-metadata h2 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.footer-metadata p {
+  margin: 0;
+}
+
+.technical-metadata {
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  padding: 0.7rem 0.8rem;
+}
+
+.technical-metadata summary {
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.resource-links--inline {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}

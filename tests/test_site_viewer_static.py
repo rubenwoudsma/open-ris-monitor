@@ -109,3 +109,38 @@ def test_document_metadata_fallbacks_are_visible() -> None:
 
     for marker in [".quality-notice", ".metadata-notice"]:
         assert marker in styles
+
+
+
+def test_compact_meeting_list_view_exists() -> None:
+    index = Path("site/index.html").read_text(encoding="utf-8")
+    source = Path("site/src/main.ts").read_text(encoding="utf-8")
+    styles = Path("site/assets/styles.css").read_text(encoding="utf-8")
+
+    for marker in [
+        "nav-documents",
+        "nav-meetings",
+        "documents-view",
+        "meetings-view",
+        "meetings-table-body",
+        "meetings-result-count",
+        "Technische metadata en databestanden",
+    ]:
+        assert marker in index
+
+    for marker in [
+        "renderMeetings",
+        "agendaItemIdsForMeeting",
+        "linkedDocumentIdsForMeeting",
+        "setActiveView",
+        "#meetings",
+    ]:
+        assert marker in source
+
+    for marker in [
+        ".side-nav",
+        ".meetings-table",
+        ".technical-metadata",
+        ".footer-metadata",
+    ]:
+        assert marker in styles

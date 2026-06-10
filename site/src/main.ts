@@ -19,6 +19,7 @@ interface ViewerState {
   pageSize: number;
   sortMode: string;
   selectedDocumentId: string | null;
+  activeView: "documents" | "meetings";
 }
 
 type RequiredElements = {
@@ -44,6 +45,12 @@ type RequiredElements = {
   dataQualityNotice: HTMLElement;
   visibleDocumentsCount: HTMLElement;
   tableBody: HTMLElement;
+  documentsView: HTMLElement;
+  meetingsView: HTMLElement;
+  meetingsTableBody: HTMLElement;
+  meetingsResultCount: HTMLElement;
+  navDocuments: HTMLAnchorElement;
+  navMeetings: HTMLAnchorElement;
   previousTop: HTMLButtonElement;
   nextTop: HTMLButtonElement;
   pageInfoTop: HTMLElement;
@@ -60,6 +67,7 @@ const state: ViewerState = {
   pageSize: 50,
   sortMode: "date-desc",
   selectedDocumentId: null,
+  activeView: "documents",
 };
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -91,6 +99,12 @@ const elements: RequiredElements = {
   dataQualityNotice: byId("data-quality-notice"),
   visibleDocumentsCount: byId("visible-documents-count"),
   tableBody: byId("documents-table-body"),
+  documentsView: byId("documents-view"),
+  meetingsView: byId("meetings-view"),
+  meetingsTableBody: byId("meetings-table-body"),
+  meetingsResultCount: byId("meetings-result-count"),
+  navDocuments: byId("nav-documents"),
+  navMeetings: byId("nav-meetings"),
   previousTop: byId("previous-page-top"),
   nextTop: byId("next-page-top"),
   pageInfoTop: byId("page-info-top"),
@@ -126,6 +140,76 @@ function getAgendaItemTitle(item: AgendaItemRecord | undefined): string {
   const number = pick(item?.number);
   const title = pick(item?.title, item?.description) || "Agendapunt zonder titel";
   return number ? `${number}. ${title}` : title;
+}
+
+
+function getMeetingId(meeting: MeetingRecord): string {
+  return pick(meeting.id, meeting.meeting_id, meeting.source_id, meeting.source_object_id, meeting.upstream_id);
+}
+
+function getMeetingDate(meeting: MeetingRecord | undefined): string {
+  return pick(meeting?.date, meeting?.start_time, meeting?.startTime, meeting?.datetime, meeting?.meeting_date);
+}
+
+function agendaItemIdsForMeeting(meeting: MeetingRecord): string[] {
+  const meetingId = getMeetingId(meeting);
+  const indexed = meetingId ? state.indexes?.agendaItemIdsByMeetingId.get(meetingId) ?? [] : [];
+  if (indexed.length > 0) return uniqueValues(indexed);
+  return uniqueValues(
+    (state.data?.agendaItems ?? [])
+      .filter((item) => pick(item.meeting_id, item.meetingId, item.session_id, item.sessionId) === meetingId)
+      .map((item) => pick(item.id, item.agenda_item_id, item.source_id, item.source_object_id)),
+  );
+}
+
+function linkedDocumentIdsForMeeting(meeting: MeetingRecord): string[] {
+  const meetingId = getMeetingId(meeting);
+  const directDocumentIds = meetingId ? state.indexes?.documentIdsByMeetingId.get(meetingId) ?? [] : [];
+  const agendaDocumentIds = agendaItemIdsForMeeting(meeting).flatMap((itemId) => state.indexes?.documentIdsByAgendaItemId.get(itemId) ?? []);
+  return uniqueValues([...directDocumentIds, ...agendaDocumentIds]);
+}
+
+function renderMeetings(): void {
+  const meetings = [...(state.data?.meetings ?? [])].sort((a, b) => timestamp(getMeetingDate(b)) - timestamp(getMeetingDate(a)));
+  elements.meetingsResultCount.textContent = `${meetings.length} vergadering(en)`;
+  elements.meetingsTableBody.replaceChildren();
+  if (meetings.length === 0) {
+    const row = document.createElement("tr");
+    const cell = createCell("Geen vergaderingen gevonden in de huidige public export.");
+    cell.colSpan = 4;
+    row.appendChild(cell);
+    elements.meetingsTableBody.appendChild(row);
+    return;
+  }
+  for (const meeting of meetings) {
+    const row = document.createElement("tr");
+    const titleCell = document.createElement("td");
+    const title = document.createElement("strong");
+    title.className = "meeting-title";
+    title.textContent = getMeetingTitle(meeting);
+    titleCell.appendChild(title);
+    row.appendChild(createCell(formatDate(getMeetingDate(meeting))));
+    row.appendChild(titleCell);
+    row.appendChild(createCell(text(agendaItemIdsForMeeting(meeting).length)));
+    row.appendChild(createCell(text(linkedDocumentIdsForMeeting(meeting).length)));
+    elements.meetingsTableBody.appendChild(row);
+  }
+}
+
+function setActiveView(view: "documents" | "meetings", updateHash = false): void {
+  state.activeView = view;
+  elements.documentsView.toggleAttribute("hidden", view !== "documents");
+  elements.meetingsView.toggleAttribute("hidden", view !== "meetings");
+  elements.navDocuments.classList.toggle("top-nav__link--active", view === "documents");
+  elements.navMeetings.classList.toggle("top-nav__link--active", view === "meetings");
+  for (const link of Array.from(document.querySelectorAll<HTMLElement>("[data-view-link]"))) {
+    link.classList.toggle("is-active", link.dataset.viewLink === view);
+  }
+  if (updateHash) window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}#${view}`);
+}
+
+function restoreView(): void {
+  setActiveView(window.location.hash === "#meetings" ? "meetings" : "documents");
 }
 
 function isUnknownType(value: string): boolean {
@@ -250,7 +334,7 @@ function setTableColumnVisibility(headerLabel: string, visible: boolean): void {
   const table = elements.tableBody.closest("table");
   const headers = Array.from(table?.querySelectorAll("thead th") ?? []);
   const header = headers.find((cell) => cell.textContent?.trim() === headerLabel);
-  if (header) header.hidden = !visible;
+  if (header) header.toggleAttribute("hidden", !visible);
 }
 
 function getDocumentUrl(documentRecord: DocumentRecord): string | null {
@@ -741,6 +825,15 @@ function attachEvents(): void {
     applyFilters();
   });
   elements.clearDocumentSelection.addEventListener("click", () => clearDocumentSelection(true));
+  elements.navDocuments.addEventListener("click", (event) => { event.preventDefault(); setActiveView("documents", true); });
+  elements.navMeetings.addEventListener("click", (event) => { event.preventDefault(); setActiveView("meetings", true); });
+  for (const link of Array.from(document.querySelectorAll<HTMLAnchorElement>("[data-view-link]"))) {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      setActiveView(link.dataset.viewLink === "meetings" ? "meetings" : "documents", true);
+    });
+  }
+  window.addEventListener("hashchange", restoreView);
   for (const button of [elements.previousTop, elements.previousBottom]) {
     button.addEventListener("click", () => {
       state.currentPage -= 1;
@@ -767,7 +860,9 @@ async function init(): Promise<void> {
   );
   populateTypeFilter();
   renderSummary();
+  renderMeetings();
   restoreDeepLink();
+  restoreView();
   applyFilters();
   window.OpenRISMonitor = {
     indexes: state.indexes,

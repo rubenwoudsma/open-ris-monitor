@@ -9,6 +9,7 @@ const state = {
     pageSize: 50,
     sortMode: "date-desc",
     selectedDocumentId: null,
+    activeView: "documents",
 };
 function byId(id) {
     const element = document.getElementById(id);
@@ -39,6 +40,12 @@ const elements = {
     dataQualityNotice: byId("data-quality-notice"),
     visibleDocumentsCount: byId("visible-documents-count"),
     tableBody: byId("documents-table-body"),
+    documentsView: byId("documents-view"),
+    meetingsView: byId("meetings-view"),
+    meetingsTableBody: byId("meetings-table-body"),
+    meetingsResultCount: byId("meetings-result-count"),
+    navDocuments: byId("nav-documents"),
+    navMeetings: byId("nav-meetings"),
     previousTop: byId("previous-page-top"),
     nextTop: byId("next-page-top"),
     pageInfoTop: byId("page-info-top"),
@@ -62,6 +69,68 @@ function getAgendaItemTitle(item) {
     const number = pick(item?.number);
     const title = pick(item?.title, item?.description) || "Agendapunt zonder titel";
     return number ? `${number}. ${title}` : title;
+}
+function getMeetingId(meeting) {
+    return pick(meeting.id, meeting.meeting_id, meeting.source_id, meeting.source_object_id, meeting.upstream_id);
+}
+function getMeetingDate(meeting) {
+    return pick(meeting?.date, meeting?.start_time, meeting?.startTime, meeting?.datetime, meeting?.meeting_date);
+}
+function agendaItemIdsForMeeting(meeting) {
+    const meetingId = getMeetingId(meeting);
+    const indexed = meetingId ? state.indexes?.agendaItemIdsByMeetingId.get(meetingId) ?? [] : [];
+    if (indexed.length > 0)
+        return uniqueValues(indexed);
+    return uniqueValues((state.data?.agendaItems ?? [])
+        .filter((item) => pick(item.meeting_id, item.meetingId, item.session_id, item.sessionId) === meetingId)
+        .map((item) => pick(item.id, item.agenda_item_id, item.source_id, item.source_object_id)));
+}
+function linkedDocumentIdsForMeeting(meeting) {
+    const meetingId = getMeetingId(meeting);
+    const directDocumentIds = meetingId ? state.indexes?.documentIdsByMeetingId.get(meetingId) ?? [] : [];
+    const agendaDocumentIds = agendaItemIdsForMeeting(meeting).flatMap((itemId) => state.indexes?.documentIdsByAgendaItemId.get(itemId) ?? []);
+    return uniqueValues([...directDocumentIds, ...agendaDocumentIds]);
+}
+function renderMeetings() {
+    const meetings = [...(state.data?.meetings ?? [])].sort((a, b) => timestamp(getMeetingDate(b)) - timestamp(getMeetingDate(a)));
+    elements.meetingsResultCount.textContent = `${meetings.length} vergadering(en)`;
+    elements.meetingsTableBody.replaceChildren();
+    if (meetings.length === 0) {
+        const row = document.createElement("tr");
+        const cell = createCell("Geen vergaderingen gevonden in de huidige public export.");
+        cell.colSpan = 4;
+        row.appendChild(cell);
+        elements.meetingsTableBody.appendChild(row);
+        return;
+    }
+    for (const meeting of meetings) {
+        const row = document.createElement("tr");
+        const titleCell = document.createElement("td");
+        const title = document.createElement("strong");
+        title.className = "meeting-title";
+        title.textContent = getMeetingTitle(meeting);
+        titleCell.appendChild(title);
+        row.appendChild(createCell(formatDate(getMeetingDate(meeting))));
+        row.appendChild(titleCell);
+        row.appendChild(createCell(text(agendaItemIdsForMeeting(meeting).length)));
+        row.appendChild(createCell(text(linkedDocumentIdsForMeeting(meeting).length)));
+        elements.meetingsTableBody.appendChild(row);
+    }
+}
+function setActiveView(view, updateHash = false) {
+    state.activeView = view;
+    elements.documentsView.toggleAttribute("hidden", view !== "documents");
+    elements.meetingsView.toggleAttribute("hidden", view !== "meetings");
+    elements.navDocuments.classList.toggle("top-nav__link--active", view === "documents");
+    elements.navMeetings.classList.toggle("top-nav__link--active", view === "meetings");
+    for (const link of Array.from(document.querySelectorAll("[data-view-link]"))) {
+        link.classList.toggle("is-active", link.dataset.viewLink === view);
+    }
+    if (updateHash)
+        window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}#${view}`);
+}
+function restoreView() {
+    setActiveView(window.location.hash === "#meetings" ? "meetings" : "documents");
 }
 function isUnknownType(value) {
     const normalized = value.trim().toLowerCase();
@@ -162,7 +231,7 @@ function setTableColumnVisibility(headerLabel, visible) {
     const headers = Array.from(table?.querySelectorAll("thead th") ?? []);
     const header = headers.find((cell) => cell.textContent?.trim() === headerLabel);
     if (header)
-        header.hidden = !visible;
+        header.toggleAttribute("hidden", !visible);
 }
 function getDocumentUrl(documentRecord) {
     return safeUrl(pick(documentRecord.download_url, documentRecord.source_url, documentRecord.url, documentRecord.file_url, documentRecord.document_url, documentRecord.web_url, documentRecord.external_url, pickFromRaw(documentRecord, "download_url", "downloadUrl", "source_url", "sourceUrl", "url", "fileUrl", "documentUrl", "webUrl"), pickNestedRaw(documentRecord, "file", "url", "downloadUrl", "download_url", "href")));
@@ -616,6 +685,15 @@ function attachEvents() {
         applyFilters();
     });
     elements.clearDocumentSelection.addEventListener("click", () => clearDocumentSelection(true));
+    elements.navDocuments.addEventListener("click", (event) => { event.preventDefault(); setActiveView("documents", true); });
+    elements.navMeetings.addEventListener("click", (event) => { event.preventDefault(); setActiveView("meetings", true); });
+    for (const link of Array.from(document.querySelectorAll("[data-view-link]"))) {
+        link.addEventListener("click", (event) => {
+            event.preventDefault();
+            setActiveView(link.dataset.viewLink === "meetings" ? "meetings" : "documents", true);
+        });
+    }
+    window.addEventListener("hashchange", restoreView);
     for (const button of [elements.previousTop, elements.previousBottom]) {
         button.addEventListener("click", () => {
             state.currentPage -= 1;
@@ -635,7 +713,9 @@ async function init() {
     state.indexes = buildRelationIndexes(state.data.documents, state.data.meetings, state.data.agendaItems, state.data.meetingDocumentRelations, state.data.meetingItemDocumentRelations);
     populateTypeFilter();
     renderSummary();
+    renderMeetings();
     restoreDeepLink();
+    restoreView();
     applyFilters();
     window.OpenRISMonitor = {
         indexes: state.indexes,
@@ -650,4 +730,3 @@ init().catch((error) => {
     console.error(error);
     elements.statusMessage.textContent = "De viewer kon de publieke exports niet laden. Controleer data/public en de browserconsole.";
 });
-//# sourceMappingURL=main.js.map
