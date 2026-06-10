@@ -224,7 +224,7 @@ function hasAnyDocumentSizeMetadata(records) {
     return records.some(hasDocumentSizeMetadata);
 }
 function getVisibleDocumentColumnCount(showFilenameColumn, showSizeColumn) {
-    return 5 + Number(showFilenameColumn) + Number(showSizeColumn);
+    return 4 + Number(showFilenameColumn) + Number(showSizeColumn);
 }
 function setTableColumnVisibility(headerLabel, visible) {
     const table = elements.tableBody.closest("table");
@@ -336,7 +336,6 @@ function sortDocuments(records) {
     const sorted = [...records];
     const byTitle = (a, b) => getDocumentTitle(a).localeCompare(getDocumentTitle(b), "nl");
     const byType = (a, b) => getCompactTypeLabel(a).localeCompare(getCompactTypeLabel(b), "nl");
-    const bySourceType = (a, b) => text(getSourceDocumentType(a)).localeCompare(text(getSourceDocumentType(b)), "nl");
     const bySize = (a, b) => Number(getDocumentSize(a) ?? 0) - Number(getDocumentSize(b) ?? 0);
     const byDate = (a, b) => timestamp(getDocumentDate(a)) - timestamp(getDocumentDate(b));
     switch (state.sortMode) {
@@ -346,8 +345,6 @@ function sortDocuments(records) {
             return sorted.sort(byTitle);
         case "type-asc":
             return sorted.sort(byType);
-        case "source-type-asc":
-            return sorted.sort(bySourceType);
         case "size-desc":
             return sorted.sort((a, b) => bySize(b, a));
         case "size-asc":
@@ -462,7 +459,6 @@ function renderDocuments() {
             row.className = "is-selected";
         row.appendChild(createCell(formatDate(getDocumentDate(documentRecord))));
         row.appendChild(createCell(getCompactTypeLabel(documentRecord)));
-        row.appendChild(createCell(text(getSourceDocumentType(documentRecord), unavailable())));
         row.appendChild(createDocumentTitleCell(documentRecord));
         if (showFilenameColumn)
             row.appendChild(createCell(text(getDocumentFilename(documentRecord), unavailable("Geen bestandsmetadata"))));
@@ -523,7 +519,6 @@ function renderDocumentDetail(documentRecord) {
     meta.className = "summary-list document-detail-meta";
     appendDefinition(meta, "Datum", formatDate(getDocumentDate(documentRecord)));
     appendDefinition(meta, "Compact type", getCompactTypeLabel(documentRecord));
-    appendDefinition(meta, "Bron type", text(getSourceDocumentType(documentRecord), unavailable()));
     const filename = getDocumentFilename(documentRecord);
     if (filename)
         appendDefinition(meta, "Bestand", filename);

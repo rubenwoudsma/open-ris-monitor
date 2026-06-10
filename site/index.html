@@ -43,30 +43,9 @@
         </div>
       </section>
 
-      <div class="content-layout">
-        <aside class="sidebar" aria-label="Navigatie en context">
-          <section class="panel panel--compact" aria-labelledby="navigation-title">
-            <div class="panel__header">
-              <h2 id="navigation-title">Navigatie</h2>
-            </div>
-            <nav class="side-nav" aria-label="Viewer navigatie">
-              <a class="side-nav__link is-active" href="#documents" data-view-link="documents">Documenten</a>
-              <a class="side-nav__link" href="#meetings" data-view-link="meetings">Vergaderingen</a>
-            </nav>
-          </section>
-
-          <section class="panel panel--compact" aria-labelledby="relation-summary-title">
-            <div class="panel__header">
-              <h2 id="relation-summary-title">Context</h2>
-            </div>
-            <p class="muted">
-              Documenten blijven de primaire ingang. Vergaderingen tonen alleen compacte tellingen uit de relationele exports.
-            </p>
-            <p id="data-quality-notice" class="quality-notice" hidden></p>
-          </section>
-        </aside>
-
+      <div class="content-layout content-layout--single">
         <div class="main-column">
+          <p id="data-quality-notice" class="quality-notice" hidden></p>
           <div id="documents-view" data-view="documents">
             <section class="panel" aria-labelledby="filters-title">
               <div class="panel__header panel__header--split">
@@ -92,7 +71,6 @@
                     <option value="date-asc">Datum, oudste eerst</option>
                     <option value="title-asc">Titel, A-Z</option>
                     <option value="type-asc">Compact type, A-Z</option>
-                    <option value="source-type-asc">Bron type, A-Z</option>
                     <option value="size-desc">Grootte, groot naar klein</option>
                     <option value="size-asc">Grootte, klein naar groot</option>
                   </select>
@@ -123,7 +101,6 @@
             <section class="panel" aria-labelledby="documents-title">
               <div class="panel__header panel__header--split">
                 <div>
-                  <p class="eyebrow">Document-first overzicht</p>
                   <h2 id="documents-title">Documenten</h2>
                 </div>
                 <p id="result-count" class="count-pill">-</p>
@@ -139,7 +116,6 @@
                     <tr>
                       <th scope="col">Datum</th>
                       <th scope="col">Compact type</th>
-                      <th scope="col">Bron type</th>
                       <th scope="col">Titel en context</th>
                       <th scope="col">Bestand</th>
                       <th scope="col">Grootte</th>
@@ -147,7 +123,7 @@
                     </tr>
                   </thead>
                   <tbody id="documents-table-body">
-                    <tr><td colspan="7">Documenten worden geladen...</td></tr>
+                    <tr><td colspan="6">Documenten worden geladen...</td></tr>
                   </tbody>
                 </table>
               </div>
