@@ -26,6 +26,11 @@ export interface DocumentRecord extends UnknownRecord {
   normalized_document_type_label?: string;
   download_url?: string;
   source_url?: string;
+  url?: string;
+  file_url?: string;
+  document_url?: string;
+  web_url?: string;
+  external_url?: string;
   publication_datetime?: string;
   publication_date?: string;
   date_published?: string;
@@ -54,6 +59,8 @@ export interface MeetingRecord extends UnknownRecord {
   title?: string;
   description?: string;
   dmu_name?: string;
+  location?: string;
+  status?: string;
   items?: AgendaItemRecord[];
 }
 

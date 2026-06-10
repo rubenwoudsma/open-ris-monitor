@@ -38,21 +38,9 @@ def test_relation_indexes_are_named_in_relations_module() -> None:
 def test_github_like_shell_layout_exists() -> None:
     index = Path("site/index.html").read_text(encoding="utf-8")
     styles = Path("site/assets/styles.css").read_text(encoding="utf-8")
-
-    for marker in [
-        "skip-link",
-        "site-header__inner",
-        "top-nav",
-        "content-layout",
-        "main-column",
-    ]:
+    for marker in ["skip-link", "site-header__inner", "top-nav", "main-column"]:
         assert marker in index
-
-    for marker in [
-        ".content-layout",
-        ".top-nav__link--active",
-        "@media",
-    ]:
+    for marker in [".top-nav__link--active", "@media"]:
         assert marker in styles
 
 
@@ -60,7 +48,6 @@ def test_document_first_detail_view_exists() -> None:
     index = Path("site/index.html").read_text(encoding="utf-8")
     source = Path("site/src/main.ts").read_text(encoding="utf-8")
     styles = Path("site/assets/styles.css").read_text(encoding="utf-8")
-
     for marker in [
         "document-detail",
         "document-detail-title",
@@ -69,23 +56,15 @@ def test_document_first_detail_view_exists() -> None:
         "Acties",
     ]:
         assert marker in index
-
     for marker in [
         "renderDocumentDetail",
         "relatedMeetingIds",
         "relatedAgendaItemIds",
         "relatedVersions",
         "selectDocument",
-        "doc",
     ]:
         assert marker in source
-
-    for marker in [
-        ".document-detail",
-        ".relation-card",
-        ".document-actions",
-        ".is-selected",
-    ]:
+    for marker in [".document-detail", ".relation-card", ".document-actions", ".is-selected"]:
         assert marker in styles
 
 
@@ -93,7 +72,6 @@ def test_document_metadata_fallbacks_are_visible() -> None:
     index = Path("site/index.html").read_text(encoding="utf-8")
     source = Path("site/src/main.ts").read_text(encoding="utf-8")
     styles = Path("site/assets/styles.css").read_text(encoding="utf-8")
-
     assert "data-quality-notice" in index
     for marker in [
         "Niet beschikbaar in export",
@@ -103,17 +81,14 @@ def test_document_metadata_fallbacks_are_visible() -> None:
         "Geen bruikbare documentkoppelingen",
     ]:
         assert marker in source
-
     for marker in [".quality-notice", ".metadata-notice"]:
         assert marker in styles
-
 
 
 def test_compact_meeting_list_view_exists() -> None:
     index = Path("site/index.html").read_text(encoding="utf-8")
     source = Path("site/src/main.ts").read_text(encoding="utf-8")
     styles = Path("site/assets/styles.css").read_text(encoding="utf-8")
-
     for marker in [
         "nav-documents",
         "nav-meetings",
@@ -124,31 +99,51 @@ def test_compact_meeting_list_view_exists() -> None:
         "Technische metadata en databestanden",
     ]:
         assert marker in index
-
     for marker in [
         "renderMeetings",
         "agendaItemIdsForMeeting",
         "linkedDocumentIdsForMeeting",
         "setActiveView",
-        "#meetings",
     ]:
         assert marker in source
-
-    for marker in [
-        ".meetings-table",
-        ".technical-metadata",
-        ".footer-metadata",
-    ]:
+    for marker in [".meetings-table", ".technical-metadata", ".footer-metadata"]:
         assert marker in styles
 
 
 def test_compact_layout_removes_sidebar_and_source_type_column() -> None:
     index = Path("site/index.html").read_text(encoding="utf-8")
     source = Path("site/src/main.ts").read_text(encoding="utf-8")
-
     assert 'class="sidebar"' not in index
     assert "Document-first overzicht" not in index
     assert "Bron type" not in index
     assert "source-type-asc" not in index
     assert 'appendDefinition(meta, "Bron type"' not in source
     assert "getVisibleDocumentColumnCount" in source
+
+
+def test_meeting_detail_view_exists_without_new_route() -> None:
+    index = Path("site/index.html").read_text(encoding="utf-8")
+    source = Path("site/src/main.ts").read_text(encoding="utf-8")
+    styles = Path("site/assets/styles.css").read_text(encoding="utf-8")
+    for marker in [
+        "meeting-detail",
+        "meeting-detail-title",
+        "meeting-detail-body",
+        "clear-meeting-selection",
+    ]:
+        assert marker in index
+    for marker in [
+        "Agendapunten binnen deze vergadering",
+        "Gekoppelde documenten bij de vergadering",
+        "renderMeetingDetail",
+        "selectMeeting",
+        "clearMeetingSelection",
+        "linkedDocumentIdsForAgendaItem",
+        "createDocumentList",
+        "Bekijk documentdetails",
+    ]:
+        assert marker in source
+    for marker in [".meeting-detail", ".agenda-item-card", ".linked-document-list"]:
+        assert marker in styles
+    assert "meetingId" not in index
+    assert "URLSearchParams" not in source

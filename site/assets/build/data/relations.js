@@ -1,8 +1,8 @@
 import { pick } from "../ui/format.js";
 function addValue(set, value) {
-    const text = pick(value);
-    if (text)
-        set.add(text);
+    const stringValue = pick(value);
+    if (stringValue)
+        set.add(stringValue);
 }
 function addUnique(map, key, value) {
     if (!key || !value)
@@ -71,9 +71,8 @@ export function buildRelationIndexes(documents, meetings, agendaItems, meetingDo
         agendaItemIdsByMeetingId: new Map(),
     };
     for (const documentRecord of documents) {
-        for (const identifier of getDocumentIdentifiers(documentRecord)) {
+        for (const identifier of getDocumentIdentifiers(documentRecord))
             indexes.documentsById.set(identifier, documentRecord);
-        }
     }
     for (const meeting of meetings) {
         const id = getRecordId(meeting);

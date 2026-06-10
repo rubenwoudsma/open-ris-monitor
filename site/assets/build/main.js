@@ -1,14 +1,15 @@
 import { loadPublicData } from "./data/loaders.js";
-import { buildRelationIndexes, getDocumentIdentifiers } from "./data/relations.js";
+import { buildRelationIndexes, getDocumentIdentifiers, getRecordId } from "./data/relations.js";
 import { formatBytes, formatDate, formatDateTime, pick, safeUrl, text, timestamp } from "./ui/format.js";
 const state = {
     data: null,
     indexes: null,
     filteredDocuments: [],
+    selectedDocumentId: null,
+    selectedMeetingId: null,
     currentPage: 1,
     pageSize: 50,
     sortMode: "date-desc",
-    selectedDocumentId: null,
     activeView: "documents",
 };
 function byId(id) {
@@ -25,36 +26,49 @@ const elements = {
     generatedAt: byId("generated-at"),
     municipalityCopy: byId("municipality-copy"),
     generatedAtCopy: byId("generated-at-copy"),
+    meetingsCount: byId("meetings-count"),
+    agendaItemsCount: byId("agenda-items-count"),
+    linkedDocumentsCount: byId("linked-documents-count"),
+    dataQualityNotice: byId("data-quality-notice"),
+    documentsView: byId("documents-view"),
+    meetingsView: byId("meetings-view"),
+    navDocuments: byId("nav-documents"),
+    navMeetings: byId("nav-meetings"),
     searchInput: byId("search-input"),
     typeFilter: byId("type-filter"),
     sortSelect: byId("sort-select"),
     pageSizeSelect: byId("page-size-select"),
     resultCount: byId("result-count"),
-    documentDetail: byId("document-detail"),
-    documentDetailTitle: byId("document-detail-title"),
-    documentDetailBody: byId("document-detail-body"),
-    clearDocumentSelection: byId("clear-document-selection"),
-    meetingsCount: byId("meetings-count"),
-    agendaItemsCount: byId("agenda-items-count"),
-    linkedDocumentsCount: byId("linked-documents-count"),
-    dataQualityNotice: byId("data-quality-notice"),
     visibleDocumentsCount: byId("visible-documents-count"),
     tableBody: byId("documents-table-body"),
-    documentsView: byId("documents-view"),
-    meetingsView: byId("meetings-view"),
-    meetingsTableBody: byId("meetings-table-body"),
-    meetingsResultCount: byId("meetings-result-count"),
-    navDocuments: byId("nav-documents"),
-    navMeetings: byId("nav-meetings"),
     previousTop: byId("previous-page-top"),
     nextTop: byId("next-page-top"),
     pageInfoTop: byId("page-info-top"),
     previousBottom: byId("previous-page-bottom"),
     nextBottom: byId("next-page-bottom"),
     pageInfoBottom: byId("page-info-bottom"),
+    documentDetail: byId("document-detail"),
+    documentDetailTitle: byId("document-detail-title"),
+    documentDetailBody: byId("document-detail-body"),
+    clearDocumentSelection: byId("clear-document-selection"),
+    meetingsResultCount: byId("meetings-result-count"),
+    meetingsTableBody: byId("meetings-table-body"),
+    meetingDetail: byId("meeting-detail"),
+    meetingDetailTitle: byId("meeting-detail-title"),
+    meetingDetailBody: byId("meeting-detail-body"),
+    clearMeetingSelection: byId("clear-meeting-selection"),
 };
+function unavailable(reason = "Niet beschikbaar in export") {
+    return reason;
+}
+function uniqueValues(values) {
+    return [...new Set(values.filter(Boolean))];
+}
 function getDocumentId(documentRecord) {
     return getDocumentIdentifiers(documentRecord)[0] ?? "";
+}
+function documentIds(documentRecord) {
+    return uniqueValues(getDocumentIdentifiers(documentRecord));
 }
 function getDocumentTitle(documentRecord) {
     return pick(documentRecord.title, documentRecord.description, documentRecord.filename) || "Geen titel";
@@ -62,89 +76,35 @@ function getDocumentTitle(documentRecord) {
 function getDocumentDate(documentRecord) {
     return pick(documentRecord.publication_datetime, documentRecord.date_published, documentRecord.publication_date, documentRecord.document_date, documentRecord.date, documentRecord.retrieved_at);
 }
+function getMeetingId(meeting) {
+    return getRecordId(meeting) || pick(meeting.id, meeting.source_id, meeting.source_object_id);
+}
 function getMeetingTitle(meeting) {
     return pick(meeting?.description, meeting?.title, meeting?.dmu_name) || "Vergadering zonder titel";
+}
+function getMeetingDate(meeting) {
+    return pick(meeting?.date, meeting?.start_time);
+}
+function getAgendaItemId(item) {
+    return getRecordId(item) || pick(item.id, item.meeting_item_id, item.source_id, item.source_object_id);
 }
 function getAgendaItemTitle(item) {
     const number = pick(item?.number);
     const title = pick(item?.title, item?.description) || "Agendapunt zonder titel";
     return number ? `${number}. ${title}` : title;
 }
-function getMeetingId(meeting) {
-    return pick(meeting.id, meeting.meeting_id, meeting.source_id, meeting.source_object_id, meeting.upstream_id);
-}
-function getMeetingDate(meeting) {
-    return pick(meeting?.date, meeting?.start_time, meeting?.startTime, meeting?.datetime, meeting?.meeting_date);
-}
-function agendaItemIdsForMeeting(meeting) {
-    const meetingId = getMeetingId(meeting);
-    const indexed = meetingId ? state.indexes?.agendaItemIdsByMeetingId.get(meetingId) ?? [] : [];
-    if (indexed.length > 0)
-        return uniqueValues(indexed);
-    return uniqueValues((state.data?.agendaItems ?? [])
-        .filter((item) => pick(item.meeting_id, item.meetingId, item.session_id, item.sessionId) === meetingId)
-        .map((item) => pick(item.id, item.agenda_item_id, item.source_id, item.source_object_id)));
-}
-function linkedDocumentIdsForMeeting(meeting) {
-    const meetingId = getMeetingId(meeting);
-    const directDocumentIds = meetingId ? state.indexes?.documentIdsByMeetingId.get(meetingId) ?? [] : [];
-    const agendaDocumentIds = agendaItemIdsForMeeting(meeting).flatMap((itemId) => state.indexes?.documentIdsByAgendaItemId.get(itemId) ?? []);
-    return uniqueValues([...directDocumentIds, ...agendaDocumentIds]);
-}
-function renderMeetings() {
-    const meetings = [...(state.data?.meetings ?? [])].sort((a, b) => timestamp(getMeetingDate(b)) - timestamp(getMeetingDate(a)));
-    elements.meetingsResultCount.textContent = `${meetings.length} vergadering(en)`;
-    elements.meetingsTableBody.replaceChildren();
-    if (meetings.length === 0) {
-        const row = document.createElement("tr");
-        const cell = createCell("Geen vergaderingen gevonden in de huidige public export.");
-        cell.colSpan = 4;
-        row.appendChild(cell);
-        elements.meetingsTableBody.appendChild(row);
-        return;
-    }
-    for (const meeting of meetings) {
-        const row = document.createElement("tr");
-        const titleCell = document.createElement("td");
-        const title = document.createElement("strong");
-        title.className = "meeting-title";
-        title.textContent = getMeetingTitle(meeting);
-        titleCell.appendChild(title);
-        row.appendChild(createCell(formatDate(getMeetingDate(meeting))));
-        row.appendChild(titleCell);
-        row.appendChild(createCell(text(agendaItemIdsForMeeting(meeting).length)));
-        row.appendChild(createCell(text(linkedDocumentIdsForMeeting(meeting).length)));
-        elements.meetingsTableBody.appendChild(row);
-    }
-}
-function setActiveView(view, updateHash = false) {
-    state.activeView = view;
-    elements.documentsView.toggleAttribute("hidden", view !== "documents");
-    elements.meetingsView.toggleAttribute("hidden", view !== "meetings");
-    elements.navDocuments.classList.toggle("top-nav__link--active", view === "documents");
-    elements.navMeetings.classList.toggle("top-nav__link--active", view === "meetings");
-    for (const link of Array.from(document.querySelectorAll("[data-view-link]"))) {
-        link.classList.toggle("is-active", link.dataset.viewLink === view);
-    }
-    if (updateHash)
-        window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}#${view}`);
-}
-function restoreView() {
-    setActiveView(window.location.hash === "#meetings" ? "meetings" : "documents");
+function getAgendaItemMeetingId(item) {
+    return pick(item?.meeting_id, item?.meetingId, item?.session_id, item?.sessionId);
 }
 function isUnknownType(value) {
     const normalized = value.trim().toLowerCase();
     return !normalized || normalized === "unknown" || normalized === "onbekend";
 }
-function unavailable(reason = "Niet beschikbaar in export") {
-    return reason;
-}
 function pickFromRaw(record, ...keys) {
     if (!record.raw || typeof record.raw !== "object")
         return "";
     for (const key of keys) {
-        const value = record.raw[key];
-        const picked = pick(value);
+        const picked = pick(record.raw[key]);
         if (picked)
             return picked;
     }
@@ -178,20 +138,20 @@ function getCompactTypeLabel(documentRecord) {
     return unavailable();
 }
 function getSourceDocumentType(documentRecord) {
-    const sourceType = pick(documentRecord.document_type, pickFromRaw(documentRecord, "document_type", "documentTypeLabel", "documentType", "category", "kind"));
-    if (!sourceType)
-        return "";
+    const sourceType = pick(documentRecord.document_type, pickFromRaw(documentRecord, "document_type", "documentType", "source_document_type", "sourceDocumentType"));
     const compactType = getCompactType(documentRecord);
     const compactTypeLabel = getCompactTypeLabel(documentRecord);
-    if (sourceType === compactType || sourceType === compactTypeLabel)
-        return "";
-    return sourceType;
+    let documentTypeLabel = sourceType;
+    if (sourceType === compactType || sourceType === compactTypeLabel) {
+        documentTypeLabel = sourceType;
+    }
+    return documentTypeLabel || unavailable("Geen bronmetadata");
 }
 function getDocumentFilename(documentRecord) {
-    return pick(documentRecord.filename, documentRecord.file_name, documentRecord.fileName, documentRecord.name, documentRecord.display_name, documentRecord.original_filename, pickFromRaw(documentRecord, "filename", "file_name", "fileName", "name", "displayName", "originalFilename"), pickNestedRaw(documentRecord, "file", "filename", "fileName", "name"));
+    return pick(documentRecord.filename, documentRecord.file_name, documentRecord.name, documentRecord.display_name, documentRecord.original_filename, pickFromRaw(documentRecord, "filename", "file_name", "fileName", "name", "displayName", "originalFilename"), pickNestedRaw(documentRecord, "file", "filename", "fileName", "name"));
 }
 function getDocumentSize(documentRecord) {
-    const values = [
+    return [
         documentRecord.file_size_bytes,
         documentRecord.size_bytes,
         documentRecord.file_size,
@@ -199,48 +159,16 @@ function getDocumentSize(documentRecord) {
         documentRecord.size,
         documentRecord.bytes,
         documentRecord.content_length,
-        pickFromRaw(recordDocumentForRaw(documentRecord), "file_size_bytes", "size_bytes", "file_size", "fileSize", "filesize", "size", "bytes", "contentLength"),
+        pickFromRaw(documentRecord, "file_size_bytes", "size_bytes", "file_size", "fileSize", "filesize", "size", "bytes", "contentLength"),
         pickNestedRaw(documentRecord, "file", "size", "bytes", "size_bytes", "fileSize"),
-    ];
-    return values.find((value) => pick(value));
-}
-function recordDocumentForRaw(documentRecord) {
-    return documentRecord;
+    ].find((value) => pick(value));
 }
 function formatDocumentSize(documentRecord) {
     const formatted = formatBytes(getDocumentSize(documentRecord));
     return formatted === "-" ? unavailable("Geen bestandsgrootte beschikbaar") : formatted;
 }
-function hasDocumentFilenameMetadata(documentRecord) {
-    return Boolean(getDocumentFilename(documentRecord));
-}
-function hasDocumentSizeMetadata(documentRecord) {
-    return Boolean(getDocumentSize(documentRecord));
-}
-function hasAnyDocumentFilenameMetadata(records) {
-    return records.some(hasDocumentFilenameMetadata);
-}
-function hasAnyDocumentSizeMetadata(records) {
-    return records.some(hasDocumentSizeMetadata);
-}
-function getVisibleDocumentColumnCount(showFilenameColumn, showSizeColumn) {
-    return 4 + Number(showFilenameColumn) + Number(showSizeColumn);
-}
-function setTableColumnVisibility(headerLabel, visible) {
-    const table = elements.tableBody.closest("table");
-    const headers = Array.from(table?.querySelectorAll("thead th") ?? []);
-    const header = headers.find((cell) => cell.textContent?.trim() === headerLabel);
-    if (header)
-        header.toggleAttribute("hidden", !visible);
-}
 function getDocumentUrl(documentRecord) {
     return safeUrl(pick(documentRecord.download_url, documentRecord.source_url, documentRecord.url, documentRecord.file_url, documentRecord.document_url, documentRecord.web_url, documentRecord.external_url, pickFromRaw(documentRecord, "download_url", "downloadUrl", "source_url", "sourceUrl", "url", "fileUrl", "documentUrl", "webUrl"), pickNestedRaw(documentRecord, "file", "url", "downloadUrl", "download_url", "href")));
-}
-function uniqueValues(values) {
-    return [...new Set(values.filter(Boolean))];
-}
-function documentIds(documentRecord) {
-    return uniqueValues(getDocumentIdentifiers(documentRecord));
 }
 function relatedMeetingIds(documentRecord) {
     if (!state.indexes)
@@ -258,7 +186,7 @@ function relationLabelsForDocument(documentRecord) {
     const labels = [];
     for (const meetingId of relatedMeetingIds(documentRecord)) {
         const meeting = state.indexes.meetingsById.get(meetingId);
-        labels.push([getMeetingTitle(meeting), formatDate(pick(meeting?.date, meeting?.start_time))].filter(Boolean).join(", "));
+        labels.push([getMeetingTitle(meeting), formatDate(getMeetingDate(meeting))].filter(Boolean).join(", "));
     }
     for (const itemId of relatedAgendaItemIds(documentRecord)) {
         const item = state.indexes.agendaItemsById.get(itemId);
@@ -273,21 +201,115 @@ function relatedVersions(documentRecord) {
         return versionDocumentId ? ids.has(versionDocumentId) : false;
     });
 }
-function searchBlob(documentRecord) {
-    return [
-        getDocumentTitle(documentRecord),
-        documentRecord.description,
-        documentRecord.filename,
-        documentRecord.document_type,
-        documentRecord.normalized_document_type,
-        documentRecord.normalized_document_type_label,
-        documentRecord.source_id,
-        documentRecord.source_object_id,
-        relationLabelsForDocument(documentRecord).join(" "),
-    ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+function agendaItemIdsForMeeting(meetingId) {
+    if (!state.indexes)
+        return [];
+    return uniqueValues(state.indexes.agendaItemIdsByMeetingId.get(meetingId) ?? []);
+}
+function linkedDocumentIdsForMeeting(meetingId) {
+    if (!state.indexes)
+        return [];
+    return uniqueValues(state.indexes.documentIdsByMeetingId.get(meetingId) ?? []);
+}
+function linkedDocumentIdsForAgendaItem(itemId) {
+    if (!state.indexes)
+        return [];
+    return uniqueValues(state.indexes.documentIdsByAgendaItemId.get(itemId) ?? []);
+}
+function findDocumentById(documentId) {
+    if (!documentId)
+        return undefined;
+    return state.data?.documents.find((documentRecord) => documentIds(documentRecord).includes(documentId));
+}
+function findMeetingById(meetingId) {
+    if (!meetingId)
+        return undefined;
+    return state.data?.meetings.find((meeting) => getMeetingId(meeting) === meetingId) ?? state.indexes?.meetingsById.get(meetingId);
+}
+function createCell(value) {
+    const cell = document.createElement("td");
+    cell.textContent = value;
+    return cell;
+}
+function appendDefinition(list, label, value) {
+    const wrapper = document.createElement("div");
+    const term = document.createElement("dt");
+    const description = document.createElement("dd");
+    term.textContent = label;
+    description.textContent = value;
+    wrapper.append(term, description);
+    list.appendChild(wrapper);
+}
+function createDocumentAction(documentRecord, label = "Details") {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "secondary-button";
+    button.textContent = label;
+    button.addEventListener("click", () => {
+        setActiveView("documents");
+        selectDocument(documentRecord, false);
+    });
+    return button;
+}
+function createDocumentList(documentIdsToRender, emptyLabel) {
+    const list = document.createElement("div");
+    list.className = "linked-document-list";
+    const documents = uniqueValues(documentIdsToRender)
+        .map((id) => findDocumentById(id))
+        .filter((record) => Boolean(record));
+    if (documents.length === 0)
+        return renderEmptyRelation(emptyLabel);
+    for (const documentRecord of documents) {
+        const article = document.createElement("article");
+        article.className = "relation-card relation-card--actionable";
+        const heading = document.createElement("h4");
+        heading.textContent = getDocumentTitle(documentRecord);
+        const meta = document.createElement("p");
+        meta.className = "muted";
+        meta.textContent = [formatDate(getDocumentDate(documentRecord)), getCompactTypeLabel(documentRecord)].filter(Boolean).join(" · ");
+        const actions = document.createElement("div");
+        actions.className = "document-actions";
+        actions.appendChild(createDocumentAction(documentRecord, "Bekijk documentdetails"));
+        const href = getDocumentUrl(documentRecord);
+        if (href) {
+            const link = document.createElement("a");
+            link.href = href;
+            link.rel = "noopener noreferrer";
+            link.target = "_blank";
+            link.textContent = "Open";
+            actions.appendChild(link);
+        }
+        article.append(heading, meta, actions);
+        list.appendChild(article);
+    }
+    return list;
+}
+function createRelationCard(title, meta, body) {
+    const article = document.createElement("article");
+    article.className = "relation-card";
+    const heading = document.createElement("h4");
+    heading.textContent = title;
+    const subtitle = document.createElement("p");
+    subtitle.className = "muted";
+    subtitle.textContent = meta;
+    article.append(heading, subtitle);
+    if (body) {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = body;
+        article.appendChild(paragraph);
+    }
+    return article;
+}
+function renderEmptyRelation(label) {
+    const paragraph = document.createElement("p");
+    paragraph.className = "empty-state";
+    paragraph.textContent = label;
+    return paragraph;
+}
+function appendSectionHeading(section, label) {
+    const heading = document.createElement("h3");
+    heading.textContent = label;
+    section.appendChild(heading);
 }
 function renderSummary() {
     const latest = state.data?.latest ?? {};
@@ -310,9 +332,8 @@ function renderSummary() {
     if (documents.length > 0 && linkedDocumentCount === 0 && relationCount > 0) {
         notices.push(`${relationCount} relationele records geladen, maar Geen bruikbare documentkoppelingen in deze export.`);
     }
-    if (documents.length > 0 && unknownTypeCount === documents.length) {
+    if (documents.length > 0 && unknownTypeCount === documents.length)
         notices.push("Alle documenten hebben nog een onbekend genormaliseerd documenttype.");
-    }
     elements.dataQualityNotice.textContent = notices.join(" ");
     elements.dataQualityNotice.hidden = notices.length === 0;
     const relationText = latest.relations_enabled
@@ -322,15 +343,27 @@ function renderSummary() {
 }
 function populateTypeFilter() {
     const options = new Map();
-    for (const documentRecord of state.data?.documents ?? []) {
+    for (const documentRecord of state.data?.documents ?? [])
         options.set(getCompactType(documentRecord), getCompactTypeLabel(documentRecord));
-    }
     for (const [value, label] of [...options.entries()].sort((a, b) => a[1].localeCompare(b[1], "nl"))) {
         const option = document.createElement("option");
         option.value = value;
         option.textContent = label;
         elements.typeFilter.appendChild(option);
     }
+}
+function searchBlob(documentRecord) {
+    return [
+        getDocumentTitle(documentRecord),
+        documentRecord.description,
+        documentRecord.filename,
+        documentRecord.document_type,
+        documentRecord.normalized_document_type,
+        documentRecord.normalized_document_type_label,
+        documentRecord.source_id,
+        documentRecord.source_object_id,
+        relationLabelsForDocument(documentRecord).join(" "),
+    ].filter(Boolean).join(" ").toLowerCase();
 }
 function sortDocuments(records) {
     const sorted = [...records];
@@ -339,26 +372,19 @@ function sortDocuments(records) {
     const bySize = (a, b) => Number(getDocumentSize(a) ?? 0) - Number(getDocumentSize(b) ?? 0);
     const byDate = (a, b) => timestamp(getDocumentDate(a)) - timestamp(getDocumentDate(b));
     switch (state.sortMode) {
-        case "date-asc":
-            return sorted.sort(byDate);
-        case "title-asc":
-            return sorted.sort(byTitle);
-        case "type-asc":
-            return sorted.sort(byType);
-        case "size-desc":
-            return sorted.sort((a, b) => bySize(b, a));
-        case "size-asc":
-            return sorted.sort(bySize);
+        case "date-asc": return sorted.sort(byDate);
+        case "title-asc": return sorted.sort(byTitle);
+        case "type-asc": return sorted.sort(byType);
+        case "size-desc": return sorted.sort((a, b) => bySize(b, a));
+        case "size-asc": return sorted.sort(bySize);
         case "date-desc":
-        default:
-            return sorted.sort((a, b) => byDate(b, a));
+        default: return sorted.sort((a, b) => byDate(b, a));
     }
 }
 function applyFilters() {
     const query = elements.searchInput.value.trim().toLowerCase();
     const type = elements.typeFilter.value;
-    const allDocuments = state.data?.documents ?? [];
-    let records = allDocuments.filter((documentRecord) => {
+    let records = (state.data?.documents ?? []).filter((documentRecord) => {
         if (type && getCompactType(documentRecord) !== type)
             return false;
         if (query && !searchBlob(documentRecord).includes(query))
@@ -369,19 +395,24 @@ function applyFilters() {
     state.filteredDocuments = records;
     renderDocuments();
 }
-function createCell(value) {
-    const cell = document.createElement("td");
-    cell.textContent = value;
-    return cell;
+function hasAnyDocumentFilenameMetadata(records) {
+    return records.some((record) => Boolean(getDocumentFilename(record)));
 }
-function appendDefinition(list, label, value) {
-    const wrapper = document.createElement("div");
-    const term = document.createElement("dt");
-    const description = document.createElement("dd");
-    term.textContent = label;
-    description.textContent = value;
-    wrapper.append(term, description);
-    list.appendChild(wrapper);
+function hasAnyDocumentSizeMetadata(records) {
+    return records.some((record) => Boolean(getDocumentSize(record)));
+}
+function getVisibleDocumentColumnCount(showFilenameColumn, showSizeColumn) {
+    return 4 + Number(showFilenameColumn) + Number(showSizeColumn);
+}
+function setColumnVisibilityForTable(tableSelector, headerLabel, visible) {
+    const table = document.querySelector(tableSelector);
+    const headers = Array.from(table?.querySelectorAll("thead th") ?? []);
+    const header = headers.find((cell) => cell.textContent?.trim() === headerLabel);
+    if (header)
+        header.hidden = !visible;
+}
+function setTableColumnVisibility(headerLabel, visible) {
+    setColumnVisibilityForTable(".documents-table", headerLabel, visible);
 }
 function createDocumentTitleCell(documentRecord) {
     const cell = document.createElement("td");
@@ -389,7 +420,7 @@ function createDocumentTitleCell(documentRecord) {
     button.type = "button";
     button.className = "link-button document-title-button";
     button.textContent = getDocumentTitle(documentRecord);
-    button.addEventListener("click", () => selectDocument(documentRecord, true));
+    button.addEventListener("click", () => selectDocument(documentRecord, false));
     cell.appendChild(button);
     const labels = relationLabelsForDocument(documentRecord).slice(0, 3);
     if (labels.length > 0) {
@@ -408,12 +439,7 @@ function createDocumentActionsCell(documentRecord) {
     const cell = document.createElement("td");
     const actionList = document.createElement("div");
     actionList.className = "document-actions";
-    const detailButton = document.createElement("button");
-    detailButton.type = "button";
-    detailButton.className = "secondary-button";
-    detailButton.textContent = "Details";
-    detailButton.addEventListener("click", () => selectDocument(documentRecord, true));
-    actionList.appendChild(detailButton);
+    actionList.appendChild(createDocumentAction(documentRecord));
     const href = getDocumentUrl(documentRecord);
     if (href) {
         const link = document.createElement("a");
@@ -425,11 +451,6 @@ function createDocumentActionsCell(documentRecord) {
     }
     cell.appendChild(actionList);
     return cell;
-}
-function findDocumentById(documentId) {
-    if (!documentId)
-        return undefined;
-    return state.data?.documents.find((documentRecord) => documentIds(documentRecord).includes(documentId));
 }
 function renderDocuments() {
     const total = state.filteredDocuments.length;
@@ -476,33 +497,6 @@ function renderDocuments() {
     for (const button of [elements.nextTop, elements.nextBottom])
         button.disabled = state.currentPage >= totalPages;
 }
-function createRelationCard(title, meta, body) {
-    const article = document.createElement("article");
-    article.className = "relation-card";
-    const heading = document.createElement("h4");
-    heading.textContent = title;
-    const subtitle = document.createElement("p");
-    subtitle.className = "muted";
-    subtitle.textContent = meta;
-    article.append(heading, subtitle);
-    if (body) {
-        const paragraph = document.createElement("p");
-        paragraph.textContent = body;
-        article.appendChild(paragraph);
-    }
-    return article;
-}
-function renderEmptyRelation(label) {
-    const paragraph = document.createElement("p");
-    paragraph.className = "empty-state";
-    paragraph.textContent = label;
-    return paragraph;
-}
-function appendSectionHeading(section, label) {
-    const heading = document.createElement("h3");
-    heading.textContent = label;
-    section.appendChild(heading);
-}
 function renderDocumentDetail(documentRecord) {
     const ids = documentIds(documentRecord);
     const primaryId = ids[0] ?? "";
@@ -519,6 +513,7 @@ function renderDocumentDetail(documentRecord) {
     meta.className = "summary-list document-detail-meta";
     appendDefinition(meta, "Datum", formatDate(getDocumentDate(documentRecord)));
     appendDefinition(meta, "Compact type", getCompactTypeLabel(documentRecord));
+    appendDefinition(meta, "Bron documenttype", getSourceDocumentType(documentRecord));
     const filename = getDocumentFilename(documentRecord);
     if (filename)
         appendDefinition(meta, "Bestand", filename);
@@ -542,17 +537,14 @@ function renderDocumentDetail(documentRecord) {
         actions.appendChild(link);
     }
     else {
-        const fallback = document.createElement("p");
-        fallback.className = "empty-state";
-        fallback.textContent = "Geen veilige documentlink beschikbaar in de metadata.";
-        actions.appendChild(fallback);
+        actions.appendChild(renderEmptyRelation("Geen veilige documentlink beschikbaar in de metadata."));
     }
     grid.appendChild(actions);
     elements.documentDetailBody.appendChild(grid);
     const metadataIssues = [
         isUnknownType(pick(documentRecord.normalized_document_type, documentRecord.normalized_document_type_label, documentRecord.type)) ? "compact documenttype ontbreekt" : "",
         getDocumentFilename(documentRecord) ? "" : "bestandsnaam ontbreekt",
-        hasDocumentSizeMetadata(documentRecord) ? "" : "bestandsgrootte ontbreekt",
+        getDocumentSize(documentRecord) ? "" : "bestandsgrootte ontbreekt",
         downloadHref ? "" : "documentlink ontbreekt",
     ].filter(Boolean);
     if (metadataIssues.length > 0) {
@@ -572,135 +564,195 @@ function renderDocumentDetail(documentRecord) {
     const meetingsSection = document.createElement("section");
     meetingsSection.className = "detail-section";
     appendSectionHeading(meetingsSection, "Gekoppelde vergaderingen");
-    if (meetingIds.length === 0) {
+    if (meetingIds.length === 0)
         meetingsSection.appendChild(renderEmptyRelation("Geen gekoppelde vergadering gevonden in de huidige public export."));
-    }
-    else {
-        for (const meetingId of meetingIds) {
-            const meeting = state.indexes?.meetingsById.get(meetingId);
-            const meta = [formatDate(pick(meeting?.date, meeting?.start_time)), pick(meeting?.dmu_name), meetingId].filter(Boolean).join(" · ");
-            meetingsSection.appendChild(createRelationCard(getMeetingTitle(meeting), meta || "Vergadering", text(meeting?.description, "")));
-        }
+    for (const meetingId of meetingIds) {
+        const meeting = state.indexes?.meetingsById.get(meetingId);
+        const card = createRelationCard(getMeetingTitle(meeting), [formatDate(getMeetingDate(meeting)), pick(meeting?.dmu_name), meetingId].filter(Boolean).join(" · ") || "Vergadering", text(meeting?.description, ""));
+        meetingsSection.appendChild(card);
     }
     relations.appendChild(meetingsSection);
     const agendaSection = document.createElement("section");
     agendaSection.className = "detail-section";
     appendSectionHeading(agendaSection, "Gekoppelde agendapunten");
-    if (itemIds.length === 0) {
+    if (itemIds.length === 0)
         agendaSection.appendChild(renderEmptyRelation("Geen gekoppeld agendapunt gevonden in de huidige public export."));
-    }
-    else {
-        for (const itemId of itemIds) {
-            const item = state.indexes?.agendaItemsById.get(itemId);
-            const meeting = state.indexes?.meetingsById.get(pick(item?.meeting_id, item?.meetingId, item?.session_id, item?.sessionId));
-            const meta = [getMeetingTitle(meeting), itemId].filter(Boolean).join(" · ");
-            agendaSection.appendChild(createRelationCard(getAgendaItemTitle(item), meta || "Agendapunt", text(item?.description, "")));
-        }
+    for (const itemId of itemIds) {
+        const item = state.indexes?.agendaItemsById.get(itemId);
+        const meeting = state.indexes?.meetingsById.get(getAgendaItemMeetingId(item));
+        agendaSection.appendChild(createRelationCard(getAgendaItemTitle(item), [getMeetingTitle(meeting), itemId].filter(Boolean).join(" · ") || "Agendapunt", text(item?.description, "")));
     }
     relations.appendChild(agendaSection);
     const versionsSection = document.createElement("section");
     versionsSection.className = "detail-section";
     appendSectionHeading(versionsSection, "Versies");
-    if (versions.length === 0) {
+    if (versions.length === 0)
         versionsSection.appendChild(renderEmptyRelation("Geen aparte versiehistorie gevonden."));
-    }
-    else {
-        for (const version of versions.slice(0, 10)) {
-            const meta = [formatDateTime(version.retrieved_at), pick(version.id, version.source_id)].filter(Boolean).join(" · ");
-            versionsSection.appendChild(createRelationCard("Documentversie", meta || "Versie", ""));
-        }
+    for (const version of versions.slice(0, 10)) {
+        versionsSection.appendChild(createRelationCard("Documentversie", [formatDateTime(version.retrieved_at), pick(version.id, version.source_id)].filter(Boolean).join(" · ") || "Versie", ""));
     }
     relations.appendChild(versionsSection);
     elements.documentDetailBody.appendChild(relations);
 }
-function updateUrlForDocument(documentId) {
-    const url = new URL(window.location.href);
-    if (documentId) {
-        url.searchParams.set("doc", documentId);
-    }
-    else {
-        url.searchParams.delete("doc");
-        url.searchParams.delete("documentId");
-    }
-    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-}
-function selectDocument(documentRecord, updateUrl = false) {
-    const documentId = getDocumentId(documentRecord);
-    state.selectedDocumentId = documentId || null;
+function selectDocument(documentRecord, scroll = true) {
+    state.selectedDocumentId = getDocumentId(documentRecord) || null;
     renderDocumentDetail(documentRecord);
     renderDocuments();
-    if (updateUrl)
-        updateUrlForDocument(documentId);
-    elements.documentDetail.scrollIntoView({ block: "start", behavior: "smooth" });
+    if (scroll)
+        elements.documentDetail.scrollIntoView({ block: "start", behavior: "smooth" });
 }
-function clearDocumentSelection(updateUrl = false) {
+function clearDocumentSelection() {
     state.selectedDocumentId = null;
     elements.documentDetail.hidden = true;
     elements.documentDetailTitle.textContent = "Documentdetails";
     elements.documentDetailBody.replaceChildren();
     renderDocuments();
-    if (updateUrl)
-        updateUrlForDocument(null);
 }
-function restoreDeepLink() {
-    const params = new URLSearchParams(window.location.search);
-    const query = params.get("q") ?? "";
-    const documentId = params.get("documentId") ?? params.get("doc") ?? "";
-    if (query)
-        elements.searchInput.value = query;
-    if (documentId) {
-        const documentRecord = findDocumentById(documentId);
-        if (documentRecord) {
-            state.selectedDocumentId = getDocumentId(documentRecord);
-            renderDocumentDetail(documentRecord);
-        }
-        else {
-            elements.documentDetail.hidden = false;
-            elements.documentDetailTitle.textContent = "Document niet gevonden";
-            elements.documentDetailBody.textContent = `De gedeelde documentlink kon niet worden gevonden: ${documentId}`;
-        }
+function renderMeetings() {
+    const meetings = [...(state.data?.meetings ?? [])].sort((a, b) => timestamp(getMeetingDate(b)) - timestamp(getMeetingDate(a)));
+    elements.meetingsResultCount.textContent = `${meetings.length} vergadering(en)`;
+    elements.meetingsTableBody.replaceChildren();
+    if (meetings.length === 0) {
+        const row = document.createElement("tr");
+        const cell = createCell("Geen vergaderingen gevonden in de huidige public export.");
+        cell.colSpan = 5;
+        row.appendChild(cell);
+        elements.meetingsTableBody.appendChild(row);
+        return;
     }
+    for (const meeting of meetings) {
+        const meetingId = getMeetingId(meeting);
+        const agendaIds = agendaItemIdsForMeeting(meetingId);
+        const documentIdsForMeeting = linkedDocumentIdsForMeeting(meetingId);
+        const row = document.createElement("tr");
+        if (state.selectedMeetingId === meetingId)
+            row.className = "is-selected";
+        row.appendChild(createCell(formatDate(getMeetingDate(meeting))));
+        row.appendChild(createCell(getMeetingTitle(meeting)));
+        row.appendChild(createCell(text(agendaIds.length)));
+        row.appendChild(createCell(text(documentIdsForMeeting.length)));
+        const actions = document.createElement("td");
+        const detailButton = document.createElement("button");
+        detailButton.type = "button";
+        detailButton.className = "secondary-button";
+        detailButton.textContent = "Details";
+        detailButton.addEventListener("click", () => selectMeeting(meeting, true));
+        actions.appendChild(detailButton);
+        row.appendChild(actions);
+        elements.meetingsTableBody.appendChild(row);
+    }
+}
+function renderMeetingDetail(meeting) {
+    const meetingId = getMeetingId(meeting);
+    const agendaIds = agendaItemIdsForMeeting(meetingId);
+    const documentIdsForMeeting = linkedDocumentIdsForMeeting(meetingId);
+    elements.meetingDetail.hidden = false;
+    elements.meetingDetailTitle.textContent = getMeetingTitle(meeting);
+    elements.meetingDetailBody.replaceChildren();
+    const grid = document.createElement("div");
+    grid.className = "document-detail-grid meeting-detail-grid";
+    const meta = document.createElement("dl");
+    meta.className = "summary-list document-detail-meta";
+    appendDefinition(meta, "Datum", formatDate(getMeetingDate(meeting)));
+    appendDefinition(meta, "Vergadering ID", text(meetingId, unavailable("Geen vergadering-ID")));
+    appendDefinition(meta, "Commissie", text(pick(meeting.dmu_name), unavailable()));
+    appendDefinition(meta, "Locatie", text(pick(meeting.location), unavailable()));
+    appendDefinition(meta, "Agendapunten", text(agendaIds.length));
+    appendDefinition(meta, "Gekoppelde documenten", text(documentIdsForMeeting.length));
+    grid.appendChild(meta);
+    const intro = document.createElement("div");
+    intro.className = "document-detail-actions";
+    intro.appendChild(renderEmptyRelation("Meetingdetails blijven compact. Technische metadata staat onderaan achter de disclosure."));
+    grid.appendChild(intro);
+    elements.meetingDetailBody.appendChild(grid);
+    if (pick(meeting.description) && pick(meeting.description) !== getMeetingTitle(meeting)) {
+        const description = document.createElement("p");
+        description.className = "document-description";
+        description.textContent = text(meeting.description);
+        elements.meetingDetailBody.appendChild(description);
+    }
+    const sections = document.createElement("div");
+    sections.className = "meeting-detail-sections";
+    const agendaSection = document.createElement("section");
+    agendaSection.className = "detail-section detail-section--wide";
+    appendSectionHeading(agendaSection, "Agendapunten binnen deze vergadering");
+    if (agendaIds.length === 0) {
+        agendaSection.appendChild(renderEmptyRelation("Geen agendapunten gevonden in meeting_items.jsonl voor deze vergadering."));
+    }
+    else {
+        const list = document.createElement("div");
+        list.className = "agenda-item-list";
+        for (const itemId of agendaIds) {
+            const item = state.indexes?.agendaItemsById.get(itemId);
+            const itemDocumentIds = linkedDocumentIdsForAgendaItem(itemId);
+            const article = document.createElement("article");
+            article.className = "agenda-item-card";
+            const heading = document.createElement("h4");
+            heading.textContent = getAgendaItemTitle(item);
+            const meta = document.createElement("p");
+            meta.className = "muted";
+            meta.textContent = `${itemDocumentIds.length} gekoppelde document(en)`;
+            article.append(heading, meta);
+            if (pick(item?.description) && pick(item?.description) !== getAgendaItemTitle(item)) {
+                const body = document.createElement("p");
+                body.textContent = text(item?.description);
+                article.appendChild(body);
+            }
+            article.appendChild(createDocumentList(itemDocumentIds, "Geen gekoppelde documenten bij dit agendapunt."));
+            list.appendChild(article);
+        }
+        agendaSection.appendChild(list);
+    }
+    sections.appendChild(agendaSection);
+    const documentsSection = document.createElement("section");
+    documentsSection.className = "detail-section detail-section--wide";
+    appendSectionHeading(documentsSection, "Gekoppelde documenten bij de vergadering");
+    documentsSection.appendChild(createDocumentList(documentIdsForMeeting, "Geen gekoppelde documenten gevonden voor deze vergadering."));
+    sections.appendChild(documentsSection);
+    elements.meetingDetailBody.appendChild(sections);
+}
+function selectMeeting(meeting, scroll = true) {
+    state.selectedMeetingId = getMeetingId(meeting) || null;
+    renderMeetingDetail(meeting);
+    renderMeetings();
+    if (scroll)
+        elements.meetingDetail.scrollIntoView({ block: "start", behavior: "smooth" });
+}
+function clearMeetingSelection() {
+    state.selectedMeetingId = null;
+    elements.meetingDetail.hidden = true;
+    elements.meetingDetailTitle.textContent = "Vergaderdetails";
+    elements.meetingDetailBody.replaceChildren();
+    renderMeetings();
+}
+function setActiveView(view) {
+    state.activeView = view;
+    elements.documentsView.hidden = view !== "documents";
+    elements.meetingsView.hidden = view !== "meetings";
+    elements.navDocuments.classList.toggle("top-nav__link--active", view === "documents");
+    elements.navMeetings.classList.toggle("top-nav__link--active", view === "meetings");
+    elements.navDocuments.setAttribute("aria-current", view === "documents" ? "page" : "false");
+    elements.navMeetings.setAttribute("aria-current", view === "meetings" ? "page" : "false");
 }
 function attachEvents() {
-    elements.searchInput.addEventListener("input", () => {
-        state.currentPage = 1;
-        applyFilters();
+    elements.navDocuments.addEventListener("click", (event) => {
+        event.preventDefault();
+        setActiveView("documents");
     });
-    elements.typeFilter.addEventListener("change", () => {
-        state.currentPage = 1;
-        applyFilters();
+    elements.navMeetings.addEventListener("click", (event) => {
+        event.preventDefault();
+        setActiveView("meetings");
     });
-    elements.sortSelect.addEventListener("change", () => {
-        state.sortMode = elements.sortSelect.value;
-        applyFilters();
-    });
-    elements.pageSizeSelect.addEventListener("change", () => {
-        state.pageSize = Number(elements.pageSizeSelect.value) || 50;
-        state.currentPage = 1;
-        applyFilters();
-    });
-    elements.clearDocumentSelection.addEventListener("click", () => clearDocumentSelection(true));
-    elements.navDocuments.addEventListener("click", (event) => { event.preventDefault(); setActiveView("documents", true); });
-    elements.navMeetings.addEventListener("click", (event) => { event.preventDefault(); setActiveView("meetings", true); });
-    for (const link of Array.from(document.querySelectorAll("[data-view-link]"))) {
-        link.addEventListener("click", (event) => {
-            event.preventDefault();
-            setActiveView(link.dataset.viewLink === "meetings" ? "meetings" : "documents", true);
-        });
-    }
-    window.addEventListener("hashchange", restoreView);
-    for (const button of [elements.previousTop, elements.previousBottom]) {
-        button.addEventListener("click", () => {
-            state.currentPage -= 1;
-            renderDocuments();
-        });
-    }
-    for (const button of [elements.nextTop, elements.nextBottom]) {
-        button.addEventListener("click", () => {
-            state.currentPage += 1;
-            renderDocuments();
-        });
-    }
+    elements.searchInput.addEventListener("input", () => { state.currentPage = 1; applyFilters(); });
+    elements.typeFilter.addEventListener("change", () => { state.currentPage = 1; applyFilters(); });
+    elements.sortSelect.addEventListener("change", () => { state.sortMode = elements.sortSelect.value; applyFilters(); });
+    elements.pageSizeSelect.addEventListener("change", () => { state.pageSize = Number(elements.pageSizeSelect.value) || 50; state.currentPage = 1; applyFilters(); });
+    elements.clearDocumentSelection.addEventListener("click", () => clearDocumentSelection());
+    elements.clearMeetingSelection.addEventListener("click", () => clearMeetingSelection());
+    for (const button of [elements.previousTop, elements.previousBottom])
+        button.addEventListener("click", () => { state.currentPage -= 1; renderDocuments(); });
+    for (const button of [elements.nextTop, elements.nextBottom])
+        button.addEventListener("click", () => { state.currentPage += 1; renderDocuments(); });
 }
 async function init() {
     attachEvents();
@@ -708,10 +760,9 @@ async function init() {
     state.indexes = buildRelationIndexes(state.data.documents, state.data.meetings, state.data.agendaItems, state.data.meetingDocumentRelations, state.data.meetingItemDocumentRelations);
     populateTypeFilter();
     renderSummary();
-    renderMeetings();
-    restoreDeepLink();
-    restoreView();
     applyFilters();
+    renderMeetings();
+    setActiveView("documents");
     window.OpenRISMonitor = {
         indexes: state.indexes,
         focusDocumentById(documentId) {
@@ -719,9 +770,17 @@ async function init() {
             if (documentRecord)
                 selectDocument(documentRecord, true);
         },
+        focusMeetingById(meetingId) {
+            const meeting = findMeetingById(meetingId);
+            if (meeting) {
+                setActiveView("meetings");
+                selectMeeting(meeting, true);
+            }
+        },
     };
 }
 init().catch((error) => {
     console.error(error);
     elements.statusMessage.textContent = "De viewer kon de publieke exports niet laden. Controleer data/public en de browserconsole.";
 });
+//# sourceMappingURL=main.js.map

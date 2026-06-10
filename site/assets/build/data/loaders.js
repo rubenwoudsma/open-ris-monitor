@@ -1,7 +1,7 @@
 import { loadJson, loadJsonl, loadOptionalJsonl } from "./jsonl.js";
 export const DATA_BASE = "../data/public";
 export async function loadPublicData(basePath = DATA_BASE) {
-    const [latest, documents, documentVersions, meetings, agendaItems, meetingDocumentRelations, meetingItemDocumentRelations] = await Promise.all([
+    const [latest, documents, documentVersions, meetings, agendaItems, meetingDocumentRelations, meetingItemDocumentRelations,] = await Promise.all([
         loadJson(`${basePath}/latest.json`),
         loadJsonl(`${basePath}/documents.jsonl`),
         loadOptionalJsonl(`${basePath}/document_versions.jsonl`),

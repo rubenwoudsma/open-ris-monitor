@@ -22,7 +22,11 @@ export function safeDate(value: unknown): Date | null {
 export function formatDate(value: unknown): string {
   const date = safeDate(value);
   if (!date) return text(value);
-  return new Intl.DateTimeFormat("nl-NL", { year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+  return new Intl.DateTimeFormat("nl-NL", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
 }
 
 export function formatDateTime(value: unknown): string {

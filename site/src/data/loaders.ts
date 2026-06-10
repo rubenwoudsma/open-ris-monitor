@@ -1,10 +1,26 @@
-import type { AgendaItemRecord, DocumentRecord, DocumentVersionRecord, LatestExport, MeetingRecord, PublicDataSet, RelationRecord } from "./types.js";
+import type {
+  AgendaItemRecord,
+  DocumentRecord,
+  DocumentVersionRecord,
+  LatestExport,
+  MeetingRecord,
+  PublicDataSet,
+  RelationRecord,
+} from "./types.js";
 import { loadJson, loadJsonl, loadOptionalJsonl } from "./jsonl.js";
 
 export const DATA_BASE = "../data/public";
 
 export async function loadPublicData(basePath = DATA_BASE): Promise<PublicDataSet> {
-  const [latest, documents, documentVersions, meetings, agendaItems, meetingDocumentRelations, meetingItemDocumentRelations] = await Promise.all([
+  const [
+    latest,
+    documents,
+    documentVersions,
+    meetings,
+    agendaItems,
+    meetingDocumentRelations,
+    meetingItemDocumentRelations,
+  ] = await Promise.all([
     loadJson<LatestExport>(`${basePath}/latest.json`),
     loadJsonl<DocumentRecord>(`${basePath}/documents.jsonl`),
     loadOptionalJsonl<DocumentVersionRecord>(`${basePath}/document_versions.jsonl`),
