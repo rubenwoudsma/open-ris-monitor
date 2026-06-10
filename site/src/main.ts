@@ -855,7 +855,7 @@ function clearMeetingSelection(): void {
   renderMeetings();
 }
 
-function setActiveView(view: "documents" | "meetings"): void {
+function setActiveView(view: "documents" | "meetings", updateHash = false): void {
   state.activeView = view;
   elements.documentsView.hidden = view !== "documents";
   elements.meetingsView.hidden = view !== "meetings";
@@ -863,17 +863,28 @@ function setActiveView(view: "documents" | "meetings"): void {
   elements.navMeetings.classList.toggle("top-nav__link--active", view === "meetings");
   elements.navDocuments.setAttribute("aria-current", view === "documents" ? "page" : "false");
   elements.navMeetings.setAttribute("aria-current", view === "meetings" ? "page" : "false");
+
+  if (updateHash) {
+    const nextHash = view === "meetings" ? "#meetings" : "#documents";
+    if (window.location.hash !== nextHash) window.location.hash = nextHash;
+  }
+}
+
+function viewFromHash(): "documents" | "meetings" {
+  return window.location.hash === "#meetings" ? "meetings" : "documents";
 }
 
 function attachEvents(): void {
   elements.navDocuments.addEventListener("click", (event) => {
     event.preventDefault();
-    setActiveView("documents");
+    setActiveView("documents", true);
   });
   elements.navMeetings.addEventListener("click", (event) => {
     event.preventDefault();
-    setActiveView("meetings");
+    setActiveView("meetings", true);
+    renderMeetings();
   });
+  window.addEventListener("hashchange", () => setActiveView(viewFromHash()));
   elements.searchInput.addEventListener("input", () => { state.currentPage = 1; applyFilters(); });
   elements.typeFilter.addEventListener("change", () => { state.currentPage = 1; applyFilters(); });
   elements.sortSelect.addEventListener("change", () => { state.sortMode = elements.sortSelect.value; applyFilters(); });
@@ -898,7 +909,7 @@ async function init(): Promise<void> {
   renderSummary();
   applyFilters();
   renderMeetings();
-  setActiveView("documents");
+  setActiveView(viewFromHash());
   window.OpenRISMonitor = {
     indexes: state.indexes,
     focusDocumentById(documentId: string) {
