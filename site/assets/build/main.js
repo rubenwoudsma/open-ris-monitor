@@ -137,6 +137,9 @@ function getCompactTypeLabel(documentRecord) {
         return normalizedType;
     return unavailable();
 }
+function getSourceDocumentType(documentRecord) {
+    return pick(documentRecord.document_type, pickFromRaw(documentRecord, "document_type", "documentType", "source_document_type", "sourceDocumentType")) || unavailable("Geen bronmetadata");
+}
 function getDocumentFilename(documentRecord) {
     return pick(documentRecord.filename, documentRecord.file_name, documentRecord.name, documentRecord.display_name, documentRecord.original_filename, pickFromRaw(documentRecord, "filename", "file_name", "fileName", "name", "displayName", "originalFilename"), pickNestedRaw(documentRecord, "file", "filename", "fileName", "name"));
 }
@@ -394,12 +397,15 @@ function hasAnyDocumentSizeMetadata(records) {
 function getVisibleDocumentColumnCount(showFilenameColumn, showSizeColumn) {
     return 4 + Number(showFilenameColumn) + Number(showSizeColumn);
 }
-function setTableColumnVisibility(tableSelector, headerLabel, visible) {
+function setColumnVisibilityForTable(tableSelector, headerLabel, visible) {
     const table = document.querySelector(tableSelector);
     const headers = Array.from(table?.querySelectorAll("thead th") ?? []);
     const header = headers.find((cell) => cell.textContent?.trim() === headerLabel);
     if (header)
         header.hidden = !visible;
+}
+function setTableColumnVisibility(headerLabel, visible) {
+    setColumnVisibilityForTable(".documents-table", headerLabel, visible);
 }
 function createDocumentTitleCell(documentRecord) {
     const cell = document.createElement("td");
@@ -448,8 +454,8 @@ function renderDocuments() {
     const allDocuments = state.data?.documents ?? [];
     const showFilenameColumn = hasAnyDocumentFilenameMetadata(allDocuments);
     const showSizeColumn = hasAnyDocumentSizeMetadata(allDocuments);
-    setTableColumnVisibility(".documents-table", "Bestand", showFilenameColumn);
-    setTableColumnVisibility(".documents-table", "Grootte", showSizeColumn);
+    setTableColumnVisibility("Bestand", showFilenameColumn);
+    setTableColumnVisibility("Grootte", showSizeColumn);
     elements.resultCount.textContent = `${total} document(en)`;
     elements.visibleDocumentsCount.textContent = `${total} zichtbaar`;
     elements.tableBody.replaceChildren();
@@ -500,6 +506,7 @@ function renderDocumentDetail(documentRecord) {
     meta.className = "summary-list document-detail-meta";
     appendDefinition(meta, "Datum", formatDate(getDocumentDate(documentRecord)));
     appendDefinition(meta, "Compact type", getCompactTypeLabel(documentRecord));
+    appendDefinition(meta, "Bron documenttype", getSourceDocumentType(documentRecord));
     const filename = getDocumentFilename(documentRecord);
     if (filename)
         appendDefinition(meta, "Bestand", filename);

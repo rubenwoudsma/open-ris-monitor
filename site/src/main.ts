@@ -219,6 +219,13 @@ function getCompactTypeLabel(documentRecord: DocumentRecord): string {
   return unavailable();
 }
 
+function getSourceDocumentType(documentRecord: DocumentRecord): string {
+  return pick(
+    documentRecord.document_type,
+    pickFromRaw(documentRecord, "document_type", "documentType", "source_document_type", "sourceDocumentType"),
+  ) || unavailable("Geen bronmetadata");
+}
+
 function getDocumentFilename(documentRecord: DocumentRecord): string {
   return pick(
     documentRecord.filename,
@@ -511,11 +518,15 @@ function getVisibleDocumentColumnCount(showFilenameColumn: boolean, showSizeColu
   return 4 + Number(showFilenameColumn) + Number(showSizeColumn);
 }
 
-function setTableColumnVisibility(tableSelector: string, headerLabel: string, visible: boolean): void {
+function setColumnVisibilityForTable(tableSelector: string, headerLabel: string, visible: boolean): void {
   const table = document.querySelector(tableSelector);
   const headers = Array.from(table?.querySelectorAll<HTMLTableCellElement>("thead th") ?? []);
   const header = headers.find((cell) => cell.textContent?.trim() === headerLabel);
   if (header) header.hidden = !visible;
+}
+
+function setTableColumnVisibility(headerLabel: string, visible: boolean): void {
+  setColumnVisibilityForTable(".documents-table", headerLabel, visible);
 }
 
 function createDocumentTitleCell(documentRecord: DocumentRecord): HTMLTableCellElement {
@@ -567,8 +578,8 @@ function renderDocuments(): void {
   const allDocuments = state.data?.documents ?? [];
   const showFilenameColumn = hasAnyDocumentFilenameMetadata(allDocuments);
   const showSizeColumn = hasAnyDocumentSizeMetadata(allDocuments);
-  setTableColumnVisibility(".documents-table", "Bestand", showFilenameColumn);
-  setTableColumnVisibility(".documents-table", "Grootte", showSizeColumn);
+  setTableColumnVisibility("Bestand", showFilenameColumn);
+  setTableColumnVisibility("Grootte", showSizeColumn);
   elements.resultCount.textContent = `${total} document(en)`;
   elements.visibleDocumentsCount.textContent = `${total} zichtbaar`;
   elements.tableBody.replaceChildren();
@@ -616,6 +627,7 @@ function renderDocumentDetail(documentRecord: DocumentRecord): void {
   meta.className = "summary-list document-detail-meta";
   appendDefinition(meta, "Datum", formatDate(getDocumentDate(documentRecord)));
   appendDefinition(meta, "Compact type", getCompactTypeLabel(documentRecord));
+  appendDefinition(meta, "Bron documenttype", getSourceDocumentType(documentRecord));
   const filename = getDocumentFilename(documentRecord);
   if (filename) appendDefinition(meta, "Bestand", filename);
   const size = formatDocumentSize(documentRecord);
