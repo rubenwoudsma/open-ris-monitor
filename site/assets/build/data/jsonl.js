@@ -1,9 +1,9 @@
 export function isPlainObject(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }
-export function parseJsonl(text, source = "JSONL") {
+export function parseJsonl(sourceText, source = "JSONL") {
     const records = [];
-    const lines = String(text || "").split(/\r?\n/);
+    const lines = String(sourceText || "").split(/\r?\n/);
     for (const [index, rawLine] of lines.entries()) {
         const line = rawLine.trim();
         if (!line)
@@ -25,20 +25,17 @@ export function parseJsonl(text, source = "JSONL") {
 }
 export async function loadJson(path) {
     const response = await fetch(path, { cache: "no-store" });
-    if (!response.ok) {
+    if (!response.ok)
         throw new Error(`Kan ${path} niet laden, status ${response.status}`);
-    }
     const parsed = await response.json();
-    if (!isPlainObject(parsed)) {
+    if (!isPlainObject(parsed))
         throw new Error(`${path} bevat geen JSON-object.`);
-    }
     return parsed;
 }
 export async function loadJsonl(path) {
     const response = await fetch(path, { cache: "no-store" });
-    if (!response.ok) {
+    if (!response.ok)
         throw new Error(`Kan ${path} niet laden, status ${response.status}`);
-    }
     return parseJsonl(await response.text(), path);
 }
 export async function loadOptionalJsonl(path) {

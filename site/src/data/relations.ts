@@ -1,9 +1,15 @@
-import type { AgendaItemRecord, DocumentRecord, MeetingRecord, RelationIndexes, RelationRecord } from "./types.js";
+import type {
+  AgendaItemRecord,
+  DocumentRecord,
+  MeetingRecord,
+  RelationIndexes,
+  RelationRecord,
+} from "./types.js";
 import { pick } from "../ui/format.js";
 
 function addValue(set: Set<string>, value: unknown): void {
-  const text = pick(value);
-  if (text) set.add(text);
+  const stringValue = pick(value);
+  if (stringValue) set.add(stringValue);
 }
 
 function addUnique(map: Map<string, string[]>, key: string, value: string): void {
@@ -24,7 +30,6 @@ export function getDocumentIdentifiers(documentRecord: DocumentRecord): string[]
   addValue(identifiers, documentRecord.source_object_id);
   addValue(identifiers, documentRecord.download_url);
   addValue(identifiers, documentRecord.source_url);
-
   if (documentRecord.raw && typeof documentRecord.raw === "object") {
     addValue(identifiers, documentRecord.raw.id);
     addValue(identifiers, documentRecord.raw.objectId);
@@ -32,12 +37,10 @@ export function getDocumentIdentifiers(documentRecord: DocumentRecord): string[]
     addValue(identifiers, documentRecord.raw.downloadUrl);
     addValue(identifiers, documentRecord.raw.download_url);
   }
-
   if (documentRecord.id && documentRecord.source_id && String(documentRecord.id).includes("-document-")) {
     const prefix = String(documentRecord.id).split("-document-")[0];
     addValue(identifiers, `${prefix}-document-${documentRecord.source_id}`);
   }
-
   return [...identifiers];
 }
 
@@ -49,7 +52,6 @@ export function getRelationDocumentIdentifiers(relation: RelationRecord): string
   addValue(identifiers, relation.document_url);
   addValue(identifiers, relation.download_url);
   addValue(identifiers, relation.source_url);
-
   if (relation.document && typeof relation.document === "object") {
     addValue(identifiers, relation.document.id);
     addValue(identifiers, relation.document.objectId);
@@ -57,7 +59,6 @@ export function getRelationDocumentIdentifiers(relation: RelationRecord): string
     addValue(identifiers, relation.document.downloadUrl);
     addValue(identifiers, relation.document.download_url);
   }
-
   return [...identifiers];
 }
 
@@ -87,9 +88,7 @@ export function buildRelationIndexes(
   };
 
   for (const documentRecord of documents) {
-    for (const identifier of getDocumentIdentifiers(documentRecord)) {
-      indexes.documentsById.set(identifier, documentRecord);
-    }
+    for (const identifier of getDocumentIdentifiers(documentRecord)) indexes.documentsById.set(identifier, documentRecord);
   }
 
   for (const meeting of meetings) {
@@ -117,7 +116,6 @@ export function buildRelationIndexes(
     const item = itemId ? indexes.agendaItemsById.get(itemId) : undefined;
     const meetingId = relationMeetingId || pick(item?.meeting_id, item?.meetingId, item?.session_id, item?.sessionId);
     const documentId = resolveDocumentId(indexes, relation);
-
     addUnique(indexes.agendaItemIdsByDocumentId, documentId, itemId);
     addUnique(indexes.documentIdsByAgendaItemId, itemId, documentId);
     addUnique(indexes.meetingIdsByDocumentId, documentId, meetingId);

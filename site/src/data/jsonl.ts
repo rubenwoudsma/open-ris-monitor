@@ -2,14 +2,12 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export function parseJsonl<T extends Record<string, unknown>>(text: string, source = "JSONL"): T[] {
+export function parseJsonl<T extends Record<string, unknown>>(sourceText: string, source = "JSONL"): T[] {
   const records: T[] = [];
-  const lines = String(text || "").split(/\r?\n/);
-
+  const lines = String(sourceText || "").split(/\r?\n/);
   for (const [index, rawLine] of lines.entries()) {
     const line = rawLine.trim();
     if (!line) continue;
-
     try {
       const parsed: unknown = JSON.parse(line);
       if (isPlainObject(parsed)) {
@@ -21,30 +19,20 @@ export function parseJsonl<T extends Record<string, unknown>>(text: string, sour
       console.warn(`${source}: regel ${index + 1} bevat ongeldige JSON en wordt overgeslagen.`, error);
     }
   }
-
   return records;
 }
 
 export async function loadJson<T extends Record<string, unknown>>(path: string): Promise<T> {
   const response = await fetch(path, { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error(`Kan ${path} niet laden, status ${response.status}`);
-  }
-
+  if (!response.ok) throw new Error(`Kan ${path} niet laden, status ${response.status}`);
   const parsed: unknown = await response.json();
-  if (!isPlainObject(parsed)) {
-    throw new Error(`${path} bevat geen JSON-object.`);
-  }
-
+  if (!isPlainObject(parsed)) throw new Error(`${path} bevat geen JSON-object.`);
   return parsed as T;
 }
 
 export async function loadJsonl<T extends Record<string, unknown>>(path: string): Promise<T[]> {
   const response = await fetch(path, { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error(`Kan ${path} niet laden, status ${response.status}`);
-  }
-
+  if (!response.ok) throw new Error(`Kan ${path} niet laden, status ${response.status}`);
   return parseJsonl<T>(await response.text(), path);
 }
 

@@ -8,7 +8,6 @@
   </head>
   <body>
     <a class="skip-link" href="#main-content">Direct naar inhoud</a>
-
     <header class="site-header" role="banner">
       <div class="site-header__inner">
         <a class="brand" href="index.html" aria-label="Open RIS Monitor startpagina">
@@ -19,7 +18,7 @@
           </span>
         </a>
         <nav class="top-nav" aria-label="Primaire navigatie">
-          <a id="nav-documents" class="top-nav__link top-nav__link--active" href="#documents">Documenten</a>
+          <a id="nav-documents" class="top-nav__link top-nav__link--active" href="#documents" aria-current="page">Documenten</a>
           <a id="nav-meetings" class="top-nav__link" href="#meetings">Vergaderingen</a>
         </nav>
       </div>
@@ -27,170 +26,126 @@
 
     <main id="main-content" class="page-shell">
       <section class="hero-card" aria-labelledby="page-title">
-        <p class="eyebrow">Publieke raadsinformatie, statisch gepubliceerd</p>
         <div class="hero-card__content">
           <div>
+            <p class="eyebrow">Publieke raadsinformatie, statisch gepubliceerd</p>
             <h1 id="page-title">Raadsinformatie Huizen</h1>
-            <p>
-              Een snelle, reproduceerbare viewer op compacte JSONL-exportbestanden. Documenten blijven de primaire ingang,
-              met relationele context naar vergaderingen en agendapunten.
-            </p>
+            <p>Een snelle, reproduceerbare viewer op compacte JSONL-exportbestanden. Documenten blijven de primaire ingang, met compacte navigatie naar vergaderingen en agendapunten.</p>
           </div>
-          <div class="hero-card__status" aria-live="polite">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span id="status-message">Data wordt geladen...</span>
-          </div>
+          <p class="hero-card__status"><span class="status-dot" aria-hidden="true"></span><span id="status-message">Data wordt geladen...</span></p>
         </div>
       </section>
 
-      <div class="content-layout content-layout--single">
-        <div class="main-column">
-          <p id="data-quality-notice" class="quality-notice" hidden></p>
-          <div id="documents-view" data-view="documents">
-            <section class="panel" aria-labelledby="filters-title">
-              <div class="panel__header panel__header--split">
-                <div>
-                  <h2 id="filters-title">Zoeken en filteren</h2>
-                  <p class="panel__subtitle">Filter client-side door de geladen publieke exports.</p>
-                </div>
-                <p id="visible-documents-count" class="count-pill">-</p>
-              </div>
-              <form class="controls" id="viewer-controls">
-                <label class="control control--wide">
-                  <span>Zoeken</span>
-                  <input id="search-input" type="search" autocomplete="off" placeholder="Zoek op titel, type, vergadering of agendapunt" />
-                </label>
-                <label class="control">
-                  <span>Compact documenttype</span>
-                  <select id="type-filter"><option value="">Alle compacte documenttypen</option></select>
-                </label>
-                <label class="control">
-                  <span>Sorteer</span>
-                  <select id="sort-select">
-                    <option value="date-desc">Datum, nieuwste eerst</option>
-                    <option value="date-asc">Datum, oudste eerst</option>
-                    <option value="title-asc">Titel, A-Z</option>
-                    <option value="type-asc">Compact type, A-Z</option>
-                    <option value="size-desc">Grootte, groot naar klein</option>
-                    <option value="size-asc">Grootte, klein naar groot</option>
-                  </select>
-                </label>
-                <label class="control control--small">
-                  <span>Per pagina</span>
-                  <select id="page-size-select">
-                    <option>25</option>
-                    <option selected>50</option>
-                    <option>100</option>
-                  </select>
-                </label>
-              </form>
-            </section>
-
-            <section id="document-detail" class="panel document-detail" aria-labelledby="document-detail-title" hidden>
-              <div class="panel__header panel__header--split">
-                <div>
-                  <p class="eyebrow">Documentdetail</p>
-                  <h2 id="document-detail-title">Documentdetails</h2>
-                  <p class="panel__subtitle">Metadata, gekoppelde vergaderingen, agendapunten en versies.</p>
-                </div>
-                <button id="clear-document-selection" type="button">Sluit details</button>
-              </div>
-              <div id="document-detail-body" class="document-detail-body"></div>
-            </section>
-
-            <section class="panel" aria-labelledby="documents-title">
-              <div class="panel__header panel__header--split">
-                <div>
-                  <h2 id="documents-title">Documenten</h2>
-                </div>
-                <p id="result-count" class="count-pill">-</p>
-              </div>
-              <nav class="pagination" aria-label="Paginering boven documenten">
-                <button id="previous-page-top" type="button">Vorige</button>
-                <span id="page-info-top">Pagina 1 van 1</span>
-                <button id="next-page-top" type="button">Volgende</button>
-              </nav>
-              <div class="table-wrapper">
-                <table>
-                  <thead>
-                    <tr>
-                      <th scope="col">Datum</th>
-                      <th scope="col">Compact type</th>
-                      <th scope="col">Titel en context</th>
-                      <th scope="col">Bestand</th>
-                      <th scope="col">Grootte</th>
-                      <th scope="col">Acties</th>
-                    </tr>
-                  </thead>
-                  <tbody id="documents-table-body">
-                    <tr><td colspan="6">Documenten worden geladen...</td></tr>
-                  </tbody>
-                </table>
-              </div>
-              <nav class="pagination" aria-label="Paginering onder documenten">
-                <button id="previous-page-bottom" type="button">Vorige</button>
-                <span id="page-info-bottom">Pagina 1 van 1</span>
-                <button id="next-page-bottom" type="button">Volgende</button>
-              </nav>
-            </section>
+      <section id="documents-view" class="main-column" aria-labelledby="documents-heading">
+        <section class="panel panel--compact" aria-labelledby="search-heading">
+          <div class="panel__header panel__header--split">
+            <div>
+              <p class="eyebrow">Documenten</p>
+              <h2 id="search-heading">Zoeken en filteren</h2>
+              <p class="panel__subtitle">Filter client-side door de geladen publieke exports.</p>
+            </div>
+            <p id="visible-documents-count" class="count-pill">-</p>
           </div>
+          <p id="data-quality-notice" class="quality-notice" hidden></p>
+          <div class="controls">
+            <label class="control"><span>Zoeken</span><input id="search-input" type="search" autocomplete="off" /></label>
+            <label class="control"><span>Compact documenttype</span><select id="type-filter"><option value="">Alle compacte documenttypen</option></select></label>
+            <label class="control"><span>Sorteer</span><select id="sort-select"><option value="date-desc">Datum, nieuwste eerst</option><option value="date-asc">Datum, oudste eerst</option><option value="title-asc">Titel, A-Z</option><option value="type-asc">Compact type, A-Z</option><option value="size-desc">Grootte, groot naar klein</option><option value="size-asc">Grootte, klein naar groot</option></select></label>
+            <label class="control"><span>Per pagina</span><select id="page-size-select"><option>25</option><option selected>50</option><option>100</option></select></label>
+          </div>
+        </section>
 
-          <section id="meetings-view" class="panel" data-view="meetings" aria-labelledby="meetings-title" hidden>
-            <div class="panel__header panel__header--split">
-              <div>
-                <p class="eyebrow">Compact vergaderingsoverzicht</p>
-                <h2 id="meetings-title">Vergaderingen</h2>
-                <p class="panel__subtitle">Titel, datum en tellingen uit de relationele exports. Agendadetails volgen later in #43.4b.</p>
-              </div>
-              <p id="meetings-result-count" class="count-pill">-</p>
+        <section id="document-detail" class="panel document-detail" aria-labelledby="document-detail-title" hidden>
+          <div class="panel__header panel__header--split">
+            <div>
+              <p class="eyebrow">Documentdetail</p>
+              <h2 id="document-detail-title">Documentdetails</h2>
+              <p class="panel__subtitle">Metadata, gekoppelde vergaderingen, agendapunten en versies.</p>
             </div>
-            <div class="table-wrapper">
-              <table class="meetings-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Datum</th>
-                    <th scope="col">Titel</th>
-                    <th scope="col">Agendapunten</th>
-                    <th scope="col">Gekoppelde documenten</th>
-                  </tr>
-                </thead>
-                <tbody id="meetings-table-body">
-                  <tr><td colspan="4">Vergaderingen worden geladen...</td></tr>
-                </tbody>
-              </table>
+            <button id="clear-document-selection" type="button">Sluit details</button>
+          </div>
+          <div id="document-detail-body" class="document-detail-body"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="documents-heading">
+          <div class="panel__header panel__header--split">
+            <div>
+              <p class="eyebrow">Overzicht</p>
+              <h2 id="documents-heading">Documenten</h2>
             </div>
-          </section>
-        </div>
-      </div>
+            <p id="result-count" class="count-pill">-</p>
+          </div>
+          <div class="pagination"><button id="previous-page-top" type="button">Vorige</button><span id="page-info-top">Pagina 1 van 1</span><button id="next-page-top" type="button">Volgende</button></div>
+          <div class="table-wrapper">
+            <table class="documents-table">
+              <thead><tr><th>Datum</th><th>Compact type</th><th>Titel en context</th><th>Bestand</th><th>Grootte</th><th>Acties</th></tr></thead>
+              <tbody id="documents-table-body"><tr><td colspan="6">Documenten worden geladen...</td></tr></tbody>
+            </table>
+          </div>
+          <div class="pagination"><button id="previous-page-bottom" type="button">Vorige</button><span id="page-info-bottom">Pagina 1 van 1</span><button id="next-page-bottom" type="button">Volgende</button></div>
+        </section>
+      </section>
+
+      <section id="meetings-view" class="main-column" aria-labelledby="meetings-heading" hidden>
+        <section id="meeting-detail" class="panel document-detail meeting-detail" aria-labelledby="meeting-detail-title" hidden>
+          <div class="panel__header panel__header--split">
+            <div>
+              <p class="eyebrow">Vergaderdetail</p>
+              <h2 id="meeting-detail-title">Vergaderdetails</h2>
+              <p class="panel__subtitle">Agendapunten en gekoppelde documenten binnen de gekozen vergadering.</p>
+            </div>
+            <button id="clear-meeting-selection" type="button">Sluit details</button>
+          </div>
+          <div id="meeting-detail-body" class="document-detail-body"></div>
+        </section>
+
+        <section class="panel" aria-labelledby="meetings-heading">
+          <div class="panel__header panel__header--split">
+            <div>
+              <p class="eyebrow">Overzicht</p>
+              <h2 id="meetings-heading">Vergaderingen</h2>
+              <p class="panel__subtitle">Compacte lijst met datum, titel, agendapunten en gekoppelde documenten.</p>
+            </div>
+            <p id="meetings-result-count" class="count-pill">-</p>
+          </div>
+          <div class="table-wrapper">
+            <table class="meetings-table">
+              <thead><tr><th>Datum</th><th>Titel</th><th>Agendapunten</th><th>Gekoppelde documenten</th><th>Acties</th></tr></thead>
+              <tbody id="meetings-table-body"><tr><td colspan="5">Vergaderingen worden geladen...</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
     </main>
 
-    <footer class="site-footer" aria-labelledby="footer-metadata-title">
-      <div class="footer-metadata">
-        <div>
-          <h2 id="footer-metadata-title">Dataset</h2>
-          <p>
-            Gemeente: <span id="municipality">-</span>. Gegenereerd: <span id="generated-at">-</span>.
-            Documenten gezien: <span id="documents-seen">-</span>. Genormaliseerd: <span id="documents-normalized">-</span>.
-            Vergaderingen: <span id="meetings-count">-</span>. Agendapunten: <span id="agenda-items-count">-</span>.
-            Gekoppelde documenten: <span id="linked-documents-count">-</span>.
-          </p>
-        </div>
-        <details class="technical-metadata">
-          <summary>Technische metadata en databestanden</summary>
-          <p>Laatste export: <span id="generated-at-copy">-</span>. Gemeente: <span id="municipality-copy">-</span>.</p>
-          <nav class="resource-links resource-links--inline" aria-label="Publieke databestanden">
-            <a href="../data/public/latest.json">latest.json</a>
-            <a href="../data/public/documents.jsonl">documents.jsonl</a>
-            <a href="../data/public/document_versions.jsonl">document_versions.jsonl</a>
-            <a href="../data/public/meetings.jsonl">meetings.jsonl</a>
-            <a href="../data/public/meeting_items.jsonl">meeting_items.jsonl</a>
-            <a href="../data/public/meeting_documents.jsonl">meeting_documents.jsonl</a>
-            <a href="../data/public/meeting_item_documents.jsonl">meeting_item_documents.jsonl</a>
-            <a href="../data/public/quality/document_types.json">documenttypenrapport</a>
-            <a href="../README.md">README</a>
-          </nav>
-        </details>
+    <footer class="site-footer">
+      <div class="footer-metadata" aria-label="Datasetbrede metadata">
+        <span>Gemeente: <strong id="municipality-copy">-</strong></span>
+        <span>Gegenereerd: <strong id="generated-at-copy">-</strong></span>
+        <span>Documenten gezien: <strong id="documents-seen">-</strong></span>
+        <span>Genormaliseerd: <strong id="documents-normalized">-</strong></span>
+        <span>Vergaderingen: <strong id="meetings-count">-</strong></span>
+        <span>Agendapunten: <strong id="agenda-items-count">-</strong></span>
+        <span>Gekoppelde documenten: <strong id="linked-documents-count">-</strong></span>
       </div>
+      <details class="technical-metadata">
+        <summary>Technische metadata en databestanden</summary>
+        <dl class="summary-list">
+          <div><dt>Gemeente</dt><dd id="municipality">-</dd></div>
+          <div><dt>Laatste export</dt><dd id="generated-at">-</dd></div>
+        </dl>
+        <div class="resource-links">
+          <a href="../data/public/latest.json">latest.json</a>
+          <a href="../data/public/documents.jsonl">documents.jsonl</a>
+          <a href="../data/public/document_versions.jsonl">document_versions.jsonl</a>
+          <a href="../data/public/meetings.jsonl">meetings.jsonl</a>
+          <a href="../data/public/meeting_items.jsonl">meeting_items.jsonl</a>
+          <a href="../data/public/meeting_documents.jsonl">meeting_documents.jsonl</a>
+          <a href="../data/public/meeting_item_documents.jsonl">meeting_item_documents.jsonl</a>
+          <a href="../data/public/README.md">README</a>
+        </div>
+      </details>
+      <p>Open RIS Monitor, metadata-only MVP. Brondata blijft afkomstig uit het Raadsinformatiesysteem van gemeente Huizen.</p>
     </footer>
     <script type="module" src="assets/build/main.js"></script>
   </body>
