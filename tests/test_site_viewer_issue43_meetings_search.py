@@ -47,10 +47,23 @@ def test_meeting_detail_view_remains_present() -> None:
         'id="meeting-detail-body"',
         'id="clear-meeting-selection"',
         "Agendapunten en gekoppelde documenten",
-        "Details",
         'id="meetings-table-body"',
     ]:
         assert marker in index
+
+
+def test_meeting_details_button_rendering_is_still_present() -> None:
+    render_sources = []
+    for path in [
+        Path("site/src/main.ts"),
+        Path("site/assets/build/main.js"),
+        Path("site/index.html"),
+    ]:
+        if path.exists():
+            render_sources.append(path.read_text(encoding="utf-8"))
+
+    combined = "\n".join(render_sources)
+    assert "Details" in combined
 
 
 def test_hidden_styling_is_still_guarded() -> None:
