@@ -1,6 +1,6 @@
 {
   "documents_total": 250,
-  "generated_at": "2026-06-10T07:57:07.728323+00:00",
+  "generated_at": "2026-06-11T08:24:30.651446+00:00",
   "mapping": {
     "Agenda": {
       "count": 9,
@@ -38,7 +38,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 25,
+      "count": 26,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -63,7 +63,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Raadsvoorstel": {
-      "count": 27,
+      "count": 26,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -102,19 +102,19 @@
   "normalized_document_types": [
     {
       "count": 52,
+      "normalized_document_type": "attachment",
+      "normalized_document_type_label": "Bijlage",
+      "source_document_types": [
+        "Bijlage"
+      ]
+    },
+    {
+      "count": 51,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
         "Collegevoorstel (BBV)",
         "Raadsvoorstel"
-      ]
-    },
-    {
-      "count": 52,
-      "normalized_document_type": "attachment",
-      "normalized_document_type_label": "Bijlage",
-      "source_document_types": [
-        "Bijlage"
       ]
     },
     {
@@ -126,7 +126,7 @@
       ]
     },
     {
-      "count": 25,
+      "count": 26,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -231,13 +231,13 @@
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 27,
+      "count": 26,
       "document_type": "Raadsvoorstel",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 25,
+      "count": 26,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
