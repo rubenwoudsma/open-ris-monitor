@@ -16,7 +16,9 @@ const meetingsSearchElements = {
   tableBody: document.getElementById("meetings-table-body") as HTMLTableSectionElement | null,
 };
 
+let meetingRowsObserver: MutationObserver | null = null;
 let applyingMeetingFilters = false;
+let lastRenderedMeetingSignature = "";
 
 function meetingTimestamp(value: string): number {
   const parsed = Date.parse(value);
@@ -61,26 +63,51 @@ function updateMeetingCounts(visibleCount: number, totalCount: number): void {
   if (meetingsSearchElements.resultCount) meetingsSearchElements.resultCount.textContent = `${visibleCount} van ${totalCount} vergadering(en)`;
 }
 
+function meetingSignature(rows: MeetingRow[]): string {
+  return rows.map((entry) => `${entry.dateText}|${entry.titleText}|${entry.agendaText}`).join("\n");
+}
+
+function pauseMeetingRowsObserver(): void {
+  meetingRowsObserver?.disconnect();
+}
+
+function resumeMeetingRowsObserver(): void {
+  if (!meetingRowsObserver || !meetingsSearchElements.tableBody) return;
+  meetingRowsObserver.observe(meetingsSearchElements.tableBody, { childList: true });
+}
+
 function applyMeetingFilters(): void {
   const tableBody = meetingsSearchElements.tableBody;
   if (!tableBody || applyingMeetingFilters) return;
 
   applyingMeetingFilters = true;
+  pauseMeetingRowsObserver();
   try {
     tableBody.querySelectorAll('tr[data-meeting-search-empty="true"]').forEach((row) => row.remove());
 
+    const rows = collectMeetingRows();
+    if (rows.length === 0) {
+      lastRenderedMeetingSignature = "";
+      updateMeetingCounts(0, 0);
+      return;
+    }
+
     const query = meetingsSearchElements.query?.value.trim().toLowerCase() ?? "";
     const sortMode = meetingsSearchElements.sort?.value ?? "date-desc";
-    const rows = collectMeetingRows();
     const visibleRows = rows.filter((entry) => !query || entry.searchableText.includes(query));
 
     visibleRows.sort((a, b) => (sortMode === "date-asc" ? a.timestamp - b.timestamp : b.timestamp - a.timestamp));
 
-    tableBody.replaceChildren(...visibleRows.map((entry) => entry.row));
-    if (visibleRows.length === 0 && rows.length > 0) renderEmptyMeetingSearchResult();
+    const nextSignature = `${query}|${sortMode}|${meetingSignature(visibleRows)}`;
+    if (nextSignature !== lastRenderedMeetingSignature) {
+      tableBody.replaceChildren(...visibleRows.map((entry) => entry.row));
+      if (visibleRows.length === 0) renderEmptyMeetingSearchResult();
+      lastRenderedMeetingSignature = nextSignature;
+    }
     updateMeetingCounts(visibleRows.length, rows.length);
   } finally {
     applyingMeetingFilters = false;
+    resumeMeetingRowsObserver();
   }
 }
 
@@ -91,11 +118,8 @@ function initializeMeetingSearch(): void {
   meetingsSearchElements.query.addEventListener("input", applyMeetingFilters);
   meetingsSearchElements.sort.addEventListener("change", applyMeetingFilters);
 
-  const observer = new MutationObserver(() => {
-    if (!applyingMeetingFilters) applyMeetingFilters();
-  });
-  observer.observe(meetingsSearchElements.tableBody, { childList: true });
-
+  meetingRowsObserver = new MutationObserver(() => applyMeetingFilters());
+  resumeMeetingRowsObserver();
   applyMeetingFilters();
 }
 
