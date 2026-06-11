@@ -329,7 +329,26 @@ function linkedDocumentIdsForAgendaItem(itemId: string): string[] {
 
 function findDocumentById(documentId: string): DocumentRecord | undefined {
   if (!documentId) return undefined;
-  return state.data?.documents.find((documentRecord) => documentIds(documentRecord).includes(documentId));
+  return state.indexes?.documentsById.get(documentId) ?? state.data?.documents.find((documentRecord) => documentIds(documentRecord).includes(documentId));
+}
+
+function primaryDocumentHashId(documentRecord: DocumentRecord): string {
+  return getDocumentId(documentRecord) || documentIds(documentRecord)[0] || "";
+}
+
+function documentHashFor(documentRecord: DocumentRecord): string {
+  const documentId = primaryDocumentHashId(documentRecord);
+  return documentId ? `#documents/${encodeURIComponent(documentId)}` : "#documents";
+}
+
+function documentIdFromHash(): string {
+  const prefix = "#documents/";
+  if (!window.location.hash.startsWith(prefix)) return "";
+  return decodeURIComponent(window.location.hash.slice(prefix.length));
+}
+
+function updateHash(nextHash: string): void {
+  if (window.location.hash !== nextHash) history.pushState(null, "", nextHash);
 }
 
 function findMeetingById(meetingId: string): MeetingRecord | undefined {
@@ -369,7 +388,7 @@ function createDocumentAction(documentRecord: DocumentRecord, label = "Details",
 }
 
 function ensureDocumentVisible(documentRecord: DocumentRecord): void {
-  const documentId = getDocumentId(documentRecord);
+  const documentId = primaryDocumentHashId(documentRecord);
   let index = state.filteredDocuments.findIndex((record) => documentIds(record).includes(documentId));
   if (index < 0) {
     elements.searchInput.value = "";
@@ -382,12 +401,10 @@ function ensureDocumentVisible(documentRecord: DocumentRecord): void {
 }
 
 function focusDocumentFromMeetingDetail(documentRecord: DocumentRecord): void {
-  setActiveView("documents", true, false);
+  setActiveView("documents", false, false);
+  updateHash(documentHashFor(documentRecord));
   ensureDocumentVisible(documentRecord);
-  state.selectedDocumentId = getDocumentId(documentRecord) || null;
-  renderDocumentDetail(documentRecord);
-  renderDocuments();
-  elements.documentDetail.scrollIntoView({ block: "start", behavior: "smooth" });
+  selectDocument(documentRecord, true);
 }
 
 function createInlineDocumentLinks(documentIdsToRender: string[], emptyLabel: string): HTMLElement {
@@ -920,7 +937,7 @@ function clearMeetingSelection(): void {
   renderMeetings();
 }
 
-function setActiveView(view: "documents" | "meetings", updateHash = false, scrollToView = true): void {
+function setActiveView(view: "documents" | "meetings", updateHash = false, scrollToView = false): void {
   state.activeView = view;
   elements.documentsView.hidden = view !== "documents";
   elements.meetingsView.hidden = view !== "meetings";
@@ -930,31 +947,46 @@ function setActiveView(view: "documents" | "meetings", updateHash = false, scrol
   elements.navDocuments.setAttribute("aria-current", view === "documents" ? "page" : "false");
   elements.navMeetings.setAttribute("aria-current", view === "meetings" ? "page" : "false");
 
-  if (updateHash) {
-    const nextHash = view === "meetings" ? "#meetings" : "#documents";
-    if (window.location.hash !== nextHash) history.pushState(null, "", nextHash);
-  }
+  if (updateHash) updateHashForView(view);
   if (scrollToView) {
     const target = view === "meetings" ? elements.meetingsView : elements.documentsView;
     target.scrollIntoView({ block: "start", behavior: "smooth" });
   }
 }
 
+function updateHashForView(view: "documents" | "meetings"): void {
+  updateHash(view === "meetings" ? "#meetings" : "#documents");
+}
+
 function viewFromHash(): "documents" | "meetings" {
   return window.location.hash === "#meetings" ? "meetings" : "documents";
+}
+
+function applyHashState(scrollDocumentDetail = false): void {
+  const documentId = documentIdFromHash();
+  if (documentId) {
+    const documentRecord = findDocumentById(documentId);
+    setActiveView("documents", false, false);
+    if (documentRecord) {
+      ensureDocumentVisible(documentRecord);
+      selectDocument(documentRecord, scrollDocumentDetail);
+    }
+    return;
+  }
+  setActiveView(viewFromHash(), false, false);
 }
 
 function attachEvents(): void {
   elements.navDocuments.addEventListener("click", (event) => {
     event.preventDefault();
-    setActiveView("documents", true);
+    setActiveView("documents", true, false);
   });
   elements.navMeetings.addEventListener("click", (event) => {
     event.preventDefault();
-    setActiveView("meetings", true);
+    setActiveView("meetings", true, false);
     renderMeetings();
   });
-  window.addEventListener("hashchange", () => setActiveView(viewFromHash(), false, true));
+  window.addEventListener("hashchange", () => applyHashState(true));
   elements.searchInput.addEventListener("input", () => { state.currentPage = 1; applyFilters(); });
   elements.typeFilter.addEventListener("change", () => { state.currentPage = 1; applyFilters(); });
   elements.sortSelect.addEventListener("change", () => { state.sortMode = elements.sortSelect.value; applyFilters(); });
@@ -979,17 +1011,22 @@ async function init(): Promise<void> {
   renderSummary();
   applyFilters();
   renderMeetings();
-  setActiveView(viewFromHash(), false, false);
+  applyHashState(false);
   window.OpenRISMonitor = {
     indexes: state.indexes,
     focusDocumentById(documentId: string) {
       const documentRecord = findDocumentById(documentId);
-      if (documentRecord) selectDocument(documentRecord, true);
+      if (documentRecord) {
+        setActiveView("documents", false, false);
+        updateHash(documentHashFor(documentRecord));
+        ensureDocumentVisible(documentRecord);
+        selectDocument(documentRecord, true);
+      }
     },
     focusMeetingById(meetingId: string) {
       const meeting = findMeetingById(meetingId);
       if (meeting) {
-        setActiveView("meetings");
+        setActiveView("meetings", true, false);
         selectMeeting(meeting, true);
       }
     },
