@@ -147,3 +147,9 @@ def test_meeting_detail_view_exists_without_new_route() -> None:
         assert marker in styles
     assert "meetingId" not in index
     assert "URLSearchParams" not in source
+
+
+def test_hidden_views_are_not_overridden_by_main_column_layout() -> None:
+    styles = Path("site/assets/styles.css").read_text(encoding="utf-8")
+    assert "[hidden]" in styles
+    assert "display: none !important" in styles
