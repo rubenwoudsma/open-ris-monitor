@@ -1,6 +1,11 @@
 :root { color-scheme: light; --bg: #f6f8fa; --surface: #ffffff; --surface-muted: #f6f8fa; --border: #d0d7de; --border-muted: #d8dee4; --text: #1f2328; --muted: #57606a; --accent: #0969da; --accent-muted: #ddf4ff; --success: #1a7f37; --shadow: 0 1px 0 rgba(31, 35, 40, 0.04); --radius: 10px; --radius-sm: 6px; --max-width: 1240px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+
+[hidden] {
+  display: none !important;
+}
+
 body { margin: 0; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.5; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
