@@ -219,7 +219,24 @@ function linkedDocumentIdsForAgendaItem(itemId) {
 function findDocumentById(documentId) {
     if (!documentId)
         return undefined;
-    return state.data?.documents.find((documentRecord) => documentIds(documentRecord).includes(documentId));
+    return state.indexes?.documentsById.get(documentId) ?? state.data?.documents.find((documentRecord) => documentIds(documentRecord).includes(documentId));
+}
+function primaryDocumentHashId(documentRecord) {
+    return getDocumentId(documentRecord) || documentIds(documentRecord)[0] || "";
+}
+function documentHashFor(documentRecord) {
+    const documentId = primaryDocumentHashId(documentRecord);
+    return documentId ? `#documents/${encodeURIComponent(documentId)}` : "#documents";
+}
+function documentIdFromHash() {
+    const prefix = "#documents/";
+    if (!window.location.hash.startsWith(prefix))
+        return "";
+    return decodeURIComponent(window.location.hash.slice(prefix.length));
+}
+function updateHash(nextHash) {
+    if (window.location.hash !== nextHash)
+        history.pushState(null, "", nextHash);
 }
 function findMeetingById(meetingId) {
     if (!meetingId)
@@ -255,7 +272,7 @@ function createDocumentAction(documentRecord, label = "Details", fromMeetingDeta
     return button;
 }
 function ensureDocumentVisible(documentRecord) {
-    const documentId = getDocumentId(documentRecord);
+    const documentId = primaryDocumentHashId(documentRecord);
     let index = state.filteredDocuments.findIndex((record) => documentIds(record).includes(documentId));
     if (index < 0) {
         elements.searchInput.value = "";
@@ -268,12 +285,10 @@ function ensureDocumentVisible(documentRecord) {
         state.currentPage = Math.floor(index / state.pageSize) + 1;
 }
 function focusDocumentFromMeetingDetail(documentRecord) {
-    setActiveView("documents", true, false);
+    setActiveView("documents", false, false);
+    updateHash(documentHashFor(documentRecord));
     ensureDocumentVisible(documentRecord);
-    state.selectedDocumentId = getDocumentId(documentRecord) || null;
-    renderDocumentDetail(documentRecord);
-    renderDocuments();
-    elements.documentDetail.scrollIntoView({ block: "start", behavior: "smooth" });
+    selectDocument(documentRecord, true);
 }
 function createInlineDocumentLinks(documentIdsToRender, emptyLabel) {
     const wrapper = document.createElement("div");
@@ -788,7 +803,7 @@ function clearMeetingSelection() {
     elements.meetingDetailBody.replaceChildren();
     renderMeetings();
 }
-function setActiveView(view, updateHash = false, scrollToView = true) {
+function setActiveView(view, updateHash = false, scrollToView = false) {
     state.activeView = view;
     elements.documentsView.hidden = view !== "documents";
     elements.meetingsView.hidden = view !== "meetings";
@@ -797,30 +812,43 @@ function setActiveView(view, updateHash = false, scrollToView = true) {
     elements.navMeetings.classList.toggle("top-nav__link--active", view === "meetings");
     elements.navDocuments.setAttribute("aria-current", view === "documents" ? "page" : "false");
     elements.navMeetings.setAttribute("aria-current", view === "meetings" ? "page" : "false");
-    if (updateHash) {
-        const nextHash = view === "meetings" ? "#meetings" : "#documents";
-        if (window.location.hash !== nextHash)
-            history.pushState(null, "", nextHash);
-    }
+    if (updateHash)
+        updateHashForView(view);
     if (scrollToView) {
         const target = view === "meetings" ? elements.meetingsView : elements.documentsView;
         target.scrollIntoView({ block: "start", behavior: "smooth" });
     }
 }
+function updateHashForView(view) {
+    updateHash(view === "meetings" ? "#meetings" : "#documents");
+}
 function viewFromHash() {
     return window.location.hash === "#meetings" ? "meetings" : "documents";
+}
+function applyHashState(scrollDocumentDetail = false) {
+    const documentId = documentIdFromHash();
+    if (documentId) {
+        const documentRecord = findDocumentById(documentId);
+        setActiveView("documents", false, false);
+        if (documentRecord) {
+            ensureDocumentVisible(documentRecord);
+            selectDocument(documentRecord, scrollDocumentDetail);
+        }
+        return;
+    }
+    setActiveView(viewFromHash(), false, false);
 }
 function attachEvents() {
     elements.navDocuments.addEventListener("click", (event) => {
         event.preventDefault();
-        setActiveView("documents", true);
+        setActiveView("documents", true, false);
     });
     elements.navMeetings.addEventListener("click", (event) => {
         event.preventDefault();
-        setActiveView("meetings", true);
+        setActiveView("meetings", true, false);
         renderMeetings();
     });
-    window.addEventListener("hashchange", () => setActiveView(viewFromHash(), false, true));
+    window.addEventListener("hashchange", () => applyHashState(true));
     elements.searchInput.addEventListener("input", () => { state.currentPage = 1; applyFilters(); });
     elements.typeFilter.addEventListener("change", () => { state.currentPage = 1; applyFilters(); });
     elements.sortSelect.addEventListener("change", () => { state.sortMode = elements.sortSelect.value; applyFilters(); });
@@ -840,18 +868,22 @@ async function init() {
     renderSummary();
     applyFilters();
     renderMeetings();
-    setActiveView(viewFromHash(), false, false);
+    applyHashState(false);
     window.OpenRISMonitor = {
         indexes: state.indexes,
         focusDocumentById(documentId) {
             const documentRecord = findDocumentById(documentId);
-            if (documentRecord)
+            if (documentRecord) {
+                setActiveView("documents", false, false);
+                updateHash(documentHashFor(documentRecord));
+                ensureDocumentVisible(documentRecord);
                 selectDocument(documentRecord, true);
+            }
         },
         focusMeetingById(meetingId) {
             const meeting = findMeetingById(meetingId);
             if (meeting) {
-                setActiveView("meetings");
+                setActiveView("meetings", true, false);
                 selectMeeting(meeting, true);
             }
         },
