@@ -1,9 +1,9 @@
 {
   "documents_total": 250,
-  "generated_at": "2026-06-11T08:24:30.651446+00:00",
+  "generated_at": "2026-06-12T08:13:01.619697+00:00",
   "mapping": {
     "Agenda": {
-      "count": 9,
+      "count": 8,
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda"
     },
@@ -23,7 +23,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Bijlage": {
-      "count": 52,
+      "count": 54,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
     },
@@ -38,22 +38,22 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 26,
+      "count": 31,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
     "Mededelingen": {
-      "count": 23,
+      "count": 21,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
     "Moties": {
-      "count": 13,
+      "count": 8,
       "normalized_document_type": "motion",
       "normalized_document_type_label": "Motie"
     },
     "Overig": {
-      "count": 46,
+      "count": 49,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -63,7 +63,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Raadsvoorstel": {
-      "count": 26,
+      "count": 25,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -93,7 +93,7 @@
       "normalized_document_type_label": "Toezegging"
     },
     "Vragen van raadsleden": {
-      "count": 11,
+      "count": 10,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
     }
@@ -101,7 +101,7 @@
   "normalized_document_type_count": 13,
   "normalized_document_types": [
     {
-      "count": 52,
+      "count": 54,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage",
       "source_document_types": [
@@ -109,7 +109,7 @@
       ]
     },
     {
-      "count": 51,
+      "count": 50,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -118,7 +118,7 @@
       ]
     },
     {
-      "count": 46,
+      "count": 49,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -126,7 +126,7 @@
       ]
     },
     {
-      "count": 26,
+      "count": 31,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -134,7 +134,7 @@
       ]
     },
     {
-      "count": 23,
+      "count": 21,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling",
       "source_document_types": [
@@ -142,15 +142,7 @@
       ]
     },
     {
-      "count": 13,
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie",
-      "source_document_types": [
-        "Moties"
-      ]
-    },
-    {
-      "count": 11,
+      "count": 10,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag",
       "source_document_types": [
@@ -158,7 +150,15 @@
       ]
     },
     {
-      "count": 9,
+      "count": 8,
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie",
+      "source_document_types": [
+        "Moties"
+      ]
+    },
+    {
+      "count": 8,
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda",
       "source_document_types": [
@@ -219,28 +219,28 @@
   "source_document_type_count": 19,
   "source_document_types": [
     {
-      "count": 52,
+      "count": 54,
       "document_type": "Bijlage",
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
     },
     {
-      "count": 46,
+      "count": 49,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 26,
-      "document_type": "Raadsvoorstel",
-      "normalized_document_type": "proposal",
-      "normalized_document_type_label": "Voorstel"
-    },
-    {
-      "count": 26,
+      "count": 31,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
+    },
+    {
+      "count": 25,
+      "document_type": "Raadsvoorstel",
+      "normalized_document_type": "proposal",
+      "normalized_document_type_label": "Voorstel"
     },
     {
       "count": 25,
@@ -249,25 +249,25 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 23,
+      "count": 21,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
     {
-      "count": 13,
-      "document_type": "Moties",
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie"
-    },
-    {
-      "count": 11,
+      "count": 10,
       "document_type": "Vragen van raadsleden",
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
     },
     {
-      "count": 9,
+      "count": 8,
+      "document_type": "Moties",
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie"
+    },
+    {
+      "count": 8,
       "document_type": "Agenda",
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda"
