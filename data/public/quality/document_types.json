@@ -1,6 +1,6 @@
 {
   "documents_total": 250,
-  "generated_at": "2026-06-12T08:13:01.619697+00:00",
+  "generated_at": "2026-06-13T07:15:36.885017+00:00",
   "mapping": {
     "Agenda": {
       "count": 8,
@@ -11,6 +11,11 @@
       "count": 3,
       "normalized_document_type": "amendment",
       "normalized_document_type_label": "Amendement"
+    },
+    "Besluit": {
+      "count": 3,
+      "normalized_document_type": "decision",
+      "normalized_document_type_label": "Besluit"
     },
     "Besluitenlijst raad": {
       "count": 1,
@@ -48,12 +53,12 @@
       "normalized_document_type_label": "Mededeling"
     },
     "Moties": {
-      "count": 8,
+      "count": 6,
       "normalized_document_type": "motion",
       "normalized_document_type_label": "Motie"
     },
     "Overig": {
-      "count": 49,
+      "count": 48,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -118,7 +123,7 @@
       ]
     },
     {
-      "count": 49,
+      "count": 48,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -151,18 +156,18 @@
     },
     {
       "count": 8,
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie",
-      "source_document_types": [
-        "Moties"
-      ]
-    },
-    {
-      "count": 8,
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda",
       "source_document_types": [
         "Agenda"
+      ]
+    },
+    {
+      "count": 6,
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie",
+      "source_document_types": [
+        "Moties"
       ]
     },
     {
@@ -177,20 +182,21 @@
       ]
     },
     {
+      "count": 6,
+      "normalized_document_type": "decision",
+      "normalized_document_type_label": "Besluit",
+      "source_document_types": [
+        "Besluit",
+        "Besluitenlijst raad",
+        "Besluitenlijsten"
+      ]
+    },
+    {
       "count": 4,
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging",
       "source_document_types": [
         "Toezeggingen"
-      ]
-    },
-    {
-      "count": 3,
-      "normalized_document_type": "decision",
-      "normalized_document_type_label": "Besluit",
-      "source_document_types": [
-        "Besluitenlijst raad",
-        "Besluitenlijsten"
       ]
     },
     {
@@ -216,7 +222,7 @@
     "normalized_document_type is now part of the canonical Document export.",
     "Unknown should be reserved for genuinely missing or explicitly unknown source values."
   ],
-  "source_document_type_count": 19,
+  "source_document_type_count": 20,
   "source_document_types": [
     {
       "count": 54,
@@ -225,7 +231,7 @@
       "normalized_document_type_label": "Bijlage"
     },
     {
-      "count": 49,
+      "count": 48,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
@@ -262,15 +268,15 @@
     },
     {
       "count": 8,
-      "document_type": "Moties",
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie"
-    },
-    {
-      "count": 8,
       "document_type": "Agenda",
       "normalized_document_type": "agenda",
       "normalized_document_type_label": "Agenda"
+    },
+    {
+      "count": 6,
+      "document_type": "Moties",
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie"
     },
     {
       "count": 4,
@@ -289,6 +295,12 @@
       "document_type": "Amendementen",
       "normalized_document_type": "amendment",
       "normalized_document_type_label": "Amendement"
+    },
+    {
+      "count": 3,
+      "document_type": "Besluit",
+      "normalized_document_type": "decision",
+      "normalized_document_type_label": "Besluit"
     },
     {
       "count": 2,
