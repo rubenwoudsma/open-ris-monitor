@@ -53,7 +53,7 @@ def test_relation_harvest_uses_documented_meetings_endpoint_not_meetingsessions(
         meeting_session_scan_mode="full",
     )
 
-    assert result["summary"]["meeting_scan_source"] == "meetings"
+    assert result["meeting_scan_source"] == "meetings"
     assert result["meeting_sessions"] == []
     assert result["candidate_meeting_ids"] == ["10"]
     assert result["meetings"] == [{"id": 10, "description": "Raadsvergadering"}]
@@ -176,7 +176,7 @@ def test_relation_harvest_keeps_legacy_connector_fallback_for_existing_tests() -
         meeting_item_limit=1,
     )
 
-    assert result["summary"]["meeting_scan_source"] == "meetingsessions"
+    assert result["meeting_scan_source"] == "meetingsessions"
     assert result["candidate_meeting_ids"] == ["10", "20"]
     assert result["meetings"][0]["id"] == "10"
     assert ("meetingsessions", {"limit": 2, "offset": 0}) in connector.calls

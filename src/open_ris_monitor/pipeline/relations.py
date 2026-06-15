@@ -334,8 +334,8 @@ def collect_raw_relation_harvest(
         "meeting_items": meeting_items,
         "meeting_documents": meeting_documents,
         "meeting_item_documents": meeting_item_documents,
+        "meeting_scan_source": meeting_scan_source,
         "summary": {
-            "meeting_scan_source": meeting_scan_source,
             "meeting_session_scan_mode": meeting_session_scan_mode,
             "meeting_sessions_seen": len(meeting_sessions),
             "candidate_meetings_seen": len(candidate_meeting_ids),
