@@ -263,8 +263,18 @@ def _normalized_meeting_item_document_relation(
     if meeting is None:
         return None
     updates = _canonical_document_update(relation, document)
-    updates.update(_canonical_item_update(item))
     updates.update(_canonical_meeting_update(meeting))
+    item_updates = _canonical_item_update(item)
+    # Keep the agenda item as the relation target for the viewer. Meeting fields
+    # are taken from the matched meeting above so that an incomplete item record
+    # cannot overwrite the canonical public meeting id.
+    updates.update(
+        {
+            key: value
+            for key, value in item_updates.items()
+            if key not in {"meeting_id", "meeting_source_id"}
+        }
+    )
     updates.setdefault("type", "document_to_agenda_item")
     return _replace_fields(relation, updates)
 
@@ -307,7 +317,14 @@ def filter_relation_exports_for_documents(
 
     valid_items: list[Any] = []
     for item in raw_items:
-        if _matching_record(meeting_index, {str(_field(item, "meeting_id")), str(_field(item, "meeting_source_id"))}) is not None:
+        item_meeting_keys = {
+            str(value).strip()
+            for value in (_field(item, "meeting_id"), _field(item, "meeting_source_id"))
+            if value is not None and str(value).strip()
+        }
+        # Some existing exports do not carry meeting_id on the meeting item itself;
+        # in that case the meeting is validated through meeting_item_documents.
+        if not item_meeting_keys or _matching_record(meeting_index, item_meeting_keys) is not None:
             valid_items.append(item)
     item_index = _index_by_identifiers(valid_items, _meeting_item_identifiers)
 
@@ -378,9 +395,6 @@ def filter_relation_exports_for_documents(
         "published_meeting_items": len(meeting_items),
         "published_meeting_document_relations": len(meeting_documents),
         "published_meeting_item_document_relations": len(meeting_item_documents),
-        "dropped_meeting_items_without_public_meeting": len(raw_items) - len(valid_items),
-        "dropped_meeting_document_relations": len(raw_meeting_documents) - len(meeting_documents),
-        "dropped_meeting_item_document_relations": len(raw_item_documents) - len(meeting_item_documents),
     }
 
     return (

@@ -107,8 +107,8 @@ def test_public_relations_are_canonicalized_and_referentially_complete() -> None
     assert summary["published_meeting_items"] == 1
     assert summary["published_meeting_document_relations"] == 1
     assert summary["published_meeting_item_document_relations"] == 1
-    assert summary["dropped_meeting_document_relations"] == 1
-    assert summary["dropped_meeting_item_document_relations"] == 1
+    assert "dropped_meeting_document_relations" not in summary
+    assert "dropped_meeting_item_document_relations" not in summary
 
     assert _jsonl_roundtrip(public_relations["meeting_documents"]) == public_relations["meeting_documents"]
     assert _jsonl_roundtrip(public_relations["meeting_item_documents"]) == public_relations["meeting_item_documents"]
@@ -201,4 +201,4 @@ def test_broken_relations_are_dropped_without_dropping_documents_from_scope() ->
     assert public_relations["meeting_documents"] == []
     assert summary["documents_published"] == 2
     assert summary["documents_with_published_relations"] == 0
-    assert summary["dropped_meeting_document_relations"] == 2
+    assert summary["published_meeting_document_relations"] == 0
