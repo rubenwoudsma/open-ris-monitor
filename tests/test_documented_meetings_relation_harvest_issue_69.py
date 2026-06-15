@@ -132,3 +132,51 @@ def test_gemeenteoplossingen_connector_fetches_documented_meetings_page() -> Non
             {"limit": 100, "offset": 300},
         )
     ]
+
+class LegacyOnlyRelationConnector:
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, Any]] = []
+
+    def fetch_meeting_sessions_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
+        self.calls.append(("meetingsessions", {"limit": limit, "offset": offset}))
+        sessions = [
+            {"container": {"meeting": {"id": 10}}},
+            {"container": {"meeting": {"id": 20}}},
+        ]
+        return sessions[offset : offset + limit]
+
+    def fetch_latest_meeting_sessions(self, limit: int) -> list[dict[str, Any]]:
+        self.calls.append(("latest_meetingsessions", limit))
+        return [{"container": {"meeting": {"id": 20}}}]
+
+    def fetch_meeting(self, meeting_id: int | str) -> dict[str, Any] | None:
+        self.calls.append(("meeting", str(meeting_id)))
+        return {"id": meeting_id, "description": f"Meeting {meeting_id}"}
+
+    def fetch_meeting_items(self, meeting_id: int | str) -> list[dict[str, Any]]:
+        self.calls.append(("meetingitems", str(meeting_id)))
+        return [{"id": 100, "title": "Opening"}]
+
+    def fetch_meeting_documents(self, meeting_id: int | str) -> list[dict[str, Any]]:
+        self.calls.append(("meeting_documents", str(meeting_id)))
+        return []
+
+    def fetch_meeting_item_documents(self, meeting_item_id: int | str) -> list[dict[str, Any]]:
+        self.calls.append(("meeting_item_documents", str(meeting_item_id)))
+        return []
+
+
+def test_relation_harvest_keeps_legacy_connector_fallback_for_existing_tests() -> None:
+    connector = LegacyOnlyRelationConnector()
+
+    result = collect_raw_relation_harvest(
+        connector,
+        meeting_scan_limit=2,
+        meeting_session_batch_size=2,
+        meeting_item_limit=1,
+    )
+
+    assert result["summary"]["meeting_scan_source"] == "meetingsessions"
+    assert result["candidate_meeting_ids"] == ["10", "20"]
+    assert result["meetings"][0]["id"] == "10"
+    assert ("meetingsessions", {"limit": 2, "offset": 0}) in connector.calls

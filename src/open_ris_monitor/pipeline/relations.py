@@ -77,6 +77,22 @@ def stable_unique(values: list[str]) -> list[str]:
     return result
 
 
+def _supports_documented_meeting_scan(
+    connector: RelationConnector,
+    *,
+    scan_mode: RelationScanMode,
+) -> bool:
+    """Return whether the connector can scan the documented /meetings endpoint.
+
+    Older tests and third-party connector fakes may only implement the legacy
+    meetingsession methods. Keep that fallback available while making the real
+    GemeenteOplossingen connector use /meetings.
+    """
+    if scan_mode == "latest":
+        return hasattr(connector, "fetch_latest_meetings")
+    return hasattr(connector, "fetch_meetings_page")
+
+
 def fetch_meetings(
     connector: RelationConnector,
     *,
@@ -84,13 +100,22 @@ def fetch_meetings(
     batch_size: int = 100,
     scan_mode: RelationScanMode = "full",
 ) -> list[dict[str, Any]]:
-    """Fetch a bounded number of meetings from the documented /meetings endpoint."""
+    """Fetch a bounded number of meetings from the documented /meetings endpoint.
+
+    This helper intentionally falls back to the legacy meetingsession traversal
+    when a connector fake or older adapter does not yet expose /meetings scan
+    methods. The production GemeenteOplossingen connector added for #69 does
+    implement these methods, so real harvests prefer the documented endpoint.
+    """
     if scan_limit <= 0:
         raise ValueError("scan_limit must be greater than 0")
     if batch_size <= 0:
         raise ValueError("batch_size must be greater than 0")
     if scan_mode not in {"full", "latest"}:
         raise ValueError("scan_mode must be 'full' or 'latest'")
+
+    if not _supports_documented_meeting_scan(connector, scan_mode=scan_mode):
+        return []
 
     if scan_mode == "latest":
         return connector.fetch_latest_meetings(scan_limit)
@@ -164,28 +189,71 @@ def collect_raw_relation_harvest(
     if meeting_item_limit is not None and meeting_item_limit <= 0:
         raise ValueError("meeting_item_limit must be greater than 0 when provided")
 
-    meetings = fetch_meetings(
-        connector,
-        scan_limit=meeting_scan_limit,
-        batch_size=meeting_session_batch_size,
-        scan_mode=meeting_session_scan_mode,
-    )
-    candidate_meeting_ids = stable_unique(
-        [
-            meeting_id
-            for meeting in meetings
-            if (meeting_id := _as_source_id(meeting.get("id"))) is not None
-        ]
-    )
-
-    skipped_meeting_ids: list[str] = []
     relation_errors: list[dict[str, Any]] = []
+    skipped_meeting_ids: list[str] = []
+    meeting_scan_source = "meetings"
+
+    if _supports_documented_meeting_scan(connector, scan_mode=meeting_session_scan_mode):
+        meeting_sessions: list[dict[str, Any]] = []
+        meetings = fetch_meetings(
+            connector,
+            scan_limit=meeting_scan_limit,
+            batch_size=meeting_session_batch_size,
+            scan_mode=meeting_session_scan_mode,
+        )
+        candidate_meeting_ids = stable_unique(
+            [
+                meeting_id
+                for meeting in meetings
+                if (meeting_id := _as_source_id(meeting.get("id"))) is not None
+            ]
+        )
+        meeting_ids_to_scan = candidate_meeting_ids
+    else:
+        meeting_scan_source = "meetingsessions"
+        meeting_sessions = fetch_meeting_sessions(
+            connector,
+            scan_limit=meeting_scan_limit,
+            batch_size=meeting_session_batch_size,
+            scan_mode=meeting_session_scan_mode,
+        )
+        candidate_meeting_ids = stable_unique(
+            [
+                meeting_id
+                for session in meeting_sessions
+                if (meeting_id := extract_meeting_id_from_session(session)) is not None
+            ]
+        )
+        meetings = []
+        meeting_ids_to_scan = []
+        for meeting_id in candidate_meeting_ids:
+            try:
+                meeting = connector.fetch_meeting(meeting_id)
+            except Exception as exc:
+                if not _is_relation_fetch_error(exc):
+                    raise
+                skipped_meeting_ids.append(meeting_id)
+                relation_errors.append(
+                    {
+                        "scope": "meeting",
+                        "meeting_id": meeting_id,
+                        "error": _short_error(exc),
+                    }
+                )
+                continue
+            if meeting is None:
+                skipped_meeting_ids.append(meeting_id)
+                continue
+            meetings.append(meeting)
+            resolved_meeting_id = _as_source_id(meeting.get("id")) or meeting_id
+            meeting_ids_to_scan.append(resolved_meeting_id)
+
     meeting_items: list[dict[str, Any]] = []
     meeting_documents: list[dict[str, Any]] = []
     meeting_item_documents: list[dict[str, Any]] = []
     item_budget_remaining = meeting_item_limit
 
-    for meeting_id in candidate_meeting_ids:
+    for meeting_id in meeting_ids_to_scan:
         try:
             documents_for_meeting = connector.fetch_meeting_documents(meeting_id)
         except Exception as exc:
@@ -258,7 +326,7 @@ def collect_raw_relation_harvest(
                 )
 
     return {
-        "meeting_sessions": [],
+        "meeting_sessions": meeting_sessions,
         "candidate_meeting_ids": candidate_meeting_ids,
         "skipped_meeting_ids": skipped_meeting_ids,
         "relation_errors": relation_errors,
@@ -267,9 +335,9 @@ def collect_raw_relation_harvest(
         "meeting_documents": meeting_documents,
         "meeting_item_documents": meeting_item_documents,
         "summary": {
-            "meeting_scan_source": "meetings",
+            "meeting_scan_source": meeting_scan_source,
             "meeting_session_scan_mode": meeting_session_scan_mode,
-            "meeting_sessions_seen": 0,
+            "meeting_sessions_seen": len(meeting_sessions),
             "candidate_meetings_seen": len(candidate_meeting_ids),
             "meetings_seen": len(meetings),
             "meetings_skipped": len(skipped_meeting_ids),
