@@ -30,8 +30,8 @@ def test_normalize_document_uses_source_file_url_and_file_size_variants() -> Non
     assert document.document_type == "Raadsvoorstel"
     assert document.filename == "voorstel.pdf"
     assert document.file_size_bytes == 2048
-    assert document.download_url == "https://example.invalid/document/123.pdf"
-    assert document.source_url == "https://example.invalid/document/123.pdf"
+    assert str(document.download_url) == "https://example.invalid/document/123.pdf"
+    assert str(document.source_url) == "https://example.invalid/document/123.pdf"
 
 
 def test_normalize_document_falls_back_to_download_endpoint_when_source_url_is_absent() -> None:
@@ -44,6 +44,6 @@ def test_normalize_document_falls_back_to_download_endpoint_when_source_url_is_a
         retrieved_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
     )
 
-    assert document.download_url == "https://fallback.invalid/456/download"
+    assert str(document.download_url) == "https://fallback.invalid/456/download"
     assert document.source_url == "https://fallback.invalid/456/download"
     assert document.file_size_bytes == 10

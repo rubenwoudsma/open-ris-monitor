@@ -36,9 +36,6 @@ LEGACY_DEFAULTS: Final[HarvestProfile] = HarvestProfile(
 )
 
 HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
-    # Fast smoke-test profile. Keeps the latest-document behaviour intentionally
-    # small so forks can check credentials and endpoint shape without producing a
-    # large public dataset.
     "quick": HarvestProfile(
         mode="latest",
         limit=10,
@@ -49,32 +46,25 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         meeting_session_batch_size=50,
         meeting_item_limit=200,
     ),
-    # Public profile for GitHub Pages publication. Issue #69 observed that the
-    # previous latest/250 profile capped documents too aggressively for a useful
-    # document-first viewer. This profile now walks the full endpoint up to a
-    # bounded public cap, while keeping exports compact and reviewable.
     "public": HarvestProfile(
-        mode="full",
+        mode="latest",
         limit=250,
         batch_size=100,
-        max_documents=1000,
+        max_documents=None,
         include_relations=True,
-        meeting_scan_limit=1000,
+        meeting_scan_limit=250,
         meeting_session_batch_size=100,
-        meeting_item_limit=5000,
+        meeting_item_limit=1000,
     ),
-    # Backfill profile for deliberate manual recovery or coverage expansion. It
-    # is unbounded by default, so use it intentionally and inspect the artifact
-    # before committing public output for a new municipality.
     "backfill": HarvestProfile(
         mode="full",
         limit=1000,
         batch_size=100,
         max_documents=None,
         include_relations=True,
-        meeting_scan_limit=5000,
+        meeting_scan_limit=1000,
         meeting_session_batch_size=100,
-        meeting_item_limit=None,
+        meeting_item_limit=5000,
     ),
 }
 

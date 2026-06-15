@@ -47,7 +47,7 @@ def _resolve_download_url_builder(
 
 
 def _as_text(value: Any) -> str | None:
-    if value is None:
+    if value is None or isinstance(value, (dict, list, tuple, set)):
         return None
     text = str(value).strip()
     return text or None
