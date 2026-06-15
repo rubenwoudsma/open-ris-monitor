@@ -11,20 +11,17 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
     if not path.exists():
         raise FileNotFoundError(f"JSONL file not found: {path}")
-
     with path.open("r", encoding="utf-8") as handle:
         for line_number, line in enumerate(handle, start=1):
             text = line.strip()
             if not text:
                 continue
-
             record = json.loads(text)
-
-            # Backward-compatible guard for older or malformed generated .jsonl files.
-            # A proper JSONL file contains one JSON object per line, but some public
-            # harvest metadata files can contain a single JSON array line. Treat that
-            # array as multiple JSONL records so quality reporting does not fail after
-            # a successful harvest.
+            # Backward-compatible guard for older or malformed generated .jsonl
+            # files. A proper JSONL file contains one JSON object per line, but
+            # some public harvest metadata files can contain a single JSON array
+            # line. Treat that array as multiple JSONL records so quality
+            # reporting does not fail after a successful harvest.
             if isinstance(record, list):
                 for index, item in enumerate(record, start=1):
                     if not isinstance(item, dict):
@@ -34,13 +31,18 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
                         )
                     records.append(item)
                 continue
-
             if not isinstance(record, dict):
                 raise ValueError(f"Expected JSON object on line {line_number} in {path}")
-
             records.append(record)
-
     return records
+
+
+def _read_json_object(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    with path.open("r", encoding="utf-8") as handle:
+        value = json.load(handle)
+    return value if isinstance(value, dict) else {}
 
 
 def _latest_harvest(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -62,6 +64,13 @@ def _collect_ids(rows: list[dict[str, Any]], key: str) -> set[str]:
         if isinstance(value, str) and value:
             values.add(value)
     return values
+
+
+def _as_int(value: Any) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return 0
 
 
 def build_quality_report(public_dir: Path) -> dict[str, Any]:
@@ -92,6 +101,7 @@ def build_quality_report(public_dir: Path) -> dict[str, Any]:
         if (public_dir / "meeting_item_documents.jsonl").exists()
         else []
     )
+    latest = _read_json_object(public_dir / "latest.json")
 
     document_ids = _collect_ids(documents, "id")
     meeting_ids = _collect_ids(meetings, "id")
@@ -120,12 +130,10 @@ def build_quality_report(public_dir: Path) -> dict[str, Any]:
 
     meetings_with_items: defaultdict[str, int] = defaultdict(int)
     items_with_documents: defaultdict[str, int] = defaultdict(int)
-
     for item in meeting_items:
         meeting_id = item.get("meeting_id")
         if isinstance(meeting_id, str) and meeting_id:
             meetings_with_items[meeting_id] += 1
-
     for rel in meeting_item_documents:
         item_id = rel.get("meeting_item_id")
         if isinstance(item_id, str) and item_id:
@@ -136,6 +144,8 @@ def build_quality_report(public_dir: Path) -> dict[str, Any]:
 
     source_document_type_counter: Counter[str] = Counter()
     normalized_document_type_counter: Counter[str] = Counter()
+    documents_with_file_url = 0
+    documents_with_file_size = 0
     for doc in documents:
         source_type = doc.get("document_type")
         normalized_type = doc.get("normalized_document_type")
@@ -145,9 +155,34 @@ def build_quality_report(public_dir: Path) -> dict[str, Any]:
             normalized_document_type_counter[normalized_type] += 1
         else:
             normalized_document_type_counter["unknown"] += 1
+        if doc.get("download_url") or doc.get("source_url"):
+            documents_with_file_url += 1
+        if doc.get("file_size_bytes") not in (None, ""):
+            documents_with_file_size += 1
 
     unknown_document_types = normalized_document_type_counter.get("unknown", 0)
     latest_run = _latest_harvest(harvest_runs)
+
+    relation_publication_summary = latest.get("relations_publication_summary", {})
+    if not isinstance(relation_publication_summary, dict):
+        relation_publication_summary = {}
+
+    raw_meeting_document_relations = _as_int(
+        relation_publication_summary.get("raw_meeting_document_relations_seen")
+    )
+    raw_meeting_item_document_relations = _as_int(
+        relation_publication_summary.get("raw_meeting_item_document_relations_seen")
+    )
+    published_meeting_document_relations = len(meeting_documents)
+    published_meeting_item_document_relations = len(meeting_item_documents)
+    dropped_meeting_document_relations = max(
+        raw_meeting_document_relations - published_meeting_document_relations,
+        0,
+    )
+    dropped_meeting_item_document_relations = max(
+        raw_meeting_item_document_relations - published_meeting_item_document_relations,
+        0,
+    )
 
     issues: list[dict[str, Any]] = []
     if orphan_meeting_document_relations:
@@ -190,6 +225,7 @@ def build_quality_report(public_dir: Path) -> dict[str, Any]:
     total_documents = len(documents)
     documents_with_relations = len(related_document_ids)
     coverage_pct = round((documents_with_relations / total_documents) * 100, 2) if total_documents else 0.0
+    documents_seen = _as_int(latest.get("documents_seen") or (latest_run or {}).get("documents_seen"))
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -219,6 +255,23 @@ def build_quality_report(public_dir: Path) -> dict[str, Any]:
             "source": dict(sorted(source_document_type_counter.items())),
             "normalized": dict(sorted(normalized_document_type_counter.items())),
             "unknown_count": unknown_document_types,
+        },
+        "document_metadata": {
+            "documents_with_file_url": documents_with_file_url,
+            "documents_without_file_url": max(total_documents - documents_with_file_url, 0),
+            "documents_with_file_size": documents_with_file_size,
+            "documents_without_file_size": max(total_documents - documents_with_file_size, 0),
+        },
+        "export_diagnostics": {
+            "documents_seen": documents_seen,
+            "documents_published": total_documents,
+            "documents_seen_minus_published": max(documents_seen - total_documents, 0),
+            "raw_meeting_document_relations_seen": raw_meeting_document_relations,
+            "raw_meeting_item_document_relations_seen": raw_meeting_item_document_relations,
+            "published_meeting_document_relations": published_meeting_document_relations,
+            "published_meeting_item_document_relations": published_meeting_item_document_relations,
+            "dropped_meeting_document_relations": dropped_meeting_document_relations,
+            "dropped_meeting_item_document_relations": dropped_meeting_item_document_relations,
         },
         "harvest": {
             "latest_run_status": (latest_run or {}).get("status"),
