@@ -45,5 +45,5 @@ def test_normalize_document_falls_back_to_download_endpoint_when_source_url_is_a
     )
 
     assert str(document.download_url) == "https://fallback.invalid/456/download"
-    assert document.source_url == "https://fallback.invalid/456/download"
+    assert str(document.source_url) == "https://fallback.invalid/456/download"
     assert document.file_size_bytes == 10
