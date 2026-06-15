@@ -1,6 +1,6 @@
 {
   "documents_total": 250,
-  "generated_at": "2026-06-14T08:05:17.526907+00:00",
+  "generated_at": "2026-06-15T09:48:03.221339+00:00",
   "mapping": {
     "Agenda": {
       "count": 8,
@@ -48,12 +48,12 @@
       "normalized_document_type_label": "Ingekomen stuk"
     },
     "Mededelingen": {
-      "count": 21,
+      "count": 22,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
     "Moties": {
-      "count": 6,
+      "count": 4,
       "normalized_document_type": "motion",
       "normalized_document_type_label": "Motie"
     },
@@ -98,7 +98,7 @@
       "normalized_document_type_label": "Toezegging"
     },
     "Vragen van raadsleden": {
-      "count": 10,
+      "count": 11,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
     }
@@ -139,7 +139,7 @@
       ]
     },
     {
-      "count": 21,
+      "count": 22,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling",
       "source_document_types": [
@@ -147,7 +147,7 @@
       ]
     },
     {
-      "count": 10,
+      "count": 11,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag",
       "source_document_types": [
@@ -160,14 +160,6 @@
       "normalized_document_type_label": "Agenda",
       "source_document_types": [
         "Agenda"
-      ]
-    },
-    {
-      "count": 6,
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie",
-      "source_document_types": [
-        "Moties"
       ]
     },
     {
@@ -189,6 +181,14 @@
         "Besluit",
         "Besluitenlijst raad",
         "Besluitenlijsten"
+      ]
+    },
+    {
+      "count": 4,
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie",
+      "source_document_types": [
+        "Moties"
       ]
     },
     {
@@ -255,13 +255,13 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 21,
+      "count": 22,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
     {
-      "count": 10,
+      "count": 11,
       "document_type": "Vragen van raadsleden",
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
@@ -273,7 +273,7 @@
       "normalized_document_type_label": "Agenda"
     },
     {
-      "count": 6,
+      "count": 4,
       "document_type": "Moties",
       "normalized_document_type": "motion",
       "normalized_document_type_label": "Motie"

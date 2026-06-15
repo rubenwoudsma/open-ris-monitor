@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-14T08:05:17.531061+00:00",
+  "generated_at": "2026-06-15T09:48:03.225385+00:00",
   "counts": {
     "documents": 250,
     "document_versions": 25,
@@ -33,8 +33,8 @@
       "Collegevoorstel (BBV)": 25,
       "Financiële overzichten commissie": 1,
       "Ingekomen stuk": 31,
-      "Mededelingen": 21,
-      "Moties": 6,
+      "Mededelingen": 22,
+      "Moties": 4,
       "Overig": 48,
       "Overzicht stand van zaken": 2,
       "Raadsvoorstel": 25,
@@ -43,21 +43,21 @@
       "Resumé Sociaal Domein": 1,
       "Resumés": 3,
       "Toezeggingen": 4,
-      "Vragen van raadsleden": 10
+      "Vragen van raadsleden": 11
     },
     "normalized": {
       "agenda": 8,
       "amendment": 3,
-      "announcement": 21,
+      "announcement": 22,
       "attachment": 54,
       "commitment": 4,
       "decision": 6,
       "incoming_document": 31,
       "minutes_or_summary": 6,
-      "motion": 6,
+      "motion": 4,
       "other": 48,
       "proposal": 50,
-      "question": 10,
+      "question": 11,
       "report": 3
     },
     "unknown_count": 0
@@ -71,15 +71,15 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-06-14T08:05:17.251796+00:00",
-      "id": "harvest-huizen-20260614T080003Z",
+      "finished_at": "2026-06-15T09:48:02.958688+00:00",
+      "id": "harvest-huizen-20260615T094053Z",
       "max_documents": null,
       "meetings_seen": 199,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-06-14T08:00:03.245794+00:00",
+      "started_at": "2026-06-15T09:40:53.990056+00:00",
       "status": "success"
     }
   },
