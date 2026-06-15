@@ -114,13 +114,7 @@ class GemeenteOplossingenConnector:
         path: str,
         params: dict[str, Any] | None = None,
     ) -> dict[str, Any] | None:
-        """Fetch JSON but treat 404 as an absent resource.
-
-        Some meeting IDs discovered through meetingsessions do not resolve
-        through /meetings/{meeting_id}. That is expected source-system behaviour
-        and should not fail the relational harvest.
-        """
-
+        """Fetch JSON but treat 404 as an absent resource."""
         try:
             return self._get_json(path, params=params)
         except requests.HTTPError as exc:
@@ -193,15 +187,38 @@ class GemeenteOplossingenConnector:
                 break
         return documents
 
+    def fetch_meeting_count(self) -> int:
+        """Fetch the count from the documented /meetings endpoint."""
+        payload = self._get_json("meetings", params={"limit": 1, "offset": 0})
+        result = self._result(payload)
+        total_count = result.get("totalCount", 0)
+        return int(total_count)
+
+    def fetch_meetings_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
+        """Fetch one page from the documented /meetings endpoint."""
+        if limit <= 0:
+            raise ValueError("limit must be greater than 0")
+        if offset < 0:
+            raise ValueError("offset must be 0 or greater")
+        payload = self._get_json("meetings", params={"limit": limit, "offset": offset})
+        return self._result_list(payload, "meetings")
+
+    def fetch_latest_meetings(self, limit: int) -> list[dict[str, Any]]:
+        if limit <= 0:
+            raise ValueError("limit must be greater than 0")
+        total_count = self.fetch_meeting_count()
+        offset = max(0, total_count - limit)
+        return self.fetch_meetings_page(limit=limit, offset=offset)
+
     def fetch_meeting_session_count(self) -> int:
+        """Legacy /meetingsessions support, not used by the #69 relation harvest."""
         payload = self._get_json("meetingsessions", params={"limit": 1, "offset": 0})
         result = self._result(payload)
         total_count = result.get("totalCount", 0)
         return int(total_count)
 
     def fetch_meeting_sessions_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
-        """Fetch one page from /meetingsessions."""
-
+        """Fetch one page from legacy /meetingsessions."""
         if limit <= 0:
             raise ValueError("limit must be greater than 0")
         if offset < 0:
@@ -218,7 +235,6 @@ class GemeenteOplossingenConnector:
 
     def fetch_meeting(self, meeting_id: int | str) -> dict[str, Any] | None:
         """Fetch /meetings/{meeting_id}, returning None for 404 responses."""
-
         payload = self._get_json_or_none_on_404(f"meetings/{meeting_id}")
         if payload is None:
             return None
@@ -230,19 +246,16 @@ class GemeenteOplossingenConnector:
 
     def fetch_meeting_items(self, meeting_id: int | str) -> list[dict[str, Any]]:
         """Fetch /meetings/{meeting_id}/meetingitems."""
-
         payload = self._get_json(f"meetings/{meeting_id}/meetingitems")
         return self._result_list(payload, "meetingitems")
 
     def fetch_meeting_documents(self, meeting_id: int | str) -> list[dict[str, Any]]:
         """Fetch /meetings/{meeting_id}/documents."""
-
         payload = self._get_json(f"meetings/{meeting_id}/documents")
         return self._result_list(payload, "documents")
 
     def fetch_meeting_item_documents(self, meeting_item_id: int | str) -> list[dict[str, Any]]:
         """Fetch /meetingitems/{meeting_item_id}/documents."""
-
         payload = self._get_json(f"meetingitems/{meeting_item_id}/documents")
         return self._result_list(payload, "documents")
 
