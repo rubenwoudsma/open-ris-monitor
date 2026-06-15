@@ -1,7 +1,7 @@
 """Shared runtime configuration for bounded harvest profiles.
 
-The profiles are intentionally small and explicit. They describe how a run should
-behave operationally, without changing the public export contract.
+The profiles are intentionally small and explicit. They describe how a run
+should behave operationally, without changing the public export contract.
 """
 
 from __future__ import annotations
@@ -82,7 +82,6 @@ def resolve_harvest_options(
     applied by key presence, so values such as ``None`` remain valid explicit
     overrides for unbounded backfill-style runs.
     """
-
     if profile_name is None:
         resolved = asdict(LEGACY_DEFAULTS)
     else:
@@ -98,5 +97,4 @@ def resolve_harvest_options(
         if key not in PROFILE_OPTION_KEYS:
             raise ValueError(f"Unknown harvest profile option: {key}")
         resolved[key] = value
-
     return resolved

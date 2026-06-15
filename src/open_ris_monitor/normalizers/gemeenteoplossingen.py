@@ -22,14 +22,11 @@ def _parse_publication_datetime(raw_value: Any) -> tuple[datetime | None, str | 
     """Parse the GemeenteOplossingen publicationDate object."""
     if not isinstance(raw_value, dict):
         return None, None
-
     date_value = raw_value.get("date")
     timezone_value = raw_value.get("timezone")
     timezone = timezone_value if isinstance(timezone_value, str) else None
-
     if not isinstance(date_value, str) or not date_value:
         return None, timezone
-
     normalized = date_value.replace(" ", "T")
     try:
         return datetime.fromisoformat(normalized), timezone
@@ -45,8 +42,128 @@ def _resolve_download_url_builder(
     if build_download_url is not None:
         return build_download_url
     if connector is not None and hasattr(connector, "build_download_url"):
-        return connector.build_download_url
+        return connector.build_document_download_url
     return lambda source_id: f"https://mock-download-url/api/v2/documents/{source_id}/download"
+
+
+def _as_text(value: Any) -> str | None:
+    if value is None or isinstance(value, (dict, list, tuple, set)):
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _first_text(raw: dict[str, Any], *keys: str) -> str | None:
+    for key in keys:
+        value = _as_text(raw.get(key))
+        if value:
+            return value
+    return None
+
+
+def _nested_mapping(raw: dict[str, Any], key: str) -> dict[str, Any]:
+    value = raw.get(key)
+    return value if isinstance(value, dict) else {}
+
+
+def _nested_first_text(raw: dict[str, Any], object_key: str, *keys: str) -> str | None:
+    nested = _nested_mapping(raw, object_key)
+    return _first_text(nested, *keys) if nested else None
+
+
+def _as_positive_int(value: Any) -> int | None:
+    if value is None or value == "":
+        return None
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed >= 0 else None
+
+
+def _resolve_file_size(raw_document: dict[str, Any]) -> int | None:
+    """Return file size from known GemeenteOplossingen field variants."""
+    for value in (
+        raw_document.get("fileSize"),
+        raw_document.get("file_size"),
+        raw_document.get("file_size_bytes"),
+        raw_document.get("sizeBytes"),
+        raw_document.get("size_bytes"),
+        raw_document.get("filesize"),
+        raw_document.get("size"),
+        raw_document.get("bytes"),
+        _nested_mapping(raw_document, "file").get("fileSize"),
+        _nested_mapping(raw_document, "file").get("size"),
+        _nested_mapping(raw_document, "file").get("bytes"),
+        _nested_mapping(raw_document, "attachment").get("fileSize"),
+        _nested_mapping(raw_document, "attachment").get("size"),
+    ):
+        parsed = _as_positive_int(value)
+        if parsed is not None:
+            return parsed
+    return None
+
+
+def _resolve_source_document_type(raw_document: dict[str, Any]) -> str | None:
+    """Return the most descriptive source document type value available."""
+    direct = _first_text(
+        raw_document,
+        "documentTypeLabel",
+        "document_type_label",
+        "documentTypeDescription",
+        "document_type_description",
+        "documentTypeName",
+        "document_type_name",
+        "documentType",
+        "document_type",
+        "typeLabel",
+        "type_label",
+        "type",
+    )
+    if direct:
+        return direct
+    for object_key in ("documentType", "document_type", "type"):
+        nested = _nested_first_text(
+            raw_document,
+            object_key,
+            "label",
+            "description",
+            "name",
+            "title",
+            "value",
+            "id",
+        )
+        if nested:
+            return nested
+    return None
+
+
+def _resolve_document_url(
+    raw_document: dict[str, Any],
+    *,
+    source_id: str,
+    url_builder: Callable[[str], str],
+) -> str:
+    """Return a usable public document URL, falling back to the download endpoint."""
+    explicit = (
+        _first_text(
+            raw_document,
+            "downloadUrl",
+            "download_url",
+            "sourceUrl",
+            "source_url",
+            "fileUrl",
+            "file_url",
+            "documentUrl",
+            "document_url",
+            "webUrl",
+            "web_url",
+            "url",
+        )
+        or _nested_first_text(raw_document, "file", "downloadUrl", "download_url", "url", "href")
+        or _nested_first_text(raw_document, "attachment", "downloadUrl", "download_url", "url", "href")
+    )
+    return explicit or url_builder(source_id)
 
 
 def normalize_document(
@@ -64,29 +181,22 @@ def normalize_document(
     if not municipality_slug:
         municipality_slug = _slugify(municipality_id)
 
-    url_builder = _resolve_download_url_builder(connector=connector, build_download_url=build_download_url)
-    download_url = url_builder(source_id)
+    url_builder = _resolve_download_url_builder(
+        connector=connector,
+        build_download_url=build_download_url,
+    )
+    document_url = _resolve_document_url(raw_document, source_id=source_id, url_builder=url_builder)
 
     publication_datetime, publication_timezone = _parse_publication_datetime(
         raw_document.get("publicationDate") or raw_document.get("publication_date")
     )
 
-    # Bepaal de titel: als 'title' leeg/afwezig is, gebruik 'description' van de fixture
     title_value = raw_document.get("title") or raw_document.get("description") or ""
-    
-    # Bepaal de omschrijving/beschrijving
     description_value = raw_document.get("description")
 
-    # Ondersteun alle mogelijke varianten van het documenttype uit live data en test-fixtures
-    source_document_type = (
-        raw_document.get("documentTypeLabel")
-        or raw_document.get("document_type_label")
-        or raw_document.get("documentType")
-        or raw_document.get("document_type")
-    )
-    
+    source_document_type = _resolve_source_document_type(raw_document)
     normalized_type = normalize_document_type(source_document_type)
-    
+
     source_obj_id = raw_document.get("objectId") or raw_document.get("source_object_id")
     source_object_id_str = str(source_obj_id) if source_obj_id is not None else None
 
@@ -102,14 +212,20 @@ def normalize_document(
         document_type=str(source_document_type).strip() if source_document_type else None,
         normalized_document_type=normalized_type.value,
         normalized_document_type_label=normalized_type.label,
-        filename=raw_document.get("fileName") or raw_document.get("filename"),
-        file_size_bytes=raw_document.get("fileSize") or raw_document.get("file_size_bytes"),
+        filename=(
+            raw_document.get("fileName")
+            or raw_document.get("filename")
+            or raw_document.get("file_name")
+            or _nested_mapping(raw_document, "file").get("fileName")
+            or _nested_mapping(raw_document, "file").get("name")
+        ),
+        file_size_bytes=_resolve_file_size(raw_document),
         publication_datetime=publication_datetime,
         publication_timezone=publication_timezone,
         is_confidential=bool(raw_document.get("confidential") or raw_document.get("is_confidential")),
         is_tabsign_document=bool(raw_document.get("isTabsignDocument") or raw_document.get("is_tabsign_document")),
-        source_url=download_url,
-        download_url=download_url,
+        source_url=document_url,
+        download_url=document_url,
         retrieved_at=retrieved_at,
         raw=raw_document,
     )
