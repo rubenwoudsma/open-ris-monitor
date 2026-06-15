@@ -6,12 +6,15 @@ from typing import Any, Literal, Protocol
 
 import requests
 
-
 RelationScanMode = Literal["full", "latest"]
 
 
 class RelationConnector(Protocol):
     """Connector methods needed by the raw relation harvest."""
+
+    def fetch_meetings_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]: ...
+
+    def fetch_latest_meetings(self, limit: int) -> list[dict[str, Any]]: ...
 
     def fetch_meeting_sessions_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]: ...
 
@@ -42,18 +45,11 @@ def _short_error(exc: BaseException) -> dict[str, str]:
 
 def _is_relation_fetch_error(exc: BaseException) -> bool:
     """Return whether a relation endpoint error should not fail the whole harvest."""
-
     return isinstance(exc, requests.RequestException | ValueError)
 
 
 def extract_meeting_id_from_session(session: dict[str, Any]) -> str | None:
-    """Extract the linked meeting ID from a meetingsession record.
-
-    GemeenteOplossingen exposes the useful meeting reference through
-    `container.meeting.id`. A defensive fallback to a top-level `meeting.id` is
-    included for source records that are shaped slightly differently.
-    """
-
+    """Extract the linked meeting ID from a legacy meetingsession record."""
     container = session.get("container")
     if isinstance(container, dict):
         meeting = container.get("meeting")
@@ -71,7 +67,6 @@ def extract_meeting_id_from_session(session: dict[str, Any]) -> str | None:
 
 def stable_unique(values: list[str]) -> list[str]:
     """Return unique values while preserving first-seen order."""
-
     seen: set[str] = set()
     result: list[str] = []
     for value in values:
@@ -82,6 +77,38 @@ def stable_unique(values: list[str]) -> list[str]:
     return result
 
 
+def fetch_meetings(
+    connector: RelationConnector,
+    *,
+    scan_limit: int,
+    batch_size: int = 100,
+    scan_mode: RelationScanMode = "full",
+) -> list[dict[str, Any]]:
+    """Fetch a bounded number of meetings from the documented /meetings endpoint."""
+    if scan_limit <= 0:
+        raise ValueError("scan_limit must be greater than 0")
+    if batch_size <= 0:
+        raise ValueError("batch_size must be greater than 0")
+    if scan_mode not in {"full", "latest"}:
+        raise ValueError("scan_mode must be 'full' or 'latest'")
+
+    if scan_mode == "latest":
+        return connector.fetch_latest_meetings(scan_limit)
+
+    meetings: list[dict[str, Any]] = []
+    offset = 0
+    while len(meetings) < scan_limit:
+        limit = min(batch_size, scan_limit - len(meetings))
+        page = connector.fetch_meetings_page(limit=limit, offset=offset)
+        if not page:
+            break
+        meetings.extend(page)
+        offset += len(page)
+        if len(page) < limit:
+            break
+    return meetings
+
+
 def fetch_meeting_sessions(
     connector: RelationConnector,
     *,
@@ -89,13 +116,11 @@ def fetch_meeting_sessions(
     batch_size: int = 100,
     scan_mode: RelationScanMode = "full",
 ) -> list[dict[str, Any]]:
-    """Fetch a bounded number of meetingsession records.
+    """Fetch legacy meetingsession records.
 
-    In latest mode the helper mirrors the document latest harvest and reads the
-    tail of the meetingsession endpoint. This keeps relation exports closer to
-    the latest documents that are published by the public profile.
+    This helper is retained for backwards compatibility, but #69 relation harvests
+    use the documented /meetings traversal instead of /meetingsessions.
     """
-
     if scan_limit <= 0:
         raise ValueError("scan_limit must be greater than 0")
     if batch_size <= 0:
@@ -108,7 +133,6 @@ def fetch_meeting_sessions(
 
     sessions: list[dict[str, Any]] = []
     offset = 0
-
     while len(sessions) < scan_limit:
         limit = min(batch_size, scan_limit - len(sessions))
         page = connector.fetch_meeting_sessions_page(limit=limit, offset=offset)
@@ -118,7 +142,6 @@ def fetch_meeting_sessions(
         offset += len(page)
         if len(page) < limit:
             break
-
     return sessions
 
 
@@ -132,16 +155,16 @@ def collect_raw_relation_harvest(
 ) -> dict[str, Any]:
     """Collect raw meetings, meeting items and document relation records.
 
-    Relation endpoints are optional enrichment for the public export. Individual
-    meeting, meeting-document, meeting-item, or item-document failures are
-    recorded and skipped so a transient source timeout does not fail the entire
-    bounded public harvest.
+    The relation scan uses the documented GemeenteOplossingen API traversal:
+    /meetings, /meetings/{id}/meetingitems, /meetings/{id}/documents, and
+    /meetingitems/{id}/documents. The legacy /meetingsessions endpoint is not
+    used for the primary relation harvest because it is undocumented and can fail
+    for deeper offsets.
     """
-
     if meeting_item_limit is not None and meeting_item_limit <= 0:
         raise ValueError("meeting_item_limit must be greater than 0 when provided")
 
-    meeting_sessions = fetch_meeting_sessions(
+    meetings = fetch_meetings(
         connector,
         scan_limit=meeting_scan_limit,
         batch_size=meeting_session_batch_size,
@@ -150,42 +173,19 @@ def collect_raw_relation_harvest(
     candidate_meeting_ids = stable_unique(
         [
             meeting_id
-            for session in meeting_sessions
-            if (meeting_id := extract_meeting_id_from_session(session)) is not None
+            for meeting in meetings
+            if (meeting_id := _as_source_id(meeting.get("id"))) is not None
         ]
     )
 
-    meetings: list[dict[str, Any]] = []
     skipped_meeting_ids: list[str] = []
     relation_errors: list[dict[str, Any]] = []
     meeting_items: list[dict[str, Any]] = []
     meeting_documents: list[dict[str, Any]] = []
     meeting_item_documents: list[dict[str, Any]] = []
-
     item_budget_remaining = meeting_item_limit
 
     for meeting_id in candidate_meeting_ids:
-        try:
-            meeting = connector.fetch_meeting(meeting_id)
-        except Exception as exc:
-            if not _is_relation_fetch_error(exc):
-                raise
-            skipped_meeting_ids.append(meeting_id)
-            relation_errors.append(
-                {
-                    "scope": "meeting",
-                    "meeting_id": meeting_id,
-                    "error": _short_error(exc),
-                }
-            )
-            continue
-
-        if meeting is None:
-            skipped_meeting_ids.append(meeting_id)
-            continue
-
-        meetings.append(meeting)
-
         try:
             documents_for_meeting = connector.fetch_meeting_documents(meeting_id)
         except Exception as exc:
@@ -258,7 +258,7 @@ def collect_raw_relation_harvest(
                 )
 
     return {
-        "meeting_sessions": meeting_sessions,
+        "meeting_sessions": [],
         "candidate_meeting_ids": candidate_meeting_ids,
         "skipped_meeting_ids": skipped_meeting_ids,
         "relation_errors": relation_errors,
@@ -267,8 +267,9 @@ def collect_raw_relation_harvest(
         "meeting_documents": meeting_documents,
         "meeting_item_documents": meeting_item_documents,
         "summary": {
+            "meeting_scan_source": "meetings",
             "meeting_session_scan_mode": meeting_session_scan_mode,
-            "meeting_sessions_seen": len(meeting_sessions),
+            "meeting_sessions_seen": 0,
             "candidate_meetings_seen": len(candidate_meeting_ids),
             "meetings_seen": len(meetings),
             "meetings_skipped": len(skipped_meeting_ids),
