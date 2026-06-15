@@ -20,6 +20,8 @@ interface ViewerState {
   currentPage: number;
   pageSize: number;
   sortMode: string;
+  meetingQuery: string;
+  meetingSortMode: "date-desc" | "date-asc";
   activeView: "documents" | "meetings";
 }
 
@@ -56,6 +58,9 @@ type RequiredElements = {
   documentDetailTitle: HTMLElement;
   documentDetailBody: HTMLElement;
   clearDocumentSelection: HTMLButtonElement;
+  meetingSearchInput: HTMLInputElement;
+  meetingSortSelect: HTMLSelectElement;
+  visibleMeetingsCount: HTMLElement;
   meetingsResultCount: HTMLElement;
   meetingsTableBody: HTMLElement;
   meetingDetail: HTMLElement;
@@ -73,6 +78,8 @@ const state: ViewerState = {
   currentPage: 1,
   pageSize: 50,
   sortMode: "date-desc",
+  meetingQuery: "",
+  meetingSortMode: "date-desc",
   activeView: "documents",
 };
 
@@ -115,6 +122,9 @@ const elements: RequiredElements = {
   documentDetailTitle: byId("document-detail-title"),
   documentDetailBody: byId("document-detail-body"),
   clearDocumentSelection: byId("clear-document-selection"),
+  meetingSearchInput: byId("meeting-search-input"),
+  meetingSortSelect: byId("meeting-sort-select"),
+  visibleMeetingsCount: byId("visible-meetings-count"),
   meetingsResultCount: byId("meetings-result-count"),
   meetingsTableBody: byId("meetings-table-body"),
   meetingDetail: byId("meeting-detail"),
@@ -382,7 +392,7 @@ function createDocumentAction(documentRecord: DocumentRecord, label = "Details",
       focusDocumentFromMeetingDetail(documentRecord);
       return;
     }
-    selectDocument(documentRecord, false);
+    focusDocumentFromDocumentList(documentRecord);
   });
   return button;
 }
@@ -398,6 +408,12 @@ function ensureDocumentVisible(documentRecord: DocumentRecord): void {
     index = state.filteredDocuments.findIndex((record) => documentIds(record).includes(documentId));
   }
   if (index >= 0) state.currentPage = Math.floor(index / state.pageSize) + 1;
+}
+
+function focusDocumentFromDocumentList(documentRecord: DocumentRecord): void {
+  updateHash(documentHashFor(documentRecord));
+  ensureDocumentVisible(documentRecord);
+  selectDocument(documentRecord, true);
 }
 
 function focusDocumentFromMeetingDetail(documentRecord: DocumentRecord): void {
@@ -649,7 +665,7 @@ function createDocumentTitleCell(documentRecord: DocumentRecord): HTMLTableCellE
   button.type = "button";
   button.className = "link-button document-title-button";
   button.textContent = getDocumentTitle(documentRecord);
-  button.addEventListener("click", () => selectDocument(documentRecord, false));
+  button.addEventListener("click", () => focusDocumentFromDocumentList(documentRecord));
   cell.appendChild(button);
   const labels = relationLabelsForDocument(documentRecord).slice(0, 3);
   if (labels.length > 0) {
@@ -838,13 +854,45 @@ function clearDocumentSelection(): void {
   renderDocuments();
 }
 
+function meetingSearchBlob(meeting: MeetingRecord): string {
+  const meetingId = getMeetingId(meeting);
+  const agendaText = agendaItemIdsForMeeting(meetingId)
+    .map((itemId) => state.indexes?.agendaItemsById.get(itemId))
+    .map((item) => [getAgendaItemTitle(item), item?.description, item?.number].filter(Boolean).join(" "))
+    .join(" ");
+  return [
+    getMeetingTitle(meeting),
+    getMeetingDate(meeting),
+    formatDate(getMeetingDate(meeting)),
+    meeting.description,
+    meeting.dmu_name,
+    meeting.location,
+    meetingId,
+    agendaText,
+  ].filter(Boolean).join(" ").toLowerCase();
+}
+
+function filteredMeetings(): MeetingRecord[] {
+  const query = state.meetingQuery.trim().toLowerCase();
+  const meetings = (state.data?.meetings ?? []).filter((meeting) => {
+    if (!query) return true;
+    return meetingSearchBlob(meeting).includes(query);
+  });
+  const byDate = (a: MeetingRecord, b: MeetingRecord) => timestamp(getMeetingDate(a)) - timestamp(getMeetingDate(b));
+  return [...meetings].sort((a, b) => state.meetingSortMode === "date-asc" ? byDate(a, b) : byDate(b, a));
+}
+
 function renderMeetings(): void {
-  const meetings = [...(state.data?.meetings ?? [])].sort((a, b) => timestamp(getMeetingDate(b)) - timestamp(getMeetingDate(a)));
+  const meetings = filteredMeetings();
+  elements.visibleMeetingsCount.textContent = `${meetings.length} zichtbaar`;
   elements.meetingsResultCount.textContent = `${meetings.length} vergadering(en)`;
   elements.meetingsTableBody.replaceChildren();
   if (meetings.length === 0) {
     const row = document.createElement("tr");
-    const cell = createCell("Geen vergaderingen gevonden in de huidige public export.");
+    const emptyText = state.meetingQuery.trim()
+      ? "Geen vergaderingen gevonden voor deze zoekopdracht."
+      : "Geen vergaderingen gevonden in de huidige public export.";
+    const cell = createCell(emptyText);
     cell.colSpan = 5;
     row.appendChild(cell);
     elements.meetingsTableBody.appendChild(row);
@@ -993,6 +1041,8 @@ function attachEvents(): void {
   elements.pageSizeSelect.addEventListener("change", () => { state.pageSize = Number(elements.pageSizeSelect.value) || 50; state.currentPage = 1; applyFilters(); });
   elements.clearDocumentSelection.addEventListener("click", () => clearDocumentSelection());
   elements.clearMeetingSelection.addEventListener("click", () => clearMeetingSelection());
+  elements.meetingSearchInput.addEventListener("input", () => { state.meetingQuery = elements.meetingSearchInput.value; renderMeetings(); });
+  elements.meetingSortSelect.addEventListener("change", () => { state.meetingSortMode = elements.meetingSortSelect.value as ViewerState["meetingSortMode"]; renderMeetings(); });
   for (const button of [elements.previousTop, elements.previousBottom]) button.addEventListener("click", () => { state.currentPage -= 1; renderDocuments(); });
   for (const button of [elements.nextTop, elements.nextBottom]) button.addEventListener("click", () => { state.currentPage += 1; renderDocuments(); });
 }
