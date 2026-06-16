@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import asdict, is_dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
@@ -11,8 +12,17 @@ from pydantic import BaseModel
 
 
 def _to_jsonable(record: Any) -> Any:
+    """Convert model-like records to JSON-serializable objects.
+
+    The public exporters receive a mix of Pydantic models, dataclasses and
+    plain dictionaries. Do not fall back to ``str(record)`` for dataclasses,
+    because that turns records such as HarvestRun into one JSON string instead
+    of a JSON object.
+    """
     if isinstance(record, BaseModel):
         return record.model_dump(mode="json")
+    if is_dataclass(record) and not isinstance(record, type):
+        return asdict(record)
     return record
 
 
