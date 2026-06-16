@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, is_dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
@@ -12,19 +11,8 @@ from pydantic import BaseModel
 
 
 def _to_jsonable(record: Any) -> Any:
-    """Convert supported model objects to JSON-serializable payloads."""
     if isinstance(record, BaseModel):
         return record.model_dump(mode="json")
-
-    to_dict = getattr(record, "to_dict", None)
-    if callable(to_dict):
-        payload = to_dict()
-        if isinstance(payload, dict):
-            return payload
-
-    if is_dataclass(record) and not isinstance(record, type):
-        return asdict(record)
-
     return record
 
 
@@ -66,8 +54,8 @@ def _as_public_date(value: Any) -> str | None:
 def _public_document_record(record: Any) -> dict[str, Any]:
     """Project a canonical document to the compact public export contract.
 
-    The public `documents.jsonl` stays small and stable, but keeps the source metadata
-    needed for traceability and clear UI rendering.
+    The public `documents.jsonl` stays small and stable, but keeps the source
+    metadata needed for traceability and clear UI rendering.
     """
     data = _to_jsonable(record)
     if not isinstance(data, dict):
@@ -79,7 +67,6 @@ def _public_document_record(record: Any) -> dict[str, Any]:
     download_url = _as_public_string(
         data.get("download_url") or data.get("url") or data.get("source_url")
     )
-
     return {
         "id": _as_public_string(data.get("id")) or "",
         "schema_version": _as_public_string(data.get("schema_version")) or "1.0.0",
@@ -100,6 +87,27 @@ def _public_document_record(record: Any) -> dict[str, Any]:
         "file_size_bytes": _as_public_int(data.get("file_size_bytes")),
         "text": data.get("text") if data.get("text") is not None else None,
     }
+
+
+def _jsonl_dumps(payload: Any) -> str:
+    """Serialize one JSONL record without physical line separators.
+
+    JSONL readers split on physical line boundaries. Python's ``splitlines()``
+    treats Unicode separators such as U+2028 and U+2029 as line breaks, even
+    though they are valid JSON string characters. Use ``ensure_ascii=True`` so
+    those characters, plus normal newlines and control characters, are escaped
+    and every record remains exactly one physical line.
+    """
+    encoded = json.dumps(
+        payload,
+        ensure_ascii=True,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=str,
+    )
+    if len(encoded.splitlines()) != 1:
+        raise ValueError("JSONL serialization produced physical line separators")
+    return encoded
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -127,5 +135,5 @@ def write_jsonl(path: Path, records: Iterable[Any]) -> None:
                 if path.name == "documents.jsonl"
                 else _to_jsonable(record)
             )
-            json.dump(payload, file, ensure_ascii=False, sort_keys=True, default=str)
+            file.write(_jsonl_dumps(payload))
             file.write("\n")
