@@ -62,19 +62,15 @@ jobs:
           if [ -z "$MUNICIPALITY" ]; then
             MUNICIPALITY="huizen"
           fi
-
           if [ -z "$PROFILE" ]; then
             PROFILE="public"
           fi
-
           if [ -z "$ENRICH_CHECKSUMS" ]; then
             ENRICH_CHECKSUMS="false"
           fi
-
           if [ -z "$CHECKSUM_MAX_DOCUMENTS" ]; then
             CHECKSUM_MAX_DOCUMENTS="50"
           fi
-
           if [ -z "$COMMIT_PUBLIC" ]; then
             COMMIT_PUBLIC="true"
           fi
@@ -133,6 +129,7 @@ jobs:
               "meeting_documents",
               "meeting_item_documents",
           ]
+
           latest = json.loads(Path("data/public/latest.json").read_text(encoding="utf-8"))
           outputs = latest.get("outputs", {})
           missing = [key for key in required_outputs if not outputs.get(key)]
@@ -140,6 +137,7 @@ jobs:
               raise SystemExit(f"latest.json mist relationele outputs: {missing}")
           if latest.get("relations_enabled") is not True:
               raise SystemExit("latest.json heeft relations_enabled niet op true")
+
           for output_name in required_outputs:
               output_path = Path("data/public") / outputs[output_name]
               if not output_path.exists():
@@ -150,32 +148,40 @@ jobs:
                           json.loads(line)
                       except json.JSONDecodeError as exc:
                           raise SystemExit(f"Ongeldige JSONL in {output_path} regel {line_number}: {exc}") from exc
+
           print("Public exports en latest.json zijn consistent")
           PY
 
       - name: Show generated output
+        if: always()
         run: |
           echo "Raw output, artifact only:"
-          find data/raw/latest -maxdepth 1 -type f -print | sort
+          find data/raw/latest -maxdepth 1 -type f -print 2>/dev/null | sort || true
           echo "Public output, commit candidate:"
-          find data/public -maxdepth 2 -type f -print | sort
+          find data/public -maxdepth 2 -type f -print 2>/dev/null | sort || true
           echo "Latest summary:"
-          cat data/public/latest.json
+          if [ -f data/public/latest.json ]; then
+            cat data/public/latest.json
+          else
+            echo "data/public/latest.json not found"
+          fi
 
       - name: Upload raw harvest artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: raw-harvest-${{ steps.options.outputs.municipality }}-${{ steps.options.outputs.profile }}
           path: data/raw/latest/
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 7
 
       - name: Upload public export artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: public-export-${{ steps.options.outputs.municipality }}-${{ steps.options.outputs.profile }}
           path: data/public/
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 14
 
       - name: Commit public export output
