@@ -1,7 +1,7 @@
 """Shared runtime configuration for bounded harvest profiles.
 
-The profiles are intentionally small and explicit. They describe how a run
-should behave operationally, without changing the public export contract.
+The profiles are intentionally small and explicit. They describe how a run should
+behave operationally, without changing the public export contract.
 """
 
 from __future__ import annotations
@@ -46,6 +46,17 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         meeting_session_batch_size=50,
         meeting_item_limit=200,
     ),
+    "latest": HarvestProfile(
+        mode="latest",
+        limit=250,
+        batch_size=100,
+        max_documents=None,
+        include_relations=True,
+        meeting_scan_limit=250,
+        meeting_session_batch_size=100,
+        meeting_item_limit=1000,
+    ),
+    # Backwards-compatible name for the public latest/incremental export profile.
     "public": HarvestProfile(
         mode="latest",
         limit=250,
@@ -57,6 +68,17 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         meeting_item_limit=1000,
     ),
     "backfill": HarvestProfile(
+        mode="full",
+        limit=1000,
+        batch_size=100,
+        max_documents=None,
+        include_relations=True,
+        meeting_scan_limit=1000,
+        meeting_session_batch_size=100,
+        meeting_item_limit=5000,
+    ),
+    # Explicit broad recomputation alias for manual workflow_dispatch runs.
+    "full": HarvestProfile(
         mode="full",
         limit=1000,
         batch_size=100,
@@ -82,6 +104,7 @@ def resolve_harvest_options(
     applied by key presence, so values such as ``None`` remain valid explicit
     overrides for unbounded backfill-style runs.
     """
+
     if profile_name is None:
         resolved = asdict(LEGACY_DEFAULTS)
     else:
@@ -97,4 +120,5 @@ def resolve_harvest_options(
         if key not in PROFILE_OPTION_KEYS:
             raise ValueError(f"Unknown harvest profile option: {key}")
         resolved[key] = value
+
     return resolved
