@@ -104,9 +104,7 @@ class GemeenteOplossingenConnector:
         response = self._request(path, params=params)
         data = response.json()
         if not isinstance(data, dict):
-            raise ValueError(
-                f"Expected JSON object from {response.url}, got {type(data).__name__}"
-            )
+            raise ValueError(f"Expected JSON object from {response.url}, got {type(data).__name__}")
         return data
 
     def _get_json_or_none_on_404(
@@ -133,11 +131,50 @@ class GemeenteOplossingenConnector:
     @staticmethod
     def _result_list(payload: dict[str, Any], field_name: str) -> list[dict[str, Any]]:
         result = GemeenteOplossingenConnector._result(payload)
-        records = result.get(field_name, [])
+        records = result.get(field_name)
+        if records is None and field_name != "model":
+            records = result.get("model")
+        if records is None:
+            records = []
         if not isinstance(records, list):
             raise ValueError(f"Expected response field 'result.{field_name}' to be a list")
         if not all(isinstance(record, dict) for record in records):
             raise ValueError(f"Expected every item in 'result.{field_name}' to be an object")
+        return records
+
+    def _fetch_paged_result_list(
+        self,
+        path: str,
+        field_name: str,
+        *,
+        page_size: int = 100,
+        params: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        """Fetch all records from a paginated nested relation endpoint.
+
+        Several Open Raadsinformatie relation endpoints accept ``offset`` and
+        ``limit`` but do not expose a dedicated count method in the connector.
+        Walking pages until a short or empty page prevents silently missing
+        meeting-level or agenda-item-level relations when a meeting has more
+        records than the API default page size.
+        """
+        if page_size <= 0:
+            raise ValueError("page_size must be greater than 0")
+
+        records: list[dict[str, Any]] = []
+        offset = 0
+        base_params = dict(params or {})
+
+        while True:
+            page_params = {**base_params, "limit": page_size, "offset": offset}
+            page = self._result_list(self._get_json(path, params=page_params), field_name)
+            if not page:
+                break
+            records.extend(page)
+            if len(page) < page_size:
+                break
+            offset += len(page)
+
         return records
 
     def fetch_document_count(self) -> int:
@@ -187,23 +224,85 @@ class GemeenteOplossingenConnector:
                 break
         return documents
 
-    def fetch_meeting_count(self) -> int:
-        """Fetch the count from the documented /meetings endpoint."""
-        payload = self._get_json("meetings", params={"limit": 1, "offset": 0})
-        result = self._result(payload)
-        total_count = result.get("totalCount", 0)
-        return int(total_count)
+    def fetch_meeting_count(
+        self,
+        *,
+        date_from: str | None = None,
+        date_to: str | None = None,
+    ) -> int:
+        """Fetch the count of documented /meetings records.
 
-    def fetch_meetings_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
+        Relation backfill should use this documented endpoint for meeting
+        discovery instead of the legacy, undocumented /meetingsessions route.
+        """
+        params: dict[str, Any] = {"limit": 1, "offset": 0}
+        if date_from is not None:
+            params["date_from"] = date_from
+        if date_to is not None:
+            params["date_to"] = date_to
+        payload = self._get_json("meetings", params=params)
+        result = self._result(payload)
+        if "totalCount" in result:
+            return int(result.get("totalCount", 0))
+        return len(self._result_list(payload, "meetings"))
+
+    def fetch_meetings_page(
+        self,
+        *,
+        limit: int,
+        offset: int,
+        date_from: str | None = None,
+        date_to: str | None = None,
+    ) -> list[dict[str, Any]]:
         """Fetch one page from the documented /meetings endpoint."""
         if limit <= 0:
             raise ValueError("limit must be greater than 0")
         if offset < 0:
             raise ValueError("offset must be 0 or greater")
-        payload = self._get_json("meetings", params={"limit": limit, "offset": offset})
+        params: dict[str, Any] = {"limit": limit, "offset": offset}
+        if date_from is not None:
+            params["date_from"] = date_from
+        if date_to is not None:
+            params["date_to"] = date_to
+        payload = self._get_json("meetings", params=params)
         return self._result_list(payload, "meetings")
 
+    def fetch_all_meetings(
+        self,
+        *,
+        batch_size: int = 100,
+        max_meetings: int | None = None,
+        date_from: str | None = None,
+        date_to: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Fetch meetings through the documented /meetings pagination path."""
+        if batch_size <= 0:
+            raise ValueError("batch_size must be greater than 0")
+        if max_meetings is not None and max_meetings <= 0:
+            raise ValueError("max_meetings must be greater than 0 when provided")
+
+        total_count = self.fetch_meeting_count(date_from=date_from, date_to=date_to)
+        target_count = min(total_count, max_meetings) if max_meetings is not None else total_count
+        meetings: list[dict[str, Any]] = []
+        offset = 0
+        while offset < target_count:
+            limit = min(batch_size, target_count - offset)
+            page = self.fetch_meetings_page(
+                limit=limit,
+                offset=offset,
+                date_from=date_from,
+                date_to=date_to,
+            )
+            if not page:
+                break
+            meetings.extend(page)
+            offset += len(page)
+            if len(page) < limit:
+                break
+        return meetings
+
     def fetch_latest_meetings(self, limit: int) -> list[dict[str, Any]]:
+        """Fetch latest meetings via the documented /meetings endpoint."""
         if limit <= 0:
             raise ValueError("limit must be greater than 0")
         total_count = self.fetch_meeting_count()
@@ -211,14 +310,57 @@ class GemeenteOplossingenConnector:
         return self.fetch_meetings_page(limit=limit, offset=offset)
 
     def fetch_meeting_session_count(self) -> int:
-        """Legacy /meetingsessions support, not used by the #69 relation harvest."""
+        """Fetch count from the legacy /meetingsessions endpoint.
+
+        This method keeps its historical behavior for backwards compatibility
+        with older callers and tests. New relation discovery should prefer
+        fetch_meeting_count(), fetch_meetings_page(), fetch_all_meetings(),
+        or fetch_latest_meetings().
+        """
+        return self.fetch_legacy_meeting_session_count()
+
+    def fetch_meeting_sessions_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
+        """Fetch one page from the undocumented legacy /meetingsessions endpoint.
+
+        This method keeps its historical behavior for backwards compatibility
+        with existing callers and tests. New relation backfill discovery should
+        not call this method. Use fetch_meetings_page(), fetch_all_meetings(),
+        fetch_latest_meetings(), or fetch_latest_meeting_sessions() instead.
+        """
+        return self.fetch_legacy_meeting_sessions_page(limit=limit, offset=offset)
+
+    def fetch_latest_meeting_sessions(self, limit: int) -> list[dict[str, Any]]:
+        """Fetch latest records from the legacy /meetingsessions endpoint.
+
+        This method intentionally keeps its historical tail-offset behavior so
+        existing callers and tests remain compatible. New relation discovery
+        should avoid this legacy endpoint and call fetch_latest_meetings() or
+        fetch_all_meetings() instead.
+        """
+        if limit <= 0:
+            raise ValueError("limit must be greater than 0")
+        total_count = self.fetch_meeting_session_count()
+        offset = max(0, total_count - limit)
+        return self.fetch_meeting_sessions_page(limit=limit, offset=offset)
+
+    def fetch_legacy_meeting_session_count(self) -> int:
+        """Fetch count from the undocumented legacy /meetingsessions endpoint.
+
+        This is intentionally isolated for diagnostics or emergency fallback.
+        Relation backfill should prefer the documented /meetings methods above.
+        """
         payload = self._get_json("meetingsessions", params={"limit": 1, "offset": 0})
         result = self._result(payload)
         total_count = result.get("totalCount", 0)
         return int(total_count)
 
-    def fetch_meeting_sessions_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
-        """Fetch one page from legacy /meetingsessions."""
+    def fetch_legacy_meeting_sessions_page(
+        self,
+        *,
+        limit: int,
+        offset: int,
+    ) -> list[dict[str, Any]]:
+        """Fetch one page from the undocumented legacy /meetingsessions endpoint."""
         if limit <= 0:
             raise ValueError("limit must be greater than 0")
         if offset < 0:
@@ -226,12 +368,13 @@ class GemeenteOplossingenConnector:
         payload = self._get_json("meetingsessions", params={"limit": limit, "offset": offset})
         return self._result_list(payload, "meetingsessions")
 
-    def fetch_latest_meeting_sessions(self, limit: int) -> list[dict[str, Any]]:
+    def fetch_latest_legacy_meeting_sessions(self, limit: int) -> list[dict[str, Any]]:
+        """Fetch latest records from the undocumented legacy /meetingsessions endpoint."""
         if limit <= 0:
             raise ValueError("limit must be greater than 0")
-        total_count = self.fetch_meeting_session_count()
+        total_count = self.fetch_legacy_meeting_session_count()
         offset = max(0, total_count - limit)
-        return self.fetch_meeting_sessions_page(limit=limit, offset=offset)
+        return self.fetch_legacy_meeting_sessions_page(limit=limit, offset=offset)
 
     def fetch_meeting(self, meeting_id: int | str) -> dict[str, Any] | None:
         """Fetch /meetings/{meeting_id}, returning None for 404 responses."""
@@ -245,19 +388,16 @@ class GemeenteOplossingenConnector:
         return meeting
 
     def fetch_meeting_items(self, meeting_id: int | str) -> list[dict[str, Any]]:
-        """Fetch /meetings/{meeting_id}/meetingitems."""
-        payload = self._get_json(f"meetings/{meeting_id}/meetingitems")
-        return self._result_list(payload, "meetingitems")
+        """Fetch all pages from /meetings/{meeting_id}/meetingitems."""
+        return self._fetch_paged_result_list(f"meetings/{meeting_id}/meetingitems", "meetingitems")
 
     def fetch_meeting_documents(self, meeting_id: int | str) -> list[dict[str, Any]]:
-        """Fetch /meetings/{meeting_id}/documents."""
-        payload = self._get_json(f"meetings/{meeting_id}/documents")
-        return self._result_list(payload, "documents")
+        """Fetch all pages from /meetings/{meeting_id}/documents."""
+        return self._fetch_paged_result_list(f"meetings/{meeting_id}/documents", "documents")
 
     def fetch_meeting_item_documents(self, meeting_item_id: int | str) -> list[dict[str, Any]]:
-        """Fetch /meetingitems/{meeting_item_id}/documents."""
-        payload = self._get_json(f"meetingitems/{meeting_item_id}/documents")
-        return self._result_list(payload, "documents")
+        """Fetch all pages from /meetingitems/{meeting_item_id}/documents."""
+        return self._fetch_paged_result_list(f"meetingitems/{meeting_item_id}/documents", "documents")
 
     def build_document_download_url(self, document_id: int | str) -> str:
         return f"{self.base_url}documents/{document_id}/download"
@@ -265,6 +405,15 @@ class GemeenteOplossingenConnector:
     def download_document(self, document_id: int | str) -> bytes:
         response = self._request(f"documents/{document_id}/download")
         return response.content
+
+
+def _meeting_to_legacy_meeting_session(meeting: dict[str, Any]) -> dict[str, Any]:
+    """Return a minimal legacy session wrapper for documented /meetings records."""
+    return {
+        "id": meeting.get("id"),
+        "meeting": meeting,
+        "container": {"meeting": meeting},
+    }
 
 
 def _parse_retry_after_seconds(response: requests.Response | None) -> float | None:
