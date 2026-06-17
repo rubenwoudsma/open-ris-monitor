@@ -22,6 +22,8 @@ interface ViewerState {
   sortMode: string;
   meetingQuery: string;
   meetingSortMode: "date-desc" | "date-asc";
+  meetingCurrentPage: number;
+  meetingPageSize: number;
   activeView: "documents" | "meetings";
 }
 
@@ -60,9 +62,16 @@ type RequiredElements = {
   clearDocumentSelection: HTMLButtonElement;
   meetingSearchInput: HTMLInputElement;
   meetingSortSelect: HTMLSelectElement;
+  meetingPageSizeSelect: HTMLSelectElement;
   visibleMeetingsCount: HTMLElement;
   meetingsResultCount: HTMLElement;
   meetingsTableBody: HTMLElement;
+  previousMeetingTop: HTMLButtonElement;
+  nextMeetingTop: HTMLButtonElement;
+  meetingPageInfoTop: HTMLElement;
+  previousMeetingBottom: HTMLButtonElement;
+  nextMeetingBottom: HTMLButtonElement;
+  meetingPageInfoBottom: HTMLElement;
   meetingDetail: HTMLElement;
   meetingDetailTitle: HTMLElement;
   meetingDetailBody: HTMLElement;
@@ -80,6 +89,8 @@ const state: ViewerState = {
   sortMode: "date-desc",
   meetingQuery: "",
   meetingSortMode: "date-desc",
+  meetingCurrentPage: 1,
+  meetingPageSize: 25,
   activeView: "documents",
 };
 
@@ -124,9 +135,16 @@ const elements: RequiredElements = {
   clearDocumentSelection: byId("clear-document-selection"),
   meetingSearchInput: byId("meeting-search-input"),
   meetingSortSelect: byId("meeting-sort-select"),
+  meetingPageSizeSelect: byId("meeting-page-size-select"),
   visibleMeetingsCount: byId("visible-meetings-count"),
   meetingsResultCount: byId("meetings-result-count"),
   meetingsTableBody: byId("meetings-table-body"),
+  previousMeetingTop: byId("previous-meeting-page-top"),
+  nextMeetingTop: byId("next-meeting-page-top"),
+  meetingPageInfoTop: byId("meeting-page-info-top"),
+  previousMeetingBottom: byId("previous-meeting-page-bottom"),
+  nextMeetingBottom: byId("next-meeting-page-bottom"),
+  meetingPageInfoBottom: byId("meeting-page-info-bottom"),
   meetingDetail: byId("meeting-detail"),
   meetingDetailTitle: byId("meeting-detail-title"),
   meetingDetailBody: byId("meeting-detail-body"),
@@ -882,12 +900,33 @@ function filteredMeetings(): MeetingRecord[] {
   return [...meetings].sort((a, b) => state.meetingSortMode === "date-asc" ? byDate(a, b) : byDate(b, a));
 }
 
+function ensureMeetingVisible(meetingId: string): void {
+  const meetings = filteredMeetings();
+  const index = meetings.findIndex((meeting) => getMeetingId(meeting) === meetingId);
+  if (index >= 0) state.meetingCurrentPage = Math.floor(index / state.meetingPageSize) + 1;
+}
+
 function renderMeetings(): void {
   const meetings = filteredMeetings();
-  elements.visibleMeetingsCount.textContent = `${meetings.length} zichtbaar`;
-  elements.meetingsResultCount.textContent = `${meetings.length} vergadering(en)`;
+  const total = meetings.length;
+  const totalPages = Math.max(1, Math.ceil(total / state.meetingPageSize));
+  state.meetingCurrentPage = Math.min(Math.max(state.meetingCurrentPage, 1), totalPages);
+  const start = (state.meetingCurrentPage - 1) * state.meetingPageSize;
+  const pageMeetings = meetings.slice(start, start + state.meetingPageSize);
+
+  elements.visibleMeetingsCount.textContent = total > 0
+    ? `${start + 1}-${start + pageMeetings.length} van ${total} zichtbaar`
+    : "0 zichtbaar";
+  elements.meetingsResultCount.textContent = `${total} vergadering(en)`;
   elements.meetingsTableBody.replaceChildren();
-  if (meetings.length === 0) {
+
+  const pageText = `Pagina ${state.meetingCurrentPage} van ${totalPages}`;
+  elements.meetingPageInfoTop.textContent = pageText;
+  elements.meetingPageInfoBottom.textContent = pageText;
+  for (const button of [elements.previousMeetingTop, elements.previousMeetingBottom]) button.disabled = state.meetingCurrentPage <= 1;
+  for (const button of [elements.nextMeetingTop, elements.nextMeetingBottom]) button.disabled = state.meetingCurrentPage >= totalPages;
+
+  if (pageMeetings.length === 0) {
     const row = document.createElement("tr");
     const emptyText = state.meetingQuery.trim()
       ? "Geen vergaderingen gevonden voor deze zoekopdracht."
@@ -898,7 +937,7 @@ function renderMeetings(): void {
     elements.meetingsTableBody.appendChild(row);
     return;
   }
-  for (const meeting of meetings) {
+  for (const meeting of pageMeetings) {
     const meetingId = getMeetingId(meeting);
     const agendaIds = agendaItemIdsForMeeting(meetingId);
     const documentIdsForMeeting = linkedDocumentIdsForMeeting(meetingId);
@@ -972,6 +1011,7 @@ function renderMeetingDetail(meeting: MeetingRecord): void {
 
 function selectMeeting(meeting: MeetingRecord, scroll = true): void {
   state.selectedMeetingId = getMeetingId(meeting) || null;
+  if (state.selectedMeetingId) ensureMeetingVisible(state.selectedMeetingId);
   renderMeetingDetail(meeting);
   renderMeetings();
   if (scroll) elements.meetingDetail.scrollIntoView({ block: "start", behavior: "smooth" });
@@ -1041,10 +1081,25 @@ function attachEvents(): void {
   elements.pageSizeSelect.addEventListener("change", () => { state.pageSize = Number(elements.pageSizeSelect.value) || 50; state.currentPage = 1; applyFilters(); });
   elements.clearDocumentSelection.addEventListener("click", () => clearDocumentSelection());
   elements.clearMeetingSelection.addEventListener("click", () => clearMeetingSelection());
-  elements.meetingSearchInput.addEventListener("input", () => { state.meetingQuery = elements.meetingSearchInput.value; renderMeetings(); });
-  elements.meetingSortSelect.addEventListener("change", () => { state.meetingSortMode = elements.meetingSortSelect.value as ViewerState["meetingSortMode"]; renderMeetings(); });
+  elements.meetingSearchInput.addEventListener("input", () => {
+    state.meetingQuery = elements.meetingSearchInput.value;
+    state.meetingCurrentPage = 1;
+    renderMeetings();
+  });
+  elements.meetingSortSelect.addEventListener("change", () => {
+    state.meetingSortMode = elements.meetingSortSelect.value as ViewerState["meetingSortMode"];
+    state.meetingCurrentPage = 1;
+    renderMeetings();
+  });
+  elements.meetingPageSizeSelect.addEventListener("change", () => {
+    state.meetingPageSize = Number(elements.meetingPageSizeSelect.value) || 25;
+    state.meetingCurrentPage = 1;
+    renderMeetings();
+  });
   for (const button of [elements.previousTop, elements.previousBottom]) button.addEventListener("click", () => { state.currentPage -= 1; renderDocuments(); });
   for (const button of [elements.nextTop, elements.nextBottom]) button.addEventListener("click", () => { state.currentPage += 1; renderDocuments(); });
+  for (const button of [elements.previousMeetingTop, elements.previousMeetingBottom]) button.addEventListener("click", () => { state.meetingCurrentPage -= 1; renderMeetings(); });
+  for (const button of [elements.nextMeetingTop, elements.nextMeetingBottom]) button.addEventListener("click", () => { state.meetingCurrentPage += 1; renderMeetings(); });
 }
 
 async function init(): Promise<void> {
