@@ -152,6 +152,14 @@
                     <option value="date-asc">Datum, oudste eerst</option>
                   </select>
                 </label>
+                <label class="control control--small">
+                  <span>Per pagina</span>
+                  <select id="meeting-page-size-select">
+                    <option selected>25</option>
+                    <option>50</option>
+                    <option>100</option>
+                  </select>
+                </label>
               </form>
             </section>
 
@@ -176,6 +184,11 @@
                 </div>
                 <p id="meetings-result-count" class="count-pill">-</p>
               </div>
+              <nav class="pagination" aria-label="Paginering boven vergaderingen">
+                <button id="previous-meeting-page-top" type="button">Vorige</button>
+                <span id="meeting-page-info-top">Pagina 1 van 1</span>
+                <button id="next-meeting-page-top" type="button">Volgende</button>
+              </nav>
               <div class="table-wrapper">
                 <table class="meetings-table">
                   <thead>
@@ -190,6 +203,11 @@
                   <tbody id="meetings-table-body"><tr><td colspan="5">Vergaderingen worden geladen...</td></tr></tbody>
                 </table>
               </div>
+              <nav class="pagination" aria-label="Paginering onder vergaderingen">
+                <button id="previous-meeting-page-bottom" type="button">Vorige</button>
+                <span id="meeting-page-info-bottom">Pagina 1 van 1</span>
+                <button id="next-meeting-page-bottom" type="button">Volgende</button>
+              </nav>
             </section>
           </div>
         </div>
