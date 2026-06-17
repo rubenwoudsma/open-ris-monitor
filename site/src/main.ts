@@ -27,6 +27,13 @@ interface ViewerState {
   activeView: "documents" | "meetings";
 }
 
+interface DerivedCaches {
+  documentRelationLabelsByKey: Map<string, string[]>;
+  documentSearchBlobByKey: Map<string, string>;
+  meetingSearchBlobById: Map<string, string>;
+  filteredMeetingsByKey: Map<string, MeetingRecord[]>;
+}
+
 type RequiredElements = {
   statusMessage: HTMLElement;
   municipality: HTMLElement;
@@ -93,6 +100,20 @@ const state: ViewerState = {
   meetingPageSize: 25,
   activeView: "documents",
 };
+
+const derivedCaches: DerivedCaches = {
+  documentRelationLabelsByKey: new Map<string, string[]>(),
+  documentSearchBlobByKey: new Map<string, string>(),
+  meetingSearchBlobById: new Map<string, string>(),
+  filteredMeetingsByKey: new Map<string, MeetingRecord[]>(),
+};
+
+function clearDerivedCaches(): void {
+  derivedCaches.documentRelationLabelsByKey.clear();
+  derivedCaches.documentSearchBlobByKey.clear();
+  derivedCaches.meetingSearchBlobById.clear();
+  derivedCaches.filteredMeetingsByKey.clear();
+}
 
 function byId<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
@@ -169,6 +190,10 @@ function documentIds(documentRecord: DocumentRecord): string[] {
 
 function getDocumentTitle(documentRecord: DocumentRecord): string {
   return pick(documentRecord.title, documentRecord.description, documentRecord.filename) || "Geen titel";
+}
+
+function getDocumentCacheKey(documentRecord: DocumentRecord): string {
+  return documentIds(documentRecord).join("|") || getDocumentTitle(documentRecord);
 }
 
 function getDocumentDate(documentRecord: DocumentRecord): string {
@@ -320,6 +345,10 @@ function relatedAgendaItemIds(documentRecord: DocumentRecord): string[] {
 
 function relationLabelsForDocument(documentRecord: DocumentRecord): string[] {
   if (!state.indexes) return [];
+  const cacheKey = getDocumentCacheKey(documentRecord);
+  const cached = derivedCaches.documentRelationLabelsByKey.get(cacheKey);
+  if (cached) return cached;
+
   const labels: string[] = [];
   for (const meetingId of relatedMeetingIds(documentRecord)) {
     const meeting = state.indexes.meetingsById.get(meetingId);
@@ -329,7 +358,9 @@ function relationLabelsForDocument(documentRecord: DocumentRecord): string[] {
     const item = state.indexes.agendaItemsById.get(itemId);
     labels.push(getAgendaItemTitle(item));
   }
-  return uniqueValues(labels);
+  const uniqueLabels = uniqueValues(labels);
+  derivedCaches.documentRelationLabelsByKey.set(cacheKey, uniqueLabels);
+  return uniqueLabels;
 }
 
 function relatedVersions(documentRecord: DocumentRecord): DocumentVersionRecord[] {
@@ -611,7 +642,11 @@ function populateTypeFilter(): void {
 }
 
 function searchBlob(documentRecord: DocumentRecord): string {
-  return [
+  const cacheKey = getDocumentCacheKey(documentRecord);
+  const cached = derivedCaches.documentSearchBlobByKey.get(cacheKey);
+  if (cached !== undefined) return cached;
+
+  const blob = [
     getDocumentTitle(documentRecord),
     documentRecord.description,
     documentRecord.filename,
@@ -622,6 +657,8 @@ function searchBlob(documentRecord: DocumentRecord): string {
     documentRecord.source_object_id,
     relationLabelsForDocument(documentRecord).join(" "),
   ].filter(Boolean).join(" ").toLowerCase();
+  derivedCaches.documentSearchBlobByKey.set(cacheKey, blob);
+  return blob;
 }
 
 function sortDocuments(records: DocumentRecord[]): DocumentRecord[] {
@@ -874,11 +911,14 @@ function clearDocumentSelection(): void {
 
 function meetingSearchBlob(meeting: MeetingRecord): string {
   const meetingId = getMeetingId(meeting);
+  const cached = derivedCaches.meetingSearchBlobById.get(meetingId);
+  if (cached !== undefined) return cached;
+
   const agendaText = agendaItemIdsForMeeting(meetingId)
     .map((itemId) => state.indexes?.agendaItemsById.get(itemId))
     .map((item) => [getAgendaItemTitle(item), item?.description, item?.number].filter(Boolean).join(" "))
     .join(" ");
-  return [
+  const blob = [
     getMeetingTitle(meeting),
     getMeetingDate(meeting),
     formatDate(getMeetingDate(meeting)),
@@ -888,16 +928,24 @@ function meetingSearchBlob(meeting: MeetingRecord): string {
     meetingId,
     agendaText,
   ].filter(Boolean).join(" ").toLowerCase();
+  derivedCaches.meetingSearchBlobById.set(meetingId, blob);
+  return blob;
 }
 
 function filteredMeetings(): MeetingRecord[] {
   const query = state.meetingQuery.trim().toLowerCase();
+  const cacheKey = `${query}|${state.meetingSortMode}`;
+  const cached = derivedCaches.filteredMeetingsByKey.get(cacheKey);
+  if (cached) return cached;
+
   const meetings = (state.data?.meetings ?? []).filter((meeting) => {
     if (!query) return true;
     return meetingSearchBlob(meeting).includes(query);
   });
   const byDate = (a: MeetingRecord, b: MeetingRecord) => timestamp(getMeetingDate(a)) - timestamp(getMeetingDate(b));
-  return [...meetings].sort((a, b) => state.meetingSortMode === "date-asc" ? byDate(a, b) : byDate(b, a));
+  const sortedMeetings = [...meetings].sort((a, b) => state.meetingSortMode === "date-asc" ? byDate(a, b) : byDate(b, a));
+  derivedCaches.filteredMeetingsByKey.set(cacheKey, sortedMeetings);
+  return sortedMeetings;
 }
 
 function ensureMeetingVisible(meetingId: string): void {
@@ -1117,6 +1165,7 @@ async function init(): Promise<void> {
     state.data.meetingDocumentRelations,
     state.data.meetingItemDocumentRelations,
   );
+  clearDerivedCaches();
   populateTypeFilter();
   renderSummary();
   applyFilters();

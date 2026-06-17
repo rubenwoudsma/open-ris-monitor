@@ -16,6 +16,18 @@ const state = {
     meetingPageSize: 25,
     activeView: "documents",
 };
+const derivedCaches = {
+    documentRelationLabelsByKey: new Map(),
+    documentSearchBlobByKey: new Map(),
+    meetingSearchBlobById: new Map(),
+    filteredMeetingsByKey: new Map(),
+};
+function clearDerivedCaches() {
+    derivedCaches.documentRelationLabelsByKey.clear();
+    derivedCaches.documentSearchBlobByKey.clear();
+    derivedCaches.meetingSearchBlobById.clear();
+    derivedCaches.filteredMeetingsByKey.clear();
+}
 function byId(id) {
     const element = document.getElementById(id);
     if (!element)
@@ -86,6 +98,9 @@ function documentIds(documentRecord) {
 }
 function getDocumentTitle(documentRecord) {
     return pick(documentRecord.title, documentRecord.description, documentRecord.filename) || "Geen titel";
+}
+function getDocumentCacheKey(documentRecord) {
+    return documentIds(documentRecord).join("|") || getDocumentTitle(documentRecord);
 }
 function getDocumentDate(documentRecord) {
     return pick(documentRecord.publication_datetime, documentRecord.date_published, documentRecord.publication_date, documentRecord.document_date, documentRecord.date, documentRecord.retrieved_at);
@@ -197,6 +212,10 @@ function relatedAgendaItemIds(documentRecord) {
 function relationLabelsForDocument(documentRecord) {
     if (!state.indexes)
         return [];
+    const cacheKey = getDocumentCacheKey(documentRecord);
+    const cached = derivedCaches.documentRelationLabelsByKey.get(cacheKey);
+    if (cached)
+        return cached;
     const labels = [];
     for (const meetingId of relatedMeetingIds(documentRecord)) {
         const meeting = state.indexes.meetingsById.get(meetingId);
@@ -206,7 +225,9 @@ function relationLabelsForDocument(documentRecord) {
         const item = state.indexes.agendaItemsById.get(itemId);
         labels.push(getAgendaItemTitle(item));
     }
-    return uniqueValues(labels);
+    const uniqueLabels = uniqueValues(labels);
+    derivedCaches.documentRelationLabelsByKey.set(cacheKey, uniqueLabels);
+    return uniqueLabels;
 }
 function relatedVersions(documentRecord) {
     const ids = new Set(documentIds(documentRecord));
@@ -476,7 +497,11 @@ function populateTypeFilter() {
     }
 }
 function searchBlob(documentRecord) {
-    return [
+    const cacheKey = getDocumentCacheKey(documentRecord);
+    const cached = derivedCaches.documentSearchBlobByKey.get(cacheKey);
+    if (cached !== undefined)
+        return cached;
+    const blob = [
         getDocumentTitle(documentRecord),
         documentRecord.description,
         documentRecord.filename,
@@ -487,6 +512,8 @@ function searchBlob(documentRecord) {
         documentRecord.source_object_id,
         relationLabelsForDocument(documentRecord).join(" "),
     ].filter(Boolean).join(" ").toLowerCase();
+    derivedCaches.documentSearchBlobByKey.set(cacheKey, blob);
+    return blob;
 }
 function sortDocuments(records) {
     const sorted = [...records];
@@ -733,11 +760,14 @@ function clearDocumentSelection() {
 }
 function meetingSearchBlob(meeting) {
     const meetingId = getMeetingId(meeting);
+    const cached = derivedCaches.meetingSearchBlobById.get(meetingId);
+    if (cached !== undefined)
+        return cached;
     const agendaText = agendaItemIdsForMeeting(meetingId)
         .map((itemId) => state.indexes?.agendaItemsById.get(itemId))
         .map((item) => [getAgendaItemTitle(item), item?.description, item?.number].filter(Boolean).join(" "))
         .join(" ");
-    return [
+    const blob = [
         getMeetingTitle(meeting),
         getMeetingDate(meeting),
         formatDate(getMeetingDate(meeting)),
@@ -747,16 +777,24 @@ function meetingSearchBlob(meeting) {
         meetingId,
         agendaText,
     ].filter(Boolean).join(" ").toLowerCase();
+    derivedCaches.meetingSearchBlobById.set(meetingId, blob);
+    return blob;
 }
 function filteredMeetings() {
     const query = state.meetingQuery.trim().toLowerCase();
+    const cacheKey = `${query}|${state.meetingSortMode}`;
+    const cached = derivedCaches.filteredMeetingsByKey.get(cacheKey);
+    if (cached)
+        return cached;
     const meetings = (state.data?.meetings ?? []).filter((meeting) => {
         if (!query)
             return true;
         return meetingSearchBlob(meeting).includes(query);
     });
     const byDate = (a, b) => timestamp(getMeetingDate(a)) - timestamp(getMeetingDate(b));
-    return [...meetings].sort((a, b) => state.meetingSortMode === "date-asc" ? byDate(a, b) : byDate(b, a));
+    const sortedMeetings = [...meetings].sort((a, b) => state.meetingSortMode === "date-asc" ? byDate(a, b) : byDate(b, a));
+    derivedCaches.filteredMeetingsByKey.set(cacheKey, sortedMeetings);
+    return sortedMeetings;
 }
 function ensureMeetingVisible(meetingId) {
     const meetings = filteredMeetings();
@@ -957,6 +995,7 @@ async function init() {
     attachEvents();
     state.data = await loadPublicData();
     state.indexes = buildRelationIndexes(state.data.documents, state.data.meetings, state.data.agendaItems, state.data.meetingDocumentRelations, state.data.meetingItemDocumentRelations);
+    clearDerivedCaches();
     populateTypeFilter();
     renderSummary();
     applyFilters();
@@ -986,3 +1025,4 @@ init().catch((error) => {
     console.error(error);
     elements.statusMessage.textContent = "De viewer kon de publieke exports niet laden. Controleer data/public en de browserconsole.";
 });
+//# sourceMappingURL=main.js.map
