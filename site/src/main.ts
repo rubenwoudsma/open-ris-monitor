@@ -923,8 +923,12 @@ function renderMeetings(): void {
   const pageText = `Pagina ${state.meetingCurrentPage} van ${totalPages}`;
   elements.meetingPageInfoTop.textContent = pageText;
   elements.meetingPageInfoBottom.textContent = pageText;
-  for (const button of [elements.previousMeetingTop, elements.previousMeetingBottom]) button.disabled = state.meetingCurrentPage <= 1;
-  for (const button of [elements.nextMeetingTop, elements.nextMeetingBottom]) button.disabled = state.meetingCurrentPage >= totalPages;
+  for (const button of [elements.previousMeetingTop, elements.previousMeetingBottom]) {
+    button.disabled = state.meetingCurrentPage <= 1;
+  }
+  for (const button of [elements.nextMeetingTop, elements.nextMeetingBottom]) {
+    button.disabled = state.meetingCurrentPage >= totalPages;
+  }
 
   if (pageMeetings.length === 0) {
     const row = document.createElement("tr");
@@ -937,6 +941,7 @@ function renderMeetings(): void {
     elements.meetingsTableBody.appendChild(row);
     return;
   }
+
   for (const meeting of pageMeetings) {
     const meetingId = getMeetingId(meeting);
     const agendaIds = agendaItemIdsForMeeting(meetingId);
