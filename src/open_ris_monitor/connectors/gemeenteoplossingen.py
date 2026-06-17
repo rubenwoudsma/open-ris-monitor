@@ -314,24 +314,25 @@ class GemeenteOplossingenConnector:
         return self.fetch_meeting_count()
 
     def fetch_meeting_sessions_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
-        """Compatibility shim backed by documented /meetings discovery.
+        """Fetch one page from the undocumented legacy /meetingsessions endpoint.
 
-        Older relation backfill code may still call the meeting-session methods
-        to discover meeting IDs through ``container.meeting.id``. Returning a
-        small meeting-session-shaped wrapper keeps that code working without
-        depending on the undocumented /meetingsessions endpoint, which is known
-        to fail at higher offsets.
+        This method keeps its historical behavior for backwards compatibility
+        with existing callers and tests. New relation backfill discovery should
+        not call this method. Use fetch_meetings_page(), fetch_all_meetings(),
+        fetch_latest_meetings(), or fetch_latest_meeting_sessions() instead.
         """
-        meetings = self.fetch_meetings_page(limit=limit, offset=offset)
-        return [_meeting_to_legacy_meeting_session(meeting) for meeting in meetings]
+        return self.fetch_legacy_meeting_sessions_page(limit=limit, offset=offset)
 
     def fetch_latest_meeting_sessions(self, limit: int) -> list[dict[str, Any]]:
-        """Compatibility shim backed by documented /meetings discovery."""
-        if limit <= 0:
-            raise ValueError("limit must be greater than 0")
-        total_count = self.fetch_meeting_session_count()
-        offset = max(0, total_count - limit)
-        return self.fetch_meeting_sessions_page(limit=limit, offset=offset)
+        """Compatibility shim backed by documented /meetings discovery.
+
+        Older relation backfill code may still call this method to discover
+        meeting IDs through ``container.meeting.id``. Returning a small
+        meeting-session-shaped wrapper keeps that code working without relying
+        on high-offset calls to the undocumented /meetingsessions endpoint.
+        """
+        meetings = self.fetch_latest_meetings(limit)
+        return [_meeting_to_legacy_meeting_session(meeting) for meeting in meetings]
 
     def fetch_legacy_meeting_session_count(self) -> int:
         """Fetch count from the undocumented legacy /meetingsessions endpoint.
