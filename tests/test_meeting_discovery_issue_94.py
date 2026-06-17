@@ -43,13 +43,13 @@ class MeetingDiscoverySession:
         return FakeResponse({"result": {"totalCount": len(meetings), "meetings": page}})
 
 
-def test_fetch_latest_meeting_sessions_uses_documented_meetings_endpoint() -> None:
+def test_fetch_latest_meetings_uses_documented_meetings_endpoint() -> None:
     session = MeetingDiscoverySession()
     connector = GemeenteOplossingenConnector("https://example.test/api/v2/", session=session)
 
-    sessions = connector.fetch_latest_meeting_sessions(2)
+    meetings = connector.fetch_latest_meetings(2)
 
-    assert [session["container"]["meeting"]["id"] for session in sessions] == [11, 12]
+    assert [meeting["id"] for meeting in meetings] == [11, 12]
     assert session.calls == [
         ("https://example.test/api/v2/meetings", {"limit": 1, "offset": 0}),
         ("https://example.test/api/v2/meetings", {"limit": 2, "offset": 1}),
