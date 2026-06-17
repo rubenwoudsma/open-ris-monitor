@@ -1,0 +1,1 @@
+{"severity": "info", "code": "unknown_document_types", "count": 37, "message": "Some documents are not mapped to a normalized document type."}
