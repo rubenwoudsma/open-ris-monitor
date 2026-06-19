@@ -1,12 +1,16 @@
 """Document type normalization helpers.
 
-The source RIS document type is always preserved as ``document_type``.
-These helpers add a compact analytical type that is easier to filter and use
-in quality reports.
+The source RIS document type is always preserved as ``document_type`` when it is
+usable source metadata. Null-like placeholders are treated as missing source
+metadata.
+
+These helpers add a compact analytical type that is easier to filter and use in
+quality reports, plus a conservative user-facing label for display.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 
@@ -17,6 +21,20 @@ class NormalizedDocumentType:
     value: str
     label: str
 
+
+UNKNOWN_DOCUMENT_TYPE_VALUE = "unknown"
+GENERIC_DOCUMENT_TYPE_LABEL = "Document"
+
+_NULL_LIKE_TYPE_LABELS = {
+    "",
+    "-",
+    "n/a",
+    "na",
+    "none",
+    "null",
+    "onbekend",
+    "unknown",
+}
 
 TYPE_LABELS: dict[str, str] = {
     "agenda": "Agenda",
@@ -39,7 +57,7 @@ TYPE_LABELS: dict[str, str] = {
     "question": "Vraag",
     "report": "Rapportage of evaluatie",
     "request": "Verzoek of aanvullende gegevens",
-    "unknown": "Onbekend",
+    "unknown": GENERIC_DOCUMENT_TYPE_LABEL,
 }
 
 # Explicit mappings based on the Huizen RIS document type profile. This list is
@@ -123,25 +141,38 @@ EXPLICIT_TYPE_MAPPING: dict[str, str] = {
 }
 
 
+def clean_document_type_label(source_type: object) -> str | None:
+    """Return a cleaned source type label, or ``None`` for missing placeholders."""
+
+    if source_type is None or isinstance(source_type, (dict, list, tuple, set)):
+        return None
+
+    cleaned = re.sub(r"\s+", " ", str(source_type)).strip()
+    if cleaned.casefold() in _NULL_LIKE_TYPE_LABELS:
+        return None
+
+    return cleaned
+
+
 def normalize_document_type(source_type: str | None) -> NormalizedDocumentType:
     """Return a compact document type for a source RIS document type."""
 
-    if source_type is None or not str(source_type).strip():
-        value = "unknown"
+    cleaned = clean_document_type_label(source_type)
+    if cleaned is None:
+        value = UNKNOWN_DOCUMENT_TYPE_VALUE
     else:
-        cleaned = str(source_type).strip()
         value = EXPLICIT_TYPE_MAPPING.get(cleaned)
         if value is None:
-            lowered = cleaned.lower()
-            value = _infer_type_from_text(lowered)
+            value = _infer_type_from_text(cleaned.casefold())
+
     return NormalizedDocumentType(value=value, label=TYPE_LABELS[value])
 
 
 def _infer_type_from_text(lowered: str) -> str:
     """Fallback rules for unseen but semantically obvious source types."""
 
-    if "onbekend" in lowered:
-        return "unknown"
+    if lowered in _NULL_LIKE_TYPE_LABELS or "onbekend" in lowered:
+        return UNKNOWN_DOCUMENT_TYPE_VALUE
     if "agenda" in lowered:
         return "agenda"
     if "bijlage" in lowered:
@@ -150,7 +181,11 @@ def _infer_type_from_text(lowered: str) -> str:
         return "amendment"
     if "motie" in lowered:
         return "motion"
-    if "raadsvraag" in lowered or "vragen van raadsleden" in lowered or "vraag van raadslid" in lowered:
+    if (
+        "raadsvraag" in lowered
+        or "vragen van raadsleden" in lowered
+        or "vraag van raadslid" in lowered
+    ):
         return "question"
     if "raadsvoorstel" in lowered or "collegevoorstel" in lowered or "voorstel" in lowered:
         return "proposal"
@@ -180,4 +215,4 @@ def _infer_type_from_text(lowered: str) -> str:
         return "policy_or_plan"
     if "overig" in lowered:
         return "other"
-    return "unknown"
+    return UNKNOWN_DOCUMENT_TYPE_VALUE

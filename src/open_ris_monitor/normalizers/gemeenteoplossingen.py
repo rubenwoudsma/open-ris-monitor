@@ -9,7 +9,10 @@ from typing import Any
 
 from open_ris_monitor.connectors.gemeenteoplossingen import GemeenteOplossingenConnector
 from open_ris_monitor.models.document import Document
-from open_ris_monitor.normalizers.document_types import normalize_document_type
+from open_ris_monitor.normalizers.document_types import (
+    clean_document_type_label,
+    normalize_document_type,
+)
 
 
 def _slugify(value: str) -> str:
@@ -20,13 +23,17 @@ def _slugify(value: str) -> str:
 
 def _parse_publication_datetime(raw_value: Any) -> tuple[datetime | None, str | None]:
     """Parse the GemeenteOplossingen publicationDate object."""
+
     if not isinstance(raw_value, dict):
         return None, None
+
     date_value = raw_value.get("date")
     timezone_value = raw_value.get("timezone")
     timezone = timezone_value if isinstance(timezone_value, str) else None
+
     if not isinstance(date_value, str) or not date_value:
         return None, timezone
+
     normalized = date_value.replace(" ", "T")
     try:
         return datetime.fromisoformat(normalized), timezone
@@ -83,6 +90,7 @@ def _as_positive_int(value: Any) -> int | None:
 
 def _resolve_file_size(raw_document: dict[str, Any]) -> int | None:
     """Return file size from known GemeenteOplossingen field variants."""
+
     for value in (
         raw_document.get("fileSize"),
         raw_document.get("file_size"),
@@ -104,37 +112,46 @@ def _resolve_file_size(raw_document: dict[str, Any]) -> int | None:
     return None
 
 
+def _first_document_type_label(*values: object) -> str | None:
+    for value in values:
+        cleaned = clean_document_type_label(value)
+        if cleaned is not None:
+            return cleaned
+    return None
+
+
 def _resolve_source_document_type(raw_document: dict[str, Any]) -> str | None:
     """Return the most descriptive source document type value available."""
-    direct = _first_text(
-        raw_document,
-        "documentTypeLabel",
-        "document_type_label",
-        "documentTypeDescription",
-        "document_type_description",
-        "documentTypeName",
-        "document_type_name",
-        "documentType",
-        "document_type",
-        "typeLabel",
-        "type_label",
-        "type",
+
+    direct = _first_document_type_label(
+        raw_document.get("documentTypeLabel"),
+        raw_document.get("document_type_label"),
+        raw_document.get("documentTypeDescription"),
+        raw_document.get("document_type_description"),
+        raw_document.get("documentTypeName"),
+        raw_document.get("document_type_name"),
+        raw_document.get("documentType"),
+        raw_document.get("document_type"),
+        raw_document.get("typeLabel"),
+        raw_document.get("type_label"),
+        raw_document.get("type"),
     )
     if direct:
         return direct
+
     for object_key in ("documentType", "document_type", "type"):
-        nested = _nested_first_text(
-            raw_document,
-            object_key,
-            "label",
-            "description",
-            "name",
-            "title",
-            "value",
-            "id",
+        nested = _nested_mapping(raw_document, object_key)
+        nested_type = _first_document_type_label(
+            nested.get("label"),
+            nested.get("description"),
+            nested.get("name"),
+            nested.get("title"),
+            nested.get("value"),
+            nested.get("id"),
         )
-        if nested:
-            return nested
+        if nested_type:
+            return nested_type
+
     return None
 
 
@@ -145,6 +162,7 @@ def _resolve_document_url(
     url_builder: Callable[[str], str],
 ) -> str:
     """Return a usable public document URL, falling back to the download endpoint."""
+
     explicit = (
         _first_text(
             raw_document,
@@ -161,7 +179,14 @@ def _resolve_document_url(
             "url",
         )
         or _nested_first_text(raw_document, "file", "downloadUrl", "download_url", "url", "href")
-        or _nested_first_text(raw_document, "attachment", "downloadUrl", "download_url", "url", "href")
+        or _nested_first_text(
+            raw_document,
+            "attachment",
+            "downloadUrl",
+            "download_url",
+            "url",
+            "href",
+        )
     )
     return explicit or url_builder(source_id)
 
@@ -177,6 +202,7 @@ def normalize_document(
     build_download_url: Callable[[str], str] | None = None,
 ) -> Document:
     """Normalize a raw GemeenteOplossingen document into a Canonical Document."""
+
     source_id = str(raw_document.get("id") or raw_document.get("source_id") or "")
     if not municipality_slug:
         municipality_slug = _slugify(municipality_id)
@@ -193,10 +219,8 @@ def normalize_document(
 
     title_value = raw_document.get("title") or raw_document.get("description") or ""
     description_value = raw_document.get("description")
-
     source_document_type = _resolve_source_document_type(raw_document)
     normalized_type = normalize_document_type(source_document_type)
-
     source_obj_id = raw_document.get("objectId") or raw_document.get("source_object_id")
     source_object_id_str = str(source_obj_id) if source_obj_id is not None else None
 
@@ -209,7 +233,7 @@ def normalize_document(
         source_object_id=source_object_id_str,
         title=str(title_value).strip(),
         description=str(description_value).strip() if description_value else None,
-        document_type=str(source_document_type).strip() if source_document_type else None,
+        document_type=source_document_type,
         normalized_document_type=normalized_type.value,
         normalized_document_type_label=normalized_type.label,
         filename=(
@@ -223,7 +247,9 @@ def normalize_document(
         publication_datetime=publication_datetime,
         publication_timezone=publication_timezone,
         is_confidential=bool(raw_document.get("confidential") or raw_document.get("is_confidential")),
-        is_tabsign_document=bool(raw_document.get("isTabsignDocument") or raw_document.get("is_tabsign_document")),
+        is_tabsign_document=bool(
+            raw_document.get("isTabsignDocument") or raw_document.get("is_tabsign_document")
+        ),
         source_url=document_url,
         download_url=document_url,
         retrieved_at=retrieved_at,
@@ -242,6 +268,7 @@ def normalize_documents(
     build_download_url: Callable[[str], str] | None = None,
 ) -> list[Document]:
     """Normalize a list of raw GemeenteOplossingen documents."""
+
     return [
         normalize_document(
             raw_document,
