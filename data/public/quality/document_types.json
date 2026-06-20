@@ -1,16 +1,16 @@
 {
   "documents_total": 16735,
-  "generated_at": "2026-06-19T08:48:03.465812+00:00",
+  "generated_at": "2026-06-20T07:15:34.908386+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Aanvraag (Inkomend)": {
       "count": 1,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Aanvullende gegevens": {
       "count": 370,
@@ -110,7 +110,7 @@
     "Beschikking (Intern)": {
       "count": 1,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Besloten besluitenlijst": {
       "count": 2,
@@ -245,7 +245,7 @@
     "Inkoopopdracht (Intern)": {
       "count": 5,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Intern advies": {
       "count": 2,
@@ -270,7 +270,7 @@
     "KB ontslag burgemeester (Inkomend)": {
       "count": 1,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Kennisgeving": {
       "count": 6,
@@ -300,7 +300,7 @@
     "Mailuitwisseling": {
       "count": 2,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Mandaatvoorstel (Intern)": {
       "count": 1,
@@ -315,12 +315,12 @@
     "Melding (Inkomend)": {
       "count": 1,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Melding (Intern)": {
       "count": 2,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Memo": {
       "count": 44,
@@ -340,7 +340,7 @@
     "Nazending (Inkomend)": {
       "count": 1,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Notulen (Intern)": {
       "count": 1,
@@ -385,7 +385,7 @@
     "Onbekend": {
       "count": 11,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Onderhoudsrapport (Intern)": {
       "count": 1,
@@ -400,7 +400,7 @@
     "Opdracht (Intern)": {
       "count": 2,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Overig": {
       "count": 1849,
@@ -565,7 +565,7 @@
     "Uitspraak rechter (Inkomend)": {
       "count": 2,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Vastgesteld plan (Intern)": {
       "count": 4,
@@ -575,12 +575,12 @@
     "Verantwoording (Inkomend)": {
       "count": 5,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Verordening": {
       "count": 2,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     "Verslag": {
       "count": 5,
@@ -933,7 +933,7 @@
     {
       "count": 37,
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend",
+      "normalized_document_type_label": "Document",
       "source_document_types": [
         "Aankondiging toezicht (Inkomend)",
         "Aanvraag (Inkomend)",
@@ -1280,7 +1280,7 @@
       "count": 11,
       "document_type": "Onbekend",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 11,
@@ -1382,13 +1382,13 @@
       "count": 5,
       "document_type": "Inkoopopdracht (Intern)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 5,
       "document_type": "Verantwoording (Inkomend)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 5,
@@ -1520,13 +1520,13 @@
       "count": 2,
       "document_type": "Melding (Intern)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 2,
       "document_type": "Uitspraak rechter (Inkomend)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 2,
@@ -1544,7 +1544,7 @@
       "count": 2,
       "document_type": "Mailuitwisseling",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 2,
@@ -1568,7 +1568,7 @@
       "count": 2,
       "document_type": "Opdracht (Intern)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 2,
@@ -1586,7 +1586,7 @@
       "count": 2,
       "document_type": "Verordening",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 1,
@@ -1616,7 +1616,7 @@
       "count": 1,
       "document_type": "Nazending (Inkomend)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 1,
@@ -1634,7 +1634,7 @@
       "count": 1,
       "document_type": "KB ontslag burgemeester (Inkomend)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 1,
@@ -1694,7 +1694,7 @@
       "count": 1,
       "document_type": "Melding (Inkomend)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 1,
@@ -1706,7 +1706,7 @@
       "count": 1,
       "document_type": "Beschikking (Intern)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 1,
@@ -1730,7 +1730,7 @@
       "count": 1,
       "document_type": "Aankondiging toezicht (Inkomend)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     },
     {
       "count": 1,
@@ -1778,7 +1778,7 @@
       "count": 1,
       "document_type": "Aanvraag (Inkomend)",
       "normalized_document_type": "unknown",
-      "normalized_document_type_label": "Onbekend"
+      "normalized_document_type_label": "Document"
     }
   ],
   "unknown_document_type_count": 37,
