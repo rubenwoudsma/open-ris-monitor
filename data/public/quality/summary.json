@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-06-22T09:30:30.601368+00:00",
+  "generated_at": "2026-06-22T12:07:58.508635+00:00",
   "counts": {
-    "documents": 16735,
+    "documents": 16737,
     "document_versions": 25,
-    "harvest_runs": 6,
-    "meetings": 651,
-    "meeting_items": 3779,
-    "meeting_documents": 494,
-    "meeting_item_documents": 9699
+    "harvest_runs": 7,
+    "meetings": 675,
+    "meeting_items": 4082,
+    "meeting_documents": 496,
+    "meeting_item_documents": 9743
   },
   "coverage": {
-    "documents_with_relations": 8117,
-    "documents_without_relations": 8618,
-    "coverage_pct": 48.5
+    "documents_with_relations": 8252,
+    "documents_without_relations": 8485,
+    "coverage_pct": 49.3
   },
   "integrity": {
     "orphan_meeting_document_relations": 0,
     "orphan_meeting_item_document_relations": 0
   },
   "activity": {
-    "meetings_without_items": 167,
-    "items_without_documents": 0
+    "meetings_without_items": 184,
+    "items_without_documents": 289
   },
   "document_types": {
     "source": {
@@ -58,7 +58,7 @@
       "Burgemeestervoorstel (BBV)": 12,
       "Collegebesluit (Intern)": 23,
       "Collegevoorstel": 6,
-      "Collegevoorstel (BBV)": 2231,
+      "Collegevoorstel (BBV)": 2233,
       "Collegevoorstel (Intern)": 920,
       "Collegevoorstel B&W (Intern)": 1,
       "Collegevoorstel HBEL (BBV)": 41,
@@ -177,7 +177,7 @@
       "objection_or_response": 15,
       "other": 1936,
       "policy_or_plan": 91,
-      "proposal": 4409,
+      "proposal": 4411,
       "question": 402,
       "report": 143,
       "request": 411,
@@ -186,19 +186,19 @@
     "unknown_count": 37
   },
   "document_metadata": {
-    "documents_with_file_url": 16735,
+    "documents_with_file_url": 16737,
     "documents_without_file_url": 0,
-    "documents_with_file_size": 16735,
+    "documents_with_file_size": 16737,
     "documents_without_file_size": 0
   },
   "export_diagnostics": {
-    "documents_seen": 250,
-    "documents_published": 16735,
-    "documents_seen_minus_published": 0,
-    "raw_meeting_document_relations_seen": 223,
-    "raw_meeting_item_document_relations_seen": 1584,
-    "published_meeting_document_relations": 494,
-    "published_meeting_item_document_relations": 9699,
+    "documents_seen": 16985,
+    "documents_published": 16737,
+    "documents_seen_minus_published": 248,
+    "raw_meeting_document_relations_seen": 0,
+    "raw_meeting_item_document_relations_seen": 0,
+    "published_meeting_document_relations": 496,
+    "published_meeting_item_document_relations": 9743,
     "dropped_meeting_document_relations": 0,
     "dropped_meeting_item_document_relations": 0
   },
@@ -211,15 +211,15 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-06-22T09:30:29.504943+00:00",
-      "id": "harvest-huizen-20260622T092540Z",
+      "finished_at": "2026-06-22T12:07:56.766539+00:00",
+      "id": "harvest-huizen-20260622T120301Z",
       "max_documents": null,
       "meetings_seen": 250,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-06-22T09:25:40.450538+00:00",
+      "started_at": "2026-06-22T12:03:01.109933+00:00",
       "status": "success"
     }
   },

@@ -1,6 +1,6 @@
 {
-  "documents_total": 16735,
-  "generated_at": "2026-06-22T09:30:30.398865+00:00",
+  "documents_total": 16737,
+  "generated_at": "2026-06-22T12:07:58.305023+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -173,7 +173,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Collegevoorstel (BBV)": {
-      "count": 2231,
+      "count": 2233,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4409,
+      "count": 4411,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -977,7 +977,7 @@
       "normalized_document_type_label": "Bijlage"
     },
     {
-      "count": 2231,
+      "count": 2233,
       "document_type": "Collegevoorstel (BBV)",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
