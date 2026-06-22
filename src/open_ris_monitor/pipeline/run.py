@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -20,7 +21,6 @@ from open_ris_monitor.models.harvest_run import HarvestRun
 from open_ris_monitor.normalizers.gemeenteoplossingen import normalize_documents
 from open_ris_monitor.normalizers.relations import normalize_relation_harvest
 from open_ris_monitor.pipeline.profiles import HARVEST_PROFILE_NAMES, resolve_harvest_options
-from open_ris_monitor.pipeline.public_relations import filter_relation_exports_for_documents
 from open_ris_monitor.pipeline.relations import collect_raw_relation_harvest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -28,7 +28,6 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 def load_municipality_config(slug: str) -> dict[str, Any]:
     """Load a municipality configuration file."""
-
     config_path = REPO_ROOT / "config" / "municipalities" / f"{slug}.yml"
     if not config_path.exists():
         raise FileNotFoundError(f"Municipality config not found: {config_path}")
@@ -50,7 +49,6 @@ def parse_max_documents(value: Any) -> int | None:
 
     Empty, None and 0 mean: no explicit max_documents limit.
     """
-
     if value is None or value == "":
         return None
     parsed = int(value)
@@ -61,7 +59,6 @@ def parse_max_documents(value: Any) -> int | None:
 
 def build_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
     """Build the configured source connector."""
-
     source_system = config["source_system"]
     connector_name = source_system["connector"]
     if connector_name != "gemeenteoplossingen":
@@ -70,18 +67,17 @@ def build_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
         base_url=source_system["base_url"],
         timeout_seconds=int(source_system.get("timeout_seconds", 30)),
         request_delay_seconds=_as_float(source_system.get("request_delay_seconds"), 0.0),
-        retry_attempts=int(source_system.get("retry_attempts", 3)),
-        retry_backoff_seconds=_as_float(source_system.get("retry_backoff_seconds"), 1.0),
     )
 
 
 def _to_public_dicts(records: list[Any]) -> list[dict[str, Any]]:
     """Convert canonical model records to plain dictionaries for JSONL export."""
-
     result: list[dict[str, Any]] = []
     for record in records:
         if hasattr(record, "to_dict"):
             result.append(record.to_dict())
+        elif hasattr(record, "model_dump"):
+            result.append(record.model_dump(mode="json"))
         elif isinstance(record, dict):
             result.append(record)
         else:
@@ -89,12 +85,110 @@ def _to_public_dicts(records: list[Any]) -> list[dict[str, Any]]:
     return result
 
 
+def _read_json(path: Path) -> dict[str, Any]:
+    """Read a JSON object when it exists, otherwise return an empty object."""
+    if not path.exists():
+        return {}
+    with path.open("r", encoding="utf-8") as file:
+        payload = json.load(file)
+    return payload if isinstance(payload, dict) else {}
+
+
+def _read_jsonl(path: Path) -> list[dict[str, Any]]:
+    """Read JSONL dictionaries when a public export already exists."""
+    if not path.exists():
+        return []
+    records: list[dict[str, Any]] = []
+    with path.open("r", encoding="utf-8") as file:
+        for line in file:
+            stripped = line.strip()
+            if not stripped:
+                continue
+            payload = json.loads(stripped)
+            if isinstance(payload, dict):
+                records.append(payload)
+    return records
+
+
+def _jsonl_count(path: Path) -> int:
+    """Count non-empty records in an existing JSONL export."""
+    if not path.exists():
+        return 0
+    with path.open("r", encoding="utf-8") as file:
+        return sum(1 for line in file if line.strip())
+
+
+def _record_to_dict(record: Any) -> dict[str, Any]:
+    if isinstance(record, dict):
+        return record
+    if hasattr(record, "to_dict"):
+        payload = record.to_dict()
+    elif hasattr(record, "model_dump"):
+        payload = record.model_dump(mode="json")
+    else:
+        raise TypeError(f"Cannot convert record of type {type(record)!r}")
+    if not isinstance(payload, dict):
+        raise TypeError(f"Expected record dictionary, got {type(payload)!r}")
+    return payload
+
+
+def _document_merge_key(record: dict[str, Any]) -> str:
+    """Return a stable key for merging latest-run records into the dataset export."""
+    source_system_id = str(record.get("source_system_id") or "")
+    for key in ("source_id", "source_object_id", "id"):
+        value = record.get(key)
+        if value not in (None, ""):
+            return f"{source_system_id}:{key}:{value}"
+    return json.dumps(record, sort_keys=True, default=str)
+
+
+def _merge_document_records(existing: list[dict[str, Any]], current: list[Any]) -> list[dict[str, Any]]:
+    """Merge current harvest documents into the existing public dataset documents.
+
+    Latest harvests are intentionally narrow. They should update or add records, not
+    shrink the public dataset to only the latest-run slice.
+    """
+    merged: dict[str, dict[str, Any]] = {}
+    order: list[str] = []
+
+    for record in existing:
+        key = _document_merge_key(record)
+        if key not in merged:
+            order.append(key)
+        merged[key] = record
+
+    for record in current:
+        payload = _record_to_dict(record)
+        key = _document_merge_key(payload)
+        if key not in merged:
+            order.append(key)
+        merged[key] = payload
+
+    return [merged[key] for key in order]
+
+
+def _latest_full_backfill_at(
+    *,
+    mode: str,
+    generated_at: str,
+    previous_latest: dict[str, Any],
+) -> str | None:
+    """Return the latest reliable full backfill timestamp, without inventing one."""
+    if mode == "full":
+        return generated_at
+    previous_full_backfill = previous_latest.get("last_full_backfill_at")
+    if isinstance(previous_full_backfill, str) and previous_full_backfill:
+        return previous_full_backfill
+    if previous_latest.get("mode") == "full" and isinstance(previous_latest.get("generated_at"), str):
+        return previous_latest["generated_at"]
+    return None
+
+
 def _write_public_relation_exports(
     public_dir: Path,
     normalized_relations: dict[str, list[Any]],
 ) -> dict[str, str]:
     """Write canonical relation exports and return latest.json output entries."""
-
     relation_outputs = {
         "meetings": "meetings.jsonl",
         "meeting_items": "meeting_items.jsonl",
@@ -126,7 +220,6 @@ def _build_latest_outputs(
     relation_outputs: dict[str, str] | None = None,
 ) -> dict[str, str | None]:
     """Build the outputs block for latest.json."""
-
     outputs: dict[str, str | None] = {
         "documents": "documents.jsonl",
         "harvest_runs": "harvest_runs.jsonl",
@@ -137,9 +230,40 @@ def _build_latest_outputs(
     return outputs
 
 
+def _dataset_totals(
+    *,
+    public_dir: Path,
+    documents_total: int,
+    normalized_relations: dict[str, list[Any]] | None,
+) -> dict[str, int]:
+    """Return public dataset-wide totals, using current or existing static exports."""
+    if normalized_relations is None:
+        meetings_total = _jsonl_count(public_dir / "meetings.jsonl")
+        agenda_items_total = _jsonl_count(public_dir / "meeting_items.jsonl")
+        meeting_document_relations_total = _jsonl_count(public_dir / "meeting_documents.jsonl")
+        meeting_item_document_relations_total = _jsonl_count(
+            public_dir / "meeting_item_documents.jsonl"
+        )
+    else:
+        meetings_total = len(normalized_relations.get("meetings", []))
+        agenda_items_total = len(normalized_relations.get("meeting_items", []))
+        meeting_document_relations_total = len(normalized_relations.get("meeting_documents", []))
+        meeting_item_document_relations_total = len(
+            normalized_relations.get("meeting_item_documents", [])
+        )
+
+    return {
+        "dataset_documents_total": documents_total,
+        "dataset_meetings_total": meetings_total,
+        "dataset_agenda_items_total": agenda_items_total,
+        "dataset_document_relations_total": (
+            meeting_document_relations_total + meeting_item_document_relations_total
+        ),
+    }
+
+
 def _write_raw_relation_harvest(raw_dir: Path, relation_harvest: dict[str, Any]) -> None:
     """Write raw relation harvest artifacts for inspection."""
-
     write_json(raw_dir / "meetingsessions.json", relation_harvest["meeting_sessions"])
     write_json(raw_dir / "meeting_ids.json", relation_harvest["candidate_meeting_ids"])
     write_json(raw_dir / "meetings.json", relation_harvest["meetings"])
@@ -164,7 +288,6 @@ def run_harvest(
     meeting_item_limit: int | None = 1000,
 ) -> HarvestRun:
     """Run a metadata harvest and optional raw relation harvest."""
-
     started_at = datetime.now(timezone.utc)
     config = load_municipality_config(municipality)
     connector = build_connector(config)
@@ -179,14 +302,10 @@ def run_harvest(
     else:
         raise ValueError("mode must be 'latest' or 'full'")
 
-    if not raw_documents:
-        raise RuntimeError(
-            "Harvest returned zero documents. Refusing to overwrite public exports. "
-            "Check the upstream RIS API or run a manual recovery/backfill."
-        )
-
     raw_dir = REPO_ROOT / "data" / "raw" / "latest"
     public_dir = REPO_ROOT / "data" / "public"
+    latest_path = public_dir / "latest.json"
+    previous_latest = _read_json(latest_path)
     municipality_config = config["municipality"]
     source_system_config = config["source_system"]
     retrieved_at = datetime.now(timezone.utc)
@@ -202,29 +321,24 @@ def run_harvest(
 
     relation_harvest: dict[str, Any] | None = None
     normalized_relations: dict[str, list[Any]] | None = None
-    relation_publication_summary: dict[str, int] = {}
     if include_relations:
         relation_harvest = collect_raw_relation_harvest(
             connector,
             meeting_scan_limit=meeting_scan_limit,
             meeting_session_batch_size=meeting_session_batch_size,
             meeting_item_limit=meeting_item_limit,
-            meeting_session_scan_mode="latest" if mode == "latest" else "full",
         )
-        raw_normalized_relations = normalize_relation_harvest(
+        normalized_relations = normalize_relation_harvest(
             relation_harvest,
             municipality_slug=municipality,
             source_system_id=source_system_config["id"],
-        )
-        normalized_relations, relation_publication_summary = filter_relation_exports_for_documents(
-            raw_normalized_relations,
-            documents,
         )
 
     previous_versions_path = public_dir / "document_versions.jsonl"
     existing_versions = load_previous_versions(previous_versions_path)
     new_versions: list[Any] = []
     merged_versions: list[Any] = existing_versions
+
     if enrich_checksums:
         new_versions = enrich_document_versions(
             documents,
@@ -261,7 +375,12 @@ def run_harvest(
     if relation_harvest is not None:
         _write_raw_relation_harvest(raw_dir, relation_harvest)
 
-    write_jsonl(public_dir / "documents.jsonl", documents)
+    documents_path = public_dir / "documents.jsonl"
+    if mode == "latest":
+        public_documents = _merge_document_records(_read_jsonl(documents_path), documents)
+    else:
+        public_documents = _to_public_dicts(documents)
+    write_jsonl(documents_path, public_documents)
     write_jsonl(public_dir / "harvest_runs.jsonl", [harvest_run])
     if enrich_checksums:
         write_jsonl(previous_versions_path, merged_versions)
@@ -270,32 +389,44 @@ def run_harvest(
     if normalized_relations is not None:
         relation_outputs = _write_public_relation_exports(public_dir, normalized_relations)
 
+    generated_at = datetime.now(timezone.utc).isoformat()
     latest_payload = {
         "municipality": municipality,
         "municipality_id": municipality_config["id"],
         "source_system_id": source_system_config["id"],
         "harvest_run_id": harvest_run.id,
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": generated_at,
         "mode": mode,
-        "documents_seen": len(raw_documents),
-        "documents_normalized": len(documents),
+        "run_type": mode,
+        "documents_seen": len(public_documents),
+        "documents_normalized": len(public_documents),
+        "documents_seen_in_run": len(raw_documents),
+        "documents_normalized_in_run": len(documents),
         "documents_versioned": len(new_versions),
         "checksums_enabled": enrich_checksums,
         "relations_enabled": include_relations,
         "relations_summary": relation_summary,
-        "relations_publication_summary": relation_publication_summary,
+        "last_full_backfill_at": _latest_full_backfill_at(
+            mode=mode,
+            generated_at=generated_at,
+            previous_latest=previous_latest,
+        ),
+        **_dataset_totals(
+            public_dir=public_dir,
+            documents_total=len(public_documents),
+            normalized_relations=normalized_relations,
+        ),
         "outputs": _build_latest_outputs(
             enrich_checksums=enrich_checksums,
             relation_outputs=relation_outputs,
         ),
     }
-    write_json(public_dir / "latest.json", latest_payload)
+    write_json(latest_path, latest_payload)
     return harvest_run
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse command-line arguments."""
-
     parser = argparse.ArgumentParser(description="Run Open RIS Monitor harvest.")
     parser.add_argument("--municipality", default="huizen", help="Municipality config slug")
     parser.add_argument(
@@ -347,7 +478,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def resolve_cli_harvest_options(args: argparse.Namespace) -> dict[str, Any]:
     """Resolve profile defaults and explicit CLI overrides into run_harvest options."""
-
     overrides: dict[str, Any] = {}
     if args.mode is not None:
         overrides["mode"] = args.mode
@@ -370,7 +500,6 @@ def resolve_cli_harvest_options(args: argparse.Namespace) -> dict[str, Any]:
 
 def main() -> None:
     """CLI entrypoint."""
-
     args = parse_args()
     harvest_options = resolve_cli_harvest_options(args)
     harvest_run = run_harvest(
