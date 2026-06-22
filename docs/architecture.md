@@ -1,174 +1,75 @@
-# Architectuur
+# Architecture
 
-## Doel
+Open RIS Monitor is a small static open-data pipeline for municipal council information. The core product is not a backend service. The core product is the reproducible data chain from public RIS source data to compact public files and a static viewer.
 
-Open RIS Monitor is opgezet als een kleine open-data-infrastructuur voor gemeentelijke raadsinformatie. De kern is niet de viewer, maar de dataketen.
-
-De pipeline haalt brondata uit een RIS op, normaliseert die naar een canoniek model, verrijkt de data met kwaliteit en relaties, publiceert alles als gewone bestanden en toont dat in een statische viewer.
-
-## Lagen
+## Pipeline
 
 ```text
-+------------------------------------------------------+
-| Website / Viewer                                     |
-| GitHub Pages, statische site, downloadbare datasets  |
-+------------------------------------------------------+
-                          |
-                          v
-+------------------------------------------------------+
-| Publicatielaag                                       |
-| JSONL, JSON, rapportages, zoek- en hulpexporten      |
-+------------------------------------------------------+
-                          |
-                          v
-+------------------------------------------------------+
-| Verrijkingslaag                                      |
-| Checksums, kwaliteit, documenttypen, relaties        |
-+------------------------------------------------------+
-                          |
-                          v
-+------------------------------------------------------+
-| Normalisatielaag                                     |
-| Brondata naar canoniek RIS-model                     |
-+------------------------------------------------------+
-                          |
-                          v
-+------------------------------------------------------+
-| Raw harvest output                                   |
-| Oorspronkelijke API-responses, artifact-only in MVP  |
-+------------------------------------------------------+
-                          |
-                          v
-+------------------------------------------------------+
-| Bronconnectors                                       |
-| GemeenteOplossingen, later andere leveranciers       |
-+------------------------------------------------------+
+source RIS API
+-> harvest
+-> normalization
+-> relation building
+-> JSONL exports
+-> static site
+-> GitHub Pages
 ```
 
-## Ontwerpprincipes
+The Huizen reference implementation currently uses the GemeenteOplossingen API.
 
-1. De frontend is niet de bron van waarheid.
-2. Bronconnectors zijn verwisselbaar.
-3. Het canonieke datamodel is het contract tussen bron en publicatie.
-4. Publicatie gebeurt zoveel mogelijk als gewone bestanden.
-5. PDF's worden niet standaard in Git opgeslagen.
-6. Elke run is herleidbaar via `HarvestRun` en `latest.json`.
-7. Datakwaliteit wordt expliciet zichtbaar gemaakt.
-8. Relationele context wordt apart gepubliceerd, niet hard in documentrecords ingebakken.
-9. De repository moet forkable blijven zonder database, backend of externe zoekmachine.
-10. Raw output blijft tijdelijk en hoort niet in de publieke Git-laag thuis.
+## System layers
 
-## Huidige pipeline
+The system is easier to read as a small static pipeline rather than as a runtime application stack. GitHub renders the following Mermaid diagram directly in Markdown. The plain text pipeline above is kept as a fallback for terminals, raw file views and environments that do not render Mermaid.
 
-```text
-1. Configuratie lezen
-2. Connector initialiseren
-3. Brondata ophalen via latest of full mode
-4. Raw latest opslaan als artifact
-5. Documenten normaliseren naar canonieke objecten
-6. Optioneel relationele data ophalen
-7. Meetings, meeting items en documentrelaties normaliseren
-8. Quality signals en documenttypeanalyses schrijven
-9. Public exports genereren
-10. data/public optioneel terugcommitten
-11. GitHub Pages-site leest data/public
+```mermaid
+flowchart BT
+  connector[Connector layer<br/>GemeenteOplossingen API] --> normalizer[Normalization layer<br/>vendor records to canonical records]
+  normalizer --> model[Canonical model and relations<br/>documents, meetings, agenda items]
+  model --> export[Export and validation layer<br/>JSONL writers, summaries, integrity checks]
+  export --> data[Public data layer<br/>data/public/*.jsonl, latest.json, quality reports]
+  data --> site[Static viewer<br/>site/, client-side HTML, CSS and JavaScript]
+  site --> pages[GitHub Pages<br/>public deployment]
 ```
 
-## Document harvest
+## Design constraints
 
-De documenttak blijft de basis van het systeem.
+- static site only;
+- GitHub Pages deployment;
+- no backend;
+- no database;
+- no PDF storage in Git;
+- compact JSONL exports;
+- document-first design;
+- municipality-specific deployments;
+- forkable architecture;
+- reproducible GitHub Actions workflows.
 
-```text
-/documents
-  -> raw documents
-  -> Document
-  -> data/public/documents.jsonl
-```
+These constraints are part of the architecture, not temporary limitations.
 
-Documentversies en checksums worden apart gepubliceerd in:
+## Source connector boundary
 
-```text
-data/public/document_versions.jsonl
-```
+A connector talks to a vendor API and retrieves raw source records. The rest of the system should not depend on vendor-specific field names or route shapes.
 
-PDF-bestanden worden niet structureel in Git opgeslagen. Tijdens workflow-runs mogen ze alleen tijdelijk bestaan als artifact of tussenbestand.
+The current proven connector path is GemeenteOplossingen. See [connectors.md](connectors.md) for connector responsibilities and current route knowledge.
 
-## Relationele harvest
+## Normalization boundary
 
-De relationele route voor Huizen is:
+Normalization converts raw vendor objects into canonical Open RIS Monitor records. This is where source-specific names such as `documentTypeLabel`, `objectId` or `meetingItemId` are mapped into stable public concepts such as document type, source ID and relation target.
 
-```text
-/meetingsessions
-  -> container.meeting.id
-  -> /meetings/{meetingId}
-  -> /meetings/{meetingId}/meetingitems
-  -> /meetings/{meetingId}/documents
-  -> /meetingitems/{meetingItemId}/documents
-```
+The source may be messy. The canonical model should be stable, defensive and honest about missing data.
 
-Deze route wordt bewust optioneel gehouden via relationele harvesting, zodat snelle documentharvests klein blijven.
+## Relation building
 
-## Bronconnectors
+The project is document-first, but documents become more useful when linked to the meeting and agenda context where they were used.
 
-Een connector vertaalt een specifiek RIS naar ruwe bronrecords. De rest van het systeem mag niet afhankelijk zijn van leverancier-specifieke details.
+The relation builder uses source routes such as meeting documents and meeting-item documents to create public relation exports. It should not invent relations that are not supported by source data.
 
-Huidig connectorcontract voor documenten:
+Known source variation is expected. For example, a future or historical meeting may not resolve through every meeting detail route. That should be handled as source variation when other useful public data can still be harvested.
 
-```text
-fetch_document_count()
-fetch_documents_page(limit, offset)
-fetch_latest_documents(limit)
-fetch_all_documents(batch_size, max_documents)
-build_document_download_url(document_id)
-```
+## Public data layer
 
-Uitgebreid connectorcontract voor relationele data:
+The public data layer is the read-only contract consumed by the static viewer and potential downstream users.
 
-```text
-fetch_meeting_sessions_page(limit, offset)
-fetch_meeting(meeting_id)
-fetch_meeting_items(meeting_id)
-fetch_meeting_documents(meeting_id)
-fetch_meeting_item_documents(meeting_item_id)
-```
-
-`fetch_meeting(meeting_id)` mag `None` teruggeven wanneer de bron een meeting uit `/meetingsessions` niet via `/meetings/{meetingId}` beschikbaar maakt. Dat is bronvariatie, geen fatale fout.
-
-## Normalisatie
-
-De normalisatielaag zet bronrecords om naar stabiele canonieke records:
-
-```text
-Document
-Meeting
-MeetingItem
-MeetingDocumentRelation
-MeetingItemDocumentRelation
-HarvestRun
-QualityIssue
-```
-
-Bron-ID's blijven altijd bewaard. Canonieke identifiers zijn stabiel en volgen het patroon:
-
-```text
-{municipality_slug}-{resource_type}-{source_id}
-```
-
-Voorbeelden:
-
-```text
-huizen-document-158
-huizen-meeting-19
-huizen-meeting-item-142
-huizen-meeting-19-document-3127
-huizen-meeting-item-142-document-158
-```
-
-## Publicatie
-
-De publicatielaag levert stabiele bestanden op.
-
-Geïmplementeerd:
+Typical public outputs:
 
 ```text
 data/public/documents.jsonl
@@ -179,47 +80,42 @@ data/public/meeting_items.jsonl
 data/public/meeting_documents.jsonl
 data/public/meeting_item_documents.jsonl
 data/public/latest.json
+data/public/quality/summary.json
+data/public/quality/issues.jsonl
 ```
 
-Gepland of aanvullend:
+`latest.json` acts as the operational manifest for the latest generated dataset.
 
-```text
-data/public/quality_issues.jsonl
-data/public/document_type_mappings.jsonl
-data/public/search_index.json
-```
+## Static viewer
 
-## Viewer
+The viewer under `site/` reads public files directly from GitHub Pages. Search, filtering, sorting and detail rendering happen in the browser.
 
-De viewer in `site/` is bewust frameworkloos. De site leest direct uit `data/public` en gebruikt client-side zoeken, filteren, sorteren en paginering.
+The viewer must be defensive. Missing titles, malformed dates or absent relations should not result in a blank page. Upstream data quality issues should be visible or gracefully skipped, not crash the UI.
 
-De huidige viewer draait op:
+## GitHub Actions
 
-```text
-https://rubenwoudsma.github.io/open-ris-monitor/site/index.html
-```
+GitHub Actions runs validation and harvesting.
 
-De volgende stap is relationele context tonen bij documenten:
+- `.github/workflows/validate.yml` runs tests, linting and export integrity validation.
+- `.github/workflows/harvest.yml` runs scheduled and manual harvests, generates quality reports, validates public output and optionally commits `data/public/`.
 
-```text
-Document
-  -> gekoppelde vergadering(en)
-  -> gekoppelde agendapunt(en)
-```
+The harvest workflow uses concurrency so two harvests on the same branch do not publish over each other.
 
-Later kan dit worden uitgebreid naar een agenda- en vergaderbrowser.
+## Why no backend and no database
 
-## Operationele strategie
+The project is designed for low-maintenance civic open source. A static repository is easier to fork, inspect, mirror and preserve than a hosted application with runtime infrastructure.
 
-Voor volledige historische dekking moet de harvest incrementeel blijven:
+The trade-off is intentional:
 
-```text
-1. Kleine scheduled latest harvests
-2. Periodieke bounded full harvests
-3. Relationele backfill in vensters
-4. Public exports compact houden
-5. Raw output als artifact bewaren, niet in Git
-6. PDF's buiten Git houden
-```
+- data is refreshed by workflow runs, not live queries;
+- search is client-side;
+- datasets must stay compact;
+- public files must remain stable and validated.
 
-Zie `docs/harvesting.md` voor het operationele ontwerp en de concrete bronstrategie.
+## Related documentation
+
+- [data-model.md](data-model.md)
+- [export-contract.md](export-contract.md)
+- [harvesting.md](harvesting.md)
+- [connectors.md](connectors.md)
+- [quality.md](quality.md)

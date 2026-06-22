@@ -1,27 +1,19 @@
-# Harvesting en bronanalyse
+# Harvesting
 
-## Doel
+This document describes how Open RIS Monitor harvests, normalizes and publishes public council information for the Huizen reference implementation.
 
-Dit document beschrijft hoe Open RIS Monitor openbare raadsinformatie ophaalt, normaliseert en publiceert voor de Huizen-implementatie.
-
-Het document heeft drie doelen:
-
-1. vastleggen welke GemeenteOplossingen API-routes bewezen werken;
-2. uitleggen hoe documenten, vergaderingen en agendapunten relationeel worden gekoppeld;
-3. vastleggen welke operationele harvestprofielen, cadence, limieten, stopcriteria en succescriteria gelden.
-
-Open RIS Monitor blijft hierbij bewust lichtgewicht:
+Open RIS Monitor remains deliberately lightweight:
 
 - static site only;
-- geen backend;
-- geen database;
-- geen PDF-opslag in Git;
-- compacte publicatie via JSONL;
-- herhaalbare GitHub Actions workflows.
+- no backend;
+- no database;
+- no PDF storage in Git;
+- compact JSONL publication;
+- reproducible GitHub Actions workflows.
 
-## Bronbasis
+## Source basis
 
-De Huizen-implementatie gebruikt de GemeenteOplossingen API.
+The Huizen implementation uses the GemeenteOplossingen API.
 
 Base URL:
 
@@ -29,36 +21,19 @@ Base URL:
 https://ris.gemeenteraadhuizen.nl/api/v2/
 ```
 
-Bewezen documentendpoint:
+Important document routes:
 
 ```text
 GET /documents?limit={limit}&offset={offset}
+GET /documents/{documentId}
+GET /documents/{documentId}/download
 ```
 
-Bewezen responsepad:
+PDF files are not stored in Git. Downloads may be used temporarily for derived metadata, such as checksums, after which only compact metadata is kept.
 
-```text
-result.documents
-```
+## Proven route groups
 
-Telling:
-
-```text
-GET /documents?limit=1
-result.totalCount
-```
-
-Downloadpatroon:
-
-```text
-GET /documents/{id}/download
-```
-
-PDF-bestanden worden niet opgeslagen in Git. Downloads mogen alleen tijdelijk worden gebruikt voor afgeleide metadata, bijvoorbeeld checksumverrijking, waarna alleen compacte metadata wordt gepubliceerd.
-
-## Bewezen top-level routes
-
-De volgende routes zijn bewezen bruikbaar voor Huizen:
+Useful GemeenteOplossingen route groups include:
 
 ```text
 /documents
@@ -68,9 +43,7 @@ De volgende routes zijn bewezen bruikbaar voor Huizen:
 /meetingsessions
 ```
 
-## Bewezen nested meeting routes
-
-De volgende nested routes zijn bewezen bruikbaar voor relationele context:
+Useful nested relation routes include:
 
 ```text
 /meetings/{meetingId}
@@ -80,60 +53,41 @@ De volgende nested routes zijn bewezen bruikbaar voor relationele context:
 /meetingitems/{meetingItemId}/documents
 ```
 
-## Relationele keten
+## Relation discovery
 
-De relationele discovery heeft bevestigd dat documenten gekoppeld kunnen worden aan vergaderingen en agendapunten.
-
-Werkende keten:
+The working relation chain is:
 
 ```text
 /meetingsessions
-  -> container.meeting.id
-  -> /meetings/{meetingId}
-  -> /meetings/{meetingId}/meetingitems
-  -> /meetings/{meetingId}/documents
-  -> /meetingitems/{meetingItemId}/documents
+-> container.meeting.id
+-> /meetings/{meetingId}
+-> /meetings/{meetingId}/meetingitems
+-> /meetings/{meetingId}/documents
+-> /meetingitems/{meetingItemId}/documents
 ```
 
-Belangrijke observaties:
+Important observations:
 
-- `/meetingsessions` is nodig voor historische dekking.
-- `/meetings` is vooral nuttig voor recente of toekomstige vergaderingen.
-- Niet elke meeting ID uit `/meetingsessions` resolveert via `/meetings/{meetingId}`.
-- Een 404 op meeting detail is bronvariatie en mag de harvest niet laten falen.
-- Meeting items bevatten voldoende velden voor een canoniek agendapunt.
-- Documenten zijn zowel op vergaderniveau als op agendapuntniveau vindbaar.
+- `/meetingsessions` can be needed for historical coverage;
+- `/meetings` can be useful for recent or future meetings;
+- not every meeting ID resolves through every detail route;
+- a 404 on a meeting detail route can be source variation and should not always fail the harvest;
+- meeting items can provide enough fields for agenda context;
+- documents can be linked at meeting level and meeting-item level.
 
-## Huizen-bronvelden
+## Harvest profiles
 
-De eerste documentharvest bevestigde onder andere deze velden:
+The CLI supports operational profiles with `--profile`.
 
-| Bronveld | Betekenis | Canoniek veld |
-|---|---|---|
-| `id` | Document-ID in bron | `source_id` |
-| `objectId` | Object-ID in bron | `source_object_id` |
-| `description` | Omschrijving of titel | `title`, `description` |
-| `documentTypeLabel` | Type document | `document_type` |
-| `fileName` | Bestandsnaam | `filename` |
-| `fileSize` | Bestandsgrootte in bytes | `file_size_bytes` |
-| `publicationDate.date` | Publicatiedatum | `publication_datetime` |
-| `publicationDate.timezone` | Tijdzone | `publication_timezone` |
-| `confidential` | Vertrouwelijkheidsindicator | `is_confidential` |
-| `isTabsignDocument` | Tabsign-indicator | `is_tabsign_document` |
-
-## Harvestprofielen
-
-De CLI ondersteunt drie operationele profielen via `--profile`.
-
-| Profiel | Doel | Gebruik | Publicatiegedrag |
+| Profile | Purpose | Typical use | Publication behavior |
 |---|---|---|---|
-| `quick` | Snelle controle | Lokale smoke test, diagnose, beperkte CI-check | Niet bedoeld als normale publicatiebron |
-| `public` | Dagelijkse publicatie | Standaard scheduled harvest voor GitHub Pages | Publiceert `data/public/` |
-| `backfill` | Historische aanvulling of herstel | Handmatig via `workflow_dispatch` of lokaal | Alleen bewust uitvoeren, bij voorkeur met expliciete limieten |
+| `quick` | Smoke test and diagnostics | Local checks, small CI-like verification | Not intended as normal publication source. |
+| `public` | Regular public dataset update | Scheduled harvest and normal manual update | Publishes `data/public/`. |
+| `backfill` | Historical filling or recovery | Manual workflow dispatch or local controlled run | Use deliberately with explicit limits. |
 
-Alle profielen zetten standaard relationele harvesting aan. Daardoor worden naast documentexports ook relationele exports geschreven.
+All normal public profiles are expected to include relation exports unless a diagnostic flag disables them.
 
-Belangrijkste public outputs:
+## Important public outputs
 
 ```text
 data/public/documents.jsonl
@@ -144,99 +98,58 @@ data/public/meeting_items.jsonl
 data/public/meeting_documents.jsonl
 data/public/meeting_item_documents.jsonl
 data/public/latest.json
+data/public/quality/summary.json
+data/public/quality/issues.jsonl
 ```
 
-Kwaliteitsrapporten worden gepubliceerd onder:
+`latest.json` is the operational manifest for the latest generated public dataset. It should contain output paths, totals, generation timestamp, relation status and run profile information.
 
-```text
-data/public/quality/
-```
+## Latest, public and backfill
 
-`latest.json` blijft het operationele publicatiecontract voor de laatste run. Dit bestand bevat onder andere de outputs, relationele status en samenvatting van de laatste publicatie.
+Use `quick` for fast local confidence.
 
-## Profielbeleid
+Use `public` for the live dataset. Scheduled GitHub Actions should use this profile.
 
-### `quick`
+Use `backfill` for initial historical loading, controlled historical extension or recovery after a longer gap. Do not schedule daily backfills.
 
-Gebruik `quick` voor:
-
-- snelle lokale controle na codewijzigingen;
-- diagnose van de RIS-koppeling;
-- controle of de pipeline start, normaliseert en public exports kan schrijven;
-- beperkte test runs zonder zware API-belasting.
-
-`quick` is niet bedoeld als bron voor de live dataset.
-
-### `public`
-
-Gebruik `public` voor:
-
-- de dagelijkse scheduled harvest;
-- reguliere publicatie naar `data/public/`;
-- bijwerken van de GitHub Pages dataset.
-
-Dit is het standaardprofiel voor operationeel gebruik.
-
-### `backfill`
-
-Gebruik `backfill` voor:
-
-- gecontroleerde historische aanvulling;
-- herstel na gemiste runs;
-- initiële vulling of herbouw van bredere historische dekking.
-
-`backfill` draait niet automatisch scheduled. Start dit profiel alleen handmatig. Gebruik waar mogelijk expliciete limieten, zodat runtime, API-belasting en GitHub Actions-verbruik voorspelbaar blijven.
+A `latest` or recent-window style run must not shrink the full public dataset accidentally. The intended behavior is to update recent information while preserving the broader public output unless a full or backfill run is deliberately performed.
 
 ## Cadence policy
 
-De standaard operationele cadence is:
-
-```text
-Dagelijks, profile=public
-```
-
-De scheduled workflow draait bewust niet exact op het hele uur. Dit verlaagt de kans dat meerdere forks tegelijk dezelfde upstream API belasten.
-
-Aanbevolen scheduled cadence:
-
-```text
-23 3 * * *
-```
-
-Betekenis:
-
-- eenmaal per dag;
-- rond 03:23 UTC;
-- standaard gemeente: `huizen`;
-- standaard profiel: `public`;
-- public output wordt bij scheduled runs terug gecommit naar de branch.
-
-Hourly harvesting is bewust niet gekozen. Gemeentelijke raadsinformatie wijzigt doorgaans niet op uurbasis, terwijl hourly runs meer GitHub Actions-minuten gebruiken en meer druk op de GemeenteOplossingen API leggen.
-
-Weekly harvesting is ook niet ideaal als standaard, omdat agenda's en documenten in de dagen voor een vergadering nog kunnen wijzigen.
-
-De gekozen baseline is daarom:
+The standard operational cadence is:
 
 ```text
 daily public harvest, manual backfill when needed
 ```
 
+Recommended scheduled cron:
+
+```text
+23 3 * * *
+```
+
+This means once per day, around 03:23 UTC. The non-hourly minute is intentional. It reduces the chance that multiple forks hit the same upstream API at the exact same time.
+
+Hourly harvesting is not the default because municipal council information generally does not change hourly, while hourly runs increase GitHub Actions usage and upstream API pressure.
+
+Weekly harvesting is not ideal as a default because agendas and documents can still change in the days before a meeting.
+
+Monthly backfill can be added later as a pre-go-live or post-MVP operational improvement, but it is not required for the current documentation PR.
+
 ## GitHub Actions workflow
 
-De operationele harvest workflow staat in:
+The harvest workflow lives at:
 
 ```text
 .github/workflows/harvest.yml
 ```
 
-De workflow ondersteunt twee startmodi:
+It supports:
 
-1. scheduled run;
-2. handmatige run via `workflow_dispatch`.
+1. scheduled runs;
+2. manual `workflow_dispatch` runs.
 
-### Scheduled run
-
-Een scheduled run gebruikt standaard:
+Scheduled runs are intended to use:
 
 ```text
 municipality: huizen
@@ -244,40 +157,37 @@ profile: public
 commit_public: true
 ```
 
-De scheduled run is bedoeld als normale publicatie-run voor de live dataset.
+Manual runs can be used for quick tests, public recovery runs or backfills.
 
-### Manual dispatch
+## Manual workflow inputs
 
-Een handmatige run ondersteunt deze inputs:
+Typical inputs:
 
-| Input | Doel | Standaard |
+| Input | Purpose | Typical value |
 |---|---|---|
-| `municipality` | Gemeenteconfiguratie | `huizen` |
-| `profile` | Harvestprofiel | `public` |
-| `enrich_checksums` | Tijdelijk PDF's downloaden voor checksumverrijking | `false` |
-| `checksum_max_documents` | Maximum aantal documenten voor checksumverrijking | `50` |
-| `commit_public` | Public output terug committen | `false` |
+| `municipality` | Municipality profile slug | `huizen` |
+| `profile` | Harvest profile | `quick`, `public`, `backfill` |
+| `enrich_checksums` | Temporarily download selected PDFs for checksums | `false` |
+| `checksum_max_documents` | Maximum checksum-enriched documents | `50` |
+| `commit_public` | Commit generated `data/public/` output | `false` for manual tests, `true` for intentional publication |
 
-Handmatige runs committen `data/public/` alleen als `commit_public=true`.
+## Concurrency
 
-### Concurrency
+The harvest workflow uses concurrency to avoid two harvests publishing over each other on the same branch.
 
-De workflow gebruikt concurrency, zodat twee harvests op dezelfde branch elkaar niet tegelijk kunnen overschrijven.
-
-Policy:
+Policy intent:
 
 ```text
-concurrency group: harvest-${{ github.ref }}
 cancel-in-progress: false
 ```
 
-Dit betekent dat een tweede run wacht of niet parallel publiceert, in plaats van een lopende harvest halverwege af te breken.
+A second run should wait or avoid parallel publication rather than interrupting a run midway.
 
-## Retry en back-off policy
+## Retry and back-off policy
 
-De GemeenteOplossingen connector moet robuust omgaan met tijdelijke upstreamproblemen.
+The connector should retry temporary upstream problems with limited exponential back-off.
 
-De connector mag retries uitvoeren bij tijdelijke fouten zoals:
+Retryable examples:
 
 ```text
 408 Request Timeout
@@ -288,12 +198,12 @@ De connector mag retries uitvoeren bij tijdelijke fouten zoals:
 504 Gateway Timeout
 connect timeout
 read timeout
-tijdelijke netwerkfouten
+temporary network failures
 ```
 
-De retrystrategie gebruikt beperkte retries met exponential back-off. Als de upstream een `Retry-After` header meegeeft, moet die worden gerespecteerd.
+If the upstream returns `Retry-After`, respect it.
 
-Niet alle fouten zijn retrybaar. Client errors zoals onderstaande worden niet blind opnieuw geprobeerd:
+Do not blindly retry normal client errors:
 
 ```text
 400 Bad Request
@@ -302,21 +212,21 @@ Niet alle fouten zijn retrybaar. Client errors zoals onderstaande worden niet bl
 404 Not Found
 ```
 
-Uitzondering: een 404 op een meeting detailroute kan bronvariatie zijn. Die specifieke situatie mag relationele harvesting niet volledig laten falen, zolang de rest van de brondata bruikbaar blijft.
+Exception: a 404 on a meeting detail route can be source variation during relation harvesting. That should be handled without failing the entire harvest when other useful data remains available.
 
-## Stopcriteria
+## Stop criteria
 
-Een harvest stopt wanneer één van de volgende situaties optreedt:
+A harvest stops when:
 
-1. het profielvenster of de profiellimieten zijn volledig verwerkt;
-2. de expliciete CLI-limieten zijn bereikt;
-3. de upstream API geeft geen extra records meer terug;
-4. een niet-herstelbare fout treedt op;
-5. exportvalidatie of integriteitscontrole faalt.
+1. the profile window or configured limits are processed;
+2. explicit CLI limits are reached;
+3. the upstream returns no more records;
+4. a non-recoverable connector error occurs;
+5. export validation or integrity validation fails.
 
-Expliciete CLI-parameters winnen altijd van profielwaarden. Dit maakt gecontroleerde runs mogelijk zonder nieuwe profielen toe te voegen.
+Explicit CLI parameters should override profile defaults. This makes bounded runs possible without creating new profiles.
 
-Voorbeeld:
+Example:
 
 ```bash
 python -m open_ris_monitor.pipeline.run \
@@ -328,172 +238,80 @@ python -m open_ris_monitor.pipeline.run \
 
 ## Failure policy
 
-De pipeline moet fail closed werken.
+The pipeline should fail closed.
 
-Dat betekent:
+That means:
 
-- een upstream outage mag niet leiden tot een succesvolle lege publicatie;
-- een lege of ongeldig gegenereerde dataset telt niet als succes;
-- ongeldige JSONL of schema-incompatibele output mag niet worden gepubliceerd;
-- bij failure blijft de vorige succesvolle publicatie leidend;
-- de GitHub Action moet zichtbaar falen, zodat onderhouders kunnen ingrijpen.
+- an upstream outage must not produce a successful empty publication;
+- a zero-record dataset is not a valid success when records are expected;
+- invalid JSONL or schema-incompatible output must not be published;
+- the previous successful publication remains the public reference after a failure;
+- the GitHub Action should fail visibly so maintainers can act.
 
-De pipeline mag dus niet stilletjes slagen wanneer de bron tijdelijk onbereikbaar is of nul bruikbare records oplevert terwijl records verwacht worden.
+## Success criteria
 
-## Succescriteria
+A harvest is successful when:
 
-Een harvest telt als succesvol wanneer aan alle onderstaande voorwaarden is voldaan:
-
-1. de run eindigt zonder niet-herstelbare connectorfouten;
-2. public JSONL-bestanden zijn gegenereerd;
-3. `data/public/latest.json` bestaat en verwijst naar de gegenereerde outputs;
-4. relationele exports zijn aanwezig, tenzij bewust met een diagnoseflag uitgeschakeld;
-5. kwaliteitsrapporten onder `data/public/quality/` zijn gegenereerd;
-6. exportvalidatie slaagt;
-7. de output bevat geen PDF-bestanden;
-8. scheduled runs committen uitsluitend toegestane public output terug naar Git.
-
-Minimale verwachte public output:
-
-```text
-data/public/documents.jsonl
-data/public/harvest_runs.jsonl
-data/public/latest.json
-```
-
-Verwachte relationele public output:
-
-```text
-data/public/meetings.jsonl
-data/public/meeting_items.jsonl
-data/public/meeting_documents.jsonl
-data/public/meeting_item_documents.jsonl
-```
-
-Verwachte kwaliteitsoutput:
-
-```text
-data/public/quality/summary.json
-data/public/quality/issues.jsonl
-```
+1. the run ends without non-recoverable connector errors;
+2. public JSONL files are generated;
+3. `data/public/latest.json` exists;
+4. `latest.json` references existing output files;
+5. relational exports are present for normal public runs;
+6. quality reports are generated;
+7. export validation succeeds;
+8. no PDF files are included in public output;
+9. scheduled runs commit only allowed public output.
 
 ## Commit policy
 
-De workflow mag public data committen, maar niet alle gegenereerde data hoort in Git.
-
-Wel toegestaan:
+Allowed:
 
 ```text
 data/public/
 ```
 
-Niet toegestaan:
+Not allowed:
 
 ```text
 data/raw/
 *.pdf
-grote tijdelijke downloads
-lokale caches
+large temporary downloads
+local caches
 ```
 
-Raw harvest output mag als tijdelijk GitHub Actions artifact worden geüpload, met beperkte retention, maar hoort niet als permanente Git-data te worden opgeslagen.
-
-## CLI-gebruik
-
-Snelle smoke test:
-
-```bash
-python -m open_ris_monitor.pipeline.run \
-  --municipality huizen \
-  --profile quick
-```
-
-Standaard publieke harvest:
-
-```bash
-python -m open_ris_monitor.pipeline.run \
-  --municipality huizen \
-  --profile public
-```
-
-Gecontroleerde backfill:
-
-```bash
-python -m open_ris_monitor.pipeline.run \
-  --municipality huizen \
-  --profile backfill \
-  --max-documents 1000 \
-  --meeting-scan-limit 1000 \
-  --meeting-item-limit 5000
-```
-
-Diagnose zonder relationele exports:
-
-```bash
-python -m open_ris_monitor.pipeline.run \
-  --municipality huizen \
-  --profile quick \
-  --no-include-relations
-```
-
-Gebruik `--no-include-relations` alleen voor diagnose. De normale publicatieworkflow verwacht relationele exports.
-
-## Wanneer welk profiel gebruiken
-
-Gebruik `quick` wanneer:
-
-- je lokaal snel wilt controleren of de pipeline werkt;
-- je retry- of connectorgedrag wilt testen;
-- je geen volledige publicatie wilt draaien.
-
-Gebruik `public` wanneer:
-
-- je de live dataset wilt bijwerken;
-- de scheduled workflow draait;
-- je een normale handmatige publicatie wilt uitvoeren.
-
-Gebruik `backfill` wanneer:
-
-- je historische dekking wilt aanvullen;
-- een eerdere periode opnieuw opgebouwd moet worden;
-- je na een storing gecontroleerd wilt herstellen.
-
-Gebruik `backfill` nooit als automatische dagelijkse workflow.
+Raw harvest output may be uploaded as a short-lived GitHub Actions artifact, but should not be stored as permanent Git data.
 
 ## Recovery policy
 
-Bij een mislukte scheduled run:
+After a failed scheduled run:
 
-1. controleer de GitHub Actions logs;
-2. bepaal of het om upstream outage, rate limiting, codefout of validatiefout gaat;
-3. draai eventueel handmatig `quick` om de bronkoppeling te testen;
-4. draai daarna handmatig `public` als herstelrun;
-5. gebruik `backfill` alleen als data uit een langere periode opnieuw opgebouwd moet worden.
+1. inspect the GitHub Actions logs;
+2. determine whether it is upstream outage, rate limiting, validation failure or code failure;
+3. run `quick` manually to test the connector;
+4. run `public` manually if the source is healthy;
+5. use `backfill` only when a longer period must be rebuilt.
 
-Bij upstream outage hoeft niet direct data te worden aangepast. De vorige succesvolle publicatie blijft beschikbaar via GitHub Pages.
+Do not overwrite a healthy historical dataset with a failing or empty run.
 
 ## Forking policy
 
-Forks kunnen dezelfde workflow gebruiken met een andere gemeenteconfiguratie, zolang:
+Forks can reuse the same workflow when:
 
-- de gemeenteconfiguratie bestaat onder `config/municipalities/`;
-- de connector de benodigde bronroutes ondersteunt;
-- de fork een eigen GitHub Actions schedule kiest;
-- de cron niet exact op het hele uur hoeft te draaien.
+- a municipality profile exists under `config/municipalities/`;
+- the connector supports the needed source routes;
+- the fork chooses its own GitHub Actions schedule;
+- the cron uses a non-hourly minute.
 
-Aanbevolen voor forks:
+Recommended random minutes for forks:
 
 ```text
-Kies een eigen willekeurige minuut in de cron, bijvoorbeeld 17, 23, 41 of 52.
+17, 23, 41 or 52
 ```
 
-Dit voorkomt dat meerdere forks tegelijk dezelfde upstream leverancier belasten.
+## Related documentation
 
-## Verder lezen
-
-- `docs/architecture.md`
-- `docs/data-model.md`
-- `docs/export-contract.md`
-- `docs/quality.md`
-- `docs/validatie-ci.md`
-- `docs/adding-a-municipality.md`
+- [connectors.md](connectors.md)
+- [adding-a-municipality.md](adding-a-municipality.md)
+- [export-contract.md](export-contract.md)
+- [quality.md](quality.md)
+- [validatie-ci.md](validatie-ci.md)

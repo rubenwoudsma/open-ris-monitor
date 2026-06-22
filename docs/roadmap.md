@@ -1,116 +1,108 @@
 # Roadmap
 
-Open RIS Monitor is een kleine, reproduceerbare open-data-pipeline voor publieke raadsinformatie. De huidige focus ligt op compacte public exports, een statische GitHub Pages viewer en een relationele laag voor vergaderingen, agendapunten en documentkoppelingen.
+This roadmap is intentionally conservative. Open RIS Monitor should remain a focused civic open-source reference implementation, not a central platform or enterprise data product.
 
-## Uitgangspunten
+The roadmap is not a promise list. It is a scope guard for MVP 1.0 and the first post-MVP improvements.
 
-- Geen PDF-bestanden in Git.
-- Geen grote raw dumps in Git.
-- Raw data alleen tijdelijk, bijvoorbeeld als GitHub Actions artifact.
-- `data/public/` blijft de compacte, commitbare public export.
-- De viewer blijft statisch, frameworkloos en geschikt voor GitHub Pages.
-- De public exports blijven zo stabiel mogelijk voor hergebruikers en forks.
-- Gemeente Huizen blijft de eerste implementatie, maar de opzet moet overdraagbaar blijven naar andere gemeenten en RIS-leveranciers.
+## Roadmap shape
 
-## Afgerond
+| Horizon | Goal | Level of detail |
+|---|---|---|
+| MVP 1.0 | Stable reference deployment for Huizen and a practical path for similar GemeenteOplossingen municipalities. | Concrete enough to close issues and prepare a release. |
+| After MVP 1.0 | Improve scale, search and adoption once the reference deployment is stable. | Directional, because the right solution depends on real usage. |
+| Out of scope | Prevent the project from drifting into a platform, archive or notification product. | Explicit, to protect maintainability. |
 
-- Document-first harvest voor Huizen.
-- Canonieke documentexports.
-- GitHub Pages viewer.
-- Automatische publicatie van `data/public/` na harvest.
-- Gepagineerde documentharvest met `latest` en `full` modes.
-- Documentversies en checksummetadata.
-- #14 Research naar meetings- en agenda-item-endpoints.
-- #15 Documenten koppelen aan vergaderingen en agendapunten.
-- #21 Documenttypen normaliseren.
-- #31 Viewer verbeteren na relationele exports.
-- #32 Harveststrategie en backfill operationaliseren.
-- #33 Relationele dekking verbeteren en valideren via quick en public runs.
-- #34 Eenvoudige agenda- en vergaderingbrowser.
-- #37 Public harvest prefereert recente documenten via het public profiel met latest mode.
-- #40 Roadmap actualiseren.
+## Completed or MVP-complete foundations
 
-## Huidige stand
+- Document-first harvest for the Huizen reference implementation.
+- GemeenteOplossingen connector path for public RIS metadata.
+- Canonical document exports.
+- Document version metadata when checksum enrichment is enabled.
+- No PDF storage in Git.
+- GitHub Pages static viewer.
+- Public JSONL exports under `data/public/`.
+- Latest, public and backfill harvest profiles.
+- Scheduled public harvest workflow.
+- Concurrency protection for harvest workflows.
+- Relation exports for meetings and meeting items where the source supports them.
+- Document type normalization and fallback labels.
+- Dataset freshness and basic metadata in `latest.json`.
+- Basic quality reports under `data/public/quality/`.
+- Export validation in CI.
 
-De CLI ondersteunt drie harvestprofielen:
+## Current MVP documentation focus
 
-- `quick` voor snelle smoke tests.
-- `public` voor de handmatige publicatie van de live dataset.
-- `backfill` voor gecontroleerde historische aanvulling.
+The current milestone is documentation coherence before MVP 1.0:
 
-De handmatige workflow voor publieke RIS-data gebruikt standaard het profiel `public`. Dat profiel publiceert compacte JSONL-bestanden in `data/public/` en schrijft geen PDF's of raw dumps naar Git.
+- README as the public front door;
+- practical municipality onboarding guide;
+- connector documentation for the current GemeenteOplossingen implementation;
+- accurate harvesting, export, quality and validation documentation;
+- conservative roadmap cleanup.
 
-De public export bestaat momenteel uit:
+This supports:
 
-- `documents.jsonl`
-- `document_versions.jsonl`
-- `harvest_runs.jsonl`
-- `meetings.jsonl`
-- `meeting_items.jsonl`
-- `meeting_documents.jsonl`
-- `meeting_item_documents.jsonl`
-- `latest.json`
+- issue #52, Municipality Onboarding Guide;
+- issue #57, Connector Interface Documentation;
+- README and documentation consistency before MVP 1.0.
 
-`latest.json` is het publicatiecontract. Het bevat de outputpaden, relationele status, relationele samenvatting en publicatie-informatie over de overlap tussen gepubliceerde documenten en relationele koppelingen.
+## Before MVP 1.0
 
-De viewer toont documentmetadata, compacte documenttypen en relationele context bij documenten waar die koppeling beschikbaar is. De volgende stap is niet nog meer relationele data verzamelen, maar de relationele laag beter navigeerbaar maken.
+The remaining pre-1.0 work should focus on stability and adoption, not scope expansion.
 
-## Eerstvolgende volgorde
+| Priority | Workstream | Outcome |
+|---|---|---|
+| 1 | Export contract | Public JSONL fields and schema version policy are stable enough for downstream users. |
+| 2 | Validation and safety | CI fails on malformed, missing, empty or sharply reduced public output. |
+| 3 | Reference deployment | The Huizen public site and data exports remain healthy. |
+| 4 | Onboarding | A similar GemeenteOplossingen municipality can follow the docs without guessing the project shape. |
+| 5 | Connectors | Current connector responsibilities are documented without introducing a large abstraction framework. |
+| 6 | Static viewer resilience | The viewer handles missing or messy source fields without crashing. |
+| 7 | Release preparation | License, release notes and public documentation are checked before tagging v1.0. |
 
-### 1. #13 Kwaliteitsrapportage toevoegen
+## After MVP 1.0
 
-Doel: kwaliteitsrapportage uitbreiden op basis van de documentlaag en de relationele laag.
+These items can wait until there is real pressure from dataset size, user feedback or a second implementation:
 
-Mogelijke checks:
+| Topic | Trigger | Likely direction |
+|---|---|---|
+| Search index strategy | Client-side filtering becomes slow or too limited. | Add a compact static index. |
+| Export partitioning | Public JSONL files become too large for reliable browser loading. | Partition by year or another stable dimension. |
+| Additional vendors | A concrete municipality needs a non-GemeenteOplossingen adapter. | Add a second connector and then extract a common interface if justified. |
+| Advanced quality scoring | Basic counts are not enough to explain dataset health. | Add simple transparent metrics before composite scores. |
+| Monthly backfill automation | Manual backfill becomes operationally annoying before go-live. | Add a scheduled workflow with conservative safeguards. |
+| Optional PDF preview | Users need quicker inspection from the static viewer. | Add a lightweight preview that still does not store PDFs in Git. |
 
-- documenten zonder gepubliceerde relationele koppeling;
-- relationele koppelingen naar ontbrekende documenten;
-- vergaderingen zonder agendapunten;
-- agendapunten zonder documenten;
-- dubbele of verdachte relationele koppelingen;
-- verschillen tussen raw relationele tellingen en gepubliceerde relationele overlap;
-- signalering wanneer public exports ontbreken of leeg zijn.
+## Out of scope
 
-### 2. #41 Documentatie opschonen en consolidatie afmaken
+Open RIS Monitor is not intended to become:
 
-Doel: tijdelijke documentatie consolideren in stabiele projectdocs, zodat de repository beter leest als open source project.
+- a national portal;
+- a SaaS platform;
+- a central aggregator;
+- an OCR platform;
+- a PDF archive;
+- a notification service;
+- a generic enterprise data platform.
 
-Resultaat:
+## Release checklist for v1.0
 
-- README als hoofdingang;
-- compacte vaste docs voor architectuur, data model, harvesting, kwaliteit, development en municipality onboarding;
-- geen losse issue-notities meer als hoofdbron voor projectuitleg.
+- README explains what the project is and is not.
+- Onboarding guide works for the supported GemeenteOplossingen path.
+- Connector documentation explains current support and future vendor expectations.
+- Export contract and schema version policy are documented.
+- Harvest profiles and cadence are documented.
+- Quality and freshness metadata are documented.
+- CI validation passes.
+- Generated public data is not accidentally changed in documentation PRs.
+- License text is final.
+- GitHub Pages site loads the public dataset correctly.
 
-### 3. #43 UI redesign: GitHub-achtige layout en TypeScript frontend
+## Related documentation
 
-Doel: een rustige GitHub-achtige layout met een TypeScript frontend.
-
-Scope:
-
-- document-first interface behouden;
-- betere navigatie tussen documenten, vergaderingen en relaties;
-- rustige, leesbare layout;
-- geen verlies van de statische en compacte publicatie-aanpak.
-
-## Operationele harveststrategie
-
-De operationele lijn blijft:
-
-- kleine `quick` runs voor smoke tests;
-- `public` runs voor de live dataset;
-- begrensde `backfill` runs voor historische dekking;
-- raw output alleen tijdelijk bewaren;
-- alleen compacte public JSONL committen;
-- geen PDF-archief in Git.
-
-Zie ook `docs/harvesting.md`.
-
-## Latere richting
-
-Na stabilisatie van Huizen:
-
-- connectorinterface documenteren voor andere RIS-leveranciers;
-- leverancier-capabilities expliciet maken;
-- bron-endpoints scheiden van canonieke outputmodellen;
-- public exportcontract stabiel houden over leveranciers heen;
-- viewer uitbreidbaar houden zonder zware frameworkkeuze.
+- [README.md](../README.md)
+- [adding-a-municipality.md](adding-a-municipality.md)
+- [connectors.md](connectors.md)
+- [export-contract.md](export-contract.md)
+- [harvesting.md](harvesting.md)
+- [quality.md](quality.md)

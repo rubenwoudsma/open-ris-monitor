@@ -1,82 +1,134 @@
 # Development
 
-## Doel
+This document describes local development and review hygiene for Open RIS Monitor.
 
-Dit document beschrijft de werkafspraken rond ontwikkeling, publicatie en onderhoud van de repository.
+The project is intentionally small. Use ordinary GitHub tools, small pull requests and reproducible commands.
 
-Open RIS Monitor is klein gehouden zodat het met gewone GitHub-tools beheersbaar blijft. De nadruk ligt op herhaalbare exports, kleine PR's en duidelijke documentatie.
+## Requirements
 
-## Kernregels
+- Python 3.11 or newer;
+- Git;
+- internet access for live RIS harvest tests;
+- a shell environment that can run the commands below.
 
-- geen PDF-bestanden in Git,
-- geen raw dumps in Git,
-- raw output alleen tijdelijk als workflow artifact,
-- `data/public/` is de commitbare public laag,
-- de viewer blijft statisch en frameworkloos,
-- de documentatie moet leesbaar blijven voor hergebruik door andere gemeenten.
+## Install
 
-## Aanpak voor wijzigingen
+```bash
+python -m pip install --upgrade pip
+python -m pip install -e .[dev]
+```
 
-Werk bij voorkeur in kleine, reviewbare stappen.
+## Local checks
 
-Een logische volgorde is:
+Run tests:
 
-1. wijzig documentatie of configuratie,
-2. test met een kleine harvest,
-3. controleer de public exports,
-4. werk daarna pas verder aan viewer of datamodel.
+```bash
+python -m pytest
+```
 
-Dat maakt fouten makkelijker te herkennen en houdt PR's compact.
+Run linting:
 
-## Harvestprofielen
+```bash
+ruff check .
+```
 
-Gebruik de profielen uit `docs/harvesting.md`:
+Validate public exports when `data/public/` is present:
 
-- `quick` voor smoke tests,
-- `public` voor normale publicatie,
-- `backfill` voor grotere historische aanvulling.
+```bash
+python -m open_ris_monitor.exporters.validate_exports
+```
 
-## Verhoudingen tussen bestanden
+## Local harvest smoke test
 
-De belangrijkste contracten zijn:
+Use `quick` first:
 
-- `README.md` voor de hoofduitleg,
-- `docs/architecture.md` voor de systeemlagen,
-- `docs/data-model.md` voor de canonieke entiteiten,
-- `docs/harvesting.md` voor bron- en workflowkennis,
-- `docs/quality.md` voor rapportage en controles,
-- `docs/roadmap.md` voor de volgende stappen,
-- `docs/adding-a-municipality.md` voor forks en nieuwe gemeenten.
+```bash
+python -m open_ris_monitor.pipeline.run \
+  --municipality huizen \
+  --profile quick
+```
 
-## Publicatie
+Use bounded public-style runs for development:
 
-De publicatieketen is bewust simpel:
+```bash
+python -m open_ris_monitor.pipeline.run \
+  --municipality huizen \
+  --profile public \
+  --max-documents 100 \
+  --meeting-scan-limit 100
+```
 
-- brondata ophalen,
-- normaliseren,
-- publiceren naar JSONL,
-- viewer leest direct uit `data/public/`.
+Use `backfill` only when intentionally testing historical coverage or recovery.
 
-Dat betekent dat wijzigingen aan de public exports zorgvuldig moeten gebeuren. Als een bestand onderdeel is van het public contract, moet een wijziging daarvan in de roadmap en PR-beschrijving genoemd worden.
+## Generate quality reports
 
-## Forks en andere gemeenten
+```bash
+python -m open_ris_monitor.analysis.generate_public_reports \
+  --public-dir data/public
+```
 
-De repository is bedoeld om te kunnen forken.
+## Repository rules
 
-Nieuwe gemeenten zouden in principe via configuratie moeten kunnen starten. Alleen wanneer een andere RIS-leverancier wordt gebruikt, hoort daar een nieuwe connector bij.
+Do not commit:
 
-Zie `docs/adding-a-municipality.md`.
+```text
+data/raw/
+*.pdf
+temporary downloads
+local caches
+virtual environments
+```
 
-## Onderhoudstips
+Only commit `data/public/` when the PR intentionally updates the published dataset. For documentation-only changes, avoid generated data changes.
 
-- houd de README actueel als de hoofdinformatie verandert,
-- houd de roadmap synchroon met afgeronde issues,
-- consolideer tijdelijke issue-notities in stabiele docs,
-- bewaar bronanalyse en kwaliteit als aparte, leesbare secties,
-- vermijd grote, moeilijk te reviewen documentatie-sprongen.
+Check before every commit:
 
-## Verder lezen
+```bash
+git status --short
+```
 
-- `README.md`
-- `docs/roadmap.md`
-- `docs/adding-a-municipality.md`
+## Recommended PR style
+
+Keep PRs small and reviewable. Prefer one primary goal per PR.
+
+Good PR categories:
+
+- documentation-only;
+- connector or harvesting fix;
+- export contract or validation fix;
+- frontend-only improvement;
+- generated public data refresh.
+
+Avoid mixing documentation refreshes with unrelated harvesting or frontend behavior changes.
+
+## Important documents
+
+- [README.md](../README.md), project front door.
+- [architecture.md](architecture.md), system shape and constraints.
+- [data-model.md](data-model.md), canonical entities and relations.
+- [export-contract.md](export-contract.md), public output contract.
+- [harvesting.md](harvesting.md), profiles, cadence and recovery.
+- [quality.md](quality.md), quality report interpretation.
+- [adding-a-municipality.md](adding-a-municipality.md), fork and onboarding steps.
+- [connectors.md](connectors.md), connector responsibilities.
+- [roadmap.md](roadmap.md), MVP direction.
+- [validatie-ci.md](validatie-ci.md), CI and validation.
+
+## GitHub Actions
+
+The main workflows are:
+
+```text
+.github/workflows/validate.yml
+.github/workflows/harvest.yml
+```
+
+`validate.yml` runs tests, Ruff and export integrity validation.
+
+`harvest.yml` runs scheduled and manual harvests, generates reports, validates outputs and optionally commits `data/public/`.
+
+## Frontend development
+
+The viewer lives under `site/` and is static. Do not introduce a backend or database for viewer features. Keep asset paths compatible with GitHub Pages forks.
+
+The frontend should be defensive against source data problems. Missing fields, malformed dates or absent relations should render gracefully.
