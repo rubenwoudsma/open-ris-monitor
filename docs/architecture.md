@@ -18,41 +18,16 @@ The Huizen reference implementation currently uses the GemeenteOplossingen API.
 
 ## System layers
 
-```text
-+------------------------------------------------------+
-| Static viewer                                        |
-| site/, client-side HTML, CSS and JavaScript          |
-+------------------------------------------------------+
-                         ^
-                         |
-+------------------------------------------------------+
-| Public data layer                                    |
-| data/public/*.jsonl, latest.json, quality reports    |
-+------------------------------------------------------+
-                         ^
-                         |
-+------------------------------------------------------+
-| Export and validation layer                          |
-| JSONL writers, schema/integrity checks, summaries    |
-+------------------------------------------------------+
-                         ^
-                         |
-+------------------------------------------------------+
-| Canonical model and relations                        |
-| documents, meetings, meeting items, relations        |
-+------------------------------------------------------+
-                         ^
-                         |
-+------------------------------------------------------+
-| Normalization layer                                  |
-| vendor-shaped raw records to canonical records       |
-+------------------------------------------------------+
-                         ^
-                         |
-+------------------------------------------------------+
-| Connector layer                                      |
-| GemeenteOplossingen API, future vendors later        |
-+------------------------------------------------------+
+The system is easier to read as a small static pipeline rather than as a runtime application stack. GitHub renders the following Mermaid diagram directly in Markdown. The plain text pipeline above is kept as a fallback for terminals, raw file views and environments that do not render Mermaid.
+
+```mermaid
+flowchart BT
+  connector[Connector layer<br/>GemeenteOplossingen API] --> normalizer[Normalization layer<br/>vendor records to canonical records]
+  normalizer --> model[Canonical model and relations<br/>documents, meetings, agenda items]
+  model --> export[Export and validation layer<br/>JSONL writers, summaries, integrity checks]
+  export --> data[Public data layer<br/>data/public/*.jsonl, latest.json, quality reports]
+  data --> site[Static viewer<br/>site/, client-side HTML, CSS and JavaScript]
+  site --> pages[GitHub Pages<br/>public deployment]
 ```
 
 ## Design constraints
@@ -74,7 +49,7 @@ These constraints are part of the architecture, not temporary limitations.
 
 A connector talks to a vendor API and retrieves raw source records. The rest of the system should not depend on vendor-specific field names or route shapes.
 
-The current proven connector path is GemeenteOplossingen. See `docs/connectors.md` for connector responsibilities and current route knowledge.
+The current proven connector path is GemeenteOplossingen. See [connectors.md](connectors.md) for connector responsibilities and current route knowledge.
 
 ## Normalization boundary
 
@@ -139,8 +114,8 @@ The trade-off is intentional:
 
 ## Related documentation
 
-- `docs/data-model.md`
-- `docs/export-contract.md`
-- `docs/harvesting.md`
-- `docs/connectors.md`
-- `docs/quality.md`
+- [data-model.md](data-model.md)
+- [export-contract.md](export-contract.md)
+- [harvesting.md](harvesting.md)
+- [connectors.md](connectors.md)
+- [quality.md](quality.md)

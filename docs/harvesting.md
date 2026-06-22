@@ -310,8 +310,8 @@ Recommended random minutes for forks:
 
 ## Related documentation
 
-- `docs/connectors.md`
-- `docs/adding-a-municipality.md`
-- `docs/export-contract.md`
-- `docs/quality.md`
-- `docs/validatie-ci.md`
+- [connectors.md](connectors.md)
+- [adding-a-municipality.md](adding-a-municipality.md)
+- [export-contract.md](export-contract.md)
+- [quality.md](quality.md)
+- [validatie-ci.md](validatie-ci.md)

@@ -120,6 +120,6 @@ For MVP, the most useful questions are:
 
 ## Related documentation
 
-- `docs/harvesting.md`
-- `docs/export-contract.md`
-- `docs/validatie-ci.md`
+- [harvesting.md](harvesting.md)
+- [export-contract.md](export-contract.md)
+- [validatie-ci.md](validatie-ci.md)

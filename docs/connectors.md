@@ -141,6 +141,50 @@ Do not blindly retry normal client errors:
 
 A known exception is a meeting detail 404 during relation discovery. That can be source variation and should not necessarily fail the whole harvest when the rest of the dataset is usable.
 
+## Keeping a connector operational
+
+A connector is not finished when the first harvest succeeds. It should be treated as a small operational contract with the upstream RIS vendor. For the current GemeenteOplossingen path, keep these checks visible when maintaining or adapting the project.
+
+### Routine checks
+
+| Area | What to check | Why it matters |
+|---|---|---|
+| API reachability | Confirm list and detail routes still respond. | A public site can become stale without an obvious frontend error. |
+| Pagination | Confirm `limit` and `offset` still return complete windows. | Missing pages can silently reduce the dataset. |
+| Date filters | Confirm bounded and latest runs still select the intended period. | A wrong window can overwrite a healthy dataset with incomplete output. |
+| Confidentiality | Confirm confidential source records are not published. | Public deployments should only expose public metadata. |
+| Relation routes | Confirm meeting-document and meeting-item-document routes still work. | Broken relation routes reduce context even when document harvesting works. |
+| Document type fields | Confirm `documentTypeLabel` or fallback fields still exist. | Type labels drive filtering and public readability. |
+| Counts | Compare new counts with previous successful runs. | This guards against zero-byte or sharply reduced outputs. |
+| Rate limits | Watch for 429 responses or recurring timeouts. | Forks should avoid stressing the upstream vendor API. |
+
+### When the upstream changes
+
+When a vendor changes route behavior or payload fields, prefer this order of work:
+
+1. Capture a small failing example in a local fixture or issue description.
+2. Confirm whether harvesting, normalization or relation building is affected.
+3. Update the connector or normalizer with the smallest safe change.
+4. Add or update tests for the changed source shape.
+5. Run export validation and check `latest.json` counts.
+6. Confirm the static viewer still loads documents, meetings and relation context.
+
+Do not solve source variation by broadening the public data contract without documenting it. Source-specific variation belongs in the connector or normalizer. Public JSONL fields should remain stable.
+
+### Future vendor adaptation path
+
+For another RIS vendor, the recommended path is incremental:
+
+1. Document the vendor API routes and authentication requirements.
+2. Prove document metadata harvesting first.
+3. Map source records into the existing `Document` model.
+4. Add meetings and agenda items only after document harvesting is stable.
+5. Add relations only when the source exposes reliable links.
+6. Keep the public export contract unchanged where possible.
+7. Only introduce a shared connector interface after a second implementation shows the common shape.
+
+This keeps the system running while avoiding premature abstractions. It also matches the current project principle that the Huizen GemeenteOplossingen implementation is the proven reference path.
+
 ## What an alternate vendor connector must provide
 
 A new vendor connector should prove that it can produce the raw inputs needed for the canonical model:
@@ -163,8 +207,8 @@ A future abstraction should be added only when a second vendor implementation ma
 
 ## Related documentation
 
-- `docs/adding-a-municipality.md`
-- `docs/architecture.md`
-- `docs/data-model.md`
-- `docs/harvesting.md`
-- `docs/export-contract.md`
+- [adding-a-municipality.md](adding-a-municipality.md)
+- [architecture.md](architecture.md)
+- [data-model.md](data-model.md)
+- [harvesting.md](harvesting.md)
+- [export-contract.md](export-contract.md)

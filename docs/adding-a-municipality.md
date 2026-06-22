@@ -18,7 +18,7 @@ The shortest supported path is another municipality that uses the GemeenteOploss
 |---|---:|---|
 | Another GemeenteOplossingen municipality with compatible API routes | Low to medium | Usually starts with configuration and bounded validation. |
 | GemeenteOplossingen with route or payload differences | Medium | Configuration plus connector or normalization adjustments may be needed. |
-| Another RIS vendor | High | A new connector is likely required. See `docs/connectors.md`. |
+| Another RIS vendor | High | A new connector is likely required. See [connectors.md](connectors.md). |
 
 Do not claim a new municipality is supported until a bounded harvest has been run and the generated public exports have been validated.
 
@@ -259,8 +259,8 @@ Use `backfill` only for controlled historical filling, recovery or initial broad
 
 ## Related documentation
 
-- `docs/connectors.md`
-- `docs/harvesting.md`
-- `docs/export-contract.md`
-- `docs/quality.md`
-- `docs/development.md`
+- [connectors.md](connectors.md)
+- [harvesting.md](harvesting.md)
+- [export-contract.md](export-contract.md)
+- [quality.md](quality.md)
+- [development.md](development.md)

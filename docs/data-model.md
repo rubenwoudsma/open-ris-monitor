@@ -19,6 +19,27 @@ Open RIS Monitor uses a canonical data model between vendor-specific RIS APIs an
 
 Later concepts such as persons, organizations, decisions, topics, OCR text and notifications are outside the MVP scope.
 
+## Entity relationship overview
+
+This Mermaid diagram is intentionally included because it gives developers and data consumers a quick visual map of the model. It is conceptual, not a database schema. Open RIS Monitor still has no runtime database.
+
+```mermaid
+erDiagram
+  MUNICIPALITY ||--o{ SOURCE_SYSTEM : uses
+  SOURCE_SYSTEM ||--o{ DOCUMENT : provides
+  SOURCE_SYSTEM ||--o{ MEETING : provides
+  MUNICIPALITY ||--o{ MEETING : has
+  MEETING ||--o{ MEETING_ITEM : contains
+  MEETING ||--o{ MEETING_DOCUMENT_RELATION : links
+  MEETING_ITEM ||--o{ MEETING_ITEM_DOCUMENT_RELATION : links
+  DOCUMENT ||--o{ MEETING_DOCUMENT_RELATION : referenced_by
+  DOCUMENT ||--o{ MEETING_ITEM_DOCUMENT_RELATION : referenced_by
+  DOCUMENT ||--o{ DOCUMENT_VERSION : has
+  HARVEST_RUN ||--o{ DOCUMENT : observes
+  HARVEST_RUN ||--o{ MEETING : observes
+  HARVEST_RUN ||--o{ QUALITY_ISSUE : detects
+```
+
 ## Identifier policy
 
 Canonical identifiers should be stable and scoped. Do not rely only on vendor IDs as public IDs.
@@ -225,10 +246,10 @@ Downstream consumers should treat these as public relation tables. Missing relat
 
 ## Public export contract
 
-The public data model is the contract for the static viewer and downstream users. Structural changes should be versioned and documented in `docs/export-contract.md`.
+The public data model is the contract for the static viewer and downstream users. Structural changes should be versioned and documented in [export-contract.md](export-contract.md).
 
 Related files:
 
-- `docs/export-contract.md`
-- `docs/harvesting.md`
-- `docs/quality.md`
+- [export-contract.md](export-contract.md)
+- [harvesting.md](harvesting.md)
+- [quality.md](quality.md)

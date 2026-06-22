@@ -103,16 +103,16 @@ Avoid mixing documentation refreshes with unrelated harvesting or frontend behav
 
 ## Important documents
 
-- `README.md`, project front door.
-- `docs/architecture.md`, system shape and constraints.
-- `docs/data-model.md`, canonical entities and relations.
-- `docs/export-contract.md`, public output contract.
-- `docs/harvesting.md`, profiles, cadence and recovery.
-- `docs/quality.md`, quality report interpretation.
-- `docs/adding-a-municipality.md`, fork and onboarding steps.
-- `docs/connectors.md`, connector responsibilities.
-- `docs/roadmap.md`, MVP direction.
-- `docs/validatie-ci.md`, CI and validation.
+- [README.md](../README.md), project front door.
+- [architecture.md](architecture.md), system shape and constraints.
+- [data-model.md](data-model.md), canonical entities and relations.
+- [export-contract.md](export-contract.md), public output contract.
+- [harvesting.md](harvesting.md), profiles, cadence and recovery.
+- [quality.md](quality.md), quality report interpretation.
+- [adding-a-municipality.md](adding-a-municipality.md), fork and onboarding steps.
+- [connectors.md](connectors.md), connector responsibilities.
+- [roadmap.md](roadmap.md), MVP direction.
+- [validatie-ci.md](validatie-ci.md), CI and validation.
 
 ## GitHub Actions
 

@@ -147,7 +147,7 @@ Breaking changes should be avoided before v1.0 unless needed to stabilize the co
 
 ## Related documentation
 
-- `docs/data-model.md`
-- `docs/harvesting.md`
-- `docs/quality.md`
-- `docs/validatie-ci.md`
+- [data-model.md](data-model.md)
+- [harvesting.md](harvesting.md)
+- [quality.md](quality.md)
+- [validatie-ci.md](validatie-ci.md)

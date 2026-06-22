@@ -56,6 +56,35 @@ Validate JSON manually when diagnosing:
 python -m json.tool data/public/latest.json > /tmp/latest.json
 ```
 
+
+## What the test suite should cover
+
+The exact test files may evolve, but the validation suite should make the project safe to run as a static public data pipeline. A healthy test set should include these categories.
+
+| Test area | Purpose | Examples |
+|---|---|---|
+| Normalization tests | Verify that vendor-shaped records become canonical records. | Document titles, document type fallbacks, timestamps, source IDs. |
+| Export tests | Verify that JSONL writers produce parseable and contract-aligned records. | Required fields, schema version fields, stable output paths. |
+| Relation tests | Verify that document, meeting and agenda relations are built consistently. | Meeting-document links, meeting-item-document links, missing relation handling. |
+| Harvest profile tests | Verify that quick, public, bounded and backfill behavior stays intentional. | Date windows, limits, latest-run behavior. |
+| Quality tests | Verify that quality summaries and issue records are generated correctly. | Counts, orphan or unlinked records, freshness metadata. |
+| Frontend data contract tests | Verify that exported data remains safe for the static viewer. | Missing fields, malformed dates, defensive parsing assumptions. |
+| Workflow safety tests | Verify that generated output is not replaced by empty or implausibly small datasets. | Zero-record guard, missing file guard, latest manifest checks. |
+
+These tests do not need to make live requests to the RIS API. Prefer fixtures and small representative examples for normal CI. Live or large harvest checks should remain explicit manual or scheduled operations.
+
+## How to read validation results
+
+When a validation run fails, first classify the failure:
+
+| Failure type | Likely meaning | First check |
+|---|---|---|
+| Unit test failure | Code behavior changed. | Inspect the failing test name and fixture. |
+| Ruff failure | Style, unused import or static code issue. | Run `ruff check .` locally. |
+| Export validation failure | Generated public files are missing or malformed. | Inspect `data/public/latest.json` and referenced paths. |
+| Empty output failure | Upstream returned no usable records or the harvest window is wrong. | Check harvest profile, date window and source API availability. |
+| Link or docs failure, if added later | Documentation references are broken. | Check relative paths from the current Markdown file. |
+
 ## Export validation checklist
 
 Validation should check:
@@ -89,12 +118,12 @@ For documentation-only changes:
 - do not modify frontend behavior;
 - do not commit generated `data/public/` unless the PR intentionally updates data;
 - check changed Markdown links;
-- ensure badges in `README.md` refer to workflows that exist;
+- ensure badges in [README.md](../README.md) refer to workflows that exist;
 - ensure docs do not claim unsupported vendor support.
 
 ## Related documentation
 
-- `docs/export-contract.md`
-- `docs/harvesting.md`
-- `docs/quality.md`
-- `docs/development.md`
+- [export-contract.md](export-contract.md)
+- [harvesting.md](harvesting.md)
+- [quality.md](quality.md)
+- [development.md](development.md)
