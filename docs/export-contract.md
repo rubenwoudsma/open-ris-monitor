@@ -1,30 +1,153 @@
-# Open RIS Monitor: Exportcontract & Schemaversiebeleid
+# Export contract
 
-Dit document beschrijft de interfacegrens tussen de harvester-workflows van de gemeente en de client-side webinterfaces. Aangezien Open RIS Monitor volledig functioneert zonder gecentraliseerde database, fungeren bestanden die zijn geëxporteerd als platte JSON Lines (`.jsonl`) als ons primaire datacontract.
+The export contract is the boundary between the harvest pipeline, the static viewer and downstream users. Since Open RIS Monitor has no database or backend, the public files are the contract.
 
----
+## Public output location
 
-## 📈 Schemaversiestrategie
+Public exports are written under:
 
-Alle structurele datacontracten maken gebruik van strikte **Semantic Versioning 2.0.0** (`MAJOR.MINOR.PATCH`). Elke invoer in onze samengestelde datasets moet een tekstveld `schema_version` bevatten.
+```text
+data/public/
+```
 
-* **MAJOR**: Structurele, brekende wijzigingen. Dit vereist aanpassingen in zowel de harvesting-templates als de TypeScript UI-weergavelagen (bijv. het verwijderen van verplichte velden).
-* **MINOR**: Niet-brekende functie-updates. Het toevoegen van optionele velden die oudere verwerkingsblokken veilig kunnen overslaan zonder aan stabiliteit te verliezen.
-* **PATCH**: Updates gericht op beschrijvende teksten, patrooncorrecties of structurele verduidelijkingen in de JSON Schema-definities.
+Typical files:
 
----
+```text
+data/public/documents.jsonl
+data/public/document_versions.jsonl
+data/public/harvest_runs.jsonl
+data/public/meetings.jsonl
+data/public/meeting_items.jsonl
+data/public/meeting_documents.jsonl
+data/public/meeting_item_documents.jsonl
+data/public/latest.json
+data/public/quality/summary.json
+data/public/quality/issues.jsonl
+```
 
-## 🤝 Compatibiliteitsgaranties
+Raw source files, PDFs and temporary downloads are not part of the public export contract.
 
-1. **Defensieve Verwerking**: De TypeScript-frontend maakt gebruik van robuuste standaard parsing-patronen. Velden die worden aangetroffen maar niet zijn gedefinieerd in de versieconfiguratie, worden overgeslagen in plaats van dat er fouten optreden die de applicatie laten vastlopen.
-2. **Achterwaartse Compatibiliteit**: Kleine revisies in de lay-out (minor releases) garanderen volledige structurele ondersteuning voor data die is gegenereerd door eerdere minor updates.
+## Format
 
----
+Most public datasets are JSON Lines files. Each non-empty line is one JSON object.
 
-## 🗂️ Doellocaties voor Exports
+```text
+one object per line
+UTF-8
+no surrounding array
+```
 
-Harvesters schrijven naar de volgende voorspelbare statische relatieve paden binnen de deployment-structuur:
-* `data/documents.jsonl`
-* `data/meetings.jsonl`
-* `data/agenda_items.jsonl`
-* `data/relations.jsonl`
+`latest.json` and compact quality summaries are normal JSON files.
+
+## Schema versioning
+
+Canonical public records should include:
+
+```json
+"schema_version": "1.0.0"
+```
+
+Use semantic versioning for the public contract:
+
+| Version part | Meaning |
+|---|---|
+| MAJOR | Breaking structural change. |
+| MINOR | Backward-compatible optional fields or non-breaking additions. |
+| PATCH | Clarifications, documentation or validation corrections. |
+
+If a legacy file is missing `schema_version`, treat that as a pre-1.0 compatibility concern and document it in the PR that changes the export.
+
+## Compatibility policy
+
+For MVP 1.0:
+
+- do not remove public fields without a major version change;
+- prefer adding optional fields over changing existing field meaning;
+- keep stable identifiers stable;
+- preserve source identifiers separately from canonical identifiers;
+- keep relation direction documented;
+- validate JSONL before publishing;
+- fail closed when outputs are empty or structurally invalid.
+
+## `latest.json`
+
+`latest.json` is the operational manifest for the current generated dataset. It should be safe for the viewer and maintainers to read first.
+
+Expected information includes:
+
+- municipality slug and name;
+- generated timestamp;
+- harvest profile or run type;
+- relation harvesting status;
+- output file paths;
+- document, meeting and relation totals;
+- latest-run counts;
+- quality summary location;
+- latest successful full or backfill timestamp when available.
+
+Do not treat a successful `latest` run as proof that the complete historical dataset was rebuilt. A `latest` run may update recent records while preserving the broader public dataset.
+
+## Core JSONL exports
+
+### `documents.jsonl`
+
+Canonical public document metadata. It should include stable canonical ID, source ID, title, description, document type, filename, publication date, source URL, download URL when public, confidentiality flag and municipality context.
+
+### `document_versions.jsonl`
+
+Observed version or checksum metadata. It exists when checksum enrichment is enabled or when version tracking has been generated. It must not imply that PDFs are stored in Git.
+
+### `harvest_runs.jsonl`
+
+Operational run records, including timestamps, status, profile and counts.
+
+### `meetings.jsonl`
+
+Canonical meeting context where the source provides usable meeting data.
+
+### `meeting_items.jsonl`
+
+Agenda or meeting item context where the source provides usable meeting-item data.
+
+### `meeting_documents.jsonl`
+
+Relations between meetings and documents.
+
+### `meeting_item_documents.jsonl`
+
+Relations between meeting items and documents.
+
+## Quality outputs
+
+Quality outputs live under:
+
+```text
+data/public/quality/
+```
+
+They provide dataset health signals, not a separate product. They are intended to help maintainers and the viewer interpret completeness, freshness and relation coverage.
+
+## Validation expectations
+
+Validation should check:
+
+- `latest.json` is valid JSON;
+- JSONL files contain valid JSON per line;
+- output files referenced by `latest.json` exist;
+- required relational exports exist for normal public runs;
+- no generated public dataset is unexpectedly empty;
+- relation references point to known records where that check is implemented;
+- no PDFs are present in public output.
+
+## Breaking changes
+
+A change is breaking when it removes fields, changes field meaning, changes identifier format, changes relation direction, moves public file paths or changes JSONL into another format.
+
+Breaking changes should be avoided before v1.0 unless needed to stabilize the contract.
+
+## Related documentation
+
+- `docs/data-model.md`
+- `docs/harvesting.md`
+- `docs/quality.md`
+- `docs/validatie-ci.md`

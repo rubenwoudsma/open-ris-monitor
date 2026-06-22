@@ -1,44 +1,70 @@
-# Gemeente toevoegen
+# Adding a municipality
 
-## Doel
+This guide explains the practical path for adapting Open RIS Monitor to another municipality.
 
-Een nieuwe gemeente moet zoveel mogelijk via configuratie toegevoegd kunnen worden. Alleen wanneer een andere RIS-leverancier wordt gebruikt, is een nieuwe connector nodig.
+The shortest supported path is another municipality that uses the GemeenteOplossingen API in a similar way to the Huizen reference implementation. A municipality using another RIS vendor will likely need a new connector or adapter before the normal pipeline can be reused.
 
-Dit document beschrijft de gewenste route voor iemand die deze repo forked voor een eigen gemeente.
+## What you need first
 
-## Stap 1, fork of nieuwe branch maken
+- A fork or clone of this repository.
+- Python 3.11 or newer.
+- A public RIS endpoint for the municipality.
+- A clear municipality slug, for example `huizen`, `hilversum` or `bussum`.
+- Enough time to run a small bounded harvest before enabling scheduled publishing.
 
-Fork de repository of maak een branch in een eigen repo.
+## Supported adoption paths
 
-Aanbevolen branchnaam:
+| Situation | Expected effort | Notes |
+|---|---:|---|
+| Another GemeenteOplossingen municipality with compatible API routes | Low to medium | Usually starts with configuration and bounded validation. |
+| GemeenteOplossingen with route or payload differences | Medium | Configuration plus connector or normalization adjustments may be needed. |
+| Another RIS vendor | High | A new connector is likely required. See `docs/connectors.md`. |
 
-```text
-add-municipality-<gemeente-slug>
+Do not claim a new municipality is supported until a bounded harvest has been run and the generated public exports have been validated.
+
+## Step 1, fork or clone
+
+Fork the repository on GitHub, or clone it locally:
+
+```bash
+git clone https://github.com/rubenwoudsma/open-ris-monitor.git
+cd open-ris-monitor
+python -m pip install --upgrade pip
+python -m pip install -e .[dev]
 ```
 
-## Stap 2, configuratie kopieren
+Run the baseline checks before changing anything:
 
-Kopieer:
-
-```text
-config/municipalities/example.yml
+```bash
+python -m pytest
+ruff check .
 ```
 
-Naar:
+## Step 2, choose the municipality slug
+
+Use a stable lowercase slug. Prefer ASCII letters, digits and hyphens only.
+
+Examples:
 
 ```text
-config/municipalities/<gemeente-slug>.yml
+huizen
+hilversum
+gooise-meren
 ```
 
-Voorbeeld:
+The slug is used in configuration, generated identifiers, workflow inputs and output metadata. Changing it later may change public IDs, so choose it carefully.
 
-```text
-config/municipalities/huizen.yml
+## Step 3, create or copy a municipality profile
+
+If the repository contains an example profile, copy it:
+
+```bash
+cp config/municipalities/example.yml config/municipalities/my-municipality.yml
 ```
 
-## Stap 3, basisgegevens invullen
+If there is no example profile, copy the closest existing GemeenteOplossingen profile and adjust it carefully.
 
-Voorbeeld:
+A profile should describe at least:
 
 ```yaml
 municipality:
@@ -49,142 +75,192 @@ municipality:
   website_url: https://www.huizen.nl
   ris_url: https://ris.gemeenteraadhuizen.nl
   timezone: Europe/Amsterdam
-```
 
-## Stap 4, bron instellen
-
-Voor GemeenteOplossingen:
-
-```yaml
 source_system:
   vendor: GemeenteOplossingen
   connector: gemeenteoplossingen
   base_url: https://ris.gemeenteraadhuizen.nl/api/v2/
   api_version: v2
-```
 
-Als de gemeente een andere RIS-leverancier gebruikt, is waarschijnlijk een nieuwe connector nodig onder:
-
-```text
-src/open_ris_monitor/connectors/
-```
-
-## Stap 5, opslagbeleid kiezen
-
-Voor een eerste test:
-
-```yaml
 storage:
-  mode: metadata_only
   commit_pdf_files: false
 ```
 
-Gebruik geen PDF-opslag in Git als standaardinstelling.
+Keep `commit_pdf_files` false. Open RIS Monitor does not store PDFs in Git.
 
-## Stap 6, eerste harvest testen zonder commit
+## Step 4, verify the source API
 
-Start de harvest via GitHub Actions:
-
-```text
-Actions -> Harvest -> Run workflow
-```
-
-Gebruik eerst:
+For a GemeenteOplossingen municipality, confirm that the public API exposes the routes needed by the current connector. The Huizen implementation relies on routes such as:
 
 ```text
-municipality: <gemeente-slug>
-limit: 25
-commit_public: false
+GET /documents
+GET /documents/{documentId}
+GET /documents/{documentId}/download
+GET /meetings
+GET /meetings/{meetingId}
+GET /meetings/{meetingId}/documents
+GET /meetings/{meetingId}/meetingitems
+GET /meetingitems/{meetingItemId}
+GET /meetingitems/{meetingItemId}/documents
 ```
 
-Controleer daarna de artifacts:
+Some source systems expose different historical and future meeting coverage. A missing meeting detail may be source variation rather than a fatal error, but it should be documented during onboarding.
+
+## Step 5, run a small local harvest
+
+Start with a small smoke test:
+
+```bash
+python -m open_ris_monitor.pipeline.run \
+  --municipality huizen \
+  --profile quick
+```
+
+Replace `huizen` with the new slug after the profile exists.
+
+Then run a bounded public-style test:
+
+```bash
+python -m open_ris_monitor.pipeline.run \
+  --municipality my-municipality \
+  --profile public \
+  --max-documents 100 \
+  --meeting-scan-limit 100
+```
+
+Use explicit limits while onboarding. This keeps runtime, API load and review scope predictable.
+
+## Step 6, inspect the public exports
+
+Check that `data/public/` contains the expected files. At minimum:
 
 ```text
-raw-harvest-<gemeente-slug>
-public-export-<gemeente-slug>
+data/public/documents.jsonl
+data/public/harvest_runs.jsonl
+data/public/latest.json
 ```
 
-## Stap 7, public exports controleren
-
-Controleer minimaal:
+For the normal relational public workflow, also expect:
 
 ```text
-documents.jsonl
-harvest_runs.jsonl
-latest.json
+data/public/meetings.jsonl
+data/public/meeting_items.jsonl
+data/public/meeting_documents.jsonl
+data/public/meeting_item_documents.jsonl
+data/public/quality/summary.json
+data/public/quality/issues.jsonl
 ```
 
-Let op:
+Validate that:
 
-- Zijn er documenten opgehaald?
-- Zijn de documenttitels bruikbaar?
-- Zijn documenttypen gevuld?
-- Werken de downloadlinks?
-- Is de publicatiedatum beschikbaar?
+- JSONL files contain valid JSON per line;
+- `latest.json` points to existing output files;
+- the municipality name and slug are correct;
+- document counts are plausible;
+- relation counts are plausible for the selected source window;
+- no PDFs or raw API dumps were added to Git.
 
-## Stap 8, public exports committen
+## Step 7, generate quality reports
 
-Als de test goed is, draai opnieuw met:
+```bash
+python -m open_ris_monitor.analysis.generate_public_reports \
+  --public-dir data/public
+```
+
+Review the summary and issues files. Warnings do not automatically mean the dataset is unusable. They should be interpreted as signals about source quality, relation coverage and freshness.
+
+## Step 8, run validation
+
+Run the local checks again:
+
+```bash
+python -m pytest
+ruff check .
+python -m open_ris_monitor.exporters.validate_exports
+```
+
+If export validation fails, do not publish the dataset. Fix the profile, connector or normalization issue first.
+
+## Step 9, enable GitHub Actions
+
+In the forked repository, enable GitHub Actions.
+
+Use `.github/workflows/harvest.yml` for scheduled public harvesting. The default scheduled profile is intended to be `public`, not `backfill`.
+
+Recommended cadence for a fork:
 
 ```text
-commit_public: true
+23 3 * * *
 ```
 
-De workflow commit dan alleen:
+Choose a non-hourly minute, for example 17, 23, 41 or 52. This reduces the chance that many forks hit the same upstream API at exactly the same time.
+
+## Step 10, configure GitHub Pages
+
+Publish the static viewer from the repository settings. The current viewer lives under:
 
 ```text
-data/public/
+site/index.html
 ```
 
-De workflow commit niet:
+After publication, open the site and check:
+
+- the viewer loads without console errors;
+- documents are visible;
+- meetings are visible when relational exports exist;
+- the dataset footer shows the expected municipality and generation timestamp;
+- links to source documents work.
+
+## Step 11, avoid accidental generated-data commits
+
+During docs-only or code-only changes, avoid committing generated public data accidentally.
+
+Before committing:
+
+```bash
+git status --short
+```
+
+Only include `data/public/` when the PR is intentionally updating the public dataset. Never commit:
 
 ```text
 data/raw/
-PDF-bestanden
-tijdelijke downloadbestanden
+*.pdf
+local caches
+temporary downloads
 ```
 
-## Stap 9, GitHub Pages controleren
+## Latest, public and backfill usage
 
-Controleer de website:
+Use `quick` for smoke tests and diagnostics.
 
-```text
-https://<gebruikersnaam>.github.io/open-ris-monitor/site/index.html
-```
+Use `public` for the regular public dataset.
 
-Controleer of de site de nieuwe gemeentegegevens en documenten toont.
+Use `backfill` only for controlled historical filling, recovery or initial broad loading. Do not schedule daily backfills. Prefer manual backfill runs with explicit limits.
 
-## Stap 10, documenteer afwijkingen
+## Troubleshooting checklist
 
-Elke RIS-leverancier kan net andere velden of endpoints gebruiken. Leg afwijkingen vast in de harvestdocumentatie en in de kwaliteitsrapportage.
+- Wrong or empty dataset: check the profile slug and `base_url`.
+- API timeout or 429: reduce limits and retry later.
+- Missing meetings: verify whether the source uses `/meetings`, `/events`, `/dmus` or `/meetingsessions` differently.
+- Missing agenda-item relations: inspect nested meeting item routes for the selected meeting window.
+- Export validation failure: inspect the failing file and line number.
+- Viewer shows stale data: check `data/public/latest.json` and the last successful harvest workflow.
+- GitHub Pages asset errors: confirm relative paths and repository Pages settings.
+- Unexpected generated files in Git: reset raw output, PDFs and local caches before committing.
 
-Belangrijke vragen:
+## Known limitations
 
-- Welk endpoint levert documenten?
-- Is er `totalCount` of andere paginering?
-- Hoe worden vergaderingen ontsloten?
-- Hoe worden agendapunten ontsloten?
-- Is er een directe documentdownloadlink?
-- Zijn relaties tussen documenten, vergaderingen en agendapunten beschikbaar?
+- GemeenteOplossingen is the proven connector path today.
+- Other RIS vendors require adapter work.
+- Source data quality varies by municipality and by meeting status.
+- Planned or future meetings may have incomplete document and agenda relations.
+- Open RIS Monitor does not archive PDFs, perform OCR or redact source documents.
 
-## Minimale acceptatiecriteria voor een nieuwe gemeente
+## Related documentation
 
-Een nieuwe gemeente is minimaal bruikbaar als:
-
-- er een configuratiebestand bestaat,
-- de harvest workflow documenten kan ophalen,
-- `documents.jsonl` wordt gemaakt,
-- `latest.json` wordt gemaakt,
-- de GitHub Pages-site de documenten kan tonen,
-- PDF's niet in Git worden opgeslagen.
-
-## Richting voor verdere uitbreiding
-
-Na een werkende document-first MVP kan de gemeente-uitbreiding doorgroeien naar:
-
-- volledige harvest met paginering,
-- checksums en documentversies,
-- kwaliteitsrapportage,
-- meetings en agenda-items,
-- relaties tussen documenten en agendapunten,
-- JSON-LD of linked data exports.
+- `docs/connectors.md`
+- `docs/harvesting.md`
+- `docs/export-contract.md`
+- `docs/quality.md`
+- `docs/development.md`
