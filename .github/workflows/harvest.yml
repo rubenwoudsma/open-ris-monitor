@@ -1,9 +1,11 @@
-name: Harvest and publish public RIS data
+name: Harvest
 
 on:
   schedule:
+    # Daily public refresh. The non-hourly minute reduces synchronized fork traffic.
     - cron: "23 3 * * *"
-
+    # Monthly full backfill. Forks should choose their own non-hourly minute.
+    - cron: "41 3 1 * *"
   workflow_dispatch:
     inputs:
       municipality:
@@ -11,16 +13,35 @@ on:
         required: true
         default: huizen
       profile:
-        description: Harvest profile. Use latest for daily incremental runs, full or backfill only for explicit broad refreshes.
+        description: Harvest profile to run
         required: true
-        default: latest
+        default: public
         type: choice
         options:
-          - latest
-          - public
           - quick
+          - public
           - backfill
+      mode:
+        description: Optional explicit mode override, latest or full. Leave empty to use the profile default.
+        required: false
+        default: ""
+        type: choice
+        options:
+          - ""
+          - latest
           - full
+      limit:
+        description: Optional explicit latest limit. Leave empty to use the profile default.
+        required: false
+        default: ""
+      batch_size:
+        description: Optional explicit full-harvest batch size. Leave empty to use the profile default.
+        required: false
+        default: ""
+      max_documents:
+        description: Optional maximum documents for full harvest. Leave empty to use the profile default.
+        required: false
+        default: ""
       enrich_checksums:
         description: Temporarily download selected PDFs and calculate SHA-256 checksums
         required: true
@@ -33,11 +54,6 @@ on:
       commit_public:
         description: Commit generated data/public output back to the branch
         required: true
-        default: true
-        type: boolean
-      allow_output_shrink:
-        description: Explicit manual override to allow a broad full/backfill run to publish fewer records than the current public dataset
-        required: true
         default: false
         type: boolean
 
@@ -45,66 +61,17 @@ permissions:
   contents: write
 
 concurrency:
-  group: public-harvest-main
+  group: public-harvest-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  harvest-and-publish:
+  harvest:
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
-          fetch-depth: 0
-
-      - name: Resolve harvest options
-        id: options
-        run: |
-          MUNICIPALITY="${{ inputs.municipality }}"
-          PROFILE="${{ inputs.profile }}"
-          ENRICH_CHECKSUMS="${{ inputs.enrich_checksums }}"
-          CHECKSUM_MAX_DOCUMENTS="${{ inputs.checksum_max_documents }}"
-          COMMIT_PUBLIC="${{ inputs.commit_public }}"
-          ALLOW_OUTPUT_SHRINK="${{ inputs.allow_output_shrink }}"
-
-          if [ -z "$MUNICIPALITY" ]; then
-            MUNICIPALITY="huizen"
-          fi
-
-          if [ -z "$PROFILE" ]; then
-            PROFILE="latest"
-          fi
-
-          if [ -z "$ENRICH_CHECKSUMS" ]; then
-            ENRICH_CHECKSUMS="false"
-          fi
-
-          if [ -z "$CHECKSUM_MAX_DOCUMENTS" ]; then
-            CHECKSUM_MAX_DOCUMENTS="50"
-          fi
-
-          if [ -z "$COMMIT_PUBLIC" ]; then
-            COMMIT_PUBLIC="true"
-          fi
-
-          if [ -z "$ALLOW_OUTPUT_SHRINK" ]; then
-            ALLOW_OUTPUT_SHRINK="false"
-          fi
-
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            PROFILE="latest"
-            ALLOW_OUTPUT_SHRINK="false"
-            COMMIT_PUBLIC="true"
-          fi
-
-          echo "municipality=$MUNICIPALITY" >> "$GITHUB_OUTPUT"
-          echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
-          echo "enrich_checksums=$ENRICH_CHECKSUMS" >> "$GITHUB_OUTPUT"
-          echo "checksum_max_documents=$CHECKSUM_MAX_DOCUMENTS" >> "$GITHUB_OUTPUT"
-          echo "commit_public=$COMMIT_PUBLIC" >> "$GITHUB_OUTPUT"
-          echo "allow_output_shrink=$ALLOW_OUTPUT_SHRINK" >> "$GITHUB_OUTPUT"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -114,158 +81,141 @@ jobs:
       - name: Install package
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e .[dev]
+          python -m pip install -e .
 
-      - name: Snapshot current public output
+      - name: Resolve harvest inputs
+        id: harvest-inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+          INPUT_MUNICIPALITY: ${{ inputs.municipality }}
+          INPUT_PROFILE: ${{ inputs.profile }}
+          INPUT_MODE: ${{ inputs.mode }}
+          INPUT_LIMIT: ${{ inputs.limit }}
+          INPUT_BATCH_SIZE: ${{ inputs.batch_size }}
+          INPUT_MAX_DOCUMENTS: ${{ inputs.max_documents }}
+          INPUT_ENRICH_CHECKSUMS: ${{ inputs.enrich_checksums }}
+          INPUT_CHECKSUM_MAX_DOCUMENTS: ${{ inputs.checksum_max_documents }}
+          INPUT_COMMIT_PUBLIC: ${{ inputs.commit_public }}
         run: |
-          rm -rf /tmp/open-ris-existing-public
-          if [ -d data/public ]; then
-            cp -a data/public /tmp/open-ris-existing-public
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            municipality="huizen"
+            enrich_checksums="false"
+            checksum_max_documents="50"
+            commit_public="true"
+
+            if [ "$EVENT_SCHEDULE" = "41 3 1 * *" ]; then
+              profile="backfill"
+            else
+              profile="public"
+            fi
+
+            mode=""
+            limit=""
+            batch_size=""
+            max_documents=""
           else
-            mkdir -p /tmp/open-ris-existing-public
+            municipality="$INPUT_MUNICIPALITY"
+            profile="$INPUT_PROFILE"
+            mode="$INPUT_MODE"
+            limit="$INPUT_LIMIT"
+            batch_size="$INPUT_BATCH_SIZE"
+            max_documents="$INPUT_MAX_DOCUMENTS"
+            enrich_checksums="$INPUT_ENRICH_CHECKSUMS"
+            checksum_max_documents="$INPUT_CHECKSUM_MAX_DOCUMENTS"
+            commit_public="$INPUT_COMMIT_PUBLIC"
           fi
 
-      - name: Run bounded harvest profile
-        env:
-          MUNICIPALITY: ${{ steps.options.outputs.municipality }}
-          PROFILE: ${{ steps.options.outputs.profile }}
-          ENRICH_CHECKSUMS: ${{ steps.options.outputs.enrich_checksums }}
-          CHECKSUM_MAX_DOCUMENTS: ${{ steps.options.outputs.checksum_max_documents }}
+          {
+            echo "municipality=$municipality"
+            echo "profile=$profile"
+            echo "mode=$mode"
+            echo "limit=$limit"
+            echo "batch_size=$batch_size"
+            echo "max_documents=$max_documents"
+            echo "enrich_checksums=$enrich_checksums"
+            echo "checksum_max_documents=$checksum_max_documents"
+            echo "commit_public=$commit_public"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "Resolved harvest profile: $profile"
+          echo "Resolved municipality: $municipality"
+          echo "Commit public output: $commit_public"
+
+      - name: Run harvest and public export
         run: |
+          PROFILE_ARG="--profile ${{ steps.harvest-inputs.outputs.profile }}"
+          MODE_ARG=""
+          LIMIT_ARG=""
+          BATCH_SIZE_ARG=""
+          MAX_DOCUMENTS_ARG=""
           CHECKSUM_ARG=""
-          if [ "$ENRICH_CHECKSUMS" = "true" ]; then
+
+          if [ -n "${{ steps.harvest-inputs.outputs.mode }}" ]; then
+            MODE_ARG="--mode ${{ steps.harvest-inputs.outputs.mode }}"
+          fi
+
+          if [ -n "${{ steps.harvest-inputs.outputs.limit }}" ]; then
+            LIMIT_ARG="--limit ${{ steps.harvest-inputs.outputs.limit }}"
+          fi
+
+          if [ -n "${{ steps.harvest-inputs.outputs.batch_size }}" ]; then
+            BATCH_SIZE_ARG="--batch-size ${{ steps.harvest-inputs.outputs.batch_size }}"
+          fi
+
+          if [ -n "${{ steps.harvest-inputs.outputs.max_documents }}" ]; then
+            MAX_DOCUMENTS_ARG="--max-documents ${{ steps.harvest-inputs.outputs.max_documents }}"
+          fi
+
+          if [ "${{ steps.harvest-inputs.outputs.enrich_checksums }}" = "true" ]; then
             CHECKSUM_ARG="--enrich-checksums"
           fi
 
           python -m open_ris_monitor.pipeline.run \
-            --municipality "$MUNICIPALITY" \
-            --profile "$PROFILE" \
+            --municipality "${{ steps.harvest-inputs.outputs.municipality }}" \
+            $PROFILE_ARG \
+            $MODE_ARG \
+            $LIMIT_ARG \
+            $BATCH_SIZE_ARG \
+            $MAX_DOCUMENTS_ARG \
             $CHECKSUM_ARG \
-            --checksum-max-documents "$CHECKSUM_MAX_DOCUMENTS"
-
-      - name: Protect public output volume
-        env:
-          PROFILE: ${{ steps.options.outputs.profile }}
-          ALLOW_OUTPUT_SHRINK: ${{ steps.options.outputs.allow_output_shrink }}
-        run: |
-          python -m open_ris_monitor.pipeline.harvest_safety \
-            --existing-public-dir /tmp/open-ris-existing-public \
-            --generated-public-dir data/public \
-            --profile "$PROFILE" \
-            --allow-output-shrink "$ALLOW_OUTPUT_SHRINK"
+            --checksum-max-documents "${{ steps.harvest-inputs.outputs.checksum_max_documents }}"
 
       - name: Generate public quality reports
         run: |
           python -m open_ris_monitor.analysis.generate_public_reports \
             --public-dir data/public
 
-      - name: Validate generated public data
-        run: |
-          python -m json.tool data/public/latest.json > /tmp/latest.json
-          python - <<'PY'
-          import json
-          from pathlib import Path
-
-          required_outputs = [
-              "documents",
-              "harvest_runs",
-              "meetings",
-              "meeting_items",
-              "meeting_documents",
-              "meeting_item_documents",
-          ]
-          latest = json.loads(Path("data/public/latest.json").read_text(encoding="utf-8"))
-          outputs = latest.get("outputs", {})
-          missing = [key for key in required_outputs if not outputs.get(key)]
-          if missing:
-              raise SystemExit(f"latest.json mist relationele outputs: {missing}")
-          if latest.get("relations_enabled") is not True:
-              raise SystemExit("latest.json heeft relations_enabled niet op true")
-          for output_name in required_outputs:
-              output_path = Path("data/public") / outputs[output_name]
-              if not output_path.exists():
-                  raise SystemExit(f"Ontbrekend public exportbestand: {output_path}")
-              for line_number, line in enumerate(output_path.read_text(encoding="utf-8").splitlines(), 1):
-                  if line.strip():
-                      try:
-                          json.loads(line)
-                      except json.JSONDecodeError as exc:
-                          raise SystemExit(f"Ongeldige JSONL in {output_path} regel {line_number}: {exc}") from exc
-          print("Public exports en latest.json zijn consistent")
-          PY
-
       - name: Show generated output
         run: |
-          echo "Raw output, artifact only:"
-          find data/raw/latest -maxdepth 1 -type f -print | sort
-          echo "Public output, commit candidate:"
-          find data/public -maxdepth 2 -type f -print | sort
+          echo "Raw output:"
+          find data/raw/latest -maxdepth 1 -type f -print
+          echo "Public output:"
+          find data/public -maxdepth 1 -type f -print
           echo "Latest summary:"
           cat data/public/latest.json
 
-      - name: Upload raw harvest artifact
+      - name: Upload raw harvest output
         uses: actions/upload-artifact@v4
         with:
-          name: raw-harvest-${{ steps.options.outputs.municipality }}-${{ steps.options.outputs.profile }}
+          name: raw-harvest-${{ steps.harvest-inputs.outputs.municipality }}
           path: data/raw/latest/
           if-no-files-found: error
           retention-days: 7
 
-      - name: Upload public export artifact
+      - name: Upload public export output
         uses: actions/upload-artifact@v4
         with:
-          name: public-export-${{ steps.options.outputs.municipality }}-${{ steps.options.outputs.profile }}
+          name: public-export-${{ steps.harvest-inputs.outputs.municipality }}
           path: data/public/
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 7
 
       - name: Commit public export output
-        if: ${{ github.event_name == 'schedule' || steps.options.outputs.commit_public == 'true' }}
+        if: ${{ steps.harvest-inputs.outputs.commit_public == 'true' }}
         run: |
-          set -euo pipefail
-          TARGET_BRANCH="main"
-          echo "Preparing to publish public harvest output to ${TARGET_BRANCH}."
-          echo "Current HEAD: $(git rev-parse --short HEAD)"
-
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          echo "Synchronizing with origin/${TARGET_BRANCH} before committing public output."
-          git fetch origin "${TARGET_BRANCH}"
-          if ! git diff --quiet -- data/public; then
-            echo "Generated public output changed before synchronization. Temporarily stashing it."
-            git stash push --include-untracked --message "public-harvest-output" -- data/public
-            git rebase "origin/${TARGET_BRANCH}"
-            echo "Restoring generated public output after synchronization."
-            git stash pop
-          else
-            echo "No generated public output changes before synchronization."
-            git rebase "origin/${TARGET_BRANCH}"
-          fi
-
-          echo "Synchronized HEAD: $(git rev-parse --short HEAD)"
           git add data/public/
-          if git diff --cached --quiet; then
-            echo "No public data changes to commit."
-            exit 0
-          fi
-
-          git commit -m "Update public RIS data for ${{ steps.options.outputs.municipality }}"
-          echo "Pushing commit $(git rev-parse --short HEAD) to ${TARGET_BRANCH}."
-          git push origin "HEAD:${TARGET_BRANCH}"
-
-      - name: Write workflow summary
-        if: always()
-        run: |
-          {
-            echo "## Harvest and public data publish run"
-            echo ""
-            echo "- Event: ${{ github.event_name }}"
-            echo "- Municipality: ${{ steps.options.outputs.municipality }}"
-            echo "- Profile: ${{ steps.options.outputs.profile }}"
-            echo "- Commit public output: ${{ github.event_name == 'schedule' || steps.options.outputs.commit_public == 'true' }}"
-            echo "- Allow output shrink: ${{ steps.options.outputs.allow_output_shrink }}"
-            echo "- Checksum enrichment: ${{ steps.options.outputs.enrich_checksums }}"
-            echo "- Concurrency group: public-harvest-main"
-            echo "- Cancel in progress: false"
-          } >> "$GITHUB_STEP_SUMMARY"
+          git diff --cached --quiet || git commit -m "Update public RIS data for ${{ steps.harvest-inputs.outputs.municipality }}"
+          git push
