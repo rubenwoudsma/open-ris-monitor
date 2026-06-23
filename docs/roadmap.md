@@ -1,108 +1,78 @@
 # Roadmap
 
-This roadmap is intentionally conservative. Open RIS Monitor should remain a focused civic open-source reference implementation, not a central platform or enterprise data product.
+## Completed
 
-The roadmap is not a promise list. It is a scope guard for MVP 1.0 and the first post-MVP improvements.
+- Document-first harvest for Huizen
+- Canonical document exports
+- GitHub Pages viewer
+- Automatic `data/public` updates after harvest
+- Paginated full document harvest with `latest` and `full` modes
+- Document versions and checksum metadata
+- #14 Research meetings and agenda-items endpoints
+- #15 Step 1: GemeenteOplossingen meeting relation endpoints
+- #15 Step 2: Optional raw meeting relation harvest
+- #15 Step 3: Canonical meeting relation normalization
+- #15 Step 4: Public meeting relation exports
+- Daily scheduled public harvest cadence
+- Monthly scheduled public backfill cadence
 
-## Roadmap shape
+## Current MVP focus
 
-| Horizon | Goal | Level of detail |
-|---|---|---|
-| MVP 1.0 | Stable reference deployment for Huizen and a practical path for similar GemeenteOplossingen municipalities. | Concrete enough to close issues and prepare a release. |
-| After MVP 1.0 | Improve scale, search and adoption once the reference deployment is stable. | Directional, because the right solution depends on real usage. |
-| Out of scope | Prevent the project from drifting into a platform, archive or notification product. | Explicit, to protect maintainability. |
+The project is moving from working reference implementation to MVP 1.0 readiness.
 
-## Completed or MVP-complete foundations
+The remaining MVP work should stay small and conservative:
 
-- Document-first harvest for the Huizen reference implementation.
-- GemeenteOplossingen connector path for public RIS metadata.
-- Canonical document exports.
-- Document version metadata when checksum enrichment is enabled.
-- No PDF storage in Git.
-- GitHub Pages static viewer.
-- Public JSONL exports under `data/public/`.
-- Latest, public and backfill harvest profiles.
-- Scheduled public harvest workflow.
-- Concurrency protection for harvest workflows.
-- Relation exports for meetings and meeting items where the source supports them.
-- Document type normalization and fallback labels.
-- Dataset freshness and basic metadata in `latest.json`.
-- Basic quality reports under `data/public/quality/`.
-- Export validation in CI.
+- preserve the static GitHub Pages architecture;
+- keep public exports compact and stable;
+- avoid generated PDF storage, OCR, backend services or databases;
+- prefer bounded operational improvements before heavier frontend or export changes.
 
-## Current MVP documentation focus
+## Upcoming
 
-The current milestone is documentation coherence before MVP 1.0:
+### #89 URL state for search and filters
 
-- README as the public front door;
-- practical municipality onboarding guide;
-- connector documentation for the current GemeenteOplossingen implementation;
-- accurate harvesting, export, quality and validation documentation;
-- conservative roadmap cleanup.
+Useful for sharing exact search and filter views. Keep this small and frontend-only:
 
-This supports:
+- restore search state from URL parameters;
+- update the URL without a full page reload;
+- do not introduce a router framework.
 
-- issue #52, Municipality Onboarding Guide;
-- issue #57, Connector Interface Documentation;
-- README and documentation consistency before MVP 1.0.
+### #98 Optional PDF preview
 
-## Before MVP 1.0
+Useful but optional. It must remain a viewer convenience only:
 
-The remaining pre-1.0 work should focus on stability and adoption, not scope expansion.
+- use existing external document URLs;
+- do not store PDFs in Git;
+- do not add OCR or text extraction;
+- preserve direct open/download links.
 
-| Priority | Workstream | Outcome |
-|---|---|---|
-| 1 | Export contract | Public JSONL fields and schema version policy are stable enough for downstream users. |
-| 2 | Validation and safety | CI fails on malformed, missing, empty or sharply reduced public output. |
-| 3 | Reference deployment | The Huizen public site and data exports remain healthy. |
-| 4 | Onboarding | A similar GemeenteOplossingen municipality can follow the docs without guessing the project shape. |
-| 5 | Connectors | Current connector responsibilities are documented without introducing a large abstraction framework. |
-| 6 | Static viewer resilience | The viewer handles missing or messy source fields without crashing. |
-| 7 | Release preparation | License, release notes and public documentation are checked before tagging v1.0. |
+## Post-MVP candidates
 
-## After MVP 1.0
+### #56 Export Partitioning Strategy
 
-These items can wait until there is real pressure from dataset size, user feedback or a second implementation:
+Can wait until measured file sizes or browser performance show a concrete need. Do not introduce sharding or a manifest system before the current export contract requires it.
 
-| Topic | Trigger | Likely direction |
-|---|---|---|
-| Search index strategy | Client-side filtering becomes slow or too limited. | Add a compact static index. |
-| Export partitioning | Public JSONL files become too large for reliable browser loading. | Partition by year or another stable dimension. |
-| Additional vendors | A concrete municipality needs a non-GemeenteOplossingen adapter. | Add a second connector and then extract a common interface if justified. |
-| Advanced quality scoring | Basic counts are not enough to explain dataset health. | Add simple transparent metrics before composite scores. |
-| Monthly backfill automation | Manual backfill becomes operationally annoying before go-live. | Add a scheduled workflow with conservative safeguards. |
-| Optional PDF preview | Users need quicker inspection from the static viewer. | Add a lightweight preview that still does not store PDFs in Git. |
+### #58 Search Index Strategy
 
-## Out of scope
+Can wait while native client-side filtering remains fast enough. If search becomes slow, prefer a small static client-side approach before adding generated indexes or heavier dependencies.
 
-Open RIS Monitor is not intended to become:
+## Operational harvest strategy
 
-- a national portal;
-- a SaaS platform;
-- a central aggregator;
-- an OCR platform;
-- a PDF archive;
-- a notification service;
-- a generic enterprise data platform.
+Build toward full historical coverage through bounded, resumable harvests:
 
-## Release checklist for v1.0
+- scheduled daily public harvests;
+- scheduled monthly backfills;
+- manual backfill for recovery or first seeding;
+- no raw or PDF archive in Git;
+- compact public JSONL exports only.
 
-- README explains what the project is and is not.
-- Onboarding guide works for the supported GemeenteOplossingen path.
-- Connector documentation explains current support and future vendor expectations.
-- Export contract and schema version policy are documented.
-- Harvest profiles and cadence are documented.
-- Quality and freshness metadata are documented.
-- CI validation passes.
-- Generated public data is not accidentally changed in documentation PRs.
-- License text is final.
-- GitHub Pages site loads the public dataset correctly.
+See `docs/harvesting.md`.
 
-## Related documentation
+## Multi-source support
 
-- [README.md](../README.md)
-- [adding-a-municipality.md](adding-a-municipality.md)
-- [connectors.md](connectors.md)
-- [export-contract.md](export-contract.md)
-- [harvesting.md](harvesting.md)
-- [quality.md](quality.md)
+After the GemeenteOplossingen implementation stabilizes:
+
+- document a connector interface for other RIS suppliers;
+- add supplier capability flags;
+- distinguish source endpoints from canonical output;
+- keep public exports stable across suppliers.
