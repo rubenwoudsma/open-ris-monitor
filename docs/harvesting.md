@@ -58,12 +58,7 @@ Useful nested relation routes include:
 The working relation chain is:
 
 ```text
-/meetingsessions
--> container.meeting.id
--> /meetings/{meetingId}
--> /meetings/{meetingId}/meetingitems
--> /meetings/{meetingId}/documents
--> /meetingitems/{meetingItemId}/documents
+/meetingsessions -> container.meeting.id -> /meetings/{meetingId} -> /meetings/{meetingId}/meetingitems -> /meetings/{meetingId}/documents -> /meetingitems/{meetingItemId}/documents
 ```
 
 Important observations:
@@ -82,8 +77,8 @@ The CLI supports operational profiles with `--profile`.
 | Profile | Purpose | Typical use | Publication behavior |
 |---|---|---|---|
 | `quick` | Smoke test and diagnostics | Local checks, small CI-like verification | Not intended as normal publication source. |
-| `public` | Regular public dataset update | Scheduled harvest and normal manual update | Publishes `data/public/`. |
-| `backfill` | Historical filling or recovery | Manual workflow dispatch or local controlled run | Use deliberately with explicit limits. |
+| `public` | Regular public dataset update | Scheduled daily harvest and normal manual update | Publishes `data/public/`. |
+| `backfill` | Historical filling or recovery | Monthly scheduled backfill, manual workflow dispatch or local controlled run | Use deliberately because it can process a much larger source window. |
 
 All normal public profiles are expected to include relation exports unless a diagnostic flag disables them.
 
@@ -108,33 +103,40 @@ data/public/quality/issues.jsonl
 
 Use `quick` for fast local confidence.
 
-Use `public` for the live dataset. Scheduled GitHub Actions should use this profile.
+Use `public` for the live dataset. Scheduled daily GitHub Actions runs use this profile.
 
-Use `backfill` for initial historical loading, controlled historical extension or recovery after a longer gap. Do not schedule daily backfills.
+Use `backfill` for initial historical loading, controlled historical extension, recovery after a longer gap or the monthly scheduled full refresh.
 
-A `latest` or recent-window style run must not shrink the full public dataset accidentally. The intended behavior is to update recent information while preserving the broader public output unless a full or backfill run is deliberately performed.
+Do not schedule daily backfills. A `latest` or recent-window style run must not shrink the full public dataset accidentally. The intended behavior is to update recent information while preserving the broader public output unless a full or backfill run is deliberately performed.
 
 ## Cadence policy
 
 The standard operational cadence is:
 
 ```text
-daily public harvest, manual backfill when needed
+daily public harvest
+monthly full/backfill harvest
+manual backfill when needed
 ```
 
-Recommended scheduled cron:
+Recommended scheduled crons for the Huizen reference implementation:
 
 ```text
 23 3 * * *
+41 3 1 * *
 ```
 
-This means once per day, around 03:23 UTC. The non-hourly minute is intentional. It reduces the chance that multiple forks hit the same upstream API at the exact same time.
+The first schedule runs the daily public refresh around 03:23 UTC. The second schedule runs a monthly backfill on the first day of the month around 03:41 UTC.
 
-Hourly harvesting is not the default because municipal council information generally does not change hourly, while hourly runs increase GitHub Actions usage and upstream API pressure.
+The non-hourly minutes are intentional. They reduce the chance that multiple forks hit the same upstream API at the exact same time.
 
-Weekly harvesting is not ideal as a default because agendas and documents can still change in the days before a meeting.
+Hourly harvesting is not the default because municipal council information generally does not change hourly, while hourly runs increase GitHub Actions usage and upstream API pressure. Weekly harvesting is not ideal as a default because agendas and documents can still change in the days before a meeting.
 
-Monthly backfill can be added later as a pre-go-live or post-MVP operational improvement, but it is not required for the current documentation PR.
+Forks should choose their own non-hourly minute for both schedules. Good random minutes include:
+
+```text
+17, 23, 41 or 52
+```
 
 ## GitHub Actions workflow
 
@@ -146,18 +148,18 @@ The harvest workflow lives at:
 
 It supports:
 
-1. scheduled runs;
-2. manual `workflow_dispatch` runs.
+1. scheduled daily public runs;
+2. scheduled monthly backfill runs;
+3. manual `workflow_dispatch` runs.
 
-Scheduled runs are intended to use:
+Scheduled runs are resolved inside the workflow:
 
-```text
-municipality: huizen
-profile: public
-commit_public: true
-```
+| Trigger | Profile | Publication |
+|---|---|---|
+| `23 3 * * *` | `public` | commits `data/public/` |
+| `41 3 1 * *` | `backfill` | commits `data/public/` |
 
-Manual runs can be used for quick tests, public recovery runs or backfills.
+Manual runs can be used for quick tests, public recovery runs or backfills. Manual publication remains opt-in through `commit_public`.
 
 ## Manual workflow inputs
 
@@ -167,6 +169,10 @@ Typical inputs:
 |---|---|---|
 | `municipality` | Municipality profile slug | `huizen` |
 | `profile` | Harvest profile | `quick`, `public`, `backfill` |
+| `mode` | Optional explicit override for profile mode | empty, `latest`, `full` |
+| `limit` | Optional explicit latest limit | empty or `25` |
+| `batch_size` | Optional explicit full batch size | empty or `100` |
+| `max_documents` | Optional explicit full limit | empty for profile default |
 | `enrich_checksums` | Temporarily download selected PDFs for checksums | `false` |
 | `checksum_max_documents` | Maximum checksum-enriched documents | `50` |
 | `commit_public` | Commit generated `data/public/` output | `false` for manual tests, `true` for intentional publication |
@@ -289,7 +295,14 @@ After a failed scheduled run:
 2. determine whether it is upstream outage, rate limiting, validation failure or code failure;
 3. run `quick` manually to test the connector;
 4. run `public` manually if the source is healthy;
-5. use `backfill` only when a longer period must be rebuilt.
+5. use `backfill` when a longer period must be rebuilt.
+
+Run a manual backfill when:
+
+- a scheduled monthly backfill failed and the upstream source is healthy again;
+- a longer outage left gaps in the public dataset;
+- a new relation-harvest improvement needs to rebuild historical coverage;
+- a new municipality fork is seeded for the first time.
 
 Do not overwrite a healthy historical dataset with a failing or empty run.
 
@@ -299,7 +312,7 @@ Forks can reuse the same workflow when:
 
 - a municipality profile exists under `config/municipalities/`;
 - the connector supports the needed source routes;
-- the fork chooses its own GitHub Actions schedule;
+- the fork chooses its own GitHub Actions schedules;
 - the cron uses a non-hourly minute.
 
 Recommended random minutes for forks:
