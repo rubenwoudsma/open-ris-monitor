@@ -19,6 +19,7 @@ from open_ris_monitor.enrichers.checksum import (
 from open_ris_monitor.exporters.json_exporter import write_json, write_jsonl
 from open_ris_monitor.models.harvest_run import HarvestRun
 from open_ris_monitor.normalizers.gemeenteoplossingen import normalize_documents
+from open_ris_monitor.normalizers.organization import normalize_organization_harvest
 from open_ris_monitor.normalizers.relations import normalize_relation_harvest
 from open_ris_monitor.pipeline.profiles import HARVEST_PROFILE_NAMES, resolve_harvest_options
 from open_ris_monitor.pipeline.relations import collect_raw_relation_harvest
@@ -273,6 +274,82 @@ def _write_raw_relation_harvest(raw_dir: Path, relation_harvest: dict[str, Any])
     write_json(raw_dir / "relation_harvest_summary.json", relation_harvest["summary"])
 
 
+def _collect_raw_organization_harvest(
+    connector: GemeenteOplossingenConnector,
+    *,
+    batch_size: int = 100,
+) -> dict[str, Any]:
+    """Fetch public organisation endpoints for a low-cadence organisation export."""
+    groups = connector.fetch_all_groups(batch_size=batch_size)
+    group_memberships: dict[str, list[dict[str, Any]]] = {}
+    for group in groups:
+        group_id = group.get("id")
+        if group_id in (None, ""):
+            continue
+        try:
+            group_memberships[str(group_id)] = connector.fetch_persons_by_group_id(group_id)
+        except Exception as exc:  # pragma: no cover - defensive around optional API relation
+            group_memberships[str(group_id)] = []
+            print(f"Waarschuwing: groepsleden voor groep {group_id} konden niet worden opgehaald: {exc}")
+
+    persons = connector.fetch_all_persons(batch_size=batch_size)
+    roles = connector.fetch_all_roles(batch_size=batch_size)
+    positions = connector.fetch_all_positions(batch_size=batch_size)
+    return {
+        "groups": groups,
+        "persons": persons,
+        "roles": roles,
+        "positions": positions,
+        "group_memberships": group_memberships,
+        "summary": {
+            "groups_seen": len(groups),
+            "persons_seen": len(persons),
+            "roles_seen": len(roles),
+            "positions_seen": len(positions),
+            "group_memberships_seen": sum(len(records) for records in group_memberships.values()),
+        },
+    }
+
+
+def _write_raw_organization_harvest(raw_dir: Path, organization_harvest: dict[str, Any]) -> None:
+    """Write raw organisation harvest artifacts for inspection."""
+    write_json(raw_dir / "organization_groups.json", organization_harvest["groups"])
+    write_json(raw_dir / "organization_persons.json", organization_harvest["persons"])
+    write_json(raw_dir / "organization_roles.json", organization_harvest["roles"])
+    write_json(raw_dir / "organization_positions.json", organization_harvest["positions"])
+    write_json(raw_dir / "organization_group_memberships.json", organization_harvest["group_memberships"])
+    write_json(raw_dir / "organization_harvest_summary.json", organization_harvest["summary"])
+
+
+def _write_public_organization_exports(
+    public_dir: Path,
+    normalized_organization: dict[str, list[Any]],
+) -> dict[str, str]:
+    """Write public organisation exports and return latest.json output entries."""
+    organization_outputs = {
+        "organization_groups": "organization_groups.jsonl",
+        "organization_persons": "organization_persons.jsonl",
+        "organization_roles": "organization_roles.jsonl",
+        "organization_positions": "organization_positions.jsonl",
+        "organization_group_memberships": "organization_group_memberships.jsonl",
+    }
+    for key, filename in organization_outputs.items():
+        write_jsonl(public_dir / filename, _to_public_dicts(normalized_organization.get(key, [])))
+    return organization_outputs
+
+
+def _existing_public_organization_outputs(public_dir: Path) -> dict[str, str]:
+    """Keep monthly organisation files discoverable during daily latest runs."""
+    outputs = {
+        "organization_groups": "organization_groups.jsonl",
+        "organization_persons": "organization_persons.jsonl",
+        "organization_roles": "organization_roles.jsonl",
+        "organization_positions": "organization_positions.jsonl",
+        "organization_group_memberships": "organization_group_memberships.jsonl",
+    }
+    return {key: filename for key, filename in outputs.items() if (public_dir / filename).exists()}
+
+
 def run_harvest(
     *,
     municipality: str,
@@ -286,6 +363,8 @@ def run_harvest(
     meeting_scan_limit: int = 250,
     meeting_session_batch_size: int = 100,
     meeting_item_limit: int | None = 1000,
+    include_organization: bool = False,
+    organization_batch_size: int = 100,
 ) -> HarvestRun:
     """Run a metadata harvest and optional raw relation harvest."""
     started_at = datetime.now(timezone.utc)
@@ -321,6 +400,8 @@ def run_harvest(
 
     relation_harvest: dict[str, Any] | None = None
     normalized_relations: dict[str, list[Any]] | None = None
+    organization_harvest: dict[str, Any] | None = None
+    normalized_organization: dict[str, list[Any]] | None = None
     if include_relations:
         relation_harvest = collect_raw_relation_harvest(
             connector,
@@ -330,6 +411,17 @@ def run_harvest(
         )
         normalized_relations = normalize_relation_harvest(
             relation_harvest,
+            municipality_slug=municipality,
+            source_system_id=source_system_config["id"],
+        )
+
+    if include_organization:
+        organization_harvest = _collect_raw_organization_harvest(
+            connector,
+            batch_size=organization_batch_size,
+        )
+        normalized_organization = normalize_organization_harvest(
+            organization_harvest,
             municipality_slug=municipality,
             source_system_id=source_system_config["id"],
         )
@@ -374,6 +466,8 @@ def run_harvest(
     write_json(raw_dir / "harvest_run.json", harvest_run)
     if relation_harvest is not None:
         _write_raw_relation_harvest(raw_dir, relation_harvest)
+    if organization_harvest is not None:
+        _write_raw_organization_harvest(raw_dir, organization_harvest)
 
     documents_path = public_dir / "documents.jsonl"
     if mode == "latest":
@@ -388,6 +482,10 @@ def run_harvest(
     relation_outputs: dict[str, str] = {}
     if normalized_relations is not None:
         relation_outputs = _write_public_relation_exports(public_dir, normalized_relations)
+
+    organization_outputs: dict[str, str] = _existing_public_organization_outputs(public_dir)
+    if normalized_organization is not None:
+        organization_outputs = _write_public_organization_exports(public_dir, normalized_organization)
 
     generated_at = datetime.now(timezone.utc).isoformat()
     latest_payload = {
@@ -406,6 +504,8 @@ def run_harvest(
         "checksums_enabled": enrich_checksums,
         "relations_enabled": include_relations,
         "relations_summary": relation_summary,
+        "organization_enabled": include_organization,
+        "organization_summary": organization_harvest["summary"] if organization_harvest is not None else {},
         "last_full_backfill_at": _latest_full_backfill_at(
             mode=mode,
             generated_at=generated_at,
@@ -418,7 +518,7 @@ def run_harvest(
         ),
         "outputs": _build_latest_outputs(
             enrich_checksums=enrich_checksums,
-            relation_outputs=relation_outputs,
+            relation_outputs={**relation_outputs, **organization_outputs},
         ),
     }
     write_json(latest_path, latest_payload)
@@ -473,6 +573,18 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Maximum number of meeting items to inspect when relations are enabled. Use 0 for no limit.",
     )
+    parser.add_argument(
+        "--include-organization",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Also collect public council organisation data. The backfill profile enables this by default.",
+    )
+    parser.add_argument(
+        "--organization-batch-size",
+        type=int,
+        default=None,
+        help="Batch size for organisation endpoint pagination.",
+    )
     return parser.parse_args(argv)
 
 
@@ -495,6 +607,10 @@ def resolve_cli_harvest_options(args: argparse.Namespace) -> dict[str, Any]:
         overrides["meeting_session_batch_size"] = args.meeting_session_batch_size
     if args.meeting_item_limit is not None:
         overrides["meeting_item_limit"] = parse_max_documents(args.meeting_item_limit)
+    if args.include_organization is not None:
+        overrides["include_organization"] = args.include_organization
+    if args.organization_batch_size is not None:
+        overrides["organization_batch_size"] = args.organization_batch_size
     return resolve_harvest_options(args.profile, overrides)
 
 
@@ -514,6 +630,8 @@ def main() -> None:
         meeting_scan_limit=harvest_options["meeting_scan_limit"],
         meeting_session_batch_size=harvest_options["meeting_session_batch_size"],
         meeting_item_limit=harvest_options["meeting_item_limit"],
+        include_organization=harvest_options["include_organization"],
+        organization_batch_size=harvest_options["organization_batch_size"],
     )
     print(
         f"Harvest {harvest_run.id} completed: "

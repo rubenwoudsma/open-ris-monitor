@@ -186,3 +186,7 @@ The project is approaching MVP 1.0 as a Huizen reference implementation. The mai
 ## License
 
 This repository declares an MIT license. Before a formal v1.0 release, verify that the `LICENSE` file contains the complete final license text.
+
+### MVP 1.1 organisation context
+
+Open RIS Monitor can also publish a small static `Organisatie` view. This view uses the public RIS organisation endpoints for groups, persons, roles and positions, with optional group membership where the API exposes it. The output is intended as civic context for the council organisation, not as a political profile directory. Nested user-management metadata is excluded from the public export.

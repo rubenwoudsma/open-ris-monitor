@@ -76,3 +76,10 @@ After the GemeenteOplossingen implementation stabilizes:
 - add supplier capability flags;
 - distinguish source endpoints from canonical output;
 - keep public exports stable across suppliers.
+
+## MVP 1.1
+
+- Add a small static `Organisatie` page for council organisation context.
+- Export groups, persons, roles, positions and grounded group memberships from public RIS organisation endpoints.
+- Keep organisation harvesting low-cadence through the monthly backfill profile.
+- Keep the feature civic-context focused, without profiles, photos, social media links or enrichment outside the RIS API.

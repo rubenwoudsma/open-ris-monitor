@@ -5,6 +5,11 @@ import type {
   DocumentRecord,
   DocumentVersionRecord,
   MeetingRecord,
+  OrganizationGroupMembershipRecord,
+  OrganizationGroupRecord,
+  OrganizationPersonRecord,
+  OrganizationPositionRecord,
+  OrganizationRoleRecord,
   PublicDataSet,
   RelationIndexes,
   UnknownRecord,
@@ -24,7 +29,8 @@ interface ViewerState {
   meetingSortMode: "date-desc" | "date-asc";
   meetingCurrentPage: number;
   meetingPageSize: number;
-  activeView: "documents" | "meetings";
+  organizationRoleFilter: string;
+  activeView: "documents" | "meetings" | "organization";
 }
 
 interface DerivedCaches {
@@ -32,6 +38,7 @@ interface DerivedCaches {
   documentSearchBlobByKey: Map<string, string>;
   meetingSearchBlobById: Map<string, string>;
   filteredMeetingsByKey: Map<string, MeetingRecord[]>;
+  personGroupsByPersonId: Map<string, string[]>;
 }
 
 type RequiredElements = {
@@ -45,11 +52,14 @@ type RequiredElements = {
   meetingsCount: HTMLElement;
   agendaItemsCount: HTMLElement;
   linkedDocumentsCount: HTMLElement;
+  organizationPositionsCount: HTMLElement;
   dataQualityNotice: HTMLElement;
   documentsView: HTMLElement;
   meetingsView: HTMLElement;
+  organizationView: HTMLElement;
   navDocuments: HTMLAnchorElement;
   navMeetings: HTMLAnchorElement;
+  navOrganization: HTMLAnchorElement;
   searchInput: HTMLInputElement;
   typeFilter: HTMLSelectElement;
   sortSelect: HTMLSelectElement;
@@ -83,6 +93,11 @@ type RequiredElements = {
   meetingDetailTitle: HTMLElement;
   meetingDetailBody: HTMLElement;
   clearMeetingSelection: HTMLButtonElement;
+  organizationSummaryCount: HTMLElement;
+  organizationSummaryCards: HTMLElement;
+  organizationGroupsList: HTMLElement;
+  organizationRoleFilter: HTMLSelectElement;
+  organizationPositionsBody: HTMLElement;
 };
 
 const state: ViewerState = {
@@ -98,6 +113,7 @@ const state: ViewerState = {
   meetingSortMode: "date-desc",
   meetingCurrentPage: 1,
   meetingPageSize: 25,
+  organizationRoleFilter: "",
   activeView: "documents",
 };
 
@@ -106,6 +122,7 @@ const derivedCaches: DerivedCaches = {
   documentSearchBlobByKey: new Map<string, string>(),
   meetingSearchBlobById: new Map<string, string>(),
   filteredMeetingsByKey: new Map<string, MeetingRecord[]>(),
+  personGroupsByPersonId: new Map<string, string[]>(),
 };
 
 function clearDerivedCaches(): void {
@@ -113,6 +130,7 @@ function clearDerivedCaches(): void {
   derivedCaches.documentSearchBlobByKey.clear();
   derivedCaches.meetingSearchBlobById.clear();
   derivedCaches.filteredMeetingsByKey.clear();
+  derivedCaches.personGroupsByPersonId.clear();
 }
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -132,11 +150,14 @@ const elements: RequiredElements = {
   meetingsCount: byId("meetings-count"),
   agendaItemsCount: byId("agenda-items-count"),
   linkedDocumentsCount: byId("linked-documents-count"),
+  organizationPositionsCount: byId("organization-positions-count"),
   dataQualityNotice: byId("data-quality-notice"),
   documentsView: byId("documents-view"),
   meetingsView: byId("meetings-view"),
+  organizationView: byId("organization-view"),
   navDocuments: byId("nav-documents"),
   navMeetings: byId("nav-meetings"),
+  navOrganization: byId("nav-organization"),
   searchInput: byId("search-input"),
   typeFilter: byId("type-filter"),
   sortSelect: byId("sort-select"),
@@ -170,6 +191,11 @@ const elements: RequiredElements = {
   meetingDetailTitle: byId("meeting-detail-title"),
   meetingDetailBody: byId("meeting-detail-body"),
   clearMeetingSelection: byId("clear-meeting-selection"),
+  organizationSummaryCount: byId("organization-summary-count"),
+  organizationSummaryCards: byId("organization-summary-cards"),
+  organizationGroupsList: byId("organization-groups-list"),
+  organizationRoleFilter: byId("organization-role-filter"),
+  organizationPositionsBody: byId("organization-positions-body"),
 };
 
 function unavailable(reason = "Niet beschikbaar in export"): string {
@@ -617,6 +643,7 @@ function renderSummary(): void {
   const unknownTypeCount = documents.filter((record) => isUnknownType(pick(record.normalized_document_type, record.normalized_document_type_label, record.type))).length;
   const relationCount = (state.data?.meetingDocumentRelations.length ?? 0) + (state.data?.meetingItemDocumentRelations.length ?? 0);
   elements.linkedDocumentsCount.textContent = text(linkedDocumentCount);
+  elements.organizationPositionsCount.textContent = text(state.data?.organizationPositions.length ?? 0);
   const notices: string[] = [];
   if (documents.length > 0 && linkedDocumentCount === 0 && relationCount > 0) {
     notices.push(`${relationCount} relationele records geladen, maar Geen bruikbare documentkoppelingen in deze export.`);
@@ -627,7 +654,10 @@ function renderSummary(): void {
   const relationText = latest.relations_enabled
     ? ` Relationele context: ${latest.relations_summary?.meetings_seen ?? 0} vergaderingen, ${latest.relations_summary?.meeting_items_seen ?? 0} agendapunten. ${linkedDocumentCount} documenten hebben een koppeling.`
     : "";
-  elements.statusMessage.textContent = `${state.data?.documents.length ?? 0} documenten geladen.${relationText}`;
+  const organizationText = (state.data?.organizationPositions.length ?? 0) > 0
+    ? ` Organisatie: ${state.data?.organizationPositions.length ?? 0} posities.`
+    : "";
+  elements.statusMessage.textContent = `${state.data?.documents.length ?? 0} documenten geladen.${relationText}${organizationText}`;
 }
 
 function populateTypeFilter(): void {
@@ -1078,29 +1108,183 @@ function clearMeetingSelection(): void {
   renderMeetings();
 }
 
-function setActiveView(view: "documents" | "meetings", updateHash = false, scrollToView = false): void {
+function getOrganizationId(record: OrganizationGroupRecord | OrganizationPersonRecord | OrganizationRoleRecord | OrganizationPositionRecord | OrganizationGroupMembershipRecord): string {
+  return pick(record.id, record.source_id);
+}
+
+function roleCategory(position: OrganizationPositionRecord | OrganizationRoleRecord): string {
+  return pick(position.role_category) || roleCategoryFromName(pick("role_name" in position ? position.role_name : position.name));
+}
+
+function roleCategoryFromName(roleName: string): string {
+  const name = roleName.toLowerCase();
+  if (name.includes("burgemeester")) return "burgemeester";
+  if (name.includes("griff")) return "griffie";
+  if (name.includes("fractievoorzitter")) return "fractievoorzitter";
+  if (name.includes("raadslid") || name.includes("raads")) return "raadslid";
+  if (name.includes("commissie")) return "commissielid";
+  return "overig";
+}
+
+function personName(person: OrganizationPersonRecord | OrganizationPositionRecord | OrganizationGroupMembershipRecord | undefined): string {
+  if (!person) return "-";
+  return pick(
+    "display_name" in person ? person.display_name : "",
+    "person_display_name" in person ? person.person_display_name : "",
+    ["first_name" in person ? person.first_name : "", "preposition" in person ? person.preposition : "", "last_name" in person ? person.last_name : ""].filter(Boolean).join(" "),
+  ) || "-";
+}
+
+function personByPosition(position: OrganizationPositionRecord): OrganizationPersonRecord | undefined {
+  const personId = pick(position.person_id);
+  const personSourceId = pick(position.person_source_id);
+  return state.data?.organizationPersons.find((person) => pick(person.id) === personId || pick(person.source_id) === personSourceId);
+}
+
+function groupNamesForPerson(position: OrganizationPositionRecord): string[] {
+  const personId = pick(position.person_id);
+  const personSourceId = pick(position.person_source_id);
+  if (!derivedCaches.personGroupsByPersonId.size) {
+    for (const membership of state.data?.organizationGroupMemberships ?? []) {
+      const keys = [pick(membership.person_id), pick(membership.person_source_id)].filter(Boolean);
+      const groupName = pick(membership.group_name, membership.group_id);
+      for (const key of keys) {
+        const names = derivedCaches.personGroupsByPersonId.get(key) ?? [];
+        if (groupName && !names.includes(groupName)) names.push(groupName);
+        derivedCaches.personGroupsByPersonId.set(key, names);
+      }
+    }
+  }
+  return uniqueValues([
+    ...(personId ? derivedCaches.personGroupsByPersonId.get(personId) ?? [] : []),
+    ...(personSourceId ? derivedCaches.personGroupsByPersonId.get(personSourceId) ?? [] : []),
+  ]);
+}
+
+function renderSummaryCard(label: string, value: number, description: string): HTMLElement {
+  const card = document.createElement("article");
+  card.className = "summary-card";
+  const heading = document.createElement("h3");
+  heading.textContent = label;
+  const number = document.createElement("p");
+  number.className = "summary-card__number";
+  number.textContent = text(value);
+  const body = document.createElement("p");
+  body.className = "muted";
+  body.textContent = description;
+  card.append(heading, number, body);
+  return card;
+}
+
+function renderOrganization(): void {
+  const groups = state.data?.organizationGroups ?? [];
+  const persons = state.data?.organizationPersons ?? [];
+  const roles = state.data?.organizationRoles ?? [];
+  const positions = state.data?.organizationPositions ?? [];
+  const memberships = state.data?.organizationGroupMemberships ?? [];
+
+  elements.organizationSummaryCount.textContent = `${positions.length} positie(s)`;
+  elements.organizationSummaryCards.replaceChildren(
+    renderSummaryCard("Groepen", groups.length, "Fracties, commissies, organen en overige groepen."),
+    renderSummaryCard("Personen", persons.filter((person) => person.active !== false).length, "Actieve personen in de publieke organisatie-export."),
+    renderSummaryCard("Rollen", roles.length, "Rollen uit de RIS API, met compacte categorisering."),
+    renderSummaryCard("Posities", positions.length, "Persoon-rolrelaties met start- en einddatum waar beschikbaar."),
+  );
+
+  renderOrganizationGroups(groups, memberships);
+  renderOrganizationPositions(positions);
+}
+
+function renderOrganizationGroups(groups: OrganizationGroupRecord[], memberships: OrganizationGroupMembershipRecord[]): void {
+  elements.organizationGroupsList.replaceChildren();
+  if (groups.length === 0) {
+    elements.organizationGroupsList.appendChild(renderEmptyRelation("Geen organisatiegroepen gevonden. De maandelijkse organisatie-export is mogelijk nog niet uitgevoerd."));
+    return;
+  }
+  const labels: Record<string, string> = { fractie: "Fracties", commissie: "Commissies", orgaan: "Organen", overig: "Overig of onbekend" };
+  const grouped = new Map<string, OrganizationGroupRecord[]>();
+  for (const group of groups) {
+    const type = pick(group.type) || "overig";
+    const key = labels[type] ? type : "overig";
+    grouped.set(key, [...(grouped.get(key) ?? []), group]);
+  }
+  for (const [type, records] of grouped.entries()) {
+    const section = document.createElement("section");
+    section.className = "organization-group-section";
+    appendSectionHeading(section, labels[type] ?? type);
+    for (const group of records.sort((a, b) => pick(a.name).localeCompare(pick(b.name), "nl"))) {
+      const card = document.createElement("article");
+      card.className = "relation-card";
+      const title = document.createElement("h4");
+      title.textContent = pick(group.name) || getOrganizationId(group);
+      const memberCount = memberships.filter((membership) => pick(membership.group_id) === pick(group.id) || pick(membership.group_source_id) === pick(group.source_id)).length;
+      const meta = document.createElement("p");
+      meta.className = "muted";
+      meta.textContent = `${pick(group.type, "onbekend")} · ${memberCount} gekoppelde persoon/personen`;
+      card.append(title, meta);
+      section.appendChild(card);
+    }
+    elements.organizationGroupsList.appendChild(section);
+  }
+}
+
+function renderOrganizationPositions(positions: OrganizationPositionRecord[]): void {
+  const filter = state.organizationRoleFilter;
+  const visible = positions
+    .filter((position) => !filter || roleCategory(position) === filter)
+    .sort((a, b) => [roleCategory(a), pick(a.role_name), personName(a)].join(" ").localeCompare([roleCategory(b), pick(b.role_name), personName(b)].join(" "), "nl"));
+  elements.organizationPositionsBody.replaceChildren();
+  if (visible.length === 0) {
+    const row = document.createElement("tr");
+    const cell = createCell(positions.length === 0 ? "Geen organisatieposities gevonden in de huidige export." : "Geen posities gevonden voor dit rolfilter.");
+    cell.colSpan = 7;
+    row.appendChild(cell);
+    elements.organizationPositionsBody.appendChild(row);
+    return;
+  }
+  for (const position of visible) {
+    const person = personByPosition(position);
+    const groups = groupNamesForPerson(position);
+    const row = document.createElement("tr");
+    row.appendChild(createCell(personName(position) || personName(person)));
+    row.appendChild(createCell(text(position.role_name, unavailable("Geen rolnaam"))));
+    row.appendChild(createCell(groups.length > 0 ? groups.join(", ") : "-"));
+    row.appendChild(createCell(formatDate(position.start_date)));
+    row.appendChild(createCell(formatDate(position.end_date)));
+    row.appendChild(createCell(position.active === false ? "Niet actief" : "Actief"));
+    row.appendChild(createCell(text(person?.email, "-")));
+    elements.organizationPositionsBody.appendChild(row);
+  }
+}
+
+function setActiveView(view: "documents" | "meetings" | "organization", updateHash = false, scrollToView = false): void {
   state.activeView = view;
   elements.documentsView.hidden = view !== "documents";
   elements.meetingsView.hidden = view !== "meetings";
+  elements.organizationView.hidden = view !== "organization";
   document.body.dataset.view = view;
   elements.navDocuments.classList.toggle("top-nav__link--active", view === "documents");
   elements.navMeetings.classList.toggle("top-nav__link--active", view === "meetings");
+  elements.navOrganization.classList.toggle("top-nav__link--active", view === "organization");
   elements.navDocuments.setAttribute("aria-current", view === "documents" ? "page" : "false");
   elements.navMeetings.setAttribute("aria-current", view === "meetings" ? "page" : "false");
+  elements.navOrganization.setAttribute("aria-current", view === "organization" ? "page" : "false");
 
   if (updateHash) updateHashForView(view);
   if (scrollToView) {
-    const target = view === "meetings" ? elements.meetingsView : elements.documentsView;
+    const target = view === "meetings" ? elements.meetingsView : view === "organization" ? elements.organizationView : elements.documentsView;
     target.scrollIntoView({ block: "start", behavior: "smooth" });
   }
 }
 
-function updateHashForView(view: "documents" | "meetings"): void {
-  updateHash(view === "meetings" ? "#meetings" : "#documents");
+function updateHashForView(view: "documents" | "meetings" | "organization"): void {
+  updateHash(view === "meetings" ? "#meetings" : view === "organization" ? "#organization" : "#documents");
 }
 
-function viewFromHash(): "documents" | "meetings" {
-  return window.location.hash === "#meetings" ? "meetings" : "documents";
+function viewFromHash(): "documents" | "meetings" | "organization" {
+  if (window.location.hash === "#meetings") return "meetings";
+  if (window.location.hash === "#organization") return "organization";
+  return "documents";
 }
 
 function applyHashState(scrollDocumentDetail = false): void {
@@ -1127,6 +1311,11 @@ function attachEvents(): void {
     setActiveView("meetings", true, false);
     renderMeetings();
   });
+  elements.navOrganization.addEventListener("click", (event) => {
+    event.preventDefault();
+    setActiveView("organization", true, false);
+    renderOrganization();
+  });
   window.addEventListener("hashchange", () => applyHashState(true));
   elements.searchInput.addEventListener("input", () => { state.currentPage = 1; applyFilters(); });
   elements.typeFilter.addEventListener("change", () => { state.currentPage = 1; applyFilters(); });
@@ -1149,6 +1338,10 @@ function attachEvents(): void {
     state.meetingCurrentPage = 1;
     renderMeetings();
   });
+  elements.organizationRoleFilter.addEventListener("change", () => {
+    state.organizationRoleFilter = elements.organizationRoleFilter.value;
+    renderOrganization();
+  });
   for (const button of [elements.previousTop, elements.previousBottom]) button.addEventListener("click", () => { state.currentPage -= 1; renderDocuments(); });
   for (const button of [elements.nextTop, elements.nextBottom]) button.addEventListener("click", () => { state.currentPage += 1; renderDocuments(); });
   for (const button of [elements.previousMeetingTop, elements.previousMeetingBottom]) button.addEventListener("click", () => { state.meetingCurrentPage -= 1; renderMeetings(); });
@@ -1170,6 +1363,7 @@ async function init(): Promise<void> {
   renderSummary();
   applyFilters();
   renderMeetings();
+  renderOrganization();
   applyHashState(false);
   window.OpenRISMonitor = {
     indexes: state.indexes,

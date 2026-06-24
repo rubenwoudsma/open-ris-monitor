@@ -151,3 +151,17 @@ Breaking changes should be avoided before v1.0 unless needed to stabilize the co
 - [harvesting.md](harvesting.md)
 - [quality.md](quality.md)
 - [validatie-ci.md](validatie-ci.md)
+
+## MVP 1.1 organisation exports
+
+MVP 1.1 adds optional public organisation exports for civic context. These files are generated from the public GO/Open Raadsinformatie organisation endpoints and are expected to change slowly. The monthly backfill profile includes them by default, while daily latest harvests preserve existing organisation output references when the files already exist.
+
+New optional files under `data/public/`:
+
+- `organization_groups.jsonl`, groups such as `fractie`, `commissie`, `orgaan` and unknown or other types;
+- `organization_persons.jsonl`, public person fields only, including name parts, display name, public email and active status;
+- `organization_roles.jsonl`, roles and a conservative `role_category` for UI grouping;
+- `organization_positions.jsonl`, person-role positions with start date, end date and active flag where derivable;
+- `organization_group_memberships.jsonl`, grounded group membership from `/groups/{groupId}/persons` when available.
+
+The public person export deliberately excludes nested `user` metadata such as `usermanagementId`. The organisation view must not infer party or group membership from names or role labels. It may only use relations present in the API payloads.

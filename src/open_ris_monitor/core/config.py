@@ -22,6 +22,8 @@ class HarvestProfile:
     meeting_scan_limit: int
     meeting_session_batch_size: int
     meeting_item_limit: int | None
+    include_organization: bool
+    organization_batch_size: int
 
 
 LEGACY_DEFAULTS: Final[HarvestProfile] = HarvestProfile(
@@ -33,6 +35,8 @@ LEGACY_DEFAULTS: Final[HarvestProfile] = HarvestProfile(
     meeting_scan_limit=250,
     meeting_session_batch_size=100,
     meeting_item_limit=1000,
+    include_organization=False,
+    organization_batch_size=100,
 )
 
 HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
@@ -45,6 +49,8 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         meeting_scan_limit=50,
         meeting_session_batch_size=50,
         meeting_item_limit=200,
+        include_organization=False,
+        organization_batch_size=100,
     ),
     "latest": HarvestProfile(
         mode="latest",
@@ -55,6 +61,8 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         meeting_scan_limit=250,
         meeting_session_batch_size=100,
         meeting_item_limit=1000,
+        include_organization=False,
+        organization_batch_size=100,
     ),
     # Backwards-compatible name for the public latest/incremental export profile.
     "public": HarvestProfile(
@@ -66,6 +74,8 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         meeting_scan_limit=250,
         meeting_session_batch_size=100,
         meeting_item_limit=1000,
+        include_organization=False,
+        organization_batch_size=100,
     ),
     "backfill": HarvestProfile(
         mode="full",
@@ -76,6 +86,8 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         meeting_scan_limit=1000,
         meeting_session_batch_size=100,
         meeting_item_limit=5000,
+        include_organization=True,
+        organization_batch_size=100,
     ),
     # Explicit broad recomputation alias for manual workflow_dispatch runs.
     "full": HarvestProfile(
@@ -87,6 +99,8 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         meeting_scan_limit=1000,
         meeting_session_batch_size=100,
         meeting_item_limit=5000,
+        include_organization=True,
+        organization_batch_size=100,
     ),
 }
 

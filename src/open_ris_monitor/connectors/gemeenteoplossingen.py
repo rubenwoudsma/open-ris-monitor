@@ -399,6 +399,125 @@ class GemeenteOplossingenConnector:
         """Fetch all pages from /meetingitems/{meeting_item_id}/documents."""
         return self._fetch_paged_result_list(f"meetingitems/{meeting_item_id}/documents", "documents")
 
+
+    def _fetch_counted_collection(
+        self,
+        path: str,
+        field_name: str,
+        *,
+        batch_size: int = 100,
+        max_records: int | None = None,
+        params: dict[str, Any] | None = None,
+    ) -> list[dict[str, Any]]:
+        """Fetch a top-level paginated collection defensively."""
+        if batch_size <= 0:
+            raise ValueError("batch_size must be greater than 0")
+        if max_records is not None and max_records <= 0:
+            raise ValueError("max_records must be greater than 0 when provided")
+
+        base_params = dict(params or {})
+        count_payload = self._get_json(path, params={**base_params, "limit": 1, "offset": 0})
+        result = self._result(count_payload)
+        total_count = result.get("totalCount")
+        if total_count is None:
+            first_page = self._result_list(count_payload, field_name)
+            if len(first_page) < 1:
+                return []
+            records = list(first_page)
+            offset = len(records)
+            while True:
+                if max_records is not None and len(records) >= max_records:
+                    return records[:max_records]
+                limit = batch_size if max_records is None else min(batch_size, max_records - len(records))
+                page = self._result_list(
+                    self._get_json(path, params={**base_params, "limit": limit, "offset": offset}),
+                    field_name,
+                )
+                if not page:
+                    break
+                records.extend(page)
+                if len(page) < limit:
+                    break
+                offset += len(page)
+            return records
+
+        target_count = min(int(total_count), max_records) if max_records is not None else int(total_count)
+        records: list[dict[str, Any]] = []
+        offset = 0
+        while offset < target_count:
+            limit = min(batch_size, target_count - offset)
+            page = self._result_list(
+                self._get_json(path, params={**base_params, "limit": limit, "offset": offset}),
+                field_name,
+            )
+            if not page:
+                break
+            records.extend(page)
+            offset += len(page)
+            if len(page) < limit:
+                break
+        return records
+
+    def fetch_all_groups(
+        self,
+        *,
+        batch_size: int = 100,
+        max_records: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Fetch all public /groups records."""
+        return self._fetch_counted_collection(
+            "groups",
+            "groups",
+            batch_size=batch_size,
+            max_records=max_records,
+        )
+
+    def fetch_all_persons(
+        self,
+        *,
+        batch_size: int = 100,
+        max_records: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Fetch all public /persons records."""
+        return self._fetch_counted_collection(
+            "persons",
+            "persons",
+            batch_size=batch_size,
+            max_records=max_records,
+        )
+
+    def fetch_all_roles(
+        self,
+        *,
+        batch_size: int = 100,
+        max_records: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Fetch all public /roles records."""
+        return self._fetch_counted_collection(
+            "roles",
+            "roles",
+            batch_size=batch_size,
+            max_records=max_records,
+        )
+
+    def fetch_all_positions(
+        self,
+        *,
+        batch_size: int = 100,
+        max_records: int | None = None,
+    ) -> list[dict[str, Any]]:
+        """Fetch all public /positions records."""
+        return self._fetch_counted_collection(
+            "positions",
+            "positions",
+            batch_size=batch_size,
+            max_records=max_records,
+        )
+
+    def fetch_persons_by_group_id(self, group_id: int | str) -> list[dict[str, Any]]:
+        """Fetch grounded group membership from /groups/{groupId}/persons."""
+        return self._fetch_paged_result_list(f"groups/{group_id}/persons", "persons")
+
     def build_document_download_url(self, document_id: int | str) -> str:
         return f"{self.base_url}documents/{document_id}/download"
 

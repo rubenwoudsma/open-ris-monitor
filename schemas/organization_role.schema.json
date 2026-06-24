@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "schema_version", "source_id", "municipality_slug", "source_system_id"],
+  "properties": {
+    "id": {"type": "string"},
+    "schema_version": {"type": "string"},
+    "source_id": {"type": "string"},
+    "municipality_slug": {"type": "string"},
+    "source_system_id": {"type": "string"},
+    "name": {"type": ["string", "null"]},
+    "sort_order": {"type": ["integer", "null"]},
+    "role_category": {"type": ["string", "null"]}
+  },
+  "additionalProperties": false
+}

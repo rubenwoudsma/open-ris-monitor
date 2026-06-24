@@ -253,3 +253,17 @@ Related files:
 - [export-contract.md](export-contract.md)
 - [harvesting.md](harvesting.md)
 - [quality.md](quality.md)
+
+## Organisation entities, MVP 1.1
+
+The organisation model adds lightweight civic context around the council organisation. It is separate from the document, meeting and agenda-item model.
+
+Entities:
+
+- group, a public group from `/groups`, commonly a fraction, committee or body;
+- person, a public organisation actor from `/persons`;
+- role, a public role from `/roles`;
+- position, a public relation between person and role from `/positions`;
+- group membership, an optional relation from `/groups/{groupId}/persons`.
+
+The UI treats the following role categories as important for public interpretation: raadslid, fractievoorzitter, burgemeester, griffie and commissielid. These categories are derived conservatively from role names and are only used for grouping and filtering in the static viewer.
