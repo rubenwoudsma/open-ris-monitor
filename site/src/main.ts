@@ -27,6 +27,7 @@ interface ViewerState {
   sortMode: string;
   meetingQuery: string;
   meetingSortMode: "date-desc" | "date-asc";
+  meetingDateFilter: "all" | "past" | "future";
   meetingCurrentPage: number;
   meetingPageSize: number;
   organizationRoleFilter: string;
@@ -83,6 +84,7 @@ type RequiredElements = {
   clearDocumentSelection: HTMLButtonElement;
   meetingSearchInput: HTMLInputElement;
   meetingSortSelect: HTMLSelectElement;
+  meetingDateFilter: HTMLSelectElement;
   meetingPageSizeSelect: HTMLSelectElement;
   visibleMeetingsCount: HTMLElement;
   meetingsResultCount: HTMLElement;
@@ -118,6 +120,7 @@ const state: ViewerState = {
   sortMode: "date-desc",
   meetingQuery: "",
   meetingSortMode: "date-desc",
+  meetingDateFilter: "all",
   meetingCurrentPage: 1,
   meetingPageSize: 25,
   organizationRoleFilter: "",
@@ -189,6 +192,7 @@ const elements: RequiredElements = {
   clearDocumentSelection: byId("clear-document-selection"),
   meetingSearchInput: byId("meeting-search-input"),
   meetingSortSelect: byId("meeting-sort-select"),
+  meetingDateFilter: byId("meeting-date-filter"),
   meetingPageSizeSelect: byId("meeting-page-size-select"),
   visibleMeetingsCount: byId("visible-meetings-count"),
   meetingsResultCount: byId("meetings-result-count"),
@@ -977,13 +981,26 @@ function meetingSearchBlob(meeting: MeetingRecord): string {
   return blob;
 }
 
+function isFutureMeeting(meeting: MeetingRecord): boolean {
+  const meetingDate = parseDateValue(getMeetingDate(meeting));
+  if (!meetingDate) return false;
+  return meetingDate > new Date(new Date().toDateString());
+}
+
+function matchesMeetingDateFilter(meeting: MeetingRecord): boolean {
+  if (state.meetingDateFilter === "all") return true;
+  const future = isFutureMeeting(meeting);
+  return state.meetingDateFilter === "future" ? future : !future;
+}
+
 function filteredMeetings(): MeetingRecord[] {
   const query = state.meetingQuery.trim().toLowerCase();
-  const cacheKey = `${query}|${state.meetingSortMode}`;
+  const cacheKey = `${query}|${state.meetingDateFilter}|${state.meetingSortMode}`;
   const cached = derivedCaches.filteredMeetingsByKey.get(cacheKey);
   if (cached) return cached;
 
   const meetings = (state.data?.meetings ?? []).filter((meeting) => {
+    if (!matchesMeetingDateFilter(meeting)) return false;
     if (!query) return true;
     return meetingSearchBlob(meeting).includes(query);
   });
@@ -1419,13 +1436,24 @@ function dateRangeForRow(row: OrganizationPersonRow): string {
   return `${start} tot ${end}`;
 }
 
+function rowPositionsForRoleFilter(row: OrganizationPersonRow, statusFilter: ViewerState["organizationStatusFilter"]): OrganizationPositionRecord[] {
+  if (statusFilter === "active") return row.currentPositions;
+  if (statusFilter === "inactive") return row.positions.filter((position) => !isCurrentOrganizationPosition(position));
+  return row.positions;
+}
+
+function rowMatchesRoleFilter(row: OrganizationPersonRow, roleFilter: string, statusFilter: ViewerState["organizationStatusFilter"]): boolean {
+  if (!roleFilter) return true;
+  return rowPositionsForRoleFilter(row, statusFilter).some((position) => matchesRoleFilter(position, roleFilter));
+}
+
 function renderOrganizationPositions(positions: OrganizationPositionRecord[]): void {
   const roleFilter = state.organizationRoleFilter;
   const statusFilter = state.organizationStatusFilter;
   const groupFilter = state.organizationGroupFilter;
-  const relevantPositions = positions.filter((position) => matchesRoleFilter(position, roleFilter));
-  const visibleRows = buildOrganizationPersonRows(relevantPositions)
+  const visibleRows = buildOrganizationPersonRows(positions)
     .filter((row) => statusFilter === "all" || (statusFilter === "active" ? row.currentPositions.length > 0 : row.currentPositions.length === 0))
+    .filter((row) => rowMatchesRoleFilter(row, roleFilter, statusFilter))
     .filter((row) => !groupFilter || row.groupIds.includes(groupFilter))
     .sort((a, b) => a.displayName.localeCompare(b.displayName, "nl"));
   elements.organizationPositionsBody.replaceChildren();
@@ -1517,6 +1545,11 @@ function attachEvents(): void {
   elements.clearMeetingSelection.addEventListener("click", () => clearMeetingSelection());
   elements.meetingSearchInput.addEventListener("input", () => {
     state.meetingQuery = elements.meetingSearchInput.value;
+    state.meetingCurrentPage = 1;
+    renderMeetings();
+  });
+  elements.meetingDateFilter.addEventListener("change", () => {
+    state.meetingDateFilter = elements.meetingDateFilter.value as ViewerState["meetingDateFilter"];
     state.meetingCurrentPage = 1;
     renderMeetings();
   });
