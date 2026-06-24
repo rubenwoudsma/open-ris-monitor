@@ -26,22 +26,7 @@
     </header>
 
     <main id="main-content" class="page-shell">
-      <section class="hero-card" aria-labelledby="page-title">
-        <p class="eyebrow">Publieke raadsinformatie, statisch gepubliceerd</p>
-        <div class="hero-card__content">
-          <div>
-            <h1 id="page-title">Raadsinformatie Huizen</h1>
-            <p>
-              Een snelle, reproduceerbare viewer op compacte JSONL-exportbestanden. Documenten blijven de primaire ingang,
-              met compacte navigatie naar vergaderingen en agendapunten.
-            </p>
-          </div>
-          <div class="hero-card__status" aria-live="polite">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span id="status-message">Data wordt geladen...</span>
-          </div>
-        </div>
-      </section>
+      <h1 id="page-title" class="visually-hidden">Raadsinformatie Huizen</h1>
 
       <div class="content-layout content-layout--single">
         <div class="main-column">
@@ -147,6 +132,14 @@
                   <input id="meeting-search-input" type="search" autocomplete="off" placeholder="Zoek op vergadertitel, datum of agendapunt" />
                 </label>
                 <label class="control">
+                  <span>Moment</span>
+                  <select id="meeting-date-filter">
+                    <option value="all">Alle vergaderingen</option>
+                    <option value="past">Tot en met vandaag</option>
+                    <option value="future">Toekomstig</option>
+                  </select>
+                </label>
+                <label class="control">
                   <span>Sorteer</span>
                   <select id="meeting-sort-select">
                     <option value="date-desc">Datum, nieuwste eerst</option>
@@ -230,60 +223,40 @@
               <div id="organization-summary-cards" class="summary-card-grid"></div>
             </section>
 
-            <section class="panel" aria-labelledby="organization-groups-title">
-              <div class="panel__header panel__header--split">
-                <div>
-                  <h2 id="organization-groups-title">Groepen</h2>
-                  <p class="panel__subtitle">Compacte lijst met fracties als primaire ingang. Andere groepstypen blijven beschikbaar om verder te speuren.</p>
-                </div>
-                <label class="control control--small organization-filter">
-                  <span>Groepstype</span>
-                  <select id="organization-group-type-filter">
-                    <option value="fractie">Fracties</option>
-                    <option value="commissie">Commissies</option>
-                    <option value="orgaan">Organen</option>
-                    <option value="overig">Overig</option>
-                    <option value="">Alle typen</option>
-                  </select>
-                </label>
-              </div>
-              <div id="organization-groups-list" class="organization-group-grid"></div>
-            </section>
-
             <section class="panel" aria-labelledby="organization-positions-title">
               <div class="panel__header panel__header--split">
                 <div>
                   <h2 id="organization-positions-title">Rollen en posities</h2>
                   <p class="panel__subtitle">Nadruk op raadslid, fractievoorzitter, burgemeester, griffie en commissieleden.</p>
                 </div>
-                <div class="organization-filter-row">
-                  <label class="control control--small organization-filter">
-                    <span>Rolfilter</span>
-                    <select id="organization-role-filter">
-                      <option value="">Alle rollen</option>
-                      <option value="raadslid">Raadsleden</option>
-                      <option value="fractievoorzitter">Fractievoorzitters</option>
-                      <option value="burgemeester">Burgemeester / raadvoorzitter</option>
-                      <option value="griffie">Griffie</option>
-                      <option value="commissielid">Commissieleden</option>
-                    </select>
-                  </label>
-                  <label class="control control--small organization-filter">
-                    <span>Status</span>
-                    <select id="organization-status-filter">
-                      <option value="active">Actief</option>
-                      <option value="inactive">Niet actief</option>
-                      <option value="all">Alle statussen</option>
-                    </select>
-                  </label>
-                  <label class="control control--small organization-filter">
-                    <span>Groep</span>
-                    <select id="organization-group-filter">
-                      <option value="">Alle groepen</option>
-                    </select>
-                  </label>
-                </div>
               </div>
+              <form class="organization-filter-bar" id="organization-position-controls">
+                <label class="control organization-filter">
+                  <span>Rolfilter</span>
+                  <select id="organization-role-filter">
+                    <option value="">Alle rollen</option>
+                    <option value="raadslid">Raadsleden</option>
+                    <option value="fractievoorzitter">Fractievoorzitters</option>
+                    <option value="burgemeester">Burgemeester / raadvoorzitter</option>
+                    <option value="griffie">Griffie</option>
+                    <option value="commissielid">Commissieleden</option>
+                  </select>
+                </label>
+                <label class="control organization-filter organization-filter--narrow">
+                  <span>Status</span>
+                  <select id="organization-status-filter">
+                    <option value="active">Actief</option>
+                    <option value="inactive">Niet actief</option>
+                    <option value="all">Alle statussen</option>
+                  </select>
+                </label>
+                <label class="control organization-filter">
+                  <span>Groep</span>
+                  <select id="organization-group-filter">
+                    <option value="">Alle groepen</option>
+                  </select>
+                </label>
+              </form>
               <div class="table-wrapper">
                 <table class="organization-table">
                   <thead>
@@ -300,6 +273,28 @@
                 </table>
               </div>
             </section>
+
+            <section class="panel" aria-labelledby="organization-groups-title">
+              <div class="panel__header panel__header--split">
+                <div>
+                  <h2 id="organization-groups-title">Groepen</h2>
+                  <p class="panel__subtitle">Compacte lijst met fracties als primaire ingang. Andere groepstypen blijven beschikbaar om verder te speuren.</p>
+                </div>
+              </div>
+              <form class="organization-filter-bar organization-filter-bar--compact" id="organization-group-controls">
+                <label class="control organization-filter organization-filter--narrow">
+                  <span>Groepstype</span>
+                  <select id="organization-group-type-filter">
+                    <option value="fractie">Fracties</option>
+                    <option value="commissie">Commissies</option>
+                    <option value="orgaan">Organen</option>
+                    <option value="overig">Overig</option>
+                    <option value="">Alle typen</option>
+                  </select>
+                </label>
+              </form>
+              <div id="organization-groups-list" class="organization-group-grid"></div>
+            </section>
           </div>
         </div>
       </div>
@@ -315,6 +310,7 @@
             Vergaderingen: <span id="meetings-count">-</span>. Agendapunten: <span id="agenda-items-count">-</span>.
             Gekoppelde documenten: <span id="linked-documents-count">-</span>.
             Organisatieposities: <span id="organization-positions-count">-</span>.
+            Status: <span id="status-message">Data wordt geladen...</span>.
           </p>
         </div>
         <details class="technical-metadata">

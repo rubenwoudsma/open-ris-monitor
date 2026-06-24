@@ -20,6 +20,8 @@ def test_organization_navigation_and_view_are_present() -> None:
         'id="organization-group-filter"',
         'id="organization-group-type-filter"',
         'id="organization-positions-body"',
+        'id="meeting-date-filter"',
+        "organization-filter-bar",
         "Raadsorganisatie",
     ]:
         assert marker in index
@@ -31,6 +33,8 @@ def test_organization_navigation_and_view_are_present() -> None:
         "organizationGroupFilter",
         "roleCategoryFromName",
         "matchesRoleFilter",
+        "rowMatchesRoleFilter",
+        "meetingDateFilter",
         "personGroupsByPersonId",
         "organizationPositions",
     ]:
@@ -58,6 +62,8 @@ def test_organization_styling_exists() -> None:
         ".organization-group-grid",
         ".organization-compact-list",
         ".organization-filter-row",
+        ".organization-filter-bar",
+        ".visually-hidden",
         ".organization-table",
     ]:
         assert marker in styles

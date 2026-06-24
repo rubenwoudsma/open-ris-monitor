@@ -12,6 +12,7 @@ const state = {
     sortMode: "date-desc",
     meetingQuery: "",
     meetingSortMode: "date-desc",
+    meetingDateFilter: "all",
     meetingCurrentPage: 1,
     meetingPageSize: 25,
     organizationRoleFilter: "",
@@ -80,6 +81,7 @@ const elements = {
     clearDocumentSelection: byId("clear-document-selection"),
     meetingSearchInput: byId("meeting-search-input"),
     meetingSortSelect: byId("meeting-sort-select"),
+    meetingDateFilter: byId("meeting-date-filter"),
     meetingPageSizeSelect: byId("meeting-page-size-select"),
     visibleMeetingsCount: byId("visible-meetings-count"),
     meetingsResultCount: byId("meetings-result-count"),
@@ -803,13 +805,27 @@ function meetingSearchBlob(meeting) {
     derivedCaches.meetingSearchBlobById.set(meetingId, blob);
     return blob;
 }
+function isFutureMeeting(meeting) {
+    const meetingDate = parseDateValue(getMeetingDate(meeting));
+    if (!meetingDate)
+        return false;
+    return meetingDate > new Date(new Date().toDateString());
+}
+function matchesMeetingDateFilter(meeting) {
+    if (state.meetingDateFilter === "all")
+        return true;
+    const future = isFutureMeeting(meeting);
+    return state.meetingDateFilter === "future" ? future : !future;
+}
 function filteredMeetings() {
     const query = state.meetingQuery.trim().toLowerCase();
-    const cacheKey = `${query}|${state.meetingSortMode}`;
+    const cacheKey = `${query}|${state.meetingDateFilter}|${state.meetingSortMode}`;
     const cached = derivedCaches.filteredMeetingsByKey.get(cacheKey);
     if (cached)
         return cached;
     const meetings = (state.data?.meetings ?? []).filter((meeting) => {
+        if (!matchesMeetingDateFilter(meeting))
+            return false;
         if (!query)
             return true;
         return meetingSearchBlob(meeting).includes(query);
@@ -1211,13 +1227,25 @@ function dateRangeForRow(row) {
     const end = row.currentPositions.length > 0 ? "-" : (ends[ends.length - 1] ? formatDate(ends[ends.length - 1]) : "-");
     return `${start} tot ${end}`;
 }
+function rowPositionsForRoleFilter(row, statusFilter) {
+    if (statusFilter === "active")
+        return row.currentPositions;
+    if (statusFilter === "inactive")
+        return row.positions.filter((position) => !isCurrentOrganizationPosition(position));
+    return row.positions;
+}
+function rowMatchesRoleFilter(row, roleFilter, statusFilter) {
+    if (!roleFilter)
+        return true;
+    return rowPositionsForRoleFilter(row, statusFilter).some((position) => matchesRoleFilter(position, roleFilter));
+}
 function renderOrganizationPositions(positions) {
     const roleFilter = state.organizationRoleFilter;
     const statusFilter = state.organizationStatusFilter;
     const groupFilter = state.organizationGroupFilter;
-    const relevantPositions = positions.filter((position) => matchesRoleFilter(position, roleFilter));
-    const visibleRows = buildOrganizationPersonRows(relevantPositions)
+    const visibleRows = buildOrganizationPersonRows(positions)
         .filter((row) => statusFilter === "all" || (statusFilter === "active" ? row.currentPositions.length > 0 : row.currentPositions.length === 0))
+        .filter((row) => rowMatchesRoleFilter(row, roleFilter, statusFilter))
         .filter((row) => !groupFilter || row.groupIds.includes(groupFilter))
         .sort((a, b) => a.displayName.localeCompare(b.displayName, "nl"));
     elements.organizationPositionsBody.replaceChildren();
@@ -1306,6 +1334,11 @@ function attachEvents() {
     elements.clearMeetingSelection.addEventListener("click", () => clearMeetingSelection());
     elements.meetingSearchInput.addEventListener("input", () => {
         state.meetingQuery = elements.meetingSearchInput.value;
+        state.meetingCurrentPage = 1;
+        renderMeetings();
+    });
+    elements.meetingDateFilter.addEventListener("change", () => {
+        state.meetingDateFilter = elements.meetingDateFilter.value;
         state.meetingCurrentPage = 1;
         renderMeetings();
     });
