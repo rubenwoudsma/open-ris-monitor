@@ -231,9 +231,21 @@
             </section>
 
             <section class="panel" aria-labelledby="organization-groups-title">
-              <div class="panel__header">
-                <h2 id="organization-groups-title">Groepen</h2>
-                <p class="panel__subtitle">Fracties, commissies, organen en overige groepen zoals beschikbaar in de publieke API.</p>
+              <div class="panel__header panel__header--split">
+                <div>
+                  <h2 id="organization-groups-title">Groepen</h2>
+                  <p class="panel__subtitle">Compacte lijst met fracties als primaire ingang. Andere groepstypen blijven beschikbaar om verder te speuren.</p>
+                </div>
+                <label class="control control--small organization-filter">
+                  <span>Groepstype</span>
+                  <select id="organization-group-type-filter">
+                    <option value="fractie">Fracties</option>
+                    <option value="commissie">Commissies</option>
+                    <option value="orgaan">Organen</option>
+                    <option value="overig">Overig</option>
+                    <option value="">Alle typen</option>
+                  </select>
+                </label>
               </div>
               <div id="organization-groups-list" class="organization-group-grid"></div>
             </section>
@@ -244,17 +256,33 @@
                   <h2 id="organization-positions-title">Rollen en posities</h2>
                   <p class="panel__subtitle">Nadruk op raadslid, fractievoorzitter, burgemeester, griffie en commissieleden.</p>
                 </div>
-                <label class="control control--small organization-filter">
-                  <span>Rolfilter</span>
-                  <select id="organization-role-filter">
-                    <option value="">Alle rollen</option>
-                    <option value="raadslid">Raadsleden</option>
-                    <option value="fractievoorzitter">Fractievoorzitters</option>
-                    <option value="burgemeester">Burgemeester</option>
-                    <option value="griffie">Griffie</option>
-                    <option value="commissielid">Commissieleden</option>
-                  </select>
-                </label>
+                <div class="organization-filter-row">
+                  <label class="control control--small organization-filter">
+                    <span>Rolfilter</span>
+                    <select id="organization-role-filter">
+                      <option value="">Alle rollen</option>
+                      <option value="raadslid">Raadsleden</option>
+                      <option value="fractievoorzitter">Fractievoorzitters</option>
+                      <option value="burgemeester">Burgemeester / raadvoorzitter</option>
+                      <option value="griffie">Griffie</option>
+                      <option value="commissielid">Commissieleden</option>
+                    </select>
+                  </label>
+                  <label class="control control--small organization-filter">
+                    <span>Status</span>
+                    <select id="organization-status-filter">
+                      <option value="active">Actief</option>
+                      <option value="inactive">Niet actief</option>
+                      <option value="all">Alle statussen</option>
+                    </select>
+                  </label>
+                  <label class="control control--small organization-filter">
+                    <span>Groep</span>
+                    <select id="organization-group-filter">
+                      <option value="">Alle groepen</option>
+                    </select>
+                  </label>
+                </div>
               </div>
               <div class="table-wrapper">
                 <table class="organization-table">
@@ -263,13 +291,12 @@
                       <th scope="col">Persoon</th>
                       <th scope="col">Rol</th>
                       <th scope="col">Groep(en)</th>
-                      <th scope="col">Start</th>
-                      <th scope="col">Einde</th>
+                      <th scope="col">Periode</th>
                       <th scope="col">Status</th>
                       <th scope="col">E-mail</th>
                     </tr>
                   </thead>
-                  <tbody id="organization-positions-body"><tr><td colspan="7">Organisatiegegevens worden geladen...</td></tr></tbody>
+                  <tbody id="organization-positions-body"><tr><td colspan="6">Organisatiegegevens worden geladen...</td></tr></tbody>
                 </table>
               </div>
             </section>
