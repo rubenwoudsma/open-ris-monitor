@@ -4,6 +4,11 @@ import type {
   DocumentVersionRecord,
   LatestExport,
   MeetingRecord,
+  OrganizationGroupMembershipRecord,
+  OrganizationGroupRecord,
+  OrganizationPersonRecord,
+  OrganizationPositionRecord,
+  OrganizationRoleRecord,
   PublicDataSet,
   RelationRecord,
 } from "./types.js";
@@ -20,6 +25,11 @@ export async function loadPublicData(basePath = DATA_BASE): Promise<PublicDataSe
     agendaItems,
     meetingDocumentRelations,
     meetingItemDocumentRelations,
+    organizationGroups,
+    organizationPersons,
+    organizationRoles,
+    organizationPositions,
+    organizationGroupMemberships,
   ] = await Promise.all([
     loadJson<LatestExport>(`${basePath}/latest.json`),
     loadJsonl<DocumentRecord>(`${basePath}/documents.jsonl`),
@@ -28,6 +38,11 @@ export async function loadPublicData(basePath = DATA_BASE): Promise<PublicDataSe
     loadOptionalJsonl<AgendaItemRecord>(`${basePath}/meeting_items.jsonl`),
     loadOptionalJsonl<RelationRecord>(`${basePath}/meeting_documents.jsonl`),
     loadOptionalJsonl<RelationRecord>(`${basePath}/meeting_item_documents.jsonl`),
+    loadOptionalJsonl<OrganizationGroupRecord>(`${basePath}/organization_groups.jsonl`),
+    loadOptionalJsonl<OrganizationPersonRecord>(`${basePath}/organization_persons.jsonl`),
+    loadOptionalJsonl<OrganizationRoleRecord>(`${basePath}/organization_roles.jsonl`),
+    loadOptionalJsonl<OrganizationPositionRecord>(`${basePath}/organization_positions.jsonl`),
+    loadOptionalJsonl<OrganizationGroupMembershipRecord>(`${basePath}/organization_group_memberships.jsonl`),
   ]);
 
   return {
@@ -38,5 +53,10 @@ export async function loadPublicData(basePath = DATA_BASE): Promise<PublicDataSe
     agendaItems,
     meetingDocumentRelations,
     meetingItemDocumentRelations,
+    organizationGroups,
+    organizationPersons,
+    organizationRoles,
+    organizationPositions,
+    organizationGroupMemberships,
   };
 }

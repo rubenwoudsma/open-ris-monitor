@@ -76,6 +76,63 @@ export interface AgendaItemRecord extends UnknownRecord {
   description?: string;
 }
 
+
+export interface OrganizationGroupRecord extends UnknownRecord {
+  id?: string;
+  source_id?: string | number;
+  name?: string;
+  type?: string;
+  sort_order?: number | string;
+}
+
+export interface OrganizationPersonRecord extends UnknownRecord {
+  id?: string;
+  source_id?: string | number;
+  first_name?: string;
+  last_name?: string;
+  preposition?: string;
+  display_name?: string;
+  salutation?: string;
+  email?: string;
+  active?: boolean;
+}
+
+export interface OrganizationRoleRecord extends UnknownRecord {
+  id?: string;
+  source_id?: string | number;
+  name?: string;
+  sort_order?: number | string;
+  role_category?: string;
+}
+
+export interface OrganizationPositionRecord extends UnknownRecord {
+  id?: string;
+  source_id?: string | number;
+  person_id?: string;
+  person_source_id?: string | number;
+  person_display_name?: string;
+  role_id?: string;
+  role_source_id?: string | number;
+  role_name?: string;
+  role_category?: string;
+  start_date?: string;
+  end_date?: string;
+  sort_order?: number | string;
+  active?: boolean;
+}
+
+export interface OrganizationGroupMembershipRecord extends UnknownRecord {
+  id?: string;
+  group_id?: string;
+  group_source_id?: string | number;
+  group_name?: string;
+  group_type?: string;
+  person_id?: string;
+  person_source_id?: string | number;
+  person_display_name?: string;
+  active?: boolean;
+}
+
 export interface RelationRecord extends UnknownRecord {
   id?: string;
   schema_version?: string | number;
@@ -101,6 +158,11 @@ export interface PublicDataSet {
   agendaItems: AgendaItemRecord[];
   meetingDocumentRelations: RelationRecord[];
   meetingItemDocumentRelations: RelationRecord[];
+  organizationGroups: OrganizationGroupRecord[];
+  organizationPersons: OrganizationPersonRecord[];
+  organizationRoles: OrganizationRoleRecord[];
+  organizationPositions: OrganizationPositionRecord[];
+  organizationGroupMemberships: OrganizationGroupMembershipRecord[];
 }
 
 export interface RelationIndexes {

@@ -328,3 +328,9 @@ Recommended random minutes for forks:
 - [export-contract.md](export-contract.md)
 - [quality.md](quality.md)
 - [validatie-ci.md](validatie-ci.md)
+
+## Organisation harvest cadence
+
+Organisation data usually changes less frequently than documents and meeting agendas. The default daily public harvest therefore does not refetch organisation endpoints. The monthly backfill profile includes organisation harvesting by default and writes the public organisation JSONL files.
+
+Manual runs can still override this with `--include-organization` or `--no-include-organization`. Missing organisation exports are treated as optional by the static viewer.

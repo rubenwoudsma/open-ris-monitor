@@ -72,7 +72,12 @@ def main():
         ("data/public/documents.jsonl", "schemas/document.schema.json"),
         ("data/public/meetings.jsonl", "schemas/meeting.schema.json"),
         ("data/public/meeting_items.jsonl", "schemas/agenda_item.schema.json"),
-        ("data/public/meeting_documents.jsonl", "schemas/relation.schema.json")
+        ("data/public/meeting_documents.jsonl", "schemas/relation.schema.json"),
+        ("data/public/organization_groups.jsonl", "schemas/organization_group.schema.json"),
+        ("data/public/organization_persons.jsonl", "schemas/organization_person.schema.json"),
+        ("data/public/organization_roles.jsonl", "schemas/organization_role.schema.json"),
+        ("data/public/organization_positions.jsonl", "schemas/organization_position.schema.json"),
+        ("data/public/organization_group_memberships.jsonl", "schemas/organization_group_membership.schema.json"),
     ]
 
     if not os.path.exists("data/public"):

@@ -20,6 +20,7 @@
         <nav class="top-nav" aria-label="Primaire navigatie">
           <a id="nav-documents" class="top-nav__link top-nav__link--active" href="#documents">Documenten</a>
           <a id="nav-meetings" class="top-nav__link" href="#meetings">Vergaderingen</a>
+          <a id="nav-organization" class="top-nav__link" href="#organization">Organisatie</a>
         </nav>
       </div>
     </header>
@@ -210,6 +211,69 @@
               </nav>
             </section>
           </div>
+
+          <div id="organization-view" data-view="organization" hidden>
+            <section class="panel panel--compact" aria-labelledby="organization-title">
+              <div class="panel__header panel__header--split">
+                <div>
+                  <p class="eyebrow">Raadsorganisatie</p>
+                  <h2 id="organization-title">Organisatie</h2>
+                  <p class="panel__subtitle">
+                    Publieke context uit de RIS-organisatie-endpoints. Groepen, personen, rollen en posities worden zonder extra verrijking getoond.
+                  </p>
+                </div>
+                <p id="organization-summary-count" class="count-pill">-</p>
+              </div>
+              <p class="metadata-notice">
+                De organisatie verandert relatief weinig. Deze export wordt daarom vooral verwacht bij de maandelijkse backfill. Ontbreekt deze data, dan blijft de rest van de site gewoon bruikbaar.
+              </p>
+              <div id="organization-summary-cards" class="summary-card-grid"></div>
+            </section>
+
+            <section class="panel" aria-labelledby="organization-groups-title">
+              <div class="panel__header">
+                <h2 id="organization-groups-title">Groepen</h2>
+                <p class="panel__subtitle">Fracties, commissies, organen en overige groepen zoals beschikbaar in de publieke API.</p>
+              </div>
+              <div id="organization-groups-list" class="organization-group-grid"></div>
+            </section>
+
+            <section class="panel" aria-labelledby="organization-positions-title">
+              <div class="panel__header panel__header--split">
+                <div>
+                  <h2 id="organization-positions-title">Rollen en posities</h2>
+                  <p class="panel__subtitle">Nadruk op raadslid, fractievoorzitter, burgemeester, griffie en commissieleden.</p>
+                </div>
+                <label class="control control--small organization-filter">
+                  <span>Rolfilter</span>
+                  <select id="organization-role-filter">
+                    <option value="">Alle rollen</option>
+                    <option value="raadslid">Raadsleden</option>
+                    <option value="fractievoorzitter">Fractievoorzitters</option>
+                    <option value="burgemeester">Burgemeester</option>
+                    <option value="griffie">Griffie</option>
+                    <option value="commissielid">Commissieleden</option>
+                  </select>
+                </label>
+              </div>
+              <div class="table-wrapper">
+                <table class="organization-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Persoon</th>
+                      <th scope="col">Rol</th>
+                      <th scope="col">Groep(en)</th>
+                      <th scope="col">Start</th>
+                      <th scope="col">Einde</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">E-mail</th>
+                    </tr>
+                  </thead>
+                  <tbody id="organization-positions-body"><tr><td colspan="7">Organisatiegegevens worden geladen...</td></tr></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     </main>
@@ -223,6 +287,7 @@
             Documenten gezien: <span id="documents-seen">-</span>. Genormaliseerd: <span id="documents-normalized">-</span>.
             Vergaderingen: <span id="meetings-count">-</span>. Agendapunten: <span id="agenda-items-count">-</span>.
             Gekoppelde documenten: <span id="linked-documents-count">-</span>.
+            Organisatieposities: <span id="organization-positions-count">-</span>.
           </p>
         </div>
         <details class="technical-metadata">
@@ -236,6 +301,11 @@
             <a href="../data/public/meeting_items.jsonl">meeting_items.jsonl</a>
             <a href="../data/public/meeting_documents.jsonl">meeting_documents.jsonl</a>
             <a href="../data/public/meeting_item_documents.jsonl">meeting_item_documents.jsonl</a>
+            <a href="../data/public/organization_groups.jsonl">organization_groups.jsonl</a>
+            <a href="../data/public/organization_persons.jsonl">organization_persons.jsonl</a>
+            <a href="../data/public/organization_roles.jsonl">organization_roles.jsonl</a>
+            <a href="../data/public/organization_positions.jsonl">organization_positions.jsonl</a>
+            <a href="../data/public/organization_group_memberships.jsonl">organization_group_memberships.jsonl</a>
             <a href="../data/public/quality/document_types.json">documenttypenrapport</a>
             <a href="../README.md">README</a>
           </nav>
