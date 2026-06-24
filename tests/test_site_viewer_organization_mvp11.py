@@ -16,6 +16,9 @@ def test_organization_navigation_and_view_are_present() -> None:
         'id="organization-summary-cards"',
         'id="organization-groups-list"',
         'id="organization-role-filter"',
+        'id="organization-status-filter"',
+        'id="organization-group-filter"',
+        'id="organization-group-type-filter"',
         'id="organization-positions-body"',
         "Raadsorganisatie",
     ]:
@@ -24,7 +27,10 @@ def test_organization_navigation_and_view_are_present() -> None:
     for marker in [
         "renderOrganization",
         "organizationRoleFilter",
+        "organizationStatusFilter",
+        "organizationGroupFilter",
         "roleCategoryFromName",
+        "matchesRoleFilter",
         "personGroupsByPersonId",
         "organizationPositions",
     ]:
@@ -50,6 +56,8 @@ def test_organization_styling_exists() -> None:
         ".summary-card-grid",
         ".summary-card__number",
         ".organization-group-grid",
+        ".organization-compact-list",
+        ".organization-filter-row",
         ".organization-table",
     ]:
         assert marker in styles

@@ -30,6 +30,9 @@ interface ViewerState {
   meetingCurrentPage: number;
   meetingPageSize: number;
   organizationRoleFilter: string;
+  organizationStatusFilter: "active" | "inactive" | "all";
+  organizationGroupFilter: string;
+  organizationGroupTypeFilter: string;
   activeView: "documents" | "meetings" | "organization";
 }
 
@@ -39,6 +42,7 @@ interface DerivedCaches {
   meetingSearchBlobById: Map<string, string>;
   filteredMeetingsByKey: Map<string, MeetingRecord[]>;
   personGroupsByPersonId: Map<string, string[]>;
+  personGroupIdsByPersonId: Map<string, string[]>;
 }
 
 type RequiredElements = {
@@ -97,6 +101,9 @@ type RequiredElements = {
   organizationSummaryCards: HTMLElement;
   organizationGroupsList: HTMLElement;
   organizationRoleFilter: HTMLSelectElement;
+  organizationStatusFilter: HTMLSelectElement;
+  organizationGroupFilter: HTMLSelectElement;
+  organizationGroupTypeFilter: HTMLSelectElement;
   organizationPositionsBody: HTMLElement;
 };
 
@@ -114,6 +121,9 @@ const state: ViewerState = {
   meetingCurrentPage: 1,
   meetingPageSize: 25,
   organizationRoleFilter: "",
+  organizationStatusFilter: "active",
+  organizationGroupFilter: "",
+  organizationGroupTypeFilter: "fractie",
   activeView: "documents",
 };
 
@@ -123,6 +133,7 @@ const derivedCaches: DerivedCaches = {
   meetingSearchBlobById: new Map<string, string>(),
   filteredMeetingsByKey: new Map<string, MeetingRecord[]>(),
   personGroupsByPersonId: new Map<string, string[]>(),
+  personGroupIdsByPersonId: new Map<string, string[]>(),
 };
 
 function clearDerivedCaches(): void {
@@ -131,6 +142,7 @@ function clearDerivedCaches(): void {
   derivedCaches.meetingSearchBlobById.clear();
   derivedCaches.filteredMeetingsByKey.clear();
   derivedCaches.personGroupsByPersonId.clear();
+  derivedCaches.personGroupIdsByPersonId.clear();
 }
 
 function byId<T extends HTMLElement>(id: string): T {
@@ -195,6 +207,9 @@ const elements: RequiredElements = {
   organizationSummaryCards: byId("organization-summary-cards"),
   organizationGroupsList: byId("organization-groups-list"),
   organizationRoleFilter: byId("organization-role-filter"),
+  organizationStatusFilter: byId("organization-status-filter"),
+  organizationGroupFilter: byId("organization-group-filter"),
+  organizationGroupTypeFilter: byId("organization-group-type-filter"),
   organizationPositionsBody: byId("organization-positions-body"),
 };
 
@@ -1117,13 +1132,68 @@ function roleCategory(position: OrganizationPositionRecord | OrganizationRoleRec
 }
 
 function roleCategoryFromName(roleName: string): string {
-  const name = roleName.toLowerCase();
-  if (name.includes("burgemeester")) return "burgemeester";
+  const name = roleName.toLowerCase().trim();
+  if (name.includes("burgemeester") || name === "voorzitter van de gemeenteraad") return "burgemeester";
   if (name.includes("griff")) return "griffie";
   if (name.includes("fractievoorzitter")) return "fractievoorzitter";
-  if (name.includes("raadslid") || name.includes("raads")) return "raadslid";
+  if (name.includes("raadslid") || name === "fractie raadslid") return "raadslid";
   if (name.includes("commissie")) return "commissielid";
   return "overig";
+}
+
+function roleCategoryLabel(category: string): string {
+  const labels: Record<string, string> = {
+    burgemeester: "Burgemeester / raadvoorzitter",
+    griffie: "Griffie",
+    fractievoorzitter: "Fractievoorzitter",
+    raadslid: "Raadslid",
+    commissielid: "Commissielid",
+    overig: "Overig",
+  };
+  return labels[category] ?? category;
+}
+
+function displayRoleName(position: OrganizationPositionRecord): string {
+  const category = roleCategory(position);
+  const rawName = pick(position.role_name);
+  if (category === "raadslid") return "Raadslid";
+  if (category === "fractievoorzitter") return "Fractievoorzitter";
+  if (category === "burgemeester") return rawName === "Burgemeester" ? "Burgemeester" : "Burgemeester / raadvoorzitter";
+  if (category === "griffie") return rawName || "Griffie";
+  if (category === "commissielid") return rawName || "Commissielid";
+  return rawName || unavailable("Geen rolnaam");
+}
+
+function matchesRoleFilter(position: OrganizationPositionRecord, filter: string): boolean {
+  if (!filter) return true;
+  const category = roleCategory(position);
+  if (filter === "raadslid") return category === "raadslid" || category === "fractievoorzitter";
+  return category === filter;
+}
+
+function parseDateValue(value: unknown): Date | null {
+  const dateText = pick(value);
+  if (!dateText) return null;
+  const date = new Date(`${dateText.slice(0, 10)}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function isCurrentOrganizationPosition(position: OrganizationPositionRecord): boolean {
+  if (position.active === false) return false;
+  const endDate = parseDateValue(position.end_date);
+  if (endDate && endDate < new Date(new Date().toDateString())) return false;
+  return true;
+}
+
+function normalizedGroupType(group: OrganizationGroupRecord | OrganizationGroupMembershipRecord): string {
+  const type = pick("type" in group ? group.type : group.group_type).toLowerCase();
+  if (type === "fractie" || type === "commissie" || type === "orgaan") return type;
+  return "overig";
+}
+
+function groupTypeLabel(type: string): string {
+  const labels: Record<string, string> = { fractie: "Fracties", commissie: "Commissies", orgaan: "Organen", overig: "Overig of onbekend" };
+  return labels[type] ?? type;
 }
 
 function personName(person: OrganizationPersonRecord | OrganizationPositionRecord | OrganizationGroupMembershipRecord | undefined): string {
@@ -1141,24 +1211,42 @@ function personByPosition(position: OrganizationPositionRecord): OrganizationPer
   return state.data?.organizationPersons.find((person) => pick(person.id) === personId || pick(person.source_id) === personSourceId);
 }
 
-function groupNamesForPerson(position: OrganizationPositionRecord): string[] {
-  const personId = pick(position.person_id);
-  const personSourceId = pick(position.person_source_id);
-  if (!derivedCaches.personGroupsByPersonId.size) {
-    for (const membership of state.data?.organizationGroupMemberships ?? []) {
-      const keys = [pick(membership.person_id), pick(membership.person_source_id)].filter(Boolean);
-      const groupName = pick(membership.group_name, membership.group_id);
-      for (const key of keys) {
-        const names = derivedCaches.personGroupsByPersonId.get(key) ?? [];
-        if (groupName && !names.includes(groupName)) names.push(groupName);
-        derivedCaches.personGroupsByPersonId.set(key, names);
-      }
+function ensurePersonGroupCaches(): void {
+  if (derivedCaches.personGroupsByPersonId.size || derivedCaches.personGroupIdsByPersonId.size) return;
+  for (const membership of state.data?.organizationGroupMemberships ?? []) {
+    const keys = [pick(membership.person_id), pick(membership.person_source_id)].filter(Boolean);
+    const groupName = pick(membership.group_name, membership.group_id);
+    const groupIds = [pick(membership.group_id), pick(membership.group_source_id)].filter(Boolean);
+    for (const key of keys) {
+      const names = derivedCaches.personGroupsByPersonId.get(key) ?? [];
+      if (groupName && !names.includes(groupName)) names.push(groupName);
+      derivedCaches.personGroupsByPersonId.set(key, names);
+
+      const ids = derivedCaches.personGroupIdsByPersonId.get(key) ?? [];
+      for (const groupId of groupIds) if (groupId && !ids.includes(groupId)) ids.push(groupId);
+      derivedCaches.personGroupIdsByPersonId.set(key, ids);
     }
   }
+}
+
+function groupNamesForPersonKeys(personId: string, personSourceId: string): string[] {
+  ensurePersonGroupCaches();
   return uniqueValues([
     ...(personId ? derivedCaches.personGroupsByPersonId.get(personId) ?? [] : []),
     ...(personSourceId ? derivedCaches.personGroupsByPersonId.get(personSourceId) ?? [] : []),
   ]);
+}
+
+function groupIdsForPersonKeys(personId: string, personSourceId: string): string[] {
+  ensurePersonGroupCaches();
+  return uniqueValues([
+    ...(personId ? derivedCaches.personGroupIdsByPersonId.get(personId) ?? [] : []),
+    ...(personSourceId ? derivedCaches.personGroupIdsByPersonId.get(personSourceId) ?? [] : []),
+  ]);
+}
+
+function groupNamesForPerson(position: OrganizationPositionRecord): string[] {
+  return groupNamesForPersonKeys(pick(position.person_id), pick(position.person_source_id));
 }
 
 function renderSummaryCard(label: string, value: number, description: string): HTMLElement {
@@ -1176,19 +1264,70 @@ function renderSummaryCard(label: string, value: number, description: string): H
   return card;
 }
 
+interface OrganizationPersonRow {
+  personKey: string;
+  displayName: string;
+  email: string;
+  groupNames: string[];
+  groupIds: string[];
+  positions: OrganizationPositionRecord[];
+  currentPositions: OrganizationPositionRecord[];
+  active: boolean;
+}
+
+function syncOrganizationFilterOptions(groups: OrganizationGroupRecord[]): void {
+  const groupTypeOptions: [string, string][] = [
+    ["fractie", "Fracties"],
+    ["commissie", "Commissies"],
+    ["orgaan", "Organen"],
+    ["overig", "Overig"],
+    ["", "Alle typen"],
+  ];
+  const currentGroupType = state.organizationGroupTypeFilter;
+  elements.organizationGroupTypeFilter.replaceChildren(...groupTypeOptions.map(([value, label]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    return option;
+  }));
+  elements.organizationGroupTypeFilter.value = groupTypeOptions.some(([value]) => value === currentGroupType) ? currentGroupType : "fractie";
+  state.organizationGroupTypeFilter = elements.organizationGroupTypeFilter.value;
+
+  const currentGroup = state.organizationGroupFilter;
+  const options = groups
+    .slice()
+    .sort((a, b) => [normalizedGroupType(a), pick(a.name)].join(" ").localeCompare([normalizedGroupType(b), pick(b.name)].join(" "), "nl"));
+  elements.organizationGroupFilter.replaceChildren();
+  const allOption = document.createElement("option");
+  allOption.value = "";
+  allOption.textContent = "Alle groepen";
+  elements.organizationGroupFilter.appendChild(allOption);
+  for (const group of options) {
+    const option = document.createElement("option");
+    option.value = pick(group.id, group.source_id);
+    option.textContent = `${pick(group.name, getOrganizationId(group))} (${groupTypeLabel(normalizedGroupType(group)).toLowerCase()})`;
+    elements.organizationGroupFilter.appendChild(option);
+  }
+  elements.organizationGroupFilter.value = options.some((group) => [pick(group.id), pick(group.source_id)].includes(currentGroup)) ? currentGroup : "";
+  state.organizationGroupFilter = elements.organizationGroupFilter.value;
+}
+
 function renderOrganization(): void {
   const groups = state.data?.organizationGroups ?? [];
   const persons = state.data?.organizationPersons ?? [];
   const roles = state.data?.organizationRoles ?? [];
   const positions = state.data?.organizationPositions ?? [];
   const memberships = state.data?.organizationGroupMemberships ?? [];
+  syncOrganizationFilterOptions(groups);
 
-  elements.organizationSummaryCount.textContent = `${positions.length} positie(s)`;
+  const currentPositions = positions.filter(isCurrentOrganizationPosition);
+  const activePersonKeys = new Set(currentPositions.map((position) => pick(position.person_id, position.person_source_id, position.person_display_name)).filter(Boolean));
+  elements.organizationSummaryCount.textContent = `${currentPositions.length} actuele positie(s)`;
   elements.organizationSummaryCards.replaceChildren(
-    renderSummaryCard("Groepen", groups.length, "Fracties, commissies, organen en overige groepen."),
-    renderSummaryCard("Personen", persons.filter((person) => person.active !== false).length, "Actieve personen in de publieke organisatie-export."),
-    renderSummaryCard("Rollen", roles.length, "Rollen uit de RIS API, met compacte categorisering."),
-    renderSummaryCard("Posities", positions.length, "Persoon-rolrelaties met start- en einddatum waar beschikbaar."),
+    renderSummaryCard("Fracties", groups.filter((group) => normalizedGroupType(group) === "fractie").length, "Primaire politieke groepen in de raad."),
+    renderSummaryCard("Actieve personen", activePersonKeys.size, "Personen met minimaal een actuele positie."),
+    renderSummaryCard("Rollen", roles.length, "Rollen uit de RIS API, samengevoegd tot leesbare categorieen."),
+    renderSummaryCard("Historische posities", positions.length - currentPositions.length, "Niet-actuele positieperioden blijven opvraagbaar via het statusfilter."),
   );
 
   renderOrganizationGroups(groups, memberships);
@@ -1201,58 +1340,111 @@ function renderOrganizationGroups(groups: OrganizationGroupRecord[], memberships
     elements.organizationGroupsList.appendChild(renderEmptyRelation("Geen organisatiegroepen gevonden. De maandelijkse organisatie-export is mogelijk nog niet uitgevoerd."));
     return;
   }
-  const labels: Record<string, string> = { fractie: "Fracties", commissie: "Commissies", orgaan: "Organen", overig: "Overig of onbekend" };
-  const grouped = new Map<string, OrganizationGroupRecord[]>();
-  for (const group of groups) {
-    const type = pick(group.type) || "overig";
-    const key = labels[type] ? type : "overig";
-    grouped.set(key, [...(grouped.get(key) ?? []), group]);
+  const typeFilter = state.organizationGroupTypeFilter;
+  const visibleGroups = groups
+    .filter((group) => !typeFilter || normalizedGroupType(group) === typeFilter)
+    .sort((a, b) => [normalizedGroupType(a), pick(a.name)].join(" ").localeCompare([normalizedGroupType(b), pick(b.name)].join(" "), "nl"));
+  if (visibleGroups.length === 0) {
+    elements.organizationGroupsList.appendChild(renderEmptyRelation("Geen groepen gevonden voor dit typefilter."));
+    return;
   }
-  for (const [type, records] of grouped.entries()) {
-    const section = document.createElement("section");
-    section.className = "organization-group-section";
-    appendSectionHeading(section, labels[type] ?? type);
-    for (const group of records.sort((a, b) => pick(a.name).localeCompare(pick(b.name), "nl"))) {
-      const card = document.createElement("article");
-      card.className = "relation-card";
-      const title = document.createElement("h4");
-      title.textContent = pick(group.name) || getOrganizationId(group);
-      const memberCount = memberships.filter((membership) => pick(membership.group_id) === pick(group.id) || pick(membership.group_source_id) === pick(group.source_id)).length;
-      const meta = document.createElement("p");
-      meta.className = "muted";
-      meta.textContent = `${pick(group.type, "onbekend")} · ${memberCount} gekoppelde persoon/personen`;
-      card.append(title, meta);
-      section.appendChild(card);
-    }
-    elements.organizationGroupsList.appendChild(section);
+  const list = document.createElement("ul");
+  list.className = "organization-compact-list";
+  for (const group of visibleGroups) {
+    const item = document.createElement("li");
+    const title = document.createElement("strong");
+    title.textContent = pick(group.name) || getOrganizationId(group);
+    const memberCount = memberships.filter((membership) => pick(membership.group_id) === pick(group.id) || pick(membership.group_source_id) === pick(group.source_id)).length;
+    const meta = document.createElement("span");
+    meta.className = "muted";
+    meta.textContent = ` ${groupTypeLabel(normalizedGroupType(group)).replace(/s$/, "").toLowerCase()} · ${memberCount} gekoppelde persoon/personen`;
+    item.append(title, meta);
+    list.appendChild(item);
   }
+  elements.organizationGroupsList.appendChild(list);
+}
+
+function buildOrganizationPersonRows(positions: OrganizationPositionRecord[]): OrganizationPersonRow[] {
+  const rows = new Map<string, OrganizationPersonRow>();
+  for (const position of positions) {
+    const person = personByPosition(position);
+    const personKey = pick(position.person_id, position.person_source_id, position.person_display_name);
+    if (!personKey) continue;
+    const personId = pick(position.person_id, person?.id);
+    const personSourceId = pick(position.person_source_id, person?.source_id);
+    const existing = rows.get(personKey);
+    const row = existing ?? {
+      personKey,
+      displayName: personName(position) || personName(person),
+      email: pick(person?.email),
+      groupNames: groupNamesForPersonKeys(personId, personSourceId),
+      groupIds: groupIdsForPersonKeys(personId, personSourceId),
+      positions: [],
+      currentPositions: [],
+      active: false,
+    };
+    row.positions.push(position);
+    if (isCurrentOrganizationPosition(position)) row.currentPositions.push(position);
+    row.active = row.currentPositions.length > 0 || person?.active === true;
+    if (!row.email) row.email = pick(person?.email);
+    rows.set(personKey, row);
+  }
+  return [...rows.values()];
+}
+
+function dedupePositions(positions: OrganizationPositionRecord[]): OrganizationPositionRecord[] {
+  const seen = new Set<string>();
+  const result: OrganizationPositionRecord[] = [];
+  for (const position of positions) {
+    const key = [displayRoleName(position), roleCategory(position), pick(position.start_date), pick(position.end_date), isCurrentOrganizationPosition(position) ? "active" : "inactive"].join("|");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(position);
+  }
+  return result;
+}
+
+function roleSummaryForRow(row: OrganizationPersonRow): string {
+  const positions = dedupePositions(row.currentPositions.length > 0 ? row.currentPositions : row.positions);
+  const labels = uniqueValues(positions.map(displayRoleName));
+  return labels.length > 0 ? labels.join(", ") : "-";
+}
+
+function dateRangeForRow(row: OrganizationPersonRow): string {
+  const positions = dedupePositions(row.currentPositions.length > 0 ? row.currentPositions : row.positions);
+  const starts = positions.map((position) => pick(position.start_date)).filter(Boolean).sort();
+  const ends = positions.map((position) => pick(position.end_date)).filter(Boolean).sort();
+  const start = starts[0] ? formatDate(starts[0]) : "-";
+  const end = row.currentPositions.length > 0 ? "-" : (ends[ends.length - 1] ? formatDate(ends[ends.length - 1]) : "-");
+  return `${start} tot ${end}`;
 }
 
 function renderOrganizationPositions(positions: OrganizationPositionRecord[]): void {
-  const filter = state.organizationRoleFilter;
-  const visible = positions
-    .filter((position) => !filter || roleCategory(position) === filter)
-    .sort((a, b) => [roleCategory(a), pick(a.role_name), personName(a)].join(" ").localeCompare([roleCategory(b), pick(b.role_name), personName(b)].join(" "), "nl"));
+  const roleFilter = state.organizationRoleFilter;
+  const statusFilter = state.organizationStatusFilter;
+  const groupFilter = state.organizationGroupFilter;
+  const relevantPositions = positions.filter((position) => matchesRoleFilter(position, roleFilter));
+  const visibleRows = buildOrganizationPersonRows(relevantPositions)
+    .filter((row) => statusFilter === "all" || (statusFilter === "active" ? row.currentPositions.length > 0 : row.currentPositions.length === 0))
+    .filter((row) => !groupFilter || row.groupIds.includes(groupFilter))
+    .sort((a, b) => a.displayName.localeCompare(b.displayName, "nl"));
   elements.organizationPositionsBody.replaceChildren();
-  if (visible.length === 0) {
+  if (visibleRows.length === 0) {
     const row = document.createElement("tr");
-    const cell = createCell(positions.length === 0 ? "Geen organisatieposities gevonden in de huidige export." : "Geen posities gevonden voor dit rolfilter.");
-    cell.colSpan = 7;
+    const cell = createCell(positions.length === 0 ? "Geen organisatieposities gevonden in de huidige export." : "Geen personen gevonden voor deze filters.");
+    cell.colSpan = 6;
     row.appendChild(cell);
     elements.organizationPositionsBody.appendChild(row);
     return;
   }
-  for (const position of visible) {
-    const person = personByPosition(position);
-    const groups = groupNamesForPerson(position);
+  for (const personRow of visibleRows) {
     const row = document.createElement("tr");
-    row.appendChild(createCell(personName(position) || personName(person)));
-    row.appendChild(createCell(text(position.role_name, unavailable("Geen rolnaam"))));
-    row.appendChild(createCell(groups.length > 0 ? groups.join(", ") : "-"));
-    row.appendChild(createCell(formatDate(position.start_date)));
-    row.appendChild(createCell(formatDate(position.end_date)));
-    row.appendChild(createCell(position.active === false ? "Niet actief" : "Actief"));
-    row.appendChild(createCell(text(person?.email, "-")));
+    row.appendChild(createCell(personRow.displayName));
+    row.appendChild(createCell(roleSummaryForRow(personRow)));
+    row.appendChild(createCell(personRow.groupNames.length > 0 ? personRow.groupNames.join(", ") : "-"));
+    row.appendChild(createCell(dateRangeForRow(personRow)));
+    row.appendChild(createCell(personRow.currentPositions.length > 0 ? "Actief" : "Niet actief"));
+    row.appendChild(createCell(text(personRow.email, "-")));
     elements.organizationPositionsBody.appendChild(row);
   }
 }
@@ -1340,6 +1532,18 @@ function attachEvents(): void {
   });
   elements.organizationRoleFilter.addEventListener("change", () => {
     state.organizationRoleFilter = elements.organizationRoleFilter.value;
+    renderOrganization();
+  });
+  elements.organizationStatusFilter.addEventListener("change", () => {
+    state.organizationStatusFilter = elements.organizationStatusFilter.value as "active" | "inactive" | "all";
+    renderOrganization();
+  });
+  elements.organizationGroupFilter.addEventListener("change", () => {
+    state.organizationGroupFilter = elements.organizationGroupFilter.value;
+    renderOrganization();
+  });
+  elements.organizationGroupTypeFilter.addEventListener("change", () => {
+    state.organizationGroupTypeFilter = elements.organizationGroupTypeFilter.value;
     renderOrganization();
   });
   for (const button of [elements.previousTop, elements.previousBottom]) button.addEventListener("click", () => { state.currentPage -= 1; renderDocuments(); });
