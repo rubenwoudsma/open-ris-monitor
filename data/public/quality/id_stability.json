@@ -1,35 +1,2515 @@
 {
   "canonical_id": {
-    "duplicate_count": 0,
-    "duplicates": [],
+    "duplicate_count": 488,
+    "duplicates": [
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
+            "id": "huizen-document-23161",
+            "source_id": "23161",
+            "source_object_id": "38408",
+            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
+          },
+          {
+            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
+            "id": "huizen-document-23161",
+            "source_id": "23161",
+            "source_object_id": "38408",
+            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
+          }
+        ],
+        "id": "huizen-document-23161"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Agenda Fysiek Domein 28 januari 2026 + aanvulling.pdf",
+            "id": "huizen-document-25113",
+            "source_id": "25113",
+            "source_object_id": "41768",
+            "title": "Agenda Fysiek Domein 28 januari 2026 + aanvulling"
+          },
+          {
+            "filename": "Agenda Fysiek Domein 28 januari 2026 + aanvulling.pdf",
+            "id": "huizen-document-25113",
+            "source_id": "25113",
+            "source_object_id": "41768",
+            "title": "Agenda Fysiek Domein 28 januari 2026 + aanvulling"
+          }
+        ],
+        "id": "huizen-document-25113"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
+            "id": "huizen-document-25296",
+            "source_id": "25296",
+            "source_object_id": "42134",
+            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
+          },
+          {
+            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
+            "id": "huizen-document-25296",
+            "source_id": "25296",
+            "source_object_id": "42134",
+            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
+          }
+        ],
+        "id": "huizen-document-25296"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
+            "id": "huizen-document-25455",
+            "source_id": "25455",
+            "source_object_id": "42516",
+            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
+          },
+          {
+            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
+            "id": "huizen-document-25455",
+            "source_id": "25455",
+            "source_object_id": "42516",
+            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
+          }
+        ],
+        "id": "huizen-document-25455"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
+            "id": "huizen-document-25718",
+            "source_id": "25718",
+            "source_object_id": "43002",
+            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
+          },
+          {
+            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
+            "id": "huizen-document-25718",
+            "source_id": "25718",
+            "source_object_id": "43002",
+            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
+          }
+        ],
+        "id": "huizen-document-25718"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
+            "id": "huizen-document-25734",
+            "source_id": "25734",
+            "source_object_id": "43019",
+            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
+          },
+          {
+            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
+            "id": "huizen-document-25734",
+            "source_id": "25734",
+            "source_object_id": "43019",
+            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
+          }
+        ],
+        "id": "huizen-document-25734"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
+            "id": "huizen-document-25739",
+            "source_id": "25739",
+            "source_object_id": "43025",
+            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
+          },
+          {
+            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
+            "id": "huizen-document-25739",
+            "source_id": "25739",
+            "source_object_id": "43025",
+            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
+          }
+        ],
+        "id": "huizen-document-25739"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie.pdf",
+            "id": "huizen-document-25820",
+            "source_id": "25820",
+            "source_object_id": "43149",
+            "title": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie"
+          },
+          {
+            "filename": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie.pdf",
+            "id": "huizen-document-25820",
+            "source_id": "25820",
+            "source_object_id": "43149",
+            "title": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie"
+          }
+        ],
+        "id": "huizen-document-25820"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
+            "id": "huizen-document-25830",
+            "source_id": "25830",
+            "source_object_id": "43160",
+            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
+          },
+          {
+            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
+            "id": "huizen-document-25830",
+            "source_id": "25830",
+            "source_object_id": "43160",
+            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
+          }
+        ],
+        "id": "huizen-document-25830"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren.pdf",
+            "id": "huizen-document-25870",
+            "source_id": "25870",
+            "source_object_id": "43214",
+            "title": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren"
+          },
+          {
+            "filename": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren.pdf",
+            "id": "huizen-document-25870",
+            "source_id": "25870",
+            "source_object_id": "43214",
+            "title": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren"
+          }
+        ],
+        "id": "huizen-document-25870"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026.pdf",
+            "id": "huizen-document-25907",
+            "source_id": "25907",
+            "source_object_id": "43261",
+            "title": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026"
+          },
+          {
+            "filename": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026.pdf",
+            "id": "huizen-document-25907",
+            "source_id": "25907",
+            "source_object_id": "43261",
+            "title": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026"
+          }
+        ],
+        "id": "huizen-document-25907"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026.pdf",
+            "id": "huizen-document-25908",
+            "source_id": "25908",
+            "source_object_id": "43262",
+            "title": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026"
+          },
+          {
+            "filename": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026.pdf",
+            "id": "huizen-document-25908",
+            "source_id": "25908",
+            "source_object_id": "43262",
+            "title": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026"
+          }
+        ],
+        "id": "huizen-document-25908"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Verantwoording fractievergoedingen 2025.pdf",
+            "id": "huizen-document-25911",
+            "source_id": "25911",
+            "source_object_id": "43265",
+            "title": "Raadsvoorstel Verantwoording fractievergoedingen 2025"
+          },
+          {
+            "filename": "Raadsvoorstel Verantwoording fractievergoedingen 2025.pdf",
+            "id": "huizen-document-25911",
+            "source_id": "25911",
+            "source_object_id": "43265",
+            "title": "Raadsvoorstel Verantwoording fractievergoedingen 2025"
+          }
+        ],
+        "id": "huizen-document-25911"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "id": "huizen-document-25916",
+            "source_id": "25916",
+            "source_object_id": "43279",
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+          },
+          {
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "id": "huizen-document-25916",
+            "source_id": "25916",
+            "source_object_id": "43279",
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+          }
+        ],
+        "id": "huizen-document-25916"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Jaarstukken 2025 (ondertekend).pdf",
+            "id": "huizen-document-25917",
+            "source_id": "25917",
+            "source_object_id": "43280",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          },
+          {
+            "filename": "Jaarstukken 2025 (ondertekend).pdf",
+            "id": "huizen-document-25917",
+            "source_id": "25917",
+            "source_object_id": "43280",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          }
+        ],
+        "id": "huizen-document-25917"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Inrichting Concern Audit.pdf",
+            "id": "huizen-document-25925",
+            "source_id": "25925",
+            "source_object_id": "43288",
+            "title": "Raadsvoorstel Inrichting Concern Audit"
+          },
+          {
+            "filename": "Raadsvoorstel Inrichting Concern Audit.pdf",
+            "id": "huizen-document-25925",
+            "source_id": "25925",
+            "source_object_id": "43288",
+            "title": "Raadsvoorstel Inrichting Concern Audit"
+          }
+        ],
+        "id": "huizen-document-25925"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
+            "id": "huizen-document-25926",
+            "source_id": "25926",
+            "source_object_id": "43289",
+            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
+          },
+          {
+            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
+            "id": "huizen-document-25926",
+            "source_id": "25926",
+            "source_object_id": "43289",
+            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
+          }
+        ],
+        "id": "huizen-document-25926"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025.pdf",
+            "id": "huizen-document-25927",
+            "source_id": "25927",
+            "source_object_id": "43290",
+            "title": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025"
+          },
+          {
+            "filename": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025.pdf",
+            "id": "huizen-document-25927",
+            "source_id": "25927",
+            "source_object_id": "43290",
+            "title": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025"
+          }
+        ],
+        "id": "huizen-document-25927"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden .pdf",
+            "id": "huizen-document-25928",
+            "source_id": "25928",
+            "source_object_id": "43292",
+            "title": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden"
+          },
+          {
+            "filename": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden .pdf",
+            "id": "huizen-document-25928",
+            "source_id": "25928",
+            "source_object_id": "43292",
+            "title": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden"
+          }
+        ],
+        "id": "huizen-document-25928"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
+            "id": "huizen-document-25929",
+            "source_id": "25929",
+            "source_object_id": "43310",
+            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
+          },
+          {
+            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
+            "id": "huizen-document-25929",
+            "source_id": "25929",
+            "source_object_id": "43310",
+            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
+          }
+        ],
+        "id": "huizen-document-25929"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College.pdf",
+            "id": "huizen-document-25930",
+            "source_id": "25930",
+            "source_object_id": "43311",
+            "title": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College"
+          },
+          {
+            "filename": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College.pdf",
+            "id": "huizen-document-25930",
+            "source_id": "25930",
+            "source_object_id": "43311",
+            "title": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College"
+          }
+        ],
+        "id": "huizen-document-25930"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsagenda 3 juni 2026.pdf",
+            "id": "huizen-document-25932",
+            "source_id": "25932",
+            "source_object_id": "43313",
+            "title": "Raadsagenda 3 juni 2026"
+          },
+          {
+            "filename": "Raadsagenda 3 juni 2026.pdf",
+            "id": "huizen-document-25932",
+            "source_id": "25932",
+            "source_object_id": "43313",
+            "title": "Raadsagenda 3 juni 2026"
+          }
+        ],
+        "id": "huizen-document-25932"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer.pdf",
+            "id": "huizen-document-25934",
+            "source_id": "25934",
+            "source_object_id": "43315",
+            "title": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer"
+          },
+          {
+            "filename": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer.pdf",
+            "id": "huizen-document-25934",
+            "source_id": "25934",
+            "source_object_id": "43315",
+            "title": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer"
+          }
+        ],
+        "id": "huizen-document-25934"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 3 Toelichting BC wamtebedrijf v030626.pdf",
+            "id": "huizen-document-25937",
+            "source_id": "25937",
+            "source_object_id": "43318",
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+          },
+          {
+            "filename": "Bijlage 3 Toelichting BC wamtebedrijf v030626.pdf",
+            "id": "huizen-document-25937",
+            "source_id": "25937",
+            "source_object_id": "43318",
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+          }
+        ],
+        "id": "huizen-document-25937"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026.pdf",
+            "id": "huizen-document-25946",
+            "source_id": "25946",
+            "source_object_id": "43327",
+            "title": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026"
+          },
+          {
+            "filename": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026.pdf",
+            "id": "huizen-document-25946",
+            "source_id": "25946",
+            "source_object_id": "43327",
+            "title": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026"
+          }
+        ],
+        "id": "huizen-document-25946"
+      }
+    ],
     "missing_count": 0,
-    "unique_count": 16740
+    "unique_count": 16746
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 0,
-    "duplicates": [],
+    "duplicate_count": 488,
+    "duplicates": [
+      {
+        "count": 2,
+        "value": "23161:38408"
+      },
+      {
+        "count": 2,
+        "value": "25113:41768"
+      },
+      {
+        "count": 2,
+        "value": "25296:42134"
+      },
+      {
+        "count": 2,
+        "value": "25455:42516"
+      },
+      {
+        "count": 2,
+        "value": "25718:43002"
+      },
+      {
+        "count": 2,
+        "value": "25734:43019"
+      },
+      {
+        "count": 2,
+        "value": "25739:43025"
+      },
+      {
+        "count": 2,
+        "value": "25820:43149"
+      },
+      {
+        "count": 2,
+        "value": "25830:43160"
+      },
+      {
+        "count": 2,
+        "value": "25870:43214"
+      },
+      {
+        "count": 2,
+        "value": "25907:43261"
+      },
+      {
+        "count": 2,
+        "value": "25908:43262"
+      },
+      {
+        "count": 2,
+        "value": "25911:43265"
+      },
+      {
+        "count": 2,
+        "value": "25916:43279"
+      },
+      {
+        "count": 2,
+        "value": "25917:43280"
+      },
+      {
+        "count": 2,
+        "value": "25925:43288"
+      },
+      {
+        "count": 2,
+        "value": "25926:43289"
+      },
+      {
+        "count": 2,
+        "value": "25927:43290"
+      },
+      {
+        "count": 2,
+        "value": "25928:43292"
+      },
+      {
+        "count": 2,
+        "value": "25929:43310"
+      },
+      {
+        "count": 2,
+        "value": "25930:43311"
+      },
+      {
+        "count": 2,
+        "value": "25932:43313"
+      },
+      {
+        "count": 2,
+        "value": "25934:43315"
+      },
+      {
+        "count": 2,
+        "value": "25937:43318"
+      },
+      {
+        "count": 2,
+        "value": "25946:43327"
+      },
+      {
+        "count": 2,
+        "value": "25947:43328"
+      },
+      {
+        "count": 2,
+        "value": "25949:43341"
+      },
+      {
+        "count": 2,
+        "value": "25960:43352"
+      },
+      {
+        "count": 2,
+        "value": "25961:43353"
+      },
+      {
+        "count": 2,
+        "value": "25962:43354"
+      },
+      {
+        "count": 2,
+        "value": "25963:43355"
+      },
+      {
+        "count": 2,
+        "value": "25964:43356"
+      },
+      {
+        "count": 2,
+        "value": "25966:43361"
+      },
+      {
+        "count": 2,
+        "value": "25967:43362"
+      },
+      {
+        "count": 2,
+        "value": "25968:43363"
+      },
+      {
+        "count": 2,
+        "value": "25969:43364"
+      },
+      {
+        "count": 2,
+        "value": "25970:43365"
+      },
+      {
+        "count": 2,
+        "value": "25971:43366"
+      },
+      {
+        "count": 2,
+        "value": "25973:43368"
+      },
+      {
+        "count": 2,
+        "value": "25974:43369"
+      },
+      {
+        "count": 2,
+        "value": "25975:43370"
+      },
+      {
+        "count": 2,
+        "value": "25976:43371"
+      },
+      {
+        "count": 2,
+        "value": "25977:43372"
+      },
+      {
+        "count": 2,
+        "value": "25978:43373"
+      },
+      {
+        "count": 2,
+        "value": "25980:43375"
+      },
+      {
+        "count": 2,
+        "value": "25982:43377"
+      },
+      {
+        "count": 2,
+        "value": "25984:43379"
+      },
+      {
+        "count": 2,
+        "value": "25987:43382"
+      },
+      {
+        "count": 2,
+        "value": "25988:43384"
+      },
+      {
+        "count": 2,
+        "value": "25989:43385"
+      },
+      {
+        "count": 2,
+        "value": "25991:43387"
+      },
+      {
+        "count": 2,
+        "value": "25993:43389"
+      },
+      {
+        "count": 2,
+        "value": "25994:43390"
+      },
+      {
+        "count": 2,
+        "value": "25995:43391"
+      },
+      {
+        "count": 2,
+        "value": "25996:43392"
+      },
+      {
+        "count": 2,
+        "value": "25997:43393"
+      },
+      {
+        "count": 2,
+        "value": "25998:43394"
+      },
+      {
+        "count": 2,
+        "value": "25999:43395"
+      },
+      {
+        "count": 2,
+        "value": "26000:43396"
+      },
+      {
+        "count": 2,
+        "value": "26001:43397"
+      },
+      {
+        "count": 2,
+        "value": "26002:43398"
+      },
+      {
+        "count": 2,
+        "value": "26003:43399"
+      },
+      {
+        "count": 2,
+        "value": "26004:43400"
+      },
+      {
+        "count": 2,
+        "value": "26012:43408"
+      },
+      {
+        "count": 2,
+        "value": "26013:43409"
+      },
+      {
+        "count": 2,
+        "value": "26014:43410"
+      },
+      {
+        "count": 2,
+        "value": "26015:43411"
+      },
+      {
+        "count": 2,
+        "value": "26016:43412"
+      },
+      {
+        "count": 2,
+        "value": "26018:43414"
+      },
+      {
+        "count": 2,
+        "value": "26020:43416"
+      },
+      {
+        "count": 2,
+        "value": "26021:43417"
+      },
+      {
+        "count": 2,
+        "value": "26023:43419"
+      },
+      {
+        "count": 2,
+        "value": "26026:43423"
+      },
+      {
+        "count": 2,
+        "value": "26027:43424"
+      },
+      {
+        "count": 2,
+        "value": "26028:43425"
+      },
+      {
+        "count": 2,
+        "value": "26029:43426"
+      },
+      {
+        "count": 2,
+        "value": "26030:43427"
+      },
+      {
+        "count": 2,
+        "value": "26031:43428"
+      },
+      {
+        "count": 2,
+        "value": "26032:43429"
+      },
+      {
+        "count": 2,
+        "value": "26040:43439"
+      },
+      {
+        "count": 2,
+        "value": "26041:43442"
+      },
+      {
+        "count": 2,
+        "value": "26042:43444"
+      },
+      {
+        "count": 2,
+        "value": "26043:43445"
+      },
+      {
+        "count": 2,
+        "value": "26044:43448"
+      },
+      {
+        "count": 2,
+        "value": "26045:43450"
+      },
+      {
+        "count": 2,
+        "value": "26046:43453"
+      },
+      {
+        "count": 2,
+        "value": "26047:43455"
+      },
+      {
+        "count": 2,
+        "value": "26048:43458"
+      },
+      {
+        "count": 2,
+        "value": "26049:43460"
+      },
+      {
+        "count": 2,
+        "value": "26050:43461"
+      },
+      {
+        "count": 2,
+        "value": "26051:43462"
+      },
+      {
+        "count": 2,
+        "value": "26052:43463"
+      },
+      {
+        "count": 2,
+        "value": "26053:43464"
+      },
+      {
+        "count": 2,
+        "value": "26054:43465"
+      },
+      {
+        "count": 2,
+        "value": "26055:43466"
+      },
+      {
+        "count": 2,
+        "value": "26056:43467"
+      },
+      {
+        "count": 2,
+        "value": "26057:43468"
+      },
+      {
+        "count": 2,
+        "value": "26062:43473"
+      },
+      {
+        "count": 2,
+        "value": "26063:43476"
+      },
+      {
+        "count": 2,
+        "value": "26064:43477"
+      },
+      {
+        "count": 2,
+        "value": "26067:43488"
+      },
+      {
+        "count": 2,
+        "value": "26069:43490"
+      },
+      {
+        "count": 2,
+        "value": "26070:43491"
+      },
+      {
+        "count": 2,
+        "value": "26071:43492"
+      },
+      {
+        "count": 2,
+        "value": "26072:43493"
+      },
+      {
+        "count": 2,
+        "value": "26073:43497"
+      },
+      {
+        "count": 2,
+        "value": "26074:43498"
+      },
+      {
+        "count": 2,
+        "value": "26076:43500"
+      },
+      {
+        "count": 2,
+        "value": "26078:43502"
+      },
+      {
+        "count": 2,
+        "value": "26080:43504"
+      },
+      {
+        "count": 2,
+        "value": "26082:43506"
+      },
+      {
+        "count": 2,
+        "value": "26084:43508"
+      },
+      {
+        "count": 2,
+        "value": "26086:43510"
+      },
+      {
+        "count": 2,
+        "value": "26089:43513"
+      },
+      {
+        "count": 2,
+        "value": "26091:43515"
+      },
+      {
+        "count": 2,
+        "value": "26092:43517"
+      },
+      {
+        "count": 2,
+        "value": "26093:43519"
+      },
+      {
+        "count": 2,
+        "value": "26094:43523"
+      },
+      {
+        "count": 2,
+        "value": "26095:43524"
+      },
+      {
+        "count": 2,
+        "value": "26096:43525"
+      },
+      {
+        "count": 2,
+        "value": "26097:43526"
+      },
+      {
+        "count": 2,
+        "value": "26098:43527"
+      },
+      {
+        "count": 2,
+        "value": "26099:43528"
+      },
+      {
+        "count": 2,
+        "value": "26100:43529"
+      },
+      {
+        "count": 2,
+        "value": "26101:43530"
+      },
+      {
+        "count": 2,
+        "value": "26102:43531"
+      },
+      {
+        "count": 2,
+        "value": "26103:43532"
+      },
+      {
+        "count": 2,
+        "value": "26104:43533"
+      },
+      {
+        "count": 2,
+        "value": "26105:43534"
+      },
+      {
+        "count": 2,
+        "value": "26106:43535"
+      },
+      {
+        "count": 2,
+        "value": "26108:43537"
+      },
+      {
+        "count": 2,
+        "value": "26110:43539"
+      },
+      {
+        "count": 2,
+        "value": "26111:43540"
+      },
+      {
+        "count": 2,
+        "value": "26112:43541"
+      },
+      {
+        "count": 2,
+        "value": "26113:43542"
+      },
+      {
+        "count": 2,
+        "value": "26115:43544"
+      },
+      {
+        "count": 2,
+        "value": "26117:43548"
+      },
+      {
+        "count": 2,
+        "value": "26118:43550"
+      },
+      {
+        "count": 2,
+        "value": "26119:43552"
+      },
+      {
+        "count": 2,
+        "value": "26120:43554"
+      },
+      {
+        "count": 2,
+        "value": "26121:43556"
+      },
+      {
+        "count": 2,
+        "value": "26122:43558"
+      },
+      {
+        "count": 2,
+        "value": "26123:43560"
+      },
+      {
+        "count": 2,
+        "value": "26124:43562"
+      },
+      {
+        "count": 2,
+        "value": "26125:43564"
+      },
+      {
+        "count": 2,
+        "value": "26126:43566"
+      },
+      {
+        "count": 2,
+        "value": "26127:43568"
+      },
+      {
+        "count": 2,
+        "value": "26128:43570"
+      },
+      {
+        "count": 2,
+        "value": "26129:43572"
+      },
+      {
+        "count": 2,
+        "value": "26130:43574"
+      },
+      {
+        "count": 2,
+        "value": "26131:43576"
+      },
+      {
+        "count": 2,
+        "value": "26132:43577"
+      },
+      {
+        "count": 2,
+        "value": "26133:43580"
+      },
+      {
+        "count": 2,
+        "value": "26134:43581"
+      },
+      {
+        "count": 2,
+        "value": "26135:43582"
+      },
+      {
+        "count": 2,
+        "value": "26137:43585"
+      },
+      {
+        "count": 2,
+        "value": "26141:43589"
+      },
+      {
+        "count": 2,
+        "value": "26142:43590"
+      },
+      {
+        "count": 2,
+        "value": "26143:43591"
+      },
+      {
+        "count": 2,
+        "value": "26144:43592"
+      },
+      {
+        "count": 2,
+        "value": "26145:43593"
+      },
+      {
+        "count": 2,
+        "value": "26146:43594"
+      },
+      {
+        "count": 2,
+        "value": "26150:43598"
+      },
+      {
+        "count": 2,
+        "value": "26151:43599"
+      },
+      {
+        "count": 2,
+        "value": "26156:43611"
+      },
+      {
+        "count": 2,
+        "value": "26158:43618"
+      },
+      {
+        "count": 2,
+        "value": "26160:43667"
+      },
+      {
+        "count": 2,
+        "value": "26163:43670"
+      },
+      {
+        "count": 2,
+        "value": "26164:43671"
+      },
+      {
+        "count": 2,
+        "value": "26165:43673"
+      },
+      {
+        "count": 2,
+        "value": "26166:43674"
+      },
+      {
+        "count": 2,
+        "value": "26167:43675"
+      },
+      {
+        "count": 2,
+        "value": "26168:43676"
+      },
+      {
+        "count": 2,
+        "value": "26169:43677"
+      },
+      {
+        "count": 2,
+        "value": "26170:43678"
+      },
+      {
+        "count": 2,
+        "value": "26171:43679"
+      },
+      {
+        "count": 2,
+        "value": "26172:43680"
+      },
+      {
+        "count": 2,
+        "value": "26173:43681"
+      },
+      {
+        "count": 2,
+        "value": "26174:43682"
+      },
+      {
+        "count": 2,
+        "value": "26175:43683"
+      },
+      {
+        "count": 2,
+        "value": "26176:43684"
+      },
+      {
+        "count": 2,
+        "value": "26177:43685"
+      },
+      {
+        "count": 2,
+        "value": "26178:43692"
+      },
+      {
+        "count": 2,
+        "value": "26179:43694"
+      },
+      {
+        "count": 2,
+        "value": "26180:43695"
+      },
+      {
+        "count": 2,
+        "value": "26181:43696"
+      },
+      {
+        "count": 2,
+        "value": "26182:43698"
+      },
+      {
+        "count": 2,
+        "value": "26184:43700"
+      },
+      {
+        "count": 2,
+        "value": "26185:43701"
+      },
+      {
+        "count": 2,
+        "value": "26188:43707"
+      },
+      {
+        "count": 2,
+        "value": "26189:43708"
+      },
+      {
+        "count": 2,
+        "value": "26190:43709"
+      },
+      {
+        "count": 2,
+        "value": "26191:43712"
+      },
+      {
+        "count": 2,
+        "value": "26192:43714"
+      },
+      {
+        "count": 2,
+        "value": "26193:43716"
+      },
+      {
+        "count": 2,
+        "value": "26194:43718"
+      },
+      {
+        "count": 2,
+        "value": "26195:43720"
+      },
+      {
+        "count": 2,
+        "value": "26196:43722"
+      },
+      {
+        "count": 2,
+        "value": "26197:43724"
+      },
+      {
+        "count": 2,
+        "value": "26198:43726"
+      },
+      {
+        "count": 2,
+        "value": "26199:43728"
+      },
+      {
+        "count": 2,
+        "value": "26200:43730"
+      },
+      {
+        "count": 2,
+        "value": "26201:43731"
+      },
+      {
+        "count": 2,
+        "value": "26202:43732"
+      },
+      {
+        "count": 2,
+        "value": "26203:43733"
+      },
+      {
+        "count": 2,
+        "value": "26204:43734"
+      },
+      {
+        "count": 2,
+        "value": "26205:43735"
+      },
+      {
+        "count": 2,
+        "value": "26206:43736"
+      },
+      {
+        "count": 2,
+        "value": "26207:43737"
+      },
+      {
+        "count": 2,
+        "value": "26208:43738"
+      },
+      {
+        "count": 2,
+        "value": "26209:43739"
+      },
+      {
+        "count": 2,
+        "value": "26210:43740"
+      },
+      {
+        "count": 2,
+        "value": "26211:43741"
+      },
+      {
+        "count": 2,
+        "value": "26212:43742"
+      },
+      {
+        "count": 2,
+        "value": "26213:43743"
+      },
+      {
+        "count": 2,
+        "value": "26214:43744"
+      },
+      {
+        "count": 2,
+        "value": "26215:43746"
+      },
+      {
+        "count": 2,
+        "value": "26216:43747"
+      },
+      {
+        "count": 2,
+        "value": "26217:43748"
+      },
+      {
+        "count": 2,
+        "value": "26218:43749"
+      },
+      {
+        "count": 2,
+        "value": "26219:43750"
+      },
+      {
+        "count": 2,
+        "value": "26221:43752"
+      },
+      {
+        "count": 2,
+        "value": "26222:43753"
+      },
+      {
+        "count": 2,
+        "value": "26223:43754"
+      },
+      {
+        "count": 2,
+        "value": "26224:43757"
+      },
+      {
+        "count": 2,
+        "value": "26225:43758"
+      },
+      {
+        "count": 2,
+        "value": "26226:43759"
+      },
+      {
+        "count": 2,
+        "value": "26230:43764"
+      },
+      {
+        "count": 2,
+        "value": "26231:43765"
+      },
+      {
+        "count": 2,
+        "value": "26233:43767"
+      },
+      {
+        "count": 2,
+        "value": "26234:43768"
+      },
+      {
+        "count": 2,
+        "value": "26236:43770"
+      },
+      {
+        "count": 2,
+        "value": "26239:43775"
+      },
+      {
+        "count": 2,
+        "value": "26240:43776"
+      },
+      {
+        "count": 2,
+        "value": "26241:43777"
+      },
+      {
+        "count": 2,
+        "value": "26242:43778"
+      },
+      {
+        "count": 2,
+        "value": "26243:43779"
+      },
+      {
+        "count": 2,
+        "value": "26244:43790"
+      },
+      {
+        "count": 2,
+        "value": "26245:43791"
+      },
+      {
+        "count": 2,
+        "value": "26248:43794"
+      },
+      {
+        "count": 2,
+        "value": "26250:43799"
+      },
+      {
+        "count": 2,
+        "value": "26251:43801"
+      },
+      {
+        "count": 2,
+        "value": "26253:43805"
+      },
+      {
+        "count": 2,
+        "value": "26255:43807"
+      }
+    ],
     "missing_count": 0,
-    "unique_count": 16740
+    "unique_count": 16746
   },
-  "documents_total": 16740,
-  "generated_at": "2026-06-24T11:32:45.661569+00:00",
+  "documents_total": 16990,
+  "generated_at": "2026-06-25T07:03:38.794877+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
     "The original RIS identifiers remain source values; the canonical id should stay stable and traceable."
   ],
-  "recommended_identity_key": "municipality_id + source_system_id + source_id + source_object_id",
+  "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 0,
-    "duplicates": [],
+    "duplicate_count": 488,
+    "duplicates": [
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
+            "id": "huizen-document-23161",
+            "source_id": "23161",
+            "source_object_id": "38408",
+            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
+          },
+          {
+            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
+            "id": "huizen-document-23161",
+            "source_id": "23161",
+            "source_object_id": "38408",
+            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
+          }
+        ],
+        "source_id": "23161"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Agenda Fysiek Domein 28 januari 2026 + aanvulling.pdf",
+            "id": "huizen-document-25113",
+            "source_id": "25113",
+            "source_object_id": "41768",
+            "title": "Agenda Fysiek Domein 28 januari 2026 + aanvulling"
+          },
+          {
+            "filename": "Agenda Fysiek Domein 28 januari 2026 + aanvulling.pdf",
+            "id": "huizen-document-25113",
+            "source_id": "25113",
+            "source_object_id": "41768",
+            "title": "Agenda Fysiek Domein 28 januari 2026 + aanvulling"
+          }
+        ],
+        "source_id": "25113"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
+            "id": "huizen-document-25296",
+            "source_id": "25296",
+            "source_object_id": "42134",
+            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
+          },
+          {
+            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
+            "id": "huizen-document-25296",
+            "source_id": "25296",
+            "source_object_id": "42134",
+            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
+          }
+        ],
+        "source_id": "25296"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
+            "id": "huizen-document-25455",
+            "source_id": "25455",
+            "source_object_id": "42516",
+            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
+          },
+          {
+            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
+            "id": "huizen-document-25455",
+            "source_id": "25455",
+            "source_object_id": "42516",
+            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
+          }
+        ],
+        "source_id": "25455"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
+            "id": "huizen-document-25718",
+            "source_id": "25718",
+            "source_object_id": "43002",
+            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
+          },
+          {
+            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
+            "id": "huizen-document-25718",
+            "source_id": "25718",
+            "source_object_id": "43002",
+            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
+          }
+        ],
+        "source_id": "25718"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
+            "id": "huizen-document-25734",
+            "source_id": "25734",
+            "source_object_id": "43019",
+            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
+          },
+          {
+            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
+            "id": "huizen-document-25734",
+            "source_id": "25734",
+            "source_object_id": "43019",
+            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
+          }
+        ],
+        "source_id": "25734"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
+            "id": "huizen-document-25739",
+            "source_id": "25739",
+            "source_object_id": "43025",
+            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
+          },
+          {
+            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
+            "id": "huizen-document-25739",
+            "source_id": "25739",
+            "source_object_id": "43025",
+            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
+          }
+        ],
+        "source_id": "25739"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie.pdf",
+            "id": "huizen-document-25820",
+            "source_id": "25820",
+            "source_object_id": "43149",
+            "title": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie"
+          },
+          {
+            "filename": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie.pdf",
+            "id": "huizen-document-25820",
+            "source_id": "25820",
+            "source_object_id": "43149",
+            "title": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie"
+          }
+        ],
+        "source_id": "25820"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
+            "id": "huizen-document-25830",
+            "source_id": "25830",
+            "source_object_id": "43160",
+            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
+          },
+          {
+            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
+            "id": "huizen-document-25830",
+            "source_id": "25830",
+            "source_object_id": "43160",
+            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
+          }
+        ],
+        "source_id": "25830"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren.pdf",
+            "id": "huizen-document-25870",
+            "source_id": "25870",
+            "source_object_id": "43214",
+            "title": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren"
+          },
+          {
+            "filename": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren.pdf",
+            "id": "huizen-document-25870",
+            "source_id": "25870",
+            "source_object_id": "43214",
+            "title": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren"
+          }
+        ],
+        "source_id": "25870"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026.pdf",
+            "id": "huizen-document-25907",
+            "source_id": "25907",
+            "source_object_id": "43261",
+            "title": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026"
+          },
+          {
+            "filename": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026.pdf",
+            "id": "huizen-document-25907",
+            "source_id": "25907",
+            "source_object_id": "43261",
+            "title": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026"
+          }
+        ],
+        "source_id": "25907"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026.pdf",
+            "id": "huizen-document-25908",
+            "source_id": "25908",
+            "source_object_id": "43262",
+            "title": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026"
+          },
+          {
+            "filename": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026.pdf",
+            "id": "huizen-document-25908",
+            "source_id": "25908",
+            "source_object_id": "43262",
+            "title": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026"
+          }
+        ],
+        "source_id": "25908"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Verantwoording fractievergoedingen 2025.pdf",
+            "id": "huizen-document-25911",
+            "source_id": "25911",
+            "source_object_id": "43265",
+            "title": "Raadsvoorstel Verantwoording fractievergoedingen 2025"
+          },
+          {
+            "filename": "Raadsvoorstel Verantwoording fractievergoedingen 2025.pdf",
+            "id": "huizen-document-25911",
+            "source_id": "25911",
+            "source_object_id": "43265",
+            "title": "Raadsvoorstel Verantwoording fractievergoedingen 2025"
+          }
+        ],
+        "source_id": "25911"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "id": "huizen-document-25916",
+            "source_id": "25916",
+            "source_object_id": "43279",
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+          },
+          {
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "id": "huizen-document-25916",
+            "source_id": "25916",
+            "source_object_id": "43279",
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+          }
+        ],
+        "source_id": "25916"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Jaarstukken 2025 (ondertekend).pdf",
+            "id": "huizen-document-25917",
+            "source_id": "25917",
+            "source_object_id": "43280",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          },
+          {
+            "filename": "Jaarstukken 2025 (ondertekend).pdf",
+            "id": "huizen-document-25917",
+            "source_id": "25917",
+            "source_object_id": "43280",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          }
+        ],
+        "source_id": "25917"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Inrichting Concern Audit.pdf",
+            "id": "huizen-document-25925",
+            "source_id": "25925",
+            "source_object_id": "43288",
+            "title": "Raadsvoorstel Inrichting Concern Audit"
+          },
+          {
+            "filename": "Raadsvoorstel Inrichting Concern Audit.pdf",
+            "id": "huizen-document-25925",
+            "source_id": "25925",
+            "source_object_id": "43288",
+            "title": "Raadsvoorstel Inrichting Concern Audit"
+          }
+        ],
+        "source_id": "25925"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
+            "id": "huizen-document-25926",
+            "source_id": "25926",
+            "source_object_id": "43289",
+            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
+          },
+          {
+            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
+            "id": "huizen-document-25926",
+            "source_id": "25926",
+            "source_object_id": "43289",
+            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
+          }
+        ],
+        "source_id": "25926"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025.pdf",
+            "id": "huizen-document-25927",
+            "source_id": "25927",
+            "source_object_id": "43290",
+            "title": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025"
+          },
+          {
+            "filename": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025.pdf",
+            "id": "huizen-document-25927",
+            "source_id": "25927",
+            "source_object_id": "43290",
+            "title": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025"
+          }
+        ],
+        "source_id": "25927"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden .pdf",
+            "id": "huizen-document-25928",
+            "source_id": "25928",
+            "source_object_id": "43292",
+            "title": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden"
+          },
+          {
+            "filename": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden .pdf",
+            "id": "huizen-document-25928",
+            "source_id": "25928",
+            "source_object_id": "43292",
+            "title": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden"
+          }
+        ],
+        "source_id": "25928"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
+            "id": "huizen-document-25929",
+            "source_id": "25929",
+            "source_object_id": "43310",
+            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
+          },
+          {
+            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
+            "id": "huizen-document-25929",
+            "source_id": "25929",
+            "source_object_id": "43310",
+            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
+          }
+        ],
+        "source_id": "25929"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College.pdf",
+            "id": "huizen-document-25930",
+            "source_id": "25930",
+            "source_object_id": "43311",
+            "title": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College"
+          },
+          {
+            "filename": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College.pdf",
+            "id": "huizen-document-25930",
+            "source_id": "25930",
+            "source_object_id": "43311",
+            "title": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College"
+          }
+        ],
+        "source_id": "25930"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsagenda 3 juni 2026.pdf",
+            "id": "huizen-document-25932",
+            "source_id": "25932",
+            "source_object_id": "43313",
+            "title": "Raadsagenda 3 juni 2026"
+          },
+          {
+            "filename": "Raadsagenda 3 juni 2026.pdf",
+            "id": "huizen-document-25932",
+            "source_id": "25932",
+            "source_object_id": "43313",
+            "title": "Raadsagenda 3 juni 2026"
+          }
+        ],
+        "source_id": "25932"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer.pdf",
+            "id": "huizen-document-25934",
+            "source_id": "25934",
+            "source_object_id": "43315",
+            "title": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer"
+          },
+          {
+            "filename": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer.pdf",
+            "id": "huizen-document-25934",
+            "source_id": "25934",
+            "source_object_id": "43315",
+            "title": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer"
+          }
+        ],
+        "source_id": "25934"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 3 Toelichting BC wamtebedrijf v030626.pdf",
+            "id": "huizen-document-25937",
+            "source_id": "25937",
+            "source_object_id": "43318",
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+          },
+          {
+            "filename": "Bijlage 3 Toelichting BC wamtebedrijf v030626.pdf",
+            "id": "huizen-document-25937",
+            "source_id": "25937",
+            "source_object_id": "43318",
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+          }
+        ],
+        "source_id": "25937"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026.pdf",
+            "id": "huizen-document-25946",
+            "source_id": "25946",
+            "source_object_id": "43327",
+            "title": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026"
+          },
+          {
+            "filename": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026.pdf",
+            "id": "huizen-document-25946",
+            "source_id": "25946",
+            "source_object_id": "43327",
+            "title": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026"
+          }
+        ],
+        "source_id": "25946"
+      }
+    ],
     "missing_count": 0,
-    "unique_count": 16740
+    "unique_count": 16746
   },
   "source_object_id": {
-    "duplicate_count": 0,
-    "duplicates": [],
+    "duplicate_count": 488,
+    "duplicates": [
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
+            "id": "huizen-document-23161",
+            "source_id": "23161",
+            "source_object_id": "38408",
+            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
+          },
+          {
+            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
+            "id": "huizen-document-23161",
+            "source_id": "23161",
+            "source_object_id": "38408",
+            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
+          }
+        ],
+        "source_object_id": "38408"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Agenda Fysiek Domein 28 januari 2026 + aanvulling.pdf",
+            "id": "huizen-document-25113",
+            "source_id": "25113",
+            "source_object_id": "41768",
+            "title": "Agenda Fysiek Domein 28 januari 2026 + aanvulling"
+          },
+          {
+            "filename": "Agenda Fysiek Domein 28 januari 2026 + aanvulling.pdf",
+            "id": "huizen-document-25113",
+            "source_id": "25113",
+            "source_object_id": "41768",
+            "title": "Agenda Fysiek Domein 28 januari 2026 + aanvulling"
+          }
+        ],
+        "source_object_id": "41768"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
+            "id": "huizen-document-25296",
+            "source_id": "25296",
+            "source_object_id": "42134",
+            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
+          },
+          {
+            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
+            "id": "huizen-document-25296",
+            "source_id": "25296",
+            "source_object_id": "42134",
+            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
+          }
+        ],
+        "source_object_id": "42134"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
+            "id": "huizen-document-25455",
+            "source_id": "25455",
+            "source_object_id": "42516",
+            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
+          },
+          {
+            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
+            "id": "huizen-document-25455",
+            "source_id": "25455",
+            "source_object_id": "42516",
+            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
+          }
+        ],
+        "source_object_id": "42516"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
+            "id": "huizen-document-25718",
+            "source_id": "25718",
+            "source_object_id": "43002",
+            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
+          },
+          {
+            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
+            "id": "huizen-document-25718",
+            "source_id": "25718",
+            "source_object_id": "43002",
+            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
+          }
+        ],
+        "source_object_id": "43002"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
+            "id": "huizen-document-25734",
+            "source_id": "25734",
+            "source_object_id": "43019",
+            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
+          },
+          {
+            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
+            "id": "huizen-document-25734",
+            "source_id": "25734",
+            "source_object_id": "43019",
+            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
+          }
+        ],
+        "source_object_id": "43019"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
+            "id": "huizen-document-25739",
+            "source_id": "25739",
+            "source_object_id": "43025",
+            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
+          },
+          {
+            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
+            "id": "huizen-document-25739",
+            "source_id": "25739",
+            "source_object_id": "43025",
+            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
+          }
+        ],
+        "source_object_id": "43025"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie.pdf",
+            "id": "huizen-document-25820",
+            "source_id": "25820",
+            "source_object_id": "43149",
+            "title": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie"
+          },
+          {
+            "filename": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie.pdf",
+            "id": "huizen-document-25820",
+            "source_id": "25820",
+            "source_object_id": "43149",
+            "title": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie"
+          }
+        ],
+        "source_object_id": "43149"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
+            "id": "huizen-document-25830",
+            "source_id": "25830",
+            "source_object_id": "43160",
+            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
+          },
+          {
+            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
+            "id": "huizen-document-25830",
+            "source_id": "25830",
+            "source_object_id": "43160",
+            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
+          }
+        ],
+        "source_object_id": "43160"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren.pdf",
+            "id": "huizen-document-25870",
+            "source_id": "25870",
+            "source_object_id": "43214",
+            "title": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren"
+          },
+          {
+            "filename": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren.pdf",
+            "id": "huizen-document-25870",
+            "source_id": "25870",
+            "source_object_id": "43214",
+            "title": "Beantwoording door het college van de commissievragen mevrouw Van Deutekom (CDA) over VOI fietsen en wildparkeren"
+          }
+        ],
+        "source_object_id": "43214"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026.pdf",
+            "id": "huizen-document-25907",
+            "source_id": "25907",
+            "source_object_id": "43261",
+            "title": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026"
+          },
+          {
+            "filename": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026.pdf",
+            "id": "huizen-document-25907",
+            "source_id": "25907",
+            "source_object_id": "43261",
+            "title": "Resumé openbare commissievergadering Sociaal Domein 19 mei 2026"
+          }
+        ],
+        "source_object_id": "43261"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026.pdf",
+            "id": "huizen-document-25908",
+            "source_id": "25908",
+            "source_object_id": "43262",
+            "title": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026"
+          },
+          {
+            "filename": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026.pdf",
+            "id": "huizen-document-25908",
+            "source_id": "25908",
+            "source_object_id": "43262",
+            "title": "Resumé openbare commissievergadering Fysiek Domein 20 mei 2026"
+          }
+        ],
+        "source_object_id": "43262"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Verantwoording fractievergoedingen 2025.pdf",
+            "id": "huizen-document-25911",
+            "source_id": "25911",
+            "source_object_id": "43265",
+            "title": "Raadsvoorstel Verantwoording fractievergoedingen 2025"
+          },
+          {
+            "filename": "Raadsvoorstel Verantwoording fractievergoedingen 2025.pdf",
+            "id": "huizen-document-25911",
+            "source_id": "25911",
+            "source_object_id": "43265",
+            "title": "Raadsvoorstel Verantwoording fractievergoedingen 2025"
+          }
+        ],
+        "source_object_id": "43265"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "id": "huizen-document-25916",
+            "source_id": "25916",
+            "source_object_id": "43279",
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+          },
+          {
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "id": "huizen-document-25916",
+            "source_id": "25916",
+            "source_object_id": "43279",
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+          }
+        ],
+        "source_object_id": "43279"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Jaarstukken 2025 (ondertekend).pdf",
+            "id": "huizen-document-25917",
+            "source_id": "25917",
+            "source_object_id": "43280",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          },
+          {
+            "filename": "Jaarstukken 2025 (ondertekend).pdf",
+            "id": "huizen-document-25917",
+            "source_id": "25917",
+            "source_object_id": "43280",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          }
+        ],
+        "source_object_id": "43280"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Inrichting Concern Audit.pdf",
+            "id": "huizen-document-25925",
+            "source_id": "25925",
+            "source_object_id": "43288",
+            "title": "Raadsvoorstel Inrichting Concern Audit"
+          },
+          {
+            "filename": "Raadsvoorstel Inrichting Concern Audit.pdf",
+            "id": "huizen-document-25925",
+            "source_id": "25925",
+            "source_object_id": "43288",
+            "title": "Raadsvoorstel Inrichting Concern Audit"
+          }
+        ],
+        "source_object_id": "43288"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
+            "id": "huizen-document-25926",
+            "source_id": "25926",
+            "source_object_id": "43289",
+            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
+          },
+          {
+            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
+            "id": "huizen-document-25926",
+            "source_id": "25926",
+            "source_object_id": "43289",
+            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
+          }
+        ],
+        "source_object_id": "43289"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025.pdf",
+            "id": "huizen-document-25927",
+            "source_id": "25927",
+            "source_object_id": "43290",
+            "title": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025"
+          },
+          {
+            "filename": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025.pdf",
+            "id": "huizen-document-25927",
+            "source_id": "25927",
+            "source_object_id": "43290",
+            "title": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025"
+          }
+        ],
+        "source_object_id": "43290"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden .pdf",
+            "id": "huizen-document-25928",
+            "source_id": "25928",
+            "source_object_id": "43292",
+            "title": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden"
+          },
+          {
+            "filename": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden .pdf",
+            "id": "huizen-document-25928",
+            "source_id": "25928",
+            "source_object_id": "43292",
+            "title": "Veiligheidsregio Gooi en Vechtstreek - Informatie inzake inzet zeer grote natuurbranden"
+          }
+        ],
+        "source_object_id": "43292"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
+            "id": "huizen-document-25929",
+            "source_id": "25929",
+            "source_object_id": "43310",
+            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
+          },
+          {
+            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
+            "id": "huizen-document-25929",
+            "source_id": "25929",
+            "source_object_id": "43310",
+            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
+          }
+        ],
+        "source_object_id": "43310"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College.pdf",
+            "id": "huizen-document-25930",
+            "source_id": "25930",
+            "source_object_id": "43311",
+            "title": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College"
+          },
+          {
+            "filename": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College.pdf",
+            "id": "huizen-document-25930",
+            "source_id": "25930",
+            "source_object_id": "43311",
+            "title": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College"
+          }
+        ],
+        "source_object_id": "43311"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsagenda 3 juni 2026.pdf",
+            "id": "huizen-document-25932",
+            "source_id": "25932",
+            "source_object_id": "43313",
+            "title": "Raadsagenda 3 juni 2026"
+          },
+          {
+            "filename": "Raadsagenda 3 juni 2026.pdf",
+            "id": "huizen-document-25932",
+            "source_id": "25932",
+            "source_object_id": "43313",
+            "title": "Raadsagenda 3 juni 2026"
+          }
+        ],
+        "source_object_id": "43313"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer.pdf",
+            "id": "huizen-document-25934",
+            "source_id": "25934",
+            "source_object_id": "43315",
+            "title": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer"
+          },
+          {
+            "filename": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer.pdf",
+            "id": "huizen-document-25934",
+            "source_id": "25934",
+            "source_object_id": "43315",
+            "title": "Raadsvoorstel oprichting gemeentelijk warmtebedrijf De Wolfskamer"
+          }
+        ],
+        "source_object_id": "43315"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 3 Toelichting BC wamtebedrijf v030626.pdf",
+            "id": "huizen-document-25937",
+            "source_id": "25937",
+            "source_object_id": "43318",
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+          },
+          {
+            "filename": "Bijlage 3 Toelichting BC wamtebedrijf v030626.pdf",
+            "id": "huizen-document-25937",
+            "source_id": "25937",
+            "source_object_id": "43318",
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+          }
+        ],
+        "source_object_id": "43318"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026.pdf",
+            "id": "huizen-document-25946",
+            "source_id": "25946",
+            "source_object_id": "43327",
+            "title": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026"
+          },
+          {
+            "filename": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026.pdf",
+            "id": "huizen-document-25946",
+            "source_id": "25946",
+            "source_object_id": "43327",
+            "title": "Bijlage 5 Bestuurlijke informatiebrief GNR 8 april 2026"
+          }
+        ],
+        "source_object_id": "43327"
+      }
+    ],
     "missing_count": 0,
-    "unique_count": 16740
+    "unique_count": 16746
   }
 }
