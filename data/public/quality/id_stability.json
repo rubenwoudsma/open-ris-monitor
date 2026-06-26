@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 488,
+    "duplicate_count": 484,
     "duplicates": [
       {
         "count": 2,
@@ -41,106 +41,6 @@
           }
         ],
         "id": "huizen-document-25113"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
-            "id": "huizen-document-25296",
-            "source_id": "25296",
-            "source_object_id": "42134",
-            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
-          },
-          {
-            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
-            "id": "huizen-document-25296",
-            "source_id": "25296",
-            "source_object_id": "42134",
-            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
-          }
-        ],
-        "id": "huizen-document-25296"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
-            "id": "huizen-document-25455",
-            "source_id": "25455",
-            "source_object_id": "42516",
-            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
-          },
-          {
-            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
-            "id": "huizen-document-25455",
-            "source_id": "25455",
-            "source_object_id": "42516",
-            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
-          }
-        ],
-        "id": "huizen-document-25455"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
-            "id": "huizen-document-25718",
-            "source_id": "25718",
-            "source_object_id": "43002",
-            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
-          },
-          {
-            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
-            "id": "huizen-document-25718",
-            "source_id": "25718",
-            "source_object_id": "43002",
-            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
-          }
-        ],
-        "id": "huizen-document-25718"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
-            "id": "huizen-document-25734",
-            "source_id": "25734",
-            "source_object_id": "43019",
-            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
-          },
-          {
-            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
-            "id": "huizen-document-25734",
-            "source_id": "25734",
-            "source_object_id": "43019",
-            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
-          }
-        ],
-        "id": "huizen-document-25734"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
-            "id": "huizen-document-25739",
-            "source_id": "25739",
-            "source_object_id": "43025",
-            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
-          },
-          {
-            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
-            "id": "huizen-document-25739",
-            "source_id": "25739",
-            "source_object_id": "43025",
-            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
-          }
-        ],
-        "id": "huizen-document-25739"
       },
       {
         "count": 2,
@@ -477,10 +377,30 @@
             "id": "huizen-document-25937",
             "source_id": "25937",
             "source_object_id": "43318",
-            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf De Wolfskamer"
           }
         ],
         "id": "huizen-document-25937"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 7 beantwoording wensen en bedenkingen AKD.pdf",
+            "id": "huizen-document-25940",
+            "source_id": "25940",
+            "source_object_id": "43321",
+            "title": "Bijlage 7 Beantwoording wensen en bedenkingen AKD"
+          },
+          {
+            "filename": "Bijlage 7 beantwoording wensen en bedenkingen AKD.pdf",
+            "id": "huizen-document-25940",
+            "source_id": "25940",
+            "source_object_id": "43321",
+            "title": "Bijlage 7 beantwoording wensen en bedenkingen AKD"
+          }
+        ],
+        "id": "huizen-document-25940"
       },
       {
         "count": 2,
@@ -501,14 +421,94 @@
           }
         ],
         "id": "huizen-document-25946"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel zienswijze jaarstukken Goois Natuurreservaat.pdf",
+            "id": "huizen-document-25947",
+            "source_id": "25947",
+            "source_object_id": "43328",
+            "title": "Zienswijze op het Jaarverslag 2025, de Jaarrekening 2025, de Eerste begrotingswijziging 2026 en de Begroting 2027 van Stichting Goois Natuurreservaat"
+          },
+          {
+            "filename": "Raadsvoorstel zienswijze jaarstukken Goois Natuurreservaat.pdf",
+            "id": "huizen-document-25947",
+            "source_id": "25947",
+            "source_object_id": "43328",
+            "title": "Zienswijze op het Jaarverslag 2025, de Jaarrekening 2025, de Eerste begrotingswijziging 2026 en de Begroting 2027 van Stichting Goois Natuurreservaat"
+          }
+        ],
+        "id": "huizen-document-25947"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
+            "id": "huizen-document-25963",
+            "source_id": "25963",
+            "source_object_id": "43355",
+            "title": "Bijlage 4 Termijnkalender"
+          },
+          {
+            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
+            "id": "huizen-document-25963",
+            "source_id": "25963",
+            "source_object_id": "43355",
+            "title": "Bijlage 4 Termijnkalender"
+          }
+        ],
+        "id": "huizen-document-25963"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 6 Financiele bijlage.pdf",
+            "id": "huizen-document-25964",
+            "source_id": "25964",
+            "source_object_id": "43356",
+            "title": "Bijlage 6 Financiele bijlage"
+          },
+          {
+            "filename": "Bijlage 6 Financiele bijlage.pdf",
+            "id": "huizen-document-25964",
+            "source_id": "25964",
+            "source_object_id": "43356",
+            "title": "Bijlage 6 Financiele bijlage"
+          }
+        ],
+        "id": "huizen-document-25964"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25966",
+            "source_id": "25966",
+            "source_object_id": "43361",
+            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+          },
+          {
+            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25966",
+            "source_id": "25966",
+            "source_object_id": "43361",
+            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+          }
+        ],
+        "id": "huizen-document-25966"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16746
+    "unique_count": 16754
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 488,
+    "duplicate_count": 484,
     "duplicates": [
       {
         "count": 2,
@@ -517,26 +517,6 @@
       {
         "count": 2,
         "value": "25113:41768"
-      },
-      {
-        "count": 2,
-        "value": "25296:42134"
-      },
-      {
-        "count": 2,
-        "value": "25455:42516"
-      },
-      {
-        "count": 2,
-        "value": "25718:43002"
-      },
-      {
-        "count": 2,
-        "value": "25734:43019"
-      },
-      {
-        "count": 2,
-        "value": "25739:43025"
       },
       {
         "count": 2,
@@ -608,27 +588,15 @@
       },
       {
         "count": 2,
+        "value": "25940:43321"
+      },
+      {
+        "count": 2,
         "value": "25946:43327"
       },
       {
         "count": 2,
         "value": "25947:43328"
-      },
-      {
-        "count": 2,
-        "value": "25949:43341"
-      },
-      {
-        "count": 2,
-        "value": "25960:43352"
-      },
-      {
-        "count": 2,
-        "value": "25961:43353"
-      },
-      {
-        "count": 2,
-        "value": "25962:43354"
       },
       {
         "count": 2,
@@ -1485,13 +1453,37 @@
       {
         "count": 2,
         "value": "26255:43807"
+      },
+      {
+        "count": 2,
+        "value": "26259:43811"
+      },
+      {
+        "count": 2,
+        "value": "26261:43813"
+      },
+      {
+        "count": 2,
+        "value": "26264:43816"
+      },
+      {
+        "count": 2,
+        "value": "26265:43817"
+      },
+      {
+        "count": 2,
+        "value": "26266:43818"
+      },
+      {
+        "count": 2,
+        "value": "26267:43819"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16746
+    "unique_count": 16754
   },
-  "documents_total": 16990,
-  "generated_at": "2026-06-25T07:03:38.794877+00:00",
+  "documents_total": 16996,
+  "generated_at": "2026-06-26T07:11:29.614248+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1499,7 +1491,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 488,
+    "duplicate_count": 484,
     "duplicates": [
       {
         "count": 2,
@@ -1540,106 +1532,6 @@
           }
         ],
         "source_id": "25113"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
-            "id": "huizen-document-25296",
-            "source_id": "25296",
-            "source_object_id": "42134",
-            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
-          },
-          {
-            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
-            "id": "huizen-document-25296",
-            "source_id": "25296",
-            "source_object_id": "42134",
-            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
-          }
-        ],
-        "source_id": "25296"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
-            "id": "huizen-document-25455",
-            "source_id": "25455",
-            "source_object_id": "42516",
-            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
-          },
-          {
-            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
-            "id": "huizen-document-25455",
-            "source_id": "25455",
-            "source_object_id": "42516",
-            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
-          }
-        ],
-        "source_id": "25455"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
-            "id": "huizen-document-25718",
-            "source_id": "25718",
-            "source_object_id": "43002",
-            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
-          },
-          {
-            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
-            "id": "huizen-document-25718",
-            "source_id": "25718",
-            "source_object_id": "43002",
-            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
-          }
-        ],
-        "source_id": "25718"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
-            "id": "huizen-document-25734",
-            "source_id": "25734",
-            "source_object_id": "43019",
-            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
-          },
-          {
-            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
-            "id": "huizen-document-25734",
-            "source_id": "25734",
-            "source_object_id": "43019",
-            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
-          }
-        ],
-        "source_id": "25734"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
-            "id": "huizen-document-25739",
-            "source_id": "25739",
-            "source_object_id": "43025",
-            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
-          },
-          {
-            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
-            "id": "huizen-document-25739",
-            "source_id": "25739",
-            "source_object_id": "43025",
-            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
-          }
-        ],
-        "source_id": "25739"
       },
       {
         "count": 2,
@@ -1976,10 +1868,30 @@
             "id": "huizen-document-25937",
             "source_id": "25937",
             "source_object_id": "43318",
-            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf De Wolfskamer"
           }
         ],
         "source_id": "25937"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 7 beantwoording wensen en bedenkingen AKD.pdf",
+            "id": "huizen-document-25940",
+            "source_id": "25940",
+            "source_object_id": "43321",
+            "title": "Bijlage 7 Beantwoording wensen en bedenkingen AKD"
+          },
+          {
+            "filename": "Bijlage 7 beantwoording wensen en bedenkingen AKD.pdf",
+            "id": "huizen-document-25940",
+            "source_id": "25940",
+            "source_object_id": "43321",
+            "title": "Bijlage 7 beantwoording wensen en bedenkingen AKD"
+          }
+        ],
+        "source_id": "25940"
       },
       {
         "count": 2,
@@ -2000,13 +1912,93 @@
           }
         ],
         "source_id": "25946"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel zienswijze jaarstukken Goois Natuurreservaat.pdf",
+            "id": "huizen-document-25947",
+            "source_id": "25947",
+            "source_object_id": "43328",
+            "title": "Zienswijze op het Jaarverslag 2025, de Jaarrekening 2025, de Eerste begrotingswijziging 2026 en de Begroting 2027 van Stichting Goois Natuurreservaat"
+          },
+          {
+            "filename": "Raadsvoorstel zienswijze jaarstukken Goois Natuurreservaat.pdf",
+            "id": "huizen-document-25947",
+            "source_id": "25947",
+            "source_object_id": "43328",
+            "title": "Zienswijze op het Jaarverslag 2025, de Jaarrekening 2025, de Eerste begrotingswijziging 2026 en de Begroting 2027 van Stichting Goois Natuurreservaat"
+          }
+        ],
+        "source_id": "25947"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
+            "id": "huizen-document-25963",
+            "source_id": "25963",
+            "source_object_id": "43355",
+            "title": "Bijlage 4 Termijnkalender"
+          },
+          {
+            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
+            "id": "huizen-document-25963",
+            "source_id": "25963",
+            "source_object_id": "43355",
+            "title": "Bijlage 4 Termijnkalender"
+          }
+        ],
+        "source_id": "25963"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 6 Financiele bijlage.pdf",
+            "id": "huizen-document-25964",
+            "source_id": "25964",
+            "source_object_id": "43356",
+            "title": "Bijlage 6 Financiele bijlage"
+          },
+          {
+            "filename": "Bijlage 6 Financiele bijlage.pdf",
+            "id": "huizen-document-25964",
+            "source_id": "25964",
+            "source_object_id": "43356",
+            "title": "Bijlage 6 Financiele bijlage"
+          }
+        ],
+        "source_id": "25964"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25966",
+            "source_id": "25966",
+            "source_object_id": "43361",
+            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+          },
+          {
+            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25966",
+            "source_id": "25966",
+            "source_object_id": "43361",
+            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+          }
+        ],
+        "source_id": "25966"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16746
+    "unique_count": 16754
   },
   "source_object_id": {
-    "duplicate_count": 488,
+    "duplicate_count": 484,
     "duplicates": [
       {
         "count": 2,
@@ -2047,106 +2039,6 @@
           }
         ],
         "source_object_id": "41768"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
-            "id": "huizen-document-25296",
-            "source_id": "25296",
-            "source_object_id": "42134",
-            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
-          },
-          {
-            "filename": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV.pdf",
-            "id": "huizen-document-25296",
-            "source_id": "25296",
-            "source_object_id": "42134",
-            "title": "Raadsvoorstel voorgenomen besluit inzake garantstelling Tomingroep GR aan BV"
-          }
-        ],
-        "source_object_id": "42134"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
-            "id": "huizen-document-25455",
-            "source_id": "25455",
-            "source_object_id": "42516",
-            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
-          },
-          {
-            "filename": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen.pdf",
-            "id": "huizen-document-25455",
-            "source_id": "25455",
-            "source_object_id": "42516",
-            "title": "Raadsvoorstel Inventarisatie en beheer kunstcollectie gemeente Huizen"
-          }
-        ],
-        "source_object_id": "42516"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
-            "id": "huizen-document-25718",
-            "source_id": "25718",
-            "source_object_id": "43002",
-            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
-          },
-          {
-            "filename": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a.pdf",
-            "id": "huizen-document-25718",
-            "source_id": "25718",
-            "source_object_id": "43002",
-            "title": "Raadsvoorstel Rekenkamer rapport onderzoek artikel 213a"
-          }
-        ],
-        "source_object_id": "43002"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
-            "id": "huizen-document-25734",
-            "source_id": "25734",
-            "source_object_id": "43019",
-            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
-          },
-          {
-            "filename": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning  ambtelijke bijstand.pdf",
-            "id": "huizen-document-25734",
-            "source_id": "25734",
-            "source_object_id": "43019",
-            "title": "Raadsvoorstel wijziging verordeningen rechtspositie en fractieondersteuning ambtelijke bijstand"
-          }
-        ],
-        "source_object_id": "43019"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
-            "id": "huizen-document-25739",
-            "source_id": "25739",
-            "source_object_id": "43025",
-            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
-          },
-          {
-            "filename": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030.pdf",
-            "id": "huizen-document-25739",
-            "source_id": "25739",
-            "source_object_id": "43025",
-            "title": "Raadsvoorstel Zienswijze Ontwerp Programmabegroting 2027 en de Meerjarenraming 2028-2030"
-          }
-        ],
-        "source_object_id": "43025"
       },
       {
         "count": 2,
@@ -2483,10 +2375,30 @@
             "id": "huizen-document-25937",
             "source_id": "25937",
             "source_object_id": "43318",
-            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf De Wolfskamer"
           }
         ],
         "source_object_id": "43318"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 7 beantwoording wensen en bedenkingen AKD.pdf",
+            "id": "huizen-document-25940",
+            "source_id": "25940",
+            "source_object_id": "43321",
+            "title": "Bijlage 7 Beantwoording wensen en bedenkingen AKD"
+          },
+          {
+            "filename": "Bijlage 7 beantwoording wensen en bedenkingen AKD.pdf",
+            "id": "huizen-document-25940",
+            "source_id": "25940",
+            "source_object_id": "43321",
+            "title": "Bijlage 7 beantwoording wensen en bedenkingen AKD"
+          }
+        ],
+        "source_object_id": "43321"
       },
       {
         "count": 2,
@@ -2507,9 +2419,89 @@
           }
         ],
         "source_object_id": "43327"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel zienswijze jaarstukken Goois Natuurreservaat.pdf",
+            "id": "huizen-document-25947",
+            "source_id": "25947",
+            "source_object_id": "43328",
+            "title": "Zienswijze op het Jaarverslag 2025, de Jaarrekening 2025, de Eerste begrotingswijziging 2026 en de Begroting 2027 van Stichting Goois Natuurreservaat"
+          },
+          {
+            "filename": "Raadsvoorstel zienswijze jaarstukken Goois Natuurreservaat.pdf",
+            "id": "huizen-document-25947",
+            "source_id": "25947",
+            "source_object_id": "43328",
+            "title": "Zienswijze op het Jaarverslag 2025, de Jaarrekening 2025, de Eerste begrotingswijziging 2026 en de Begroting 2027 van Stichting Goois Natuurreservaat"
+          }
+        ],
+        "source_object_id": "43328"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
+            "id": "huizen-document-25963",
+            "source_id": "25963",
+            "source_object_id": "43355",
+            "title": "Bijlage 4 Termijnkalender"
+          },
+          {
+            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
+            "id": "huizen-document-25963",
+            "source_id": "25963",
+            "source_object_id": "43355",
+            "title": "Bijlage 4 Termijnkalender"
+          }
+        ],
+        "source_object_id": "43355"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 6 Financiele bijlage.pdf",
+            "id": "huizen-document-25964",
+            "source_id": "25964",
+            "source_object_id": "43356",
+            "title": "Bijlage 6 Financiele bijlage"
+          },
+          {
+            "filename": "Bijlage 6 Financiele bijlage.pdf",
+            "id": "huizen-document-25964",
+            "source_id": "25964",
+            "source_object_id": "43356",
+            "title": "Bijlage 6 Financiele bijlage"
+          }
+        ],
+        "source_object_id": "43356"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25966",
+            "source_id": "25966",
+            "source_object_id": "43361",
+            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+          },
+          {
+            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25966",
+            "source_id": "25966",
+            "source_object_id": "43361",
+            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+          }
+        ],
+        "source_object_id": "43361"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16746
+    "unique_count": 16754
   }
 }
