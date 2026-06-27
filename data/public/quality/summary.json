@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-06-26T07:11:29.869729+00:00",
+  "generated_at": "2026-06-27T06:45:16.212397+00:00",
   "counts": {
-    "documents": 16996,
+    "documents": 17004,
     "document_versions": 25,
     "harvest_runs": 1,
     "meetings": 249,
     "meeting_items": 1000,
     "meeting_documents": 89,
-    "meeting_item_documents": 1809
+    "meeting_item_documents": 1810
   },
   "coverage": {
-    "documents_with_relations": 1529,
-    "documents_without_relations": 15467,
+    "documents_with_relations": 1530,
+    "documents_without_relations": 15474,
     "coverage_pct": 9.0
   },
   "integrity": {
@@ -20,7 +20,7 @@
   },
   "activity": {
     "meetings_without_items": 162,
-    "items_without_documents": 289
+    "items_without_documents": 288
   },
   "document_types": {
     "source": {
@@ -33,7 +33,7 @@
       "Advies jaarverslag (Intern)": 4,
       "Advies ontbinding overeenkomst (Intern)": 1,
       "Advies verhuur pand (Intern)": 1,
-      "Agenda": 419,
+      "Agenda": 420,
       "Amendementen": 155,
       "Beantwoording door B&W (Uitgaand)": 42,
       "Beleidsadvies (Intern)": 2,
@@ -85,7 +85,7 @@
       "Klacht (Inkomend)": 3,
       "Mailuitwisseling": 2,
       "Mandaatvoorstel (Intern)": 1,
-      "Mededelingen": 1298,
+      "Mededelingen": 1299,
       "Melding (Inkomend)": 1,
       "Melding (Intern)": 2,
       "Memo": 44,
@@ -103,16 +103,16 @@
       "Onderhoudsrapport (Intern)": 1,
       "Onderzoeksstuk (Intern)": 3,
       "Opdracht (Intern)": 2,
-      "Overig": 1902,
+      "Overig": 1906,
       "Overig stuk inkomend": 4,
       "Overig stuk intern": 82,
       "Overig stuk uitgaand": 1,
       "Overzicht mededelingen (Intern)": 4,
-      "Overzicht stand van zaken": 58,
+      "Overzicht stand van zaken": 57,
       "Planning (Intern)": 3,
       "Principeverzoek bestemmingsplanwijziging (Inkomend)": 1,
       "Raadsbesluit": 66,
-      "Raadsvoorstel": 1007,
+      "Raadsvoorstel": 1010,
       "Raadsvoorstel (Intern)": 27,
       "Raadsvragen": 66,
       "Rapport (Intern)": 4,
@@ -160,9 +160,9 @@
       "Zienswijzeadvies": 1
     },
     "normalized": {
-      "agenda": 423,
+      "agenda": 424,
       "amendment": 155,
-      "announcement": 1302,
+      "announcement": 1303,
       "answer": 42,
       "attachment": 2388,
       "commitment": 207,
@@ -174,30 +174,30 @@
       "motion": 269,
       "notice": 270,
       "objection_or_response": 15,
-      "other": 1989,
+      "other": 1993,
       "policy_or_plan": 91,
-      "proposal": 4468,
+      "proposal": 4471,
       "question": 414,
-      "report": 146,
+      "report": 145,
       "request": 411,
       "unknown": 37
     },
     "unknown_count": 37
   },
   "document_metadata": {
-    "documents_with_file_url": 16996,
+    "documents_with_file_url": 17004,
     "documents_without_file_url": 0,
-    "documents_with_file_size": 16996,
+    "documents_with_file_size": 17004,
     "documents_without_file_size": 0
   },
   "export_diagnostics": {
-    "documents_seen": 16996,
-    "documents_published": 16996,
+    "documents_seen": 17004,
+    "documents_published": 17004,
     "documents_seen_minus_published": 0,
     "raw_meeting_document_relations_seen": 0,
     "raw_meeting_item_document_relations_seen": 0,
     "published_meeting_document_relations": 89,
-    "published_meeting_item_document_relations": 1809,
+    "published_meeting_item_document_relations": 1810,
     "dropped_meeting_document_relations": 0,
     "dropped_meeting_item_document_relations": 0
   },
@@ -210,15 +210,15 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-06-26T07:11:28.786952+00:00",
-      "id": "harvest-huizen-20260626T070538Z",
+      "finished_at": "2026-06-27T06:45:15.129602+00:00",
+      "id": "harvest-huizen-20260627T064035Z",
       "max_documents": null,
       "meetings_seen": 250,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-06-26T07:05:38.911747+00:00",
+      "started_at": "2026-06-27T06:40:35.145870+00:00",
       "status": "success"
     }
   },

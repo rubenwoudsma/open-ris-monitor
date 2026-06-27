@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 484,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -370,7 +370,7 @@
             "id": "huizen-document-25937",
             "source_id": "25937",
             "source_object_id": "43318",
-            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf De Wolfskamer"
           },
           {
             "filename": "Bijlage 3 Toelichting BC wamtebedrijf v030626.pdf",
@@ -390,7 +390,7 @@
             "id": "huizen-document-25940",
             "source_id": "25940",
             "source_object_id": "43321",
-            "title": "Bijlage 7 Beantwoording wensen en bedenkingen AKD"
+            "title": "Bijlage 7 beantwoording wensen en bedenkingen AKD"
           },
           {
             "filename": "Bijlage 7 beantwoording wensen en bedenkingen AKD.pdf",
@@ -486,29 +486,29 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25966",
-            "source_id": "25966",
-            "source_object_id": "43361",
-            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25967",
+            "source_id": "25967",
+            "source_object_id": "43362",
+            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
           },
           {
-            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25966",
-            "source_id": "25966",
-            "source_object_id": "43361",
-            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25967",
+            "source_id": "25967",
+            "source_object_id": "43362",
+            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
           }
         ],
-        "id": "huizen-document-25966"
+        "id": "huizen-document-25967"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16754
+    "unique_count": 16755
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 484,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -605,10 +605,6 @@
       {
         "count": 2,
         "value": "25964:43356"
-      },
-      {
-        "count": 2,
-        "value": "25966:43361"
       },
       {
         "count": 2,
@@ -1440,6 +1436,10 @@
       },
       {
         "count": 2,
+        "value": "26249:43795"
+      },
+      {
+        "count": 2,
         "value": "26250:43799"
       },
       {
@@ -1456,11 +1456,27 @@
       },
       {
         "count": 2,
+        "value": "26256:43808"
+      },
+      {
+        "count": 2,
+        "value": "26257:43809"
+      },
+      {
+        "count": 2,
         "value": "26259:43811"
       },
       {
         "count": 2,
+        "value": "26260:43812"
+      },
+      {
+        "count": 2,
         "value": "26261:43813"
+      },
+      {
+        "count": 2,
+        "value": "26263:43815"
       },
       {
         "count": 2,
@@ -1477,13 +1493,25 @@
       {
         "count": 2,
         "value": "26267:43819"
+      },
+      {
+        "count": 2,
+        "value": "26268:43820"
+      },
+      {
+        "count": 2,
+        "value": "26269:43821"
+      },
+      {
+        "count": 2,
+        "value": "26270:43824"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16754
+    "unique_count": 16755
   },
-  "documents_total": 16996,
-  "generated_at": "2026-06-26T07:11:29.614248+00:00",
+  "documents_total": 17004,
+  "generated_at": "2026-06-27T06:45:15.953932+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1491,7 +1519,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 484,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -1861,7 +1889,7 @@
             "id": "huizen-document-25937",
             "source_id": "25937",
             "source_object_id": "43318",
-            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf De Wolfskamer"
           },
           {
             "filename": "Bijlage 3 Toelichting BC wamtebedrijf v030626.pdf",
@@ -1881,7 +1909,7 @@
             "id": "huizen-document-25940",
             "source_id": "25940",
             "source_object_id": "43321",
-            "title": "Bijlage 7 Beantwoording wensen en bedenkingen AKD"
+            "title": "Bijlage 7 beantwoording wensen en bedenkingen AKD"
           },
           {
             "filename": "Bijlage 7 beantwoording wensen en bedenkingen AKD.pdf",
@@ -1977,28 +2005,28 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25966",
-            "source_id": "25966",
-            "source_object_id": "43361",
-            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25967",
+            "source_id": "25967",
+            "source_object_id": "43362",
+            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
           },
           {
-            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25966",
-            "source_id": "25966",
-            "source_object_id": "43361",
-            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25967",
+            "source_id": "25967",
+            "source_object_id": "43362",
+            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
           }
         ],
-        "source_id": "25966"
+        "source_id": "25967"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16754
+    "unique_count": 16755
   },
   "source_object_id": {
-    "duplicate_count": 484,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -2368,7 +2396,7 @@
             "id": "huizen-document-25937",
             "source_id": "25937",
             "source_object_id": "43318",
-            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf"
+            "title": "Bijlage 3 Toelichting businesscase wamtebedrijf De Wolfskamer"
           },
           {
             "filename": "Bijlage 3 Toelichting BC wamtebedrijf v030626.pdf",
@@ -2388,7 +2416,7 @@
             "id": "huizen-document-25940",
             "source_id": "25940",
             "source_object_id": "43321",
-            "title": "Bijlage 7 Beantwoording wensen en bedenkingen AKD"
+            "title": "Bijlage 7 beantwoording wensen en bedenkingen AKD"
           },
           {
             "filename": "Bijlage 7 beantwoording wensen en bedenkingen AKD.pdf",
@@ -2484,24 +2512,24 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25966",
-            "source_id": "25966",
-            "source_object_id": "43361",
-            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25967",
+            "source_id": "25967",
+            "source_object_id": "43362",
+            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
           },
           {
-            "filename": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25966",
-            "source_id": "25966",
-            "source_object_id": "43361",
-            "title": "Overzicht van door het college te beantwoorden brieven t.b.v. raadsvergadering juni 2026"
+            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
+            "id": "huizen-document-25967",
+            "source_id": "25967",
+            "source_object_id": "43362",
+            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
           }
         ],
-        "source_object_id": "43361"
+        "source_object_id": "43362"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16754
+    "unique_count": 16755
   }
 }
