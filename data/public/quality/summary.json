@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-27T06:45:16.212397+00:00",
+  "generated_at": "2026-06-28T07:17:57.698209+00:00",
   "counts": {
-    "documents": 17004,
+    "documents": 17005,
     "document_versions": 25,
     "harvest_runs": 1,
     "meetings": 249,
@@ -11,7 +11,7 @@
   },
   "coverage": {
     "documents_with_relations": 1530,
-    "documents_without_relations": 15474,
+    "documents_without_relations": 15475,
     "coverage_pct": 9.0
   },
   "integrity": {
@@ -85,7 +85,7 @@
       "Klacht (Inkomend)": 3,
       "Mailuitwisseling": 2,
       "Mandaatvoorstel (Intern)": 1,
-      "Mededelingen": 1299,
+      "Mededelingen": 1300,
       "Melding (Inkomend)": 1,
       "Melding (Intern)": 2,
       "Memo": 44,
@@ -162,7 +162,7 @@
     "normalized": {
       "agenda": 424,
       "amendment": 155,
-      "announcement": 1303,
+      "announcement": 1304,
       "answer": 42,
       "attachment": 2388,
       "commitment": 207,
@@ -185,14 +185,14 @@
     "unknown_count": 37
   },
   "document_metadata": {
-    "documents_with_file_url": 17004,
+    "documents_with_file_url": 17005,
     "documents_without_file_url": 0,
-    "documents_with_file_size": 17004,
+    "documents_with_file_size": 17005,
     "documents_without_file_size": 0
   },
   "export_diagnostics": {
-    "documents_seen": 17004,
-    "documents_published": 17004,
+    "documents_seen": 17005,
+    "documents_published": 17005,
     "documents_seen_minus_published": 0,
     "raw_meeting_document_relations_seen": 0,
     "raw_meeting_item_document_relations_seen": 0,
@@ -210,15 +210,15 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-06-27T06:45:15.129602+00:00",
-      "id": "harvest-huizen-20260627T064035Z",
+      "finished_at": "2026-06-28T07:17:56.696456+00:00",
+      "id": "harvest-huizen-20260628T071224Z",
       "max_documents": null,
       "meetings_seen": 250,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-06-27T06:40:35.145870+00:00",
+      "started_at": "2026-06-28T07:12:24.007051+00:00",
       "status": "success"
     }
   },

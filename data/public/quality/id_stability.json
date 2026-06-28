@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 498,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -508,7 +508,7 @@
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 498,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -1505,13 +1505,17 @@
       {
         "count": 2,
         "value": "26270:43824"
+      },
+      {
+        "count": 2,
+        "value": "26271:43825"
       }
     ],
     "missing_count": 0,
     "unique_count": 16755
   },
-  "documents_total": 17004,
-  "generated_at": "2026-06-27T06:45:15.953932+00:00",
+  "documents_total": 17005,
+  "generated_at": "2026-06-28T07:17:57.467397+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1519,7 +1523,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 498,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -2026,7 +2030,7 @@
     "unique_count": 16755
   },
   "source_object_id": {
-    "duplicate_count": 498,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
