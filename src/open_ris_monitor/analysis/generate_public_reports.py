@@ -9,6 +9,7 @@ from open_ris_monitor.analysis.document_identity import (
     analyze_document_identity,
     analyze_document_types,
 )
+from open_ris_monitor.analysis.dashboard import write_dashboard_summary
 from open_ris_monitor.exporters.json_exporter import write_json
 from open_ris_monitor.quality.report import write_quality_report
 
@@ -64,7 +65,9 @@ def generate_reports(public_dir: Path) -> dict[str, Any]:
     write_json(type_path, type_report)
 
     quality_report = write_quality_report(public_dir)
+    dashboard_report = write_dashboard_summary(public_dir)
     summary_path = quality_dir / "summary.json"
+    dashboard_path = quality_dir / "dashboard.json"
     issues_path = quality_dir / "issues.jsonl"
 
     update_latest(
@@ -74,6 +77,7 @@ def generate_reports(public_dir: Path) -> dict[str, Any]:
             "document_types": "quality/document_types.json",
             "quality_summary": "quality/summary.json",
             "quality_issues": "quality/issues.jsonl",
+            "dashboard": "quality/dashboard.json",
         },
     )
 
@@ -83,6 +87,8 @@ def generate_reports(public_dir: Path) -> dict[str, Any]:
         "document_types": str(type_path),
         "quality_summary": str(summary_path),
         "quality_issues": str(issues_path),
+        "dashboard": str(dashboard_path),
+        "dashboard_totals": dashboard_report["totals"],
         "quality_issues_count": len(quality_report["issues"]),
     }
 

@@ -18,7 +18,8 @@
           </span>
         </a>
         <nav class="top-nav" aria-label="Primaire navigatie">
-          <a id="nav-documents" class="top-nav__link top-nav__link--active" href="#documents">Documenten</a>
+          <a id="nav-dashboard" class="top-nav__link top-nav__link--active" href="#dashboard">Dashboard</a>
+          <a id="nav-documents" class="top-nav__link" href="#documents">Documenten</a>
           <a id="nav-meetings" class="top-nav__link" href="#meetings">Vergaderingen</a>
           <a id="nav-organization" class="top-nav__link" href="#organization">Organisatie</a>
         </nav>
@@ -32,7 +33,34 @@
         <div class="main-column">
           <p id="data-quality-notice" class="quality-notice" hidden></p>
 
-          <div id="documents-view" data-view="documents">
+          <div id="dashboard-view" data-view="dashboard">
+            <section class="panel panel--compact" aria-labelledby="dashboard-title">
+              <div class="panel__header panel__header--split">
+                <div>
+                  <p class="eyebrow">Datasetdashboard</p>
+                  <h2 id="dashboard-title">Inzicht in de publieke dataset</h2>
+                  <p class="panel__subtitle">
+                    Compact overzicht van omvang, koppelingen, documenttypen, bestandsgrootte en versheid van de gegenereerde statische exports.
+                  </p>
+                </div>
+                <p id="dashboard-freshness" class="count-pill">-</p>
+              </div>
+              <p id="dashboard-explanation" class="metadata-notice">
+                Dit dashboard telt alleen publieke exportrecords. Het interpreteert geen politieke inhoud, rangschikt geen personen en leest geen PDF-inhoud uit.
+              </p>
+              <div id="dashboard-summary-cards" class="summary-card-grid dashboard-summary-grid"></div>
+            </section>
+
+            <section class="panel" aria-labelledby="dashboard-charts-title">
+              <div class="panel__header">
+                <h2 id="dashboard-charts-title">Grafieken</h2>
+                <p class="panel__subtitle">Lichte HTML/CSS-grafieken, zonder externe charting-bibliotheek.</p>
+              </div>
+              <div id="dashboard-charts" class="dashboard-chart-grid"></div>
+            </section>
+          </div>
+
+          <div id="documents-view" data-view="documents" hidden>
             <section class="panel panel--compact" aria-labelledby="filters-title">
               <div class="panel__header panel__header--split">
                 <div>
@@ -330,6 +358,7 @@
             <a href="../data/public/organization_positions.jsonl">organization_positions.jsonl</a>
             <a href="../data/public/organization_group_memberships.jsonl">organization_group_memberships.jsonl</a>
             <a href="../data/public/quality/document_types.json">documenttypenrapport</a>
+            <a href="../data/public/quality/dashboard.json">dashboard.json</a>
             <a href="../README.md">README</a>
           </nav>
         </details>

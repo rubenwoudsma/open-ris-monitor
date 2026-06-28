@@ -23,6 +23,7 @@ data/public/meeting_item_documents.jsonl
 data/public/latest.json
 data/public/quality/summary.json
 data/public/quality/issues.jsonl
+data/public/quality/dashboard.json
 ```
 
 Raw source files, PDFs and temporary downloads are not part of the public export contract.
@@ -37,7 +38,7 @@ UTF-8
 no surrounding array
 ```
 
-`latest.json` and compact quality summaries are normal JSON files.
+`latest.json`, compact quality summaries and `quality/dashboard.json` are normal JSON files.
 
 ## Schema versioning
 
@@ -126,6 +127,11 @@ data/public/quality/
 ```
 
 They provide dataset health signals, not a separate product. They are intended to help maintainers and the viewer interpret completeness, freshness and relation coverage.
+
+
+### `quality/dashboard.json`
+
+Compact dataset dashboard summary for the static viewer. It contains aggregate counts only, such as document totals, relation coverage, records by year, top document types, document size buckets, meeting and agenda-item totals, dataset freshness and aggregate organisation counts. It must not include political scoring, person ranking, inferred group membership or PDF-derived content.
 
 ## Validation expectations
 

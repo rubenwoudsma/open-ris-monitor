@@ -30,6 +30,15 @@ export async function loadJson<T extends Record<string, unknown>>(path: string):
   return parsed as T;
 }
 
+export async function loadOptionalJson<T extends Record<string, unknown>>(path: string): Promise<T | null> {
+  try {
+    return await loadJson<T>(path);
+  } catch (error) {
+    console.warn(`Optionele JSON-export kon niet worden geladen: ${path}`, error);
+    return null;
+  }
+}
+
 export async function loadJsonl<T extends Record<string, unknown>>(path: string): Promise<T[]> {
   const response = await fetch(path, { cache: "no-store" });
   if (!response.ok) throw new Error(`Kan ${path} niet laden, status ${response.status}`);

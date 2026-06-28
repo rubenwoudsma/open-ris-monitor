@@ -13,6 +13,54 @@ export interface LatestExport extends UnknownRecord {
   };
 }
 
+
+export interface DashboardValueCount extends UnknownRecord {
+  count?: number;
+}
+
+export interface DashboardYearCount extends DashboardValueCount {
+  year?: string;
+}
+
+export interface DashboardDocumentTypeCount extends DashboardValueCount {
+  document_type?: string;
+}
+
+export interface DashboardSizeBucketCount extends DashboardValueCount {
+  bucket?: string;
+}
+
+export interface DashboardExport extends UnknownRecord {
+  schema_version?: number;
+  municipality_id?: string;
+  generated_at?: string;
+  dataset_generated_at?: string;
+  profile?: string;
+  totals?: Record<string, number>;
+  coverage?: {
+    documents_with_any_meeting_context?: number;
+    documents_with_any_meeting_context_ratio?: number;
+    documents_without_meeting_context?: number;
+  };
+  freshness?: {
+    generated_at?: string;
+    age_days?: number | null;
+    status?: string;
+  };
+  document_file_size?: {
+    known_count?: number;
+    unknown_count?: number;
+    total_bytes?: number;
+    average_bytes?: number;
+    largest_bytes?: number;
+  };
+  documents_by_year?: DashboardYearCount[];
+  documents_by_type?: DashboardDocumentTypeCount[];
+  documents_by_size_bucket?: DashboardSizeBucketCount[];
+  meetings_by_year?: DashboardYearCount[];
+  meeting_items_by_year?: DashboardYearCount[];
+}
+
 export interface DocumentRecord extends UnknownRecord {
   id?: string;
   schema_version?: string | number;
@@ -152,6 +200,7 @@ export interface RelationRecord extends UnknownRecord {
 
 export interface PublicDataSet {
   latest: LatestExport;
+  dashboard: DashboardExport | null;
   documents: DocumentRecord[];
   documentVersions: DocumentVersionRecord[];
   meetings: MeetingRecord[];

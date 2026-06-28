@@ -56,6 +56,7 @@ The Huizen reference deployment currently supports:
 - document-to-meeting and document-to-agenda-item relation exports;
 - dataset freshness metadata in `latest.json`;
 - basic quality reports under `data/public/quality/`;
+- a compact dataset dashboard export and static dashboard page;
 - public organisation exports for groups, persons, roles, positions and group memberships;
 - a static viewer for documents, meetings and organisation context;
 - client-side search and filtering;
@@ -63,7 +64,11 @@ The Huizen reference deployment currently supports:
 
 ## Viewer features
 
-The static viewer provides three main entry points:
+The static viewer provides four main entry points:
+
+### Dashboard
+
+The dashboard view gives public insight into the generated dataset itself. It shows totals, relation coverage, document distribution by year and type, meeting and agenda-item counts, document size metadata and freshness. It deliberately avoids political interpretation, ranking people or parties, and PDF content analysis.
 
 ### Documents
 
@@ -139,6 +144,7 @@ data/public/organization_group_memberships.jsonl
 data/public/latest.json
 data/public/quality/summary.json
 data/public/quality/issues.jsonl
+data/public/quality/dashboard.json
 ```
 
 `latest.json` is the operational summary for the current public dataset. It records the municipality, generation timestamp, run profile, output files, relation status, organisation status and dataset totals.
