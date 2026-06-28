@@ -198,16 +198,94 @@ def _relation_document_identifiers(relation: dict[str, Any]) -> set[str]:
     return {identifier for identifier in identifiers if identifier}
 
 
+def _document_identifier_groups(document: dict[str, Any]) -> dict[str, set[str]]:
+    raw = document.get("raw")
+    raw_values = raw if isinstance(raw, dict) else {}
+    return {
+        "id": {_pick(document.get("id"))},
+        "source_id": {_pick(document.get("source_id")), _pick(raw_values.get("id"))},
+        "object_id": {
+            _pick(document.get("source_object_id")),
+            _pick(raw_values.get("objectId")),
+            _pick(raw_values.get("object_id")),
+        },
+        "url": {
+            _pick(document.get("download_url")),
+            _pick(document.get("source_url")),
+            _pick(raw_values.get("downloadUrl")),
+            _pick(raw_values.get("download_url")),
+        },
+    }
+
+
+def _relation_document_identifier_groups(relation: dict[str, Any]) -> dict[str, set[str]]:
+    document = relation.get("document")
+    document_values = document if isinstance(document, dict) else {}
+    return {
+        "id": {_pick(relation.get("document_id"))},
+        "source_id": {_pick(relation.get("document_source_id")), _pick(document_values.get("id"))},
+        "object_id": {
+            _pick(relation.get("document_object_id")),
+            _pick(document_values.get("objectId")),
+            _pick(document_values.get("object_id")),
+        },
+        "url": {
+            _pick(relation.get("document_url")),
+            _pick(relation.get("download_url")),
+            _pick(relation.get("source_url")),
+            _pick(document_values.get("downloadUrl")),
+            _pick(document_values.get("download_url")),
+        },
+    }
+
+
+def _clean_identifier_groups(groups: dict[str, set[str]]) -> dict[str, set[str]]:
+    return {key: {value for value in values if value} for key, values in groups.items()}
+
+
+def _has_typed_identifier_overlap(document: dict[str, Any], relation_groups: dict[str, set[str]]) -> bool:
+    document_groups = _clean_identifier_groups(_document_identifier_groups(document))
+    return any(document_groups.get(key, set()) & relation_groups.get(key, set()) for key in relation_groups)
+
+
 def _linked_document_count(
     documents: list[dict[str, Any]],
     meeting_documents: list[dict[str, Any]],
     meeting_item_documents: list[dict[str, Any]],
 ) -> int:
-    relation_identifiers: set[str] = set()
+    relation_groups = {"id": set(), "source_id": set(), "object_id": set(), "url": set()}
     for relation in [*meeting_documents, *meeting_item_documents]:
-        relation_identifiers.update(_relation_document_identifiers(relation))
+        for key, values in _clean_identifier_groups(_relation_document_identifier_groups(relation)).items():
+            relation_groups.setdefault(key, set()).update(values)
 
-    return sum(1 for document in documents if _document_identifiers(document) & relation_identifiers)
+    return sum(1 for document in documents if _has_typed_identifier_overlap(document, relation_groups))
+
+
+def _count_meeting_items_by_year(
+    meeting_items: list[dict[str, Any]],
+    meetings: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    meeting_year_by_id: dict[str, str] = {}
+    for meeting in meetings:
+        year = _year(_pick(meeting.get("date"), meeting.get("start_date"), meeting.get("publication_date")))
+        if not year:
+            continue
+        for identifier in (_pick(meeting.get("id")), _pick(meeting.get("source_id"))):
+            if identifier:
+                meeting_year_by_id[identifier] = year
+
+    counter: Counter[str] = Counter()
+    for item in meeting_items:
+        year = None
+        for key in ("meeting_date", "date", "created_at"):
+            year = _year(item.get(key))
+            if year:
+                break
+        if not year:
+            year = meeting_year_by_id.get(_pick(item.get("meeting_id"))) or meeting_year_by_id.get(_pick(item.get("meeting_source_id")))
+        if year:
+            counter[year] += 1
+    return [{"year": year, "count": counter[year]} for year in sorted(counter)]
 
 
 def _freshness(generated_at: str, now: datetime) -> dict[str, Any]:
@@ -283,7 +361,7 @@ def build_dashboard_summary(public_dir: Path, now: datetime | None = None) -> di
         "documents_by_type": _documents_by_type(documents),
         "documents_by_size_bucket": _document_size_buckets(documents),
         "meetings_by_year": _count_by_year(meetings, "date", "start_date", "publication_date"),
-        "meeting_items_by_year": _count_by_year(meeting_items, "meeting_date", "date", "created_at"),
+        "meeting_items_by_year": _count_meeting_items_by_year(meeting_items, meetings),
     }
 
 

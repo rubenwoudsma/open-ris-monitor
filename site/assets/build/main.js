@@ -19,7 +19,7 @@ const state = {
     organizationStatusFilter: "active",
     organizationGroupFilter: "",
     organizationGroupTypeFilter: "fractie",
-    activeView: "dashboard",
+    activeView: "documents",
 };
 const derivedCaches = {
     documentRelationLabelsByKey: new Map(),
@@ -1178,6 +1178,62 @@ function dashboardSizeBucketData(source) {
     }
     return [...counts.entries()].map(([bucket, count]) => ({ bucket, count }));
 }
+function documentSizeSummaryFallback() {
+    const documents = state.data?.documents ?? [];
+    const sizes = documents
+        .map((record) => Number(getDocumentSize(record)))
+        .filter((value) => Number.isFinite(value) && value >= 0);
+    const total = sizes.reduce((sum, value) => sum + value, 0);
+    return {
+        knownCount: sizes.length,
+        unknownCount: Math.max(documents.length - sizes.length, 0),
+        averageBytes: sizes.length > 0 ? Math.round(total / sizes.length) : 0,
+    };
+}
+function dashboardDocumentSizeSummary() {
+    const fallback = documentSizeSummaryFallback();
+    const summary = state.data?.dashboard?.document_file_size;
+    const knownCount = Number(summary?.known_count);
+    const unknownCount = Number(summary?.unknown_count);
+    const averageBytes = Number(summary?.average_bytes);
+    return {
+        knownCount: Number.isFinite(knownCount) && (knownCount > 0 || fallback.knownCount === 0) ? knownCount : fallback.knownCount,
+        unknownCount: Number.isFinite(unknownCount) && (knownCount > 0 || fallback.knownCount === 0) ? unknownCount : fallback.unknownCount,
+        averageBytes: Number.isFinite(averageBytes) && averageBytes > 0 ? averageBytes : fallback.averageBytes,
+    };
+}
+function relationRecordCount() {
+    return (state.data?.meetingDocumentRelations.length ?? 0) + (state.data?.meetingItemDocumentRelations.length ?? 0);
+}
+function meetingYearLookup() {
+    const lookup = new Map();
+    for (const meeting of state.data?.meetings ?? []) {
+        const dateValue = pick(meeting.date, meeting.start_date, meeting.publication_date);
+        const year = dateValue.length >= 4 && /^\d{4}/.test(dateValue) ? dateValue.slice(0, 4) : "";
+        if (!year)
+            continue;
+        for (const identifier of [pick(meeting.id), pick(meeting.source_id)]) {
+            if (identifier)
+                lookup.set(identifier, year);
+        }
+    }
+    return lookup;
+}
+function dashboardMeetingItemsByYear(source) {
+    if (source && source.length > 0)
+        return source;
+    const lookup = meetingYearLookup();
+    const counts = new Map();
+    for (const item of state.data?.agendaItems ?? []) {
+        const direct = pick(item.meeting_date, item.date, item.created_at);
+        let year = direct.length >= 4 && /^\d{4}/.test(direct) ? direct.slice(0, 4) : "";
+        if (!year)
+            year = lookup.get(pick(item.meeting_id)) ?? lookup.get(pick(item.meeting_source_id)) ?? "";
+        if (year)
+            counts.set(year, (counts.get(year) ?? 0) + 1);
+    }
+    return [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([year, count]) => ({ year, count }));
+}
 function clearElement(element) {
     element.replaceChildren();
 }
@@ -1236,6 +1292,59 @@ function renderBarChart(title, description, items) {
     section.append(heading, descriptionElement, list);
     return section;
 }
+function renderLineChart(title, description, items) {
+    const section = document.createElement("section");
+    section.className = "dashboard-chart dashboard-chart--line";
+    const heading = document.createElement("h3");
+    heading.textContent = title;
+    const descriptionElement = document.createElement("p");
+    descriptionElement.className = "muted";
+    descriptionElement.textContent = description;
+    const maxValue = Math.max(...items.map((item) => item.value), 0);
+    if (items.length === 0 || maxValue === 0) {
+        section.append(heading, descriptionElement, renderEmptyRelation("Geen dashboarddata beschikbaar voor deze grafiek."));
+        return section;
+    }
+    const width = 640;
+    const height = 220;
+    const padding = 28;
+    const plotWidth = width - padding * 2;
+    const plotHeight = height - padding * 2;
+    const points = items.map((item, index) => {
+        const x = items.length === 1 ? width / 2 : padding + (index / (items.length - 1)) * plotWidth;
+        const y = height - padding - (item.value / maxValue) * plotHeight;
+        return { ...item, x, y };
+    });
+    const pointString = points.map((point) => `${point.x},${point.y}`).join(" ");
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", `${title}: ${items.map((item) => `${item.label} ${formatNumber(item.value)}`).join(", ")}`);
+    const axis = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    axis.setAttribute("points", `${padding},${padding} ${padding},${height - padding} ${width - padding},${height - padding}`);
+    axis.setAttribute("class", "dashboard-line-axis");
+    svg.appendChild(axis);
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+    line.setAttribute("points", pointString);
+    line.setAttribute("class", "dashboard-line-path");
+    svg.appendChild(line);
+    for (const point of points) {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", String(point.x));
+        circle.setAttribute("cy", String(point.y));
+        circle.setAttribute("r", "4");
+        circle.setAttribute("class", "dashboard-line-point");
+        const titleElement = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        titleElement.textContent = `${point.label}: ${formatNumber(point.value)}`;
+        circle.appendChild(titleElement);
+        svg.appendChild(circle);
+    }
+    const summary = document.createElement("p");
+    summary.className = "muted dashboard-chart-summary";
+    summary.textContent = items.map((item) => `${item.label}: ${formatNumber(item.value)}`).join(" | ");
+    section.append(heading, descriptionElement, svg, summary);
+    return section;
+}
 function renderDashboard() {
     const data = state.data;
     if (!data)
@@ -1251,18 +1360,20 @@ function renderDashboard() {
     elements.dashboardExplanation.textContent = "Het dashboard is gebaseerd op gegenereerde statische JSON en JSONL exports. Het telt publieke metadata, relaties en organisatie-aantallen, zonder PDF-inhoud, persoonsranking of politieke analyse.";
     clearElement(elements.dashboardSummaryCards);
     appendDashboardCard("Documenten", formatNumber(documents), "Alle gepubliceerde documentmetadata in documents.jsonl.");
-    appendDashboardCard("Gekoppeld", formatRatioPercent(coverageRatio), `${formatNumber(linkedDocuments)} documenten hebben vergadering- of agendacontext.`);
+    appendDashboardCard("Gekoppelde documenten", formatNumber(linkedDocuments), `${formatRatioPercent(coverageRatio)} van alle documenten heeft een match met de huidige relatie-export.`);
     appendDashboardCard("Vergaderingen", formatNumber(dashboardTotal("meetings", data.meetings.length)), "Publieke vergaderingen in de huidige export.");
     appendDashboardCard("Agendapunten", formatNumber(dashboardTotal("meeting_items", data.agendaItems.length)), "Agenda-items die aan vergaderingen zijn gekoppeld.");
-    appendDashboardCard("Documentgrootte bekend", formatNumber(dashboard?.document_file_size?.known_count ?? 0), `Gemiddeld ${formatBytes(dashboard?.document_file_size?.average_bytes)} per bekend bestand.`);
+    const sizeSummary = dashboardDocumentSizeSummary();
+    appendDashboardCard("Documentgrootte bekend", formatNumber(sizeSummary.knownCount), `Gemiddeld ${formatBytes(sizeSummary.averageBytes)} per bekend bestand, ${formatNumber(sizeSummary.unknownCount)} onbekend.`);
+    appendDashboardCard("Relatierecords", formatNumber(relationRecordCount()), "Aantal document-koppelingen vanuit vergaderingen en agendapunten.");
     appendDashboardCard("Organisatie", formatNumber(totals.organization_positions ?? data.organizationPositions.length), "Alleen aggregate aantallen voor personen, rollen, groepen en posities.");
     const documentsByYear = dashboardYearData(dashboard?.documents_by_year, data.documents, "publication_datetime", "date_published", "publication_date", "document_date", "date", "retrieved_at");
     const meetingsByYear = dashboardYearData(dashboard?.meetings_by_year, data.meetings, "date", "start_date", "publication_date");
-    const itemsByYear = dashboardYearData(dashboard?.meeting_items_by_year, data.agendaItems, "meeting_date", "date", "created_at");
+    const itemsByYear = dashboardMeetingItemsByYear(dashboard?.meeting_items_by_year);
     const documentsByType = dashboardDocumentTypeData(dashboard?.documents_by_type);
     const documentsBySize = dashboardSizeBucketData(dashboard?.documents_by_size_bucket);
     clearElement(elements.dashboardCharts);
-    elements.dashboardCharts.append(renderBarChart("Documenten per jaar", "Verdeling van documentmetadata over publicatie- of documentjaar.", documentsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))), renderBarChart("Top documenttypen", "Meest voorkomende typen in de publieke documentexport.", documentsByType.map((item) => ({ label: text(item.document_type), value: Number(item.count) || 0 }))), renderBarChart("Vergaderingen per jaar", "Jaarverdeling van de vergaderexport.", meetingsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))), renderBarChart("Agendapunten per jaar", "Jaarverdeling van de agenda-item export.", itemsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))), renderBarChart("Documentgrootte", "Verdeling op basis van bekende file-size metadata, onbekend blijft zichtbaar.", documentsBySize.map((item) => ({ label: text(item.bucket), value: Number(item.count) || 0 }))));
+    elements.dashboardCharts.append(renderBarChart("Documenten per jaar", "Verdeling van documentmetadata over publicatie- of documentjaar.", documentsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))), renderLineChart("Trend documenten per jaar", "Zelfde data als de staafgrafiek, maar als eenvoudige trendlijn.", documentsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))), renderBarChart("Top documenttypen", "Meest voorkomende typen in de publieke documentexport.", documentsByType.map((item) => ({ label: text(item.document_type), value: Number(item.count) || 0 }))), renderBarChart("Vergaderingen per jaar", "Jaarverdeling van de vergaderexport.", meetingsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))), renderBarChart("Agendapunten per jaar", "Jaarverdeling van de agenda-item export.", itemsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))), renderBarChart("Documentgrootte", "Verdeling op basis van bekende file-size metadata, onbekend blijft zichtbaar.", documentsBySize.map((item) => ({ label: text(item.bucket), value: Number(item.count) || 0 }))));
 }
 function renderSummaryCard(label, value, description) {
     const card = document.createElement("article");
@@ -1478,13 +1589,13 @@ function updateHashForView(view) {
     updateHash(view === "meetings" ? "#meetings" : view === "organization" ? "#organization" : view === "documents" ? "#documents" : "#dashboard");
 }
 function viewFromHash() {
-    if (window.location.hash === "#documents")
-        return "documents";
+    if (window.location.hash === "#dashboard")
+        return "dashboard";
     if (window.location.hash === "#meetings")
         return "meetings";
     if (window.location.hash === "#organization")
         return "organization";
-    return "dashboard";
+    return "documents";
 }
 function applyHashState(scrollDocumentDetail = false) {
     const documentId = documentIdFromHash();

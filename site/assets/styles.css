@@ -274,3 +274,35 @@ tbody tr.is-selected { background: var(--accent-muted); }
   border-radius: inherit;
   background: var(--accent);
 }
+
+.dashboard-chart--line svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 0.8rem;
+}
+
+.dashboard-line-axis {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.5;
+}
+
+.dashboard-line-path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dashboard-line-point {
+  fill: var(--surface);
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+
+.dashboard-chart-summary {
+  margin-top: 0.5rem;
+  overflow-wrap: anywhere;
+}
