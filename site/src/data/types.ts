@@ -103,6 +103,9 @@ export interface MeetingRecord extends UnknownRecord {
   id?: string;
   schema_version?: string | number;
   date?: string;
+  start_date?: string;
+  publication_date?: string;
+  source_id?: string | number;
   start_time?: string;
   title?: string;
   description?: string;
@@ -117,6 +120,10 @@ export interface AgendaItemRecord extends UnknownRecord {
   schema_version?: string | number;
   meeting_id?: string;
   meetingId?: string;
+  meeting_source_id?: string | number;
+  meeting_date?: string;
+  date?: string;
+  created_at?: string;
   session_id?: string;
   sessionId?: string;
   number?: string | number;
@@ -186,6 +193,10 @@ export interface RelationRecord extends UnknownRecord {
   schema_version?: string | number;
   meeting_id?: string;
   meetingId?: string;
+  meeting_source_id?: string | number;
+  meeting_date?: string;
+  date?: string;
+  created_at?: string;
   meeting_item_id?: string;
   meetingItemId?: string;
   item_id?: string;

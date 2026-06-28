@@ -45,7 +45,7 @@ def test_dashboard_summary_counts_years_types_coverage_and_freshness(tmp_path: P
     )
     _write_jsonl(public_dir / "document_versions.jsonl", [{"id": "version-1"}])
     _write_jsonl(public_dir / "meetings.jsonl", [{"id": "meeting-1", "date": "2026-01-15"}])
-    _write_jsonl(public_dir / "meeting_items.jsonl", [{"id": "item-1", "meeting_id": "meeting-1", "meeting_date": "2026-01-15"}])
+    _write_jsonl(public_dir / "meeting_items.jsonl", [{"id": "item-1", "meeting_id": "meeting-1"}])
     _write_jsonl(public_dir / "meeting_documents.jsonl", [{"id": "rel-1", "meeting_id": "meeting-1", "document_id": "doc-1"}])
     _write_jsonl(public_dir / "meeting_item_documents.jsonl", [{"id": "rel-2", "meeting_item_id": "item-1", "document_id": "doc-2"}])
     _write_jsonl(public_dir / "organization_groups.jsonl", [{"id": "group-1"}])
@@ -71,6 +71,7 @@ def test_dashboard_summary_counts_years_types_coverage_and_freshness(tmp_path: P
         {"year": "2026", "count": 2},
     ]
     assert dashboard["documents_by_type"][0] == {"document_type": "Raadsvoorstel", "count": 2}
+    assert dashboard["meeting_items_by_year"] == [{"year": "2026", "count": 1}]
     assert dashboard["document_file_size"]["known_count"] == 2
     assert dashboard["document_file_size"]["unknown_count"] == 1
     assert dashboard["totals"]["organization_positions"] == 1
