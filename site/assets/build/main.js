@@ -19,7 +19,7 @@ const state = {
     organizationStatusFilter: "active",
     organizationGroupFilter: "",
     organizationGroupTypeFilter: "fractie",
-    activeView: "documents",
+    activeView: "dashboard",
 };
 const derivedCaches = {
     documentRelationLabelsByKey: new Map(),
@@ -56,9 +56,11 @@ const elements = {
     linkedDocumentsCount: byId("linked-documents-count"),
     organizationPositionsCount: byId("organization-positions-count"),
     dataQualityNotice: byId("data-quality-notice"),
+    dashboardView: byId("dashboard-view"),
     documentsView: byId("documents-view"),
     meetingsView: byId("meetings-view"),
     organizationView: byId("organization-view"),
+    navDashboard: byId("nav-dashboard"),
     navDocuments: byId("nav-documents"),
     navMeetings: byId("nav-meetings"),
     navOrganization: byId("nav-organization"),
@@ -104,6 +106,10 @@ const elements = {
     organizationGroupFilter: byId("organization-group-filter"),
     organizationGroupTypeFilter: byId("organization-group-type-filter"),
     organizationPositionsBody: byId("organization-positions-body"),
+    dashboardSummaryCards: byId("dashboard-summary-cards"),
+    dashboardCharts: byId("dashboard-charts"),
+    dashboardFreshness: byId("dashboard-freshness"),
+    dashboardExplanation: byId("dashboard-explanation"),
 };
 function unavailable(reason = "Niet beschikbaar in export") {
     return reason;
@@ -1080,6 +1086,184 @@ function groupIdsForPersonKeys(personId, personSourceId) {
 function groupNamesForPerson(position) {
     return groupNamesForPersonKeys(pick(position.person_id), pick(position.person_source_id));
 }
+function formatNumber(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number))
+        return "-";
+    return new Intl.NumberFormat("nl-NL").format(number);
+}
+function formatRatioPercent(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number))
+        return "-";
+    const ratio = number <= 1 ? number : number / 100;
+    return new Intl.NumberFormat("nl-NL", { style: "percent", maximumFractionDigits: 1 }).format(ratio);
+}
+function dashboardTotal(key, fallback = 0) {
+    const value = state.data?.dashboard?.totals?.[key];
+    return Number.isFinite(Number(value)) ? Number(value) : fallback;
+}
+function dashboardLinkedDocuments() {
+    const documents = state.data?.documents ?? [];
+    const fallback = documents.filter((record) => relationLabelsForDocument(record).length > 0).length;
+    return dashboardTotal("linked_documents", fallback);
+}
+function dashboardCoverageRatio() {
+    const value = state.data?.dashboard?.coverage?.documents_with_any_meeting_context_ratio;
+    if (Number.isFinite(Number(value)))
+        return Number(value);
+    const documents = state.data?.documents.length ?? 0;
+    return documents ? dashboardLinkedDocuments() / documents : 0;
+}
+function statusLabelForFreshness(status) {
+    switch (status) {
+        case "fresh": return "Vers";
+        case "aging": return "Veroudert";
+        case "stale": return "Verouderd";
+        default: return "Onbekend";
+    }
+}
+function dashboardYearData(source, records, ...dateKeys) {
+    if (source && source.length > 0)
+        return source;
+    const counts = new Map();
+    for (const record of records) {
+        let year = "";
+        for (const key of dateKeys) {
+            const value = pick(record[key]);
+            if (value.length >= 4 && /^\d{4}/.test(value)) {
+                year = value.slice(0, 4);
+                break;
+            }
+        }
+        if (year)
+            counts.set(year, (counts.get(year) ?? 0) + 1);
+    }
+    return [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([year, count]) => ({ year, count }));
+}
+function dashboardDocumentTypeData(source) {
+    if (source && source.length > 0)
+        return source;
+    const counts = new Map();
+    for (const documentRecord of state.data?.documents ?? []) {
+        const label = pick(documentRecord.normalized_document_type_label, documentRecord.document_type, documentRecord.normalized_document_type, "Onbekend");
+        counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "nl"))
+        .slice(0, 12)
+        .map(([document_type, count]) => ({ document_type, count }));
+}
+function dashboardSizeBucketData(source) {
+    if (source && source.length > 0)
+        return source;
+    const counts = new Map([["Onbekend", 0], ["0-100 KB", 0], ["100 KB-1 MB", 0], ["1-5 MB", 0], ["> 5 MB", 0]]);
+    for (const documentRecord of state.data?.documents ?? []) {
+        const size = getDocumentSize(documentRecord);
+        if (!Number.isFinite(Number(size))) {
+            counts.set("Onbekend", (counts.get("Onbekend") ?? 0) + 1);
+        }
+        else if (Number(size) < 100 * 1024) {
+            counts.set("0-100 KB", (counts.get("0-100 KB") ?? 0) + 1);
+        }
+        else if (Number(size) < 1024 * 1024) {
+            counts.set("100 KB-1 MB", (counts.get("100 KB-1 MB") ?? 0) + 1);
+        }
+        else if (Number(size) < 5 * 1024 * 1024) {
+            counts.set("1-5 MB", (counts.get("1-5 MB") ?? 0) + 1);
+        }
+        else {
+            counts.set("> 5 MB", (counts.get("> 5 MB") ?? 0) + 1);
+        }
+    }
+    return [...counts.entries()].map(([bucket, count]) => ({ bucket, count }));
+}
+function clearElement(element) {
+    element.replaceChildren();
+}
+function appendDashboardCard(label, value, description) {
+    const card = document.createElement("article");
+    card.className = "summary-card dashboard-card";
+    const heading = document.createElement("h3");
+    heading.textContent = label;
+    const number = document.createElement("p");
+    number.className = "summary-card__number";
+    number.textContent = value;
+    const textElement = document.createElement("p");
+    textElement.className = "muted";
+    textElement.textContent = description;
+    card.append(heading, number, textElement);
+    elements.dashboardSummaryCards.appendChild(card);
+}
+function renderBarChart(title, description, items) {
+    const section = document.createElement("section");
+    section.className = "dashboard-chart";
+    const heading = document.createElement("h3");
+    heading.textContent = title;
+    const descriptionElement = document.createElement("p");
+    descriptionElement.className = "muted";
+    descriptionElement.textContent = description;
+    const list = document.createElement("div");
+    list.className = "dashboard-bars";
+    list.setAttribute("role", "list");
+    list.setAttribute("aria-label", title);
+    const maxValue = Math.max(...items.map((item) => item.value), 0);
+    if (items.length === 0 || maxValue === 0) {
+        list.appendChild(renderEmptyRelation("Geen dashboarddata beschikbaar voor deze grafiek."));
+    }
+    else {
+        for (const item of items) {
+            const row = document.createElement("div");
+            row.className = "dashboard-bar-row";
+            row.setAttribute("role", "listitem");
+            const meta = document.createElement("div");
+            meta.className = "dashboard-bar-meta";
+            const label = document.createElement("span");
+            label.textContent = item.label;
+            const value = document.createElement("strong");
+            value.textContent = formatNumber(item.value);
+            meta.append(label, value);
+            const track = document.createElement("div");
+            track.className = "dashboard-bar-track";
+            const fill = document.createElement("span");
+            fill.className = "dashboard-bar-fill";
+            fill.style.width = `${Math.max((item.value / maxValue) * 100, 2)}%`;
+            track.appendChild(fill);
+            row.append(meta, track);
+            list.appendChild(row);
+        }
+    }
+    section.append(heading, descriptionElement, list);
+    return section;
+}
+function renderDashboard() {
+    const data = state.data;
+    if (!data)
+        return;
+    const dashboard = data.dashboard;
+    const totals = dashboard?.totals ?? {};
+    const documents = dashboardTotal("documents", data.documents.length);
+    const linkedDocuments = dashboardLinkedDocuments();
+    const coverageRatio = dashboardCoverageRatio();
+    const freshnessStatus = dashboard?.freshness?.status ?? "unknown";
+    const ageDays = dashboard?.freshness?.age_days;
+    elements.dashboardFreshness.textContent = `${statusLabelForFreshness(freshnessStatus)}${typeof ageDays === "number" ? `, ${ageDays} dagen oud` : ""}`;
+    elements.dashboardExplanation.textContent = "Het dashboard is gebaseerd op gegenereerde statische JSON en JSONL exports. Het telt publieke metadata, relaties en organisatie-aantallen, zonder PDF-inhoud, persoonsranking of politieke analyse.";
+    clearElement(elements.dashboardSummaryCards);
+    appendDashboardCard("Documenten", formatNumber(documents), "Alle gepubliceerde documentmetadata in documents.jsonl.");
+    appendDashboardCard("Gekoppeld", formatRatioPercent(coverageRatio), `${formatNumber(linkedDocuments)} documenten hebben vergadering- of agendacontext.`);
+    appendDashboardCard("Vergaderingen", formatNumber(dashboardTotal("meetings", data.meetings.length)), "Publieke vergaderingen in de huidige export.");
+    appendDashboardCard("Agendapunten", formatNumber(dashboardTotal("meeting_items", data.agendaItems.length)), "Agenda-items die aan vergaderingen zijn gekoppeld.");
+    appendDashboardCard("Documentgrootte bekend", formatNumber(dashboard?.document_file_size?.known_count ?? 0), `Gemiddeld ${formatBytes(dashboard?.document_file_size?.average_bytes)} per bekend bestand.`);
+    appendDashboardCard("Organisatie", formatNumber(totals.organization_positions ?? data.organizationPositions.length), "Alleen aggregate aantallen voor personen, rollen, groepen en posities.");
+    const documentsByYear = dashboardYearData(dashboard?.documents_by_year, data.documents, "publication_datetime", "date_published", "publication_date", "document_date", "date", "retrieved_at");
+    const meetingsByYear = dashboardYearData(dashboard?.meetings_by_year, data.meetings, "date", "start_date", "publication_date");
+    const itemsByYear = dashboardYearData(dashboard?.meeting_items_by_year, data.agendaItems, "meeting_date", "date", "created_at");
+    const documentsByType = dashboardDocumentTypeData(dashboard?.documents_by_type);
+    const documentsBySize = dashboardSizeBucketData(dashboard?.documents_by_size_bucket);
+    clearElement(elements.dashboardCharts);
+    elements.dashboardCharts.append(renderBarChart("Documenten per jaar", "Verdeling van documentmetadata over publicatie- of documentjaar.", documentsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))), renderBarChart("Top documenttypen", "Meest voorkomende typen in de publieke documentexport.", documentsByType.map((item) => ({ label: text(item.document_type), value: Number(item.count) || 0 }))), renderBarChart("Vergaderingen per jaar", "Jaarverdeling van de vergaderexport.", meetingsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))), renderBarChart("Agendapunten per jaar", "Jaarverdeling van de agenda-item export.", itemsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))), renderBarChart("Documentgrootte", "Verdeling op basis van bekende file-size metadata, onbekend blijft zichtbaar.", documentsBySize.map((item) => ({ label: text(item.bucket), value: Number(item.count) || 0 }))));
+}
 function renderSummaryCard(label, value, description) {
     const card = document.createElement("article");
     card.className = "summary-card";
@@ -1270,32 +1454,37 @@ function renderOrganizationPositions(positions) {
 }
 function setActiveView(view, updateHash = false, scrollToView = false) {
     state.activeView = view;
+    elements.dashboardView.hidden = view !== "dashboard";
     elements.documentsView.hidden = view !== "documents";
     elements.meetingsView.hidden = view !== "meetings";
     elements.organizationView.hidden = view !== "organization";
     document.body.dataset.view = view;
+    elements.navDashboard.classList.toggle("top-nav__link--active", view === "dashboard");
     elements.navDocuments.classList.toggle("top-nav__link--active", view === "documents");
     elements.navMeetings.classList.toggle("top-nav__link--active", view === "meetings");
     elements.navOrganization.classList.toggle("top-nav__link--active", view === "organization");
+    elements.navDashboard.setAttribute("aria-current", view === "dashboard" ? "page" : "false");
     elements.navDocuments.setAttribute("aria-current", view === "documents" ? "page" : "false");
     elements.navMeetings.setAttribute("aria-current", view === "meetings" ? "page" : "false");
     elements.navOrganization.setAttribute("aria-current", view === "organization" ? "page" : "false");
     if (updateHash)
         updateHashForView(view);
     if (scrollToView) {
-        const target = view === "meetings" ? elements.meetingsView : view === "organization" ? elements.organizationView : elements.documentsView;
+        const target = view === "meetings" ? elements.meetingsView : view === "organization" ? elements.organizationView : view === "dashboard" ? elements.dashboardView : elements.documentsView;
         target.scrollIntoView({ block: "start", behavior: "smooth" });
     }
 }
 function updateHashForView(view) {
-    updateHash(view === "meetings" ? "#meetings" : view === "organization" ? "#organization" : "#documents");
+    updateHash(view === "meetings" ? "#meetings" : view === "organization" ? "#organization" : view === "documents" ? "#documents" : "#dashboard");
 }
 function viewFromHash() {
+    if (window.location.hash === "#documents")
+        return "documents";
     if (window.location.hash === "#meetings")
         return "meetings";
     if (window.location.hash === "#organization")
         return "organization";
-    return "documents";
+    return "dashboard";
 }
 function applyHashState(scrollDocumentDetail = false) {
     const documentId = documentIdFromHash();
@@ -1311,6 +1500,11 @@ function applyHashState(scrollDocumentDetail = false) {
     setActiveView(viewFromHash(), false, false);
 }
 function attachEvents() {
+    elements.navDashboard.addEventListener("click", (event) => {
+        event.preventDefault();
+        setActiveView("dashboard", true, false);
+        renderDashboard();
+    });
     elements.navDocuments.addEventListener("click", (event) => {
         event.preventDefault();
         setActiveView("documents", true, false);
@@ -1384,6 +1578,7 @@ async function init() {
     clearDerivedCaches();
     populateTypeFilter();
     renderSummary();
+    renderDashboard();
     applyFilters();
     renderMeetings();
     renderOrganization();

@@ -46,6 +46,13 @@ Useful but optional. It must remain a viewer convenience only:
 - do not add OCR or text extraction;
 - preserve direct open/download links.
 
+## MVP 1.2
+
+- #117 Add a focused dataset dashboard for civic transparency.
+- Publish `data/public/quality/dashboard.json` as a compact aggregate summary.
+- Show static charts for documents by year, document type, meeting counts, agenda-item counts and file-size metadata.
+- Keep the dashboard descriptive only, without political analysis or person ranking.
+
 ## Post-MVP candidates
 
 ### #56 Export Partitioning Strategy

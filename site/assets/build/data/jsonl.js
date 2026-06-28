@@ -32,6 +32,15 @@ export async function loadJson(path) {
         throw new Error(`${path} bevat geen JSON-object.`);
     return parsed;
 }
+export async function loadOptionalJson(path) {
+    try {
+        return await loadJson(path);
+    }
+    catch (error) {
+        console.warn(`Optionele JSON-export kon niet worden geladen: ${path}`, error);
+        return null;
+    }
+}
 export async function loadJsonl(path) {
     const response = await fetch(path, { cache: "no-store" });
     if (!response.ok)

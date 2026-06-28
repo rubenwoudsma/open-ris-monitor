@@ -1,5 +1,6 @@
 import type {
   AgendaItemRecord,
+  DashboardExport,
   DocumentRecord,
   DocumentVersionRecord,
   LatestExport,
@@ -12,13 +13,14 @@ import type {
   PublicDataSet,
   RelationRecord,
 } from "./types.js";
-import { loadJson, loadJsonl, loadOptionalJsonl } from "./jsonl.js";
+import { loadJson, loadJsonl, loadOptionalJson, loadOptionalJsonl } from "./jsonl.js";
 
 export const DATA_BASE = "../data/public";
 
 export async function loadPublicData(basePath = DATA_BASE): Promise<PublicDataSet> {
   const [
     latest,
+    dashboard,
     documents,
     documentVersions,
     meetings,
@@ -32,6 +34,7 @@ export async function loadPublicData(basePath = DATA_BASE): Promise<PublicDataSe
     organizationGroupMemberships,
   ] = await Promise.all([
     loadJson<LatestExport>(`${basePath}/latest.json`),
+    loadOptionalJson<DashboardExport>(`${basePath}/quality/dashboard.json`),
     loadJsonl<DocumentRecord>(`${basePath}/documents.jsonl`),
     loadOptionalJsonl<DocumentVersionRecord>(`${basePath}/document_versions.jsonl`),
     loadOptionalJsonl<MeetingRecord>(`${basePath}/meetings.jsonl`),
@@ -47,6 +50,7 @@ export async function loadPublicData(basePath = DATA_BASE): Promise<PublicDataSe
 
   return {
     latest,
+    dashboard,
     documents,
     documentVersions,
     meetings,
