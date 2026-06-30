@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 500,
+    "duplicate_count": 486,
     "duplicates": [
       {
         "count": 2,
@@ -486,29 +486,29 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25967",
-            "source_id": "25967",
-            "source_object_id": "43362",
-            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
+            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
+            "id": "huizen-document-25975",
+            "source_id": "25975",
+            "source_object_id": "43370",
+            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
           },
           {
-            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25967",
-            "source_id": "25967",
-            "source_object_id": "43362",
-            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
+            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
+            "id": "huizen-document-25975",
+            "source_id": "25975",
+            "source_object_id": "43370",
+            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
           }
         ],
-        "id": "huizen-document-25967"
+        "id": "huizen-document-25975"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16755
+    "unique_count": 16762
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 500,
+    "duplicate_count": 486,
     "duplicates": [
       {
         "count": 2,
@@ -605,34 +605,6 @@
       {
         "count": 2,
         "value": "25964:43356"
-      },
-      {
-        "count": 2,
-        "value": "25967:43362"
-      },
-      {
-        "count": 2,
-        "value": "25968:43363"
-      },
-      {
-        "count": 2,
-        "value": "25969:43364"
-      },
-      {
-        "count": 2,
-        "value": "25970:43365"
-      },
-      {
-        "count": 2,
-        "value": "25971:43366"
-      },
-      {
-        "count": 2,
-        "value": "25973:43368"
-      },
-      {
-        "count": 2,
-        "value": "25974:43369"
       },
       {
         "count": 2,
@@ -1512,10 +1484,10 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16755
+    "unique_count": 16762
   },
   "documents_total": 17005,
-  "generated_at": "2026-06-29T08:34:42.309521+00:00",
+  "generated_at": "2026-06-30T07:11:01.975791+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1523,7 +1495,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 500,
+    "duplicate_count": 486,
     "duplicates": [
       {
         "count": 2,
@@ -2009,28 +1981,28 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25967",
-            "source_id": "25967",
-            "source_object_id": "43362",
-            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
+            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
+            "id": "huizen-document-25975",
+            "source_id": "25975",
+            "source_object_id": "43370",
+            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
           },
           {
-            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25967",
-            "source_id": "25967",
-            "source_object_id": "43362",
-            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
+            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
+            "id": "huizen-document-25975",
+            "source_id": "25975",
+            "source_object_id": "43370",
+            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
           }
         ],
-        "source_id": "25967"
+        "source_id": "25975"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16755
+    "unique_count": 16762
   },
   "source_object_id": {
-    "duplicate_count": 500,
+    "duplicate_count": 486,
     "duplicates": [
       {
         "count": 2,
@@ -2516,24 +2488,24 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25967",
-            "source_id": "25967",
-            "source_object_id": "43362",
-            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
+            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
+            "id": "huizen-document-25975",
+            "source_id": "25975",
+            "source_object_id": "43370",
+            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
           },
           {
-            "filename": "Overzicht Stand van zaken initiatiefvoorstellen en moties tbv raadsvergadering juni 2026 def.pdf",
-            "id": "huizen-document-25967",
-            "source_id": "25967",
-            "source_object_id": "43362",
-            "title": "Overzicht Stand van zaken initiatiefvoorstellen en moties t.b.v. raadsvergadering juni 2026"
+            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
+            "id": "huizen-document-25975",
+            "source_id": "25975",
+            "source_object_id": "43370",
+            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
           }
         ],
-        "source_object_id": "43362"
+        "source_object_id": "43370"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16755
+    "unique_count": 16762
   }
 }
