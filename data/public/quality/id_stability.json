@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 486,
+    "duplicate_count": 488,
     "duplicates": [
       {
         "count": 2,
@@ -486,29 +486,29 @@
         "count": 2,
         "documents": [
           {
-            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
-            "id": "huizen-document-25975",
-            "source_id": "25975",
-            "source_object_id": "43370",
-            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
+            "filename": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie.pdf",
+            "id": "huizen-document-25984",
+            "source_id": "25984",
+            "source_object_id": "43379",
+            "title": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie"
           },
           {
-            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
-            "id": "huizen-document-25975",
-            "source_id": "25975",
-            "source_object_id": "43370",
-            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
+            "filename": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie.pdf",
+            "id": "huizen-document-25984",
+            "source_id": "25984",
+            "source_object_id": "43379",
+            "title": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie"
           }
         ],
-        "id": "huizen-document-25975"
+        "id": "huizen-document-25984"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16762
+    "unique_count": 16768
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 486,
+    "duplicate_count": 488,
     "duplicates": [
       {
         "count": 2,
@@ -605,30 +605,6 @@
       {
         "count": 2,
         "value": "25964:43356"
-      },
-      {
-        "count": 2,
-        "value": "25975:43370"
-      },
-      {
-        "count": 2,
-        "value": "25976:43371"
-      },
-      {
-        "count": 2,
-        "value": "25977:43372"
-      },
-      {
-        "count": 2,
-        "value": "25978:43373"
-      },
-      {
-        "count": 2,
-        "value": "25980:43375"
-      },
-      {
-        "count": 2,
-        "value": "25982:43377"
       },
       {
         "count": 2,
@@ -1481,13 +1457,41 @@
       {
         "count": 2,
         "value": "26271:43825"
+      },
+      {
+        "count": 2,
+        "value": "26272:43828"
+      },
+      {
+        "count": 2,
+        "value": "26273:43830"
+      },
+      {
+        "count": 2,
+        "value": "26274:43833"
+      },
+      {
+        "count": 2,
+        "value": "26275:43835"
+      },
+      {
+        "count": 2,
+        "value": "26276:43837"
+      },
+      {
+        "count": 2,
+        "value": "26277:43839"
+      },
+      {
+        "count": 2,
+        "value": "26278:43840"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16762
+    "unique_count": 16768
   },
-  "documents_total": 17005,
-  "generated_at": "2026-06-30T07:11:01.975791+00:00",
+  "documents_total": 17012,
+  "generated_at": "2026-07-01T07:57:08.984419+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1495,7 +1499,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 486,
+    "duplicate_count": 488,
     "duplicates": [
       {
         "count": 2,
@@ -1981,28 +1985,28 @@
         "count": 2,
         "documents": [
           {
-            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
-            "id": "huizen-document-25975",
-            "source_id": "25975",
-            "source_object_id": "43370",
-            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
+            "filename": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie.pdf",
+            "id": "huizen-document-25984",
+            "source_id": "25984",
+            "source_object_id": "43379",
+            "title": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie"
           },
           {
-            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
-            "id": "huizen-document-25975",
-            "source_id": "25975",
-            "source_object_id": "43370",
-            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
+            "filename": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie.pdf",
+            "id": "huizen-document-25984",
+            "source_id": "25984",
+            "source_object_id": "43379",
+            "title": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie"
           }
         ],
-        "source_id": "25975"
+        "source_id": "25984"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16762
+    "unique_count": 16768
   },
   "source_object_id": {
-    "duplicate_count": 486,
+    "duplicate_count": 488,
     "duplicates": [
       {
         "count": 2,
@@ -2488,24 +2492,24 @@
         "count": 2,
         "documents": [
           {
-            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
-            "id": "huizen-document-25975",
-            "source_id": "25975",
-            "source_object_id": "43370",
-            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
+            "filename": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie.pdf",
+            "id": "huizen-document-25984",
+            "source_id": "25984",
+            "source_object_id": "43379",
+            "title": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie"
           },
           {
-            "filename": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd.pdf",
-            "id": "huizen-document-25975",
-            "source_id": "25975",
-            "source_object_id": "43370",
-            "title": "A68 Brief alliantie informele steun jeugd en gezin (Alliantie Informele Steun Jeugd en Gezin) geanonimiseerd"
+            "filename": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie.pdf",
+            "id": "huizen-document-25984",
+            "source_id": "25984",
+            "source_object_id": "43379",
+            "title": "Raadsvoorstel meerjarenonderhoudsplanning 2026 tm 2030 voor infrastructuur en rioolexploitatie"
           }
         ],
-        "source_object_id": "43370"
+        "source_object_id": "43379"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16762
+    "unique_count": 16768
   }
 }

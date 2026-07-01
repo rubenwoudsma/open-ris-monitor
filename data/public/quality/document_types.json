@@ -1,6 +1,6 @@
 {
-  "documents_total": 17005,
-  "generated_at": "2026-06-30T07:11:02.065561+00:00",
+  "documents_total": 17012,
+  "generated_at": "2026-07-01T07:57:09.095916+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -173,7 +173,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Collegevoorstel (BBV)": {
-      "count": 2276,
+      "count": 2289,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1507,
+      "count": 1501,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4478,
+      "count": 4491,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1507,
+      "count": 1501,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -977,7 +977,7 @@
       "normalized_document_type_label": "Bijlage"
     },
     {
-      "count": 2276,
+      "count": 2289,
       "document_type": "Collegevoorstel (BBV)",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
@@ -989,7 +989,7 @@
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1507,
+      "count": 1501,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"

@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1731,
-    "documents_with_any_meeting_context_ratio": 0.1018,
-    "documents_without_meeting_context": 15274
+    "documents_with_any_meeting_context": 1704,
+    "documents_with_any_meeting_context_ratio": 0.1002,
+    "documents_without_meeting_context": 15308
   },
-  "dataset_generated_at": "2026-06-30T07:11:01.664536+00:00",
+  "dataset_generated_at": "2026-07-01T07:57:08.619351+00:00",
   "document_file_size": {
-    "average_bytes": 1140446,
-    "known_count": 17005,
+    "average_bytes": 1139993,
+    "known_count": 17012,
     "largest_bytes": 162614430,
-    "total_bytes": 19393279183,
+    "total_bytes": 19393553398,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -23,7 +23,7 @@
     },
     {
       "bucket": "100 KB-1 MB",
-      "count": 8146
+      "count": 8153
     },
     {
       "bucket": "1-5 MB",
@@ -36,7 +36,7 @@
   ],
   "documents_by_type": [
     {
-      "count": 4478,
+      "count": 4491,
       "document_type": "Voorstel"
     },
     {
@@ -52,7 +52,7 @@
       "document_type": "Besluit"
     },
     {
-      "count": 1507,
+      "count": 1501,
       "document_type": "Ingekomen stuk"
     },
     {
@@ -118,29 +118,29 @@
       "year": "2025"
     },
     {
-      "count": 1335,
+      "count": 1342,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-06-30T07:11:01.664536+00:00",
+    "generated_at": "2026-07-01T07:57:08.619351+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-06-30T07:11:02.215397+00:00",
+  "generated_at": "2026-07-01T07:57:09.267761+00:00",
   "meeting_items_by_year": [
     {
-      "count": 267,
+      "count": 262,
       "year": "2025"
     },
     {
-      "count": 733,
+      "count": 738,
       "year": "2026"
     }
   ],
   "meetings_by_year": [
     {
-      "count": 40,
+      "count": 37,
       "year": "2024"
     },
     {
@@ -148,7 +148,7 @@
       "year": "2025"
     },
     {
-      "count": 76,
+      "count": 79,
       "year": "2026"
     },
     {
@@ -161,16 +161,16 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 17005,
-    "linked_documents": 1731,
-    "meeting_documents": 89,
-    "meeting_item_documents": 1790,
+    "documents": 17012,
+    "linked_documents": 1704,
+    "meeting_documents": 88,
+    "meeting_item_documents": 1763,
     "meeting_items": 1000,
     "meetings": 250,
     "organization_groups": 24,
     "organization_persons": 94,
     "organization_positions": 302,
     "organization_roles": 32,
-    "unlinked_documents": 15274
+    "unlinked_documents": 15308
   }
 }
