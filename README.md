@@ -268,6 +268,7 @@ Start with:
 - [Connectors](docs/connectors.md), current GemeenteOplossingen connector and future vendor expectations.
 - [Development](docs/development.md), local development and PR hygiene.
 - [Validation and CI](docs/validatie-ci.md), checks run by GitHub Actions.
+- [Voting and decision outcome research](docs/voting-and-decision-outcome-research.md), feasibility note for vote and decision insight.
 - [Roadmap](docs/roadmap.md), conservative MVP and post-MVP direction.
 
 ## Repository policy
