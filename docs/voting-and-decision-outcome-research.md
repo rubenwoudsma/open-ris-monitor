@@ -102,42 +102,6 @@ Recommended for MVP 1.2 and near-term post-live work.
 
 Open RIS Monitor should keep the current document-first, static architecture and open a research issue to verify whether the live source API has any undocumented vote or decision fields for Huizen.
 
-## Recommended GitHub issue
-
-Title:
-
-```text
-Research voting and decision outcome support in RIS API
-```
-
-Body:
-
-```markdown
-## Context
-
-Open RIS Monitor currently exposes documents, meetings, agenda items, relations and council organisation context. It does not expose voting insight.
-
-The documented GemeenteOplossingen Open Raadsinformatie API currently shows route groups for attachments, DMUs, documents, events, groups, meetings, meeting items, persons, positions and roles. It does not document explicit vote, voting-result, motion, amendment, toezegging or structured decision-outcome endpoints.
-
-## Goal
-
-Determine whether voting or decision-outcome insight can be implemented safely without OCR, PDF text extraction, a backend or unsupported inference.
-
-## Research questions
-
-- Does the live Huizen API expose undocumented vote or decision fields?
-- Do meeting items include structured outcome/status fields in real responses?
-- Do document type labels reliably identify besluiten, moties, amendementen or stemmingsdocumenten?
-- Can any feature be implemented without claiming per-person or per-party voting behavior?
-
-## Acceptance criteria
-
-- Document the exact endpoints inspected.
-- Include sample payload fields from real public responses where available.
-- State clearly whether explicit vote data exists.
-- If no explicit vote data exists, propose only a limited decision-document discovery feature.
-- Do not add OCR, PDF text extraction, a backend, database, scraping outside the public API or unsupported political inference.
-```
 
 ## Recommendation
 
