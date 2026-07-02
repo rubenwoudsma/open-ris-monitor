@@ -438,8 +438,7 @@ tbody tr:last-child td {
   font-size: 0.9rem;
 }
 
-.footer-metadata {
-  display: grid;
+.footer-metadata { display: grid;
   gap: 0.75rem;
   border: 1px solid var(--border-muted);
   border-radius: var(--radius);
