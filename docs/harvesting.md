@@ -177,9 +177,19 @@ Typical inputs:
 | `checksum_max_documents` | Maximum checksum-enriched documents | `50` |
 | `commit_public` | Commit generated `data/public/` output | `false` for manual tests, `true` for intentional publication |
 
-## Concurrency
+## Concurrency and push safety
 
-The harvest workflow uses concurrency to avoid two harvests publishing over each other on the same branch.
+The harvest workflow uses a shared GitHub Actions concurrency group for workflows that can commit public data or public quality reports back to the branch.
+
+Current shared group:
+
+```yaml
+concurrency:
+  group: public-ris-data-${{ github.ref }}
+  cancel-in-progress: false
+```
+
+The shared group is used by the scheduled harvest workflow and by relation-discovery workflows when they are allowed to commit a report under `data/public/quality/`. This prevents a daily public harvest, monthly backfill and manual diagnostic report commit from pushing to the same branch at the same time.
 
 Policy intent:
 
@@ -187,7 +197,9 @@ Policy intent:
 cancel-in-progress: false
 ```
 
-A second run should wait or avoid parallel publication rather than interrupting a run midway.
+A second run should wait rather than interrupting a run midway. The active run is allowed to finish, and the queued run can publish after it has an up-to-date branch.
+
+Commit steps should also skip no-op pushes. When a commit is needed, the workflow rebases on the target branch before pushing and retries once after a rejected push. This is intentionally conservative: it avoids force-pushes, keeps manual dispatch possible and fails visibly if a real merge conflict appears.
 
 ## Retry and back-off policy
 

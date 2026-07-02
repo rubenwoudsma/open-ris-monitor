@@ -63,6 +63,10 @@ Can wait until measured file sizes or browser performance show a concrete need. 
 
 Can wait while native client-side filtering remains fast enough. If search becomes slow, prefer a small static client-side approach before adding generated indexes or heavier dependencies.
 
+### Voting and decision outcome research
+
+Keep this as research until the source API exposes machine-readable vote or decision-outcome data. The current feasibility note is in `docs/voting-and-decision-outcome-research.md`. Do not add OCR, PDF text extraction or unsupported per-person or per-party voting inference.
+
 ## Operational harvest strategy
 
 Build toward full historical coverage through bounded, resumable harvests:
