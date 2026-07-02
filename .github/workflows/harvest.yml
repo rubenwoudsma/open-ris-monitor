@@ -61,7 +61,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: public-harvest-${{ github.ref }}
+  # Serialize all workflows that can commit data/public output to this branch.
+  group: public-ris-data-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -217,5 +218,17 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/public/
-          git diff --cached --quiet || git commit -m "Update public RIS data for ${{ steps.harvest-inputs.outputs.municipality }}"
-          git push
+          if git diff --cached --quiet; then
+            echo "No public export changes to commit."
+          else
+            git commit -m "Update public RIS data for ${{ steps.harvest-inputs.outputs.municipality }}"
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            for attempt in 1 2; do
+              if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+                exit 0
+              fi
+              echo "Push failed, rebasing before retry ${attempt}."
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
+            done
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
