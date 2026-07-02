@@ -446,8 +446,7 @@ tbody tr:last-child td {
   padding: 0.75rem;
 }
 
-.technical-metadata {
-  border-top: 1px solid var(--border-muted);
+.technical-metadata { border-top: 1px solid var(--border-muted);
   padding-top: 0.75rem;
 }
 
