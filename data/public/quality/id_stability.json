@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 488,
+    "duplicate_count": 482,
     "duplicates": [
       {
         "count": 2,
@@ -504,11 +504,11 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16768
+    "unique_count": 16777
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 488,
+    "duplicate_count": 482,
     "duplicates": [
       {
         "count": 2,
@@ -612,15 +612,7 @@
       },
       {
         "count": 2,
-        "value": "25987:43382"
-      },
-      {
-        "count": 2,
         "value": "25988:43384"
-      },
-      {
-        "count": 2,
-        "value": "25989:43385"
       },
       {
         "count": 2,
@@ -629,34 +621,6 @@
       {
         "count": 2,
         "value": "25993:43389"
-      },
-      {
-        "count": 2,
-        "value": "25994:43390"
-      },
-      {
-        "count": 2,
-        "value": "25995:43391"
-      },
-      {
-        "count": 2,
-        "value": "25996:43392"
-      },
-      {
-        "count": 2,
-        "value": "25997:43393"
-      },
-      {
-        "count": 2,
-        "value": "25998:43394"
-      },
-      {
-        "count": 2,
-        "value": "25999:43395"
-      },
-      {
-        "count": 2,
-        "value": "26000:43396"
       },
       {
         "count": 2,
@@ -1485,13 +1449,37 @@
       {
         "count": 2,
         "value": "26278:43840"
+      },
+      {
+        "count": 2,
+        "value": "26281:43845"
+      },
+      {
+        "count": 2,
+        "value": "26282:43848"
+      },
+      {
+        "count": 2,
+        "value": "26283:43851"
+      },
+      {
+        "count": 2,
+        "value": "26284:43853"
+      },
+      {
+        "count": 2,
+        "value": "26285:43856"
+      },
+      {
+        "count": 2,
+        "value": "26286:43858"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16768
+    "unique_count": 16777
   },
-  "documents_total": 17012,
-  "generated_at": "2026-07-01T07:57:08.984419+00:00",
+  "documents_total": 17018,
+  "generated_at": "2026-07-02T06:59:13.058018+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1499,7 +1487,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 488,
+    "duplicate_count": 482,
     "duplicates": [
       {
         "count": 2,
@@ -2003,10 +1991,10 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16768
+    "unique_count": 16777
   },
   "source_object_id": {
-    "duplicate_count": 488,
+    "duplicate_count": 482,
     "duplicates": [
       {
         "count": 2,
@@ -2510,6 +2498,6 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16768
+    "unique_count": 16777
   }
 }

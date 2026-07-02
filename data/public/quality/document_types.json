@@ -1,6 +1,6 @@
 {
-  "documents_total": 17012,
-  "generated_at": "2026-07-01T07:57:09.095916+00:00",
+  "documents_total": 17018,
+  "generated_at": "2026-07-02T06:59:13.168429+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -118,7 +118,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Besluit": {
-      "count": 1150,
+      "count": 1151,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
     },
@@ -148,7 +148,7 @@
       "normalized_document_type_label": "Bezwaar, klacht of zienswijze"
     },
     "Bijlage": {
-      "count": 2388,
+      "count": 2380,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
     },
@@ -173,7 +173,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Collegevoorstel (BBV)": {
-      "count": 2289,
+      "count": 2295,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1501,
+      "count": 1500,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -333,7 +333,7 @@
       "normalized_document_type_label": "Motie"
     },
     "Moties": {
-      "count": 262,
+      "count": 267,
       "normalized_document_type": "motion",
       "normalized_document_type_label": "Motie"
     },
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 1906,
+      "count": 1908,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -503,7 +503,7 @@
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     "Resumés": {
-      "count": 264,
+      "count": 265,
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4491,
+      "count": 4497,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -709,7 +709,7 @@
       ]
     },
     {
-      "count": 2388,
+      "count": 2380,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage",
       "source_document_types": [
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 1993,
+      "count": 1995,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -728,7 +728,7 @@
       ]
     },
     {
-      "count": 1700,
+      "count": 1701,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit",
       "source_document_types": [
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1501,
+      "count": 1500,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -762,7 +762,7 @@
       ]
     },
     {
-      "count": 939,
+      "count": 940,
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting",
       "source_document_types": [
@@ -821,6 +821,15 @@
       ]
     },
     {
+      "count": 274,
+      "normalized_document_type": "motion",
+      "normalized_document_type_label": "Motie",
+      "source_document_types": [
+        "Motie (Inkomend)",
+        "Moties"
+      ]
+    },
+    {
       "count": 270,
       "normalized_document_type": "notice",
       "normalized_document_type_label": "Kennisgeving of ter kennisname",
@@ -831,15 +840,6 @@
         "Kennisgeving constatering overtreding (Uitgaand)",
         "Kennisgeving van gemeenschappelijke regeling (Inkomend)",
         "Stukken ter kennisname"
-      ]
-    },
-    {
-      "count": 269,
-      "normalized_document_type": "motion",
-      "normalized_document_type_label": "Motie",
-      "source_document_types": [
-        "Motie (Inkomend)",
-        "Moties"
       ]
     },
     {
@@ -971,25 +971,25 @@
   "source_document_type_count": 135,
   "source_document_types": [
     {
-      "count": 2388,
+      "count": 2380,
       "document_type": "Bijlage",
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
     },
     {
-      "count": 2289,
+      "count": 2295,
       "document_type": "Collegevoorstel (BBV)",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 1906,
+      "count": 1908,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1501,
+      "count": 1500,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
@@ -1001,7 +1001,7 @@
       "normalized_document_type_label": "Mededeling"
     },
     {
-      "count": 1150,
+      "count": 1151,
       "document_type": "Besluit",
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
@@ -1037,16 +1037,16 @@
       "normalized_document_type_label": "Vraag"
     },
     {
-      "count": 264,
-      "document_type": "Resumés",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
-    },
-    {
-      "count": 262,
+      "count": 267,
       "document_type": "Moties",
       "normalized_document_type": "motion",
       "normalized_document_type_label": "Motie"
+    },
+    {
+      "count": 265,
+      "document_type": "Resumés",
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     {
       "count": 229,
