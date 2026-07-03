@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 482,
+    "duplicate_count": 480,
     "duplicates": [
       {
         "count": 2,
@@ -26,6 +26,26 @@
         "count": 2,
         "documents": [
           {
+            "filename": "Commissieverordening-2025.pdf",
+            "id": "huizen-document-24522",
+            "source_id": "24522",
+            "source_object_id": "40905",
+            "title": "Commissieverordening 2025"
+          },
+          {
+            "filename": "Commissieverordening-2025.pdf",
+            "id": "huizen-document-24522",
+            "source_id": "24522",
+            "source_object_id": "40905",
+            "title": "Commissieverordening-2025"
+          }
+        ],
+        "id": "huizen-document-24522"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
             "filename": "Agenda Fysiek Domein 28 januari 2026 + aanvulling.pdf",
             "id": "huizen-document-25113",
             "source_id": "25113",
@@ -46,6 +66,26 @@
         "count": 2,
         "documents": [
           {
+            "filename": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
+            "id": "huizen-document-25637",
+            "source_id": "25637",
+            "source_object_id": "42902",
+            "title": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
+          },
+          {
+            "filename": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
+            "id": "huizen-document-25637",
+            "source_id": "25637",
+            "source_object_id": "42902",
+            "title": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
+          }
+        ],
+        "id": "huizen-document-25637"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
             "filename": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie.pdf",
             "id": "huizen-document-25820",
             "source_id": "25820",
@@ -61,26 +101,6 @@
           }
         ],
         "id": "huizen-document-25820"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
-            "id": "huizen-document-25830",
-            "source_id": "25830",
-            "source_object_id": "43160",
-            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
-          },
-          {
-            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
-            "id": "huizen-document-25830",
-            "source_id": "25830",
-            "source_object_id": "43160",
-            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
-          }
-        ],
-        "id": "huizen-document-25830"
       },
       {
         "count": 2,
@@ -286,26 +306,6 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
-            "id": "huizen-document-25929",
-            "source_id": "25929",
-            "source_object_id": "43310",
-            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
-          },
-          {
-            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
-            "id": "huizen-document-25929",
-            "source_id": "25929",
-            "source_object_id": "43310",
-            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
-          }
-        ],
-        "id": "huizen-document-25929"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
             "filename": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College.pdf",
             "id": "huizen-document-25930",
             "source_id": "25930",
@@ -321,26 +321,6 @@
           }
         ],
         "id": "huizen-document-25930"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsagenda 3 juni 2026.pdf",
-            "id": "huizen-document-25932",
-            "source_id": "25932",
-            "source_object_id": "43313",
-            "title": "Raadsagenda 3 juni 2026"
-          },
-          {
-            "filename": "Raadsagenda 3 juni 2026.pdf",
-            "id": "huizen-document-25932",
-            "source_id": "25932",
-            "source_object_id": "43313",
-            "title": "Raadsagenda 3 juni 2026"
-          }
-        ],
-        "id": "huizen-document-25932"
       },
       {
         "count": 2,
@@ -501,14 +481,34 @@
           }
         ],
         "id": "huizen-document-25984"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026).pdf",
+            "id": "huizen-document-25988",
+            "source_id": "25988",
+            "source_object_id": "43384",
+            "title": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026)"
+          },
+          {
+            "filename": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026).pdf",
+            "id": "huizen-document-25988",
+            "source_id": "25988",
+            "source_object_id": "43384",
+            "title": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026)"
+          }
+        ],
+        "id": "huizen-document-25988"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16777
+    "unique_count": 16787
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 482,
+    "duplicate_count": 480,
     "duplicates": [
       {
         "count": 2,
@@ -516,15 +516,19 @@
       },
       {
         "count": 2,
+        "value": "24522:40905"
+      },
+      {
+        "count": 2,
         "value": "25113:41768"
       },
       {
         "count": 2,
-        "value": "25820:43149"
+        "value": "25637:42902"
       },
       {
         "count": 2,
-        "value": "25830:43160"
+        "value": "25820:43149"
       },
       {
         "count": 2,
@@ -568,15 +572,7 @@
       },
       {
         "count": 2,
-        "value": "25929:43310"
-      },
-      {
-        "count": 2,
         "value": "25930:43311"
-      },
-      {
-        "count": 2,
-        "value": "25932:43313"
       },
       {
         "count": 2,
@@ -624,23 +620,7 @@
       },
       {
         "count": 2,
-        "value": "26001:43397"
-      },
-      {
-        "count": 2,
-        "value": "26002:43398"
-      },
-      {
-        "count": 2,
         "value": "26003:43399"
-      },
-      {
-        "count": 2,
-        "value": "26004:43400"
-      },
-      {
-        "count": 2,
-        "value": "26012:43408"
       },
       {
         "count": 2,
@@ -648,15 +628,7 @@
       },
       {
         "count": 2,
-        "value": "26014:43410"
-      },
-      {
-        "count": 2,
         "value": "26015:43411"
-      },
-      {
-        "count": 2,
-        "value": "26016:43412"
       },
       {
         "count": 2,
@@ -668,19 +640,7 @@
       },
       {
         "count": 2,
-        "value": "26021:43417"
-      },
-      {
-        "count": 2,
-        "value": "26023:43419"
-      },
-      {
-        "count": 2,
         "value": "26026:43423"
-      },
-      {
-        "count": 2,
-        "value": "26027:43424"
       },
       {
         "count": 2,
@@ -1473,13 +1433,49 @@
       {
         "count": 2,
         "value": "26286:43858"
+      },
+      {
+        "count": 2,
+        "value": "26294:43886"
+      },
+      {
+        "count": 2,
+        "value": "26296:43888"
+      },
+      {
+        "count": 2,
+        "value": "26298:43890"
+      },
+      {
+        "count": 2,
+        "value": "26299:43893"
+      },
+      {
+        "count": 2,
+        "value": "26300:43894"
+      },
+      {
+        "count": 2,
+        "value": "26301:43896"
+      },
+      {
+        "count": 2,
+        "value": "26302:43898"
+      },
+      {
+        "count": 2,
+        "value": "26303:43899"
+      },
+      {
+        "count": 2,
+        "value": "26304:43900"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16777
+    "unique_count": 16787
   },
-  "documents_total": 17018,
-  "generated_at": "2026-07-02T06:59:13.058018+00:00",
+  "documents_total": 17027,
+  "generated_at": "2026-07-03T06:50:43.420771+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1487,7 +1483,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 482,
+    "duplicate_count": 480,
     "duplicates": [
       {
         "count": 2,
@@ -1513,6 +1509,26 @@
         "count": 2,
         "documents": [
           {
+            "filename": "Commissieverordening-2025.pdf",
+            "id": "huizen-document-24522",
+            "source_id": "24522",
+            "source_object_id": "40905",
+            "title": "Commissieverordening 2025"
+          },
+          {
+            "filename": "Commissieverordening-2025.pdf",
+            "id": "huizen-document-24522",
+            "source_id": "24522",
+            "source_object_id": "40905",
+            "title": "Commissieverordening-2025"
+          }
+        ],
+        "source_id": "24522"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
             "filename": "Agenda Fysiek Domein 28 januari 2026 + aanvulling.pdf",
             "id": "huizen-document-25113",
             "source_id": "25113",
@@ -1533,6 +1549,26 @@
         "count": 2,
         "documents": [
           {
+            "filename": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
+            "id": "huizen-document-25637",
+            "source_id": "25637",
+            "source_object_id": "42902",
+            "title": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
+          },
+          {
+            "filename": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
+            "id": "huizen-document-25637",
+            "source_id": "25637",
+            "source_object_id": "42902",
+            "title": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
+          }
+        ],
+        "source_id": "25637"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
             "filename": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie.pdf",
             "id": "huizen-document-25820",
             "source_id": "25820",
@@ -1548,26 +1584,6 @@
           }
         ],
         "source_id": "25820"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
-            "id": "huizen-document-25830",
-            "source_id": "25830",
-            "source_object_id": "43160",
-            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
-          },
-          {
-            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
-            "id": "huizen-document-25830",
-            "source_id": "25830",
-            "source_object_id": "43160",
-            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
-          }
-        ],
-        "source_id": "25830"
       },
       {
         "count": 2,
@@ -1773,26 +1789,6 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
-            "id": "huizen-document-25929",
-            "source_id": "25929",
-            "source_object_id": "43310",
-            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
-          },
-          {
-            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
-            "id": "huizen-document-25929",
-            "source_id": "25929",
-            "source_object_id": "43310",
-            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
-          }
-        ],
-        "source_id": "25929"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
             "filename": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College.pdf",
             "id": "huizen-document-25930",
             "source_id": "25930",
@@ -1808,26 +1804,6 @@
           }
         ],
         "source_id": "25930"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsagenda 3 juni 2026.pdf",
-            "id": "huizen-document-25932",
-            "source_id": "25932",
-            "source_object_id": "43313",
-            "title": "Raadsagenda 3 juni 2026"
-          },
-          {
-            "filename": "Raadsagenda 3 juni 2026.pdf",
-            "id": "huizen-document-25932",
-            "source_id": "25932",
-            "source_object_id": "43313",
-            "title": "Raadsagenda 3 juni 2026"
-          }
-        ],
-        "source_id": "25932"
       },
       {
         "count": 2,
@@ -1988,13 +1964,33 @@
           }
         ],
         "source_id": "25984"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026).pdf",
+            "id": "huizen-document-25988",
+            "source_id": "25988",
+            "source_object_id": "43384",
+            "title": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026)"
+          },
+          {
+            "filename": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026).pdf",
+            "id": "huizen-document-25988",
+            "source_id": "25988",
+            "source_object_id": "43384",
+            "title": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026)"
+          }
+        ],
+        "source_id": "25988"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16777
+    "unique_count": 16787
   },
   "source_object_id": {
-    "duplicate_count": 482,
+    "duplicate_count": 480,
     "duplicates": [
       {
         "count": 2,
@@ -2020,6 +2016,26 @@
         "count": 2,
         "documents": [
           {
+            "filename": "Commissieverordening-2025.pdf",
+            "id": "huizen-document-24522",
+            "source_id": "24522",
+            "source_object_id": "40905",
+            "title": "Commissieverordening 2025"
+          },
+          {
+            "filename": "Commissieverordening-2025.pdf",
+            "id": "huizen-document-24522",
+            "source_id": "24522",
+            "source_object_id": "40905",
+            "title": "Commissieverordening-2025"
+          }
+        ],
+        "source_object_id": "40905"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
             "filename": "Agenda Fysiek Domein 28 januari 2026 + aanvulling.pdf",
             "id": "huizen-document-25113",
             "source_id": "25113",
@@ -2040,6 +2056,26 @@
         "count": 2,
         "documents": [
           {
+            "filename": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
+            "id": "huizen-document-25637",
+            "source_id": "25637",
+            "source_object_id": "42902",
+            "title": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
+          },
+          {
+            "filename": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
+            "id": "huizen-document-25637",
+            "source_id": "25637",
+            "source_object_id": "42902",
+            "title": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
+          }
+        ],
+        "source_object_id": "42902"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
             "filename": "Beantwoording commissievragen de heer Sadykov (Forum voor Democratie) over evaluatie participatiegids en doorontwikkeling overheidsparticipatie.pdf",
             "id": "huizen-document-25820",
             "source_id": "25820",
@@ -2055,26 +2091,6 @@
           }
         ],
         "source_object_id": "43149"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
-            "id": "huizen-document-25830",
-            "source_id": "25830",
-            "source_object_id": "43160",
-            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
-          },
-          {
-            "filename": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen.pdf",
-            "id": "huizen-document-25830",
-            "source_id": "25830",
-            "source_object_id": "43160",
-            "title": "Raadsvoorstel Procesvoorstel totstandkoming beleidskader opvang vluchtelingen"
-          }
-        ],
-        "source_object_id": "43160"
       },
       {
         "count": 2,
@@ -2280,26 +2296,6 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
-            "id": "huizen-document-25929",
-            "source_id": "25929",
-            "source_object_id": "43310",
-            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
-          },
-          {
-            "filename": "Beantwoording-7.8-Verzoek-cie-Maarten-Janssen-PIT-Huizen-Mededeling-5.1.-1 [1] Copy.pdf",
-            "id": "huizen-document-25929",
-            "source_id": "25929",
-            "source_object_id": "43310",
-            "title": "Beantwoording commissiebehandeling de heer Janssen (PIT Huizen) Mededeling over participatiebeleid en verordening externe participatie"
-          }
-        ],
-        "source_object_id": "43310"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
             "filename": "Raadsvoorstel Indexering bouwkrediet uitbreiding Erfgooiers College.pdf",
             "id": "huizen-document-25930",
             "source_id": "25930",
@@ -2315,26 +2311,6 @@
           }
         ],
         "source_object_id": "43311"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsagenda 3 juni 2026.pdf",
-            "id": "huizen-document-25932",
-            "source_id": "25932",
-            "source_object_id": "43313",
-            "title": "Raadsagenda 3 juni 2026"
-          },
-          {
-            "filename": "Raadsagenda 3 juni 2026.pdf",
-            "id": "huizen-document-25932",
-            "source_id": "25932",
-            "source_object_id": "43313",
-            "title": "Raadsagenda 3 juni 2026"
-          }
-        ],
-        "source_object_id": "43313"
       },
       {
         "count": 2,
@@ -2495,9 +2471,29 @@
           }
         ],
         "source_object_id": "43379"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026).pdf",
+            "id": "huizen-document-25988",
+            "source_id": "25988",
+            "source_object_id": "43384",
+            "title": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026)"
+          },
+          {
+            "filename": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026).pdf",
+            "id": "huizen-document-25988",
+            "source_id": "25988",
+            "source_object_id": "43384",
+            "title": "Raadsvoorstel Voorjaarsnota 2026 (inclusief meicirculaire 2026)"
+          }
+        ],
+        "source_object_id": "43384"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16777
+    "unique_count": 16787
   }
 }
