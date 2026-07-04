@@ -1,6 +1,6 @@
 {
-  "documents_total": 17027,
-  "generated_at": "2026-07-03T06:50:43.517188+00:00",
+  "documents_total": 17037,
+  "generated_at": "2026-07-04T06:35:23.762653+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -138,7 +138,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Besluitenlijsten": {
-      "count": 116,
+      "count": 117,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
     },
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1502,
+      "count": 1505,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 1916,
+      "count": 1922,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 2003,
+      "count": 2009,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -728,7 +728,7 @@
       ]
     },
     {
-      "count": 1703,
+      "count": 1704,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit",
       "source_document_types": [
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1502,
+      "count": 1505,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -983,13 +983,13 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 1916,
+      "count": 1922,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1502,
+      "count": 1505,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
@@ -1091,7 +1091,7 @@
       "normalized_document_type_label": "Uitnodiging"
     },
     {
-      "count": 116,
+      "count": 117,
       "document_type": "Besluitenlijsten",
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"

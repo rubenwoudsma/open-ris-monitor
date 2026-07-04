@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 480,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -30,7 +30,7 @@
             "id": "huizen-document-24522",
             "source_id": "24522",
             "source_object_id": "40905",
-            "title": "Commissieverordening 2025"
+            "title": "Commissieverordening-2025"
           },
           {
             "filename": "Commissieverordening-2025.pdf",
@@ -66,11 +66,11 @@
         "count": 2,
         "documents": [
           {
-            "filename": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
+            "filename": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
             "id": "huizen-document-25637",
             "source_id": "25637",
             "source_object_id": "42902",
-            "title": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
+            "title": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
           },
           {
             "filename": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
@@ -508,7 +508,7 @@
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 480,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -1412,6 +1412,10 @@
       },
       {
         "count": 2,
+        "value": "26279:43841"
+      },
+      {
+        "count": 2,
         "value": "26281:43845"
       },
       {
@@ -1433,6 +1437,22 @@
       {
         "count": 2,
         "value": "26286:43858"
+      },
+      {
+        "count": 2,
+        "value": "26287:43859"
+      },
+      {
+        "count": 2,
+        "value": "26289:43881"
+      },
+      {
+        "count": 2,
+        "value": "26291:43883"
+      },
+      {
+        "count": 2,
+        "value": "26293:43885"
       },
       {
         "count": 2,
@@ -1469,13 +1489,33 @@
       {
         "count": 2,
         "value": "26304:43900"
+      },
+      {
+        "count": 2,
+        "value": "26306:43902"
+      },
+      {
+        "count": 2,
+        "value": "26309:43905"
+      },
+      {
+        "count": 2,
+        "value": "26311:43907"
+      },
+      {
+        "count": 2,
+        "value": "26313:43909"
+      },
+      {
+        "count": 2,
+        "value": "26315:43911"
       }
     ],
     "missing_count": 0,
     "unique_count": 16787
   },
-  "documents_total": 17027,
-  "generated_at": "2026-07-03T06:50:43.420771+00:00",
+  "documents_total": 17037,
+  "generated_at": "2026-07-04T06:35:23.661604+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1483,7 +1523,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 480,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -1513,7 +1553,7 @@
             "id": "huizen-document-24522",
             "source_id": "24522",
             "source_object_id": "40905",
-            "title": "Commissieverordening 2025"
+            "title": "Commissieverordening-2025"
           },
           {
             "filename": "Commissieverordening-2025.pdf",
@@ -1549,11 +1589,11 @@
         "count": 2,
         "documents": [
           {
-            "filename": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
+            "filename": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
             "id": "huizen-document-25637",
             "source_id": "25637",
             "source_object_id": "42902",
-            "title": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
+            "title": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
           },
           {
             "filename": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
@@ -1990,7 +2030,7 @@
     "unique_count": 16787
   },
   "source_object_id": {
-    "duplicate_count": 480,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -2020,7 +2060,7 @@
             "id": "huizen-document-24522",
             "source_id": "24522",
             "source_object_id": "40905",
-            "title": "Commissieverordening 2025"
+            "title": "Commissieverordening-2025"
           },
           {
             "filename": "Commissieverordening-2025.pdf",
@@ -2056,11 +2096,11 @@
         "count": 2,
         "documents": [
           {
-            "filename": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
+            "filename": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
             "id": "huizen-document-25637",
             "source_id": "25637",
             "source_object_id": "42902",
-            "title": "B4 Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
+            "title": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd"
           },
           {
             "filename": "B4 Reactiebrief Vragen over versneld uitvoeren rioolprojecten (Besluit 1565) (Privé persoon) geanonimiseerd.pdf",
