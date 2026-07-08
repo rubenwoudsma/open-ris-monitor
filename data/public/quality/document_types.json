@@ -1,6 +1,6 @@
 {
   "documents_total": 17037,
-  "generated_at": "2026-07-07T07:04:14.134446+00:00",
+  "generated_at": "2026-07-08T06:13:44.184031+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -148,7 +148,7 @@
       "normalized_document_type_label": "Bezwaar, klacht of zienswijze"
     },
     "Bijlage": {
-      "count": 2374,
+      "count": 2371,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
     },
@@ -173,7 +173,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Collegevoorstel (BBV)": {
-      "count": 2295,
+      "count": 2298,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4496,
+      "count": 4499,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -709,7 +709,7 @@
       ]
     },
     {
-      "count": 2374,
+      "count": 2371,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage",
       "source_document_types": [
@@ -971,13 +971,13 @@
   "source_document_type_count": 135,
   "source_document_types": [
     {
-      "count": 2374,
+      "count": 2371,
       "document_type": "Bijlage",
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
     },
     {
-      "count": 2295,
+      "count": 2298,
       "document_type": "Collegevoorstel (BBV)",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
