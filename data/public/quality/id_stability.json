@@ -1,27 +1,7 @@
 {
   "canonical_id": {
-    "duplicate_count": 490,
+    "duplicate_count": 444,
     "duplicates": [
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
-            "id": "huizen-document-23161",
-            "source_id": "23161",
-            "source_object_id": "38408",
-            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
-          },
-          {
-            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
-            "id": "huizen-document-23161",
-            "source_id": "23161",
-            "source_object_id": "38408",
-            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
-          }
-        ],
-        "id": "huizen-document-23161"
-      },
       {
         "count": 2,
         "documents": [
@@ -246,26 +226,6 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
-            "id": "huizen-document-25926",
-            "source_id": "25926",
-            "source_object_id": "43289",
-            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
-          },
-          {
-            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
-            "id": "huizen-document-25926",
-            "source_id": "25926",
-            "source_object_id": "43289",
-            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
-          }
-        ],
-        "id": "huizen-document-25926"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
             "filename": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025.pdf",
             "id": "huizen-document-25927",
             "source_id": "25927",
@@ -426,26 +386,6 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
-            "id": "huizen-document-25963",
-            "source_id": "25963",
-            "source_object_id": "43355",
-            "title": "Bijlage 4 Termijnkalender"
-          },
-          {
-            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
-            "id": "huizen-document-25963",
-            "source_id": "25963",
-            "source_object_id": "43355",
-            "title": "Bijlage 4 Termijnkalender"
-          }
-        ],
-        "id": "huizen-document-25963"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
             "filename": "Bijlage 6 Financiele bijlage.pdf",
             "id": "huizen-document-25964",
             "source_id": "25964",
@@ -501,19 +441,75 @@
           }
         ],
         "id": "huizen-document-25988"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 1 Jaarstukken 2025.pdf",
+            "id": "huizen-document-25991",
+            "source_id": "25991",
+            "source_object_id": "43387",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          },
+          {
+            "filename": "Bijlage 1 Jaarstukken 2025.pdf",
+            "id": "huizen-document-25991",
+            "source_id": "25991",
+            "source_object_id": "43387",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          }
+        ],
+        "id": "huizen-document-25991"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Rapportage Protocol Grote Projecten.pdf",
+            "id": "huizen-document-26003",
+            "source_id": "26003",
+            "source_object_id": "43399",
+            "title": "Raadsvoorstel Rapportage Protocol Grote Projecten"
+          },
+          {
+            "filename": "Raadsvoorstel Rapportage Protocol Grote Projecten.pdf",
+            "id": "huizen-document-26003",
+            "source_id": "26003",
+            "source_object_id": "43399",
+            "title": "Raadsvoorstel Rapportage Protocol Grote Projecten"
+          }
+        ],
+        "id": "huizen-document-26003"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren.pdf",
+            "id": "huizen-document-26013",
+            "source_id": "26013",
+            "source_object_id": "43409",
+            "title": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren"
+          },
+          {
+            "filename": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren.pdf",
+            "id": "huizen-document-26013",
+            "source_id": "26013",
+            "source_object_id": "43409",
+            "title": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren"
+          }
+        ],
+        "id": "huizen-document-26013"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16792
+    "unique_count": 16820
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 490,
+    "duplicate_count": 444,
     "duplicates": [
-      {
-        "count": 2,
-        "value": "23161:38408"
-      },
       {
         "count": 2,
         "value": "24522:40905"
@@ -560,10 +556,6 @@
       },
       {
         "count": 2,
-        "value": "25926:43289"
-      },
-      {
-        "count": 2,
         "value": "25927:43290"
       },
       {
@@ -596,10 +588,6 @@
       },
       {
         "count": 2,
-        "value": "25963:43355"
-      },
-      {
-        "count": 2,
         "value": "25964:43356"
       },
       {
@@ -616,10 +604,6 @@
       },
       {
         "count": 2,
-        "value": "25993:43389"
-      },
-      {
-        "count": 2,
         "value": "26003:43399"
       },
       {
@@ -629,10 +613,6 @@
       {
         "count": 2,
         "value": "26015:43411"
-      },
-      {
-        "count": 2,
-        "value": "26018:43414"
       },
       {
         "count": 2,
@@ -648,51 +628,7 @@
       },
       {
         "count": 2,
-        "value": "26032:43429"
-      },
-      {
-        "count": 2,
-        "value": "26042:43444"
-      },
-      {
-        "count": 2,
         "value": "26043:43445"
-      },
-      {
-        "count": 2,
-        "value": "26044:43448"
-      },
-      {
-        "count": 2,
-        "value": "26045:43450"
-      },
-      {
-        "count": 2,
-        "value": "26046:43453"
-      },
-      {
-        "count": 2,
-        "value": "26047:43455"
-      },
-      {
-        "count": 2,
-        "value": "26048:43458"
-      },
-      {
-        "count": 2,
-        "value": "26049:43460"
-      },
-      {
-        "count": 2,
-        "value": "26050:43461"
-      },
-      {
-        "count": 2,
-        "value": "26051:43462"
-      },
-      {
-        "count": 2,
-        "value": "26052:43463"
       },
       {
         "count": 2,
@@ -704,22 +640,6 @@
       },
       {
         "count": 2,
-        "value": "26055:43466"
-      },
-      {
-        "count": 2,
-        "value": "26056:43467"
-      },
-      {
-        "count": 2,
-        "value": "26057:43468"
-      },
-      {
-        "count": 2,
-        "value": "26062:43473"
-      },
-      {
-        "count": 2,
         "value": "26063:43476"
       },
       {
@@ -728,47 +648,11 @@
       },
       {
         "count": 2,
-        "value": "26067:43488"
-      },
-      {
-        "count": 2,
         "value": "26069:43490"
       },
       {
         "count": 2,
-        "value": "26070:43491"
-      },
-      {
-        "count": 2,
-        "value": "26071:43492"
-      },
-      {
-        "count": 2,
-        "value": "26072:43493"
-      },
-      {
-        "count": 2,
         "value": "26073:43497"
-      },
-      {
-        "count": 2,
-        "value": "26074:43498"
-      },
-      {
-        "count": 2,
-        "value": "26076:43500"
-      },
-      {
-        "count": 2,
-        "value": "26078:43502"
-      },
-      {
-        "count": 2,
-        "value": "26080:43504"
-      },
-      {
-        "count": 2,
-        "value": "26082:43506"
       },
       {
         "count": 2,
@@ -1489,13 +1373,37 @@
       {
         "count": 2,
         "value": "26315:43911"
+      },
+      {
+        "count": 2,
+        "value": "26323:43921"
+      },
+      {
+        "count": 2,
+        "value": "26324:43923"
+      },
+      {
+        "count": 2,
+        "value": "26325:43925"
+      },
+      {
+        "count": 2,
+        "value": "26326:43927"
+      },
+      {
+        "count": 2,
+        "value": "26327:43929"
+      },
+      {
+        "count": 2,
+        "value": "7472:12928"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16792
+    "unique_count": 16820
   },
-  "documents_total": 17037,
-  "generated_at": "2026-07-08T06:13:44.084721+00:00",
+  "documents_total": 17042,
+  "generated_at": "2026-07-09T07:09:06.198852+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1503,28 +1411,8 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 490,
+    "duplicate_count": 444,
     "duplicates": [
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
-            "id": "huizen-document-23161",
-            "source_id": "23161",
-            "source_object_id": "38408",
-            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
-          },
-          {
-            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
-            "id": "huizen-document-23161",
-            "source_id": "23161",
-            "source_object_id": "38408",
-            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
-          }
-        ],
-        "source_id": "23161"
-      },
       {
         "count": 2,
         "documents": [
@@ -1749,26 +1637,6 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
-            "id": "huizen-document-25926",
-            "source_id": "25926",
-            "source_object_id": "43289",
-            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
-          },
-          {
-            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
-            "id": "huizen-document-25926",
-            "source_id": "25926",
-            "source_object_id": "43289",
-            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
-          }
-        ],
-        "source_id": "25926"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
             "filename": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025.pdf",
             "id": "huizen-document-25927",
             "source_id": "25927",
@@ -1929,26 +1797,6 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
-            "id": "huizen-document-25963",
-            "source_id": "25963",
-            "source_object_id": "43355",
-            "title": "Bijlage 4 Termijnkalender"
-          },
-          {
-            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
-            "id": "huizen-document-25963",
-            "source_id": "25963",
-            "source_object_id": "43355",
-            "title": "Bijlage 4 Termijnkalender"
-          }
-        ],
-        "source_id": "25963"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
             "filename": "Bijlage 6 Financiele bijlage.pdf",
             "id": "huizen-document-25964",
             "source_id": "25964",
@@ -2004,33 +1852,93 @@
           }
         ],
         "source_id": "25988"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 1 Jaarstukken 2025.pdf",
+            "id": "huizen-document-25991",
+            "source_id": "25991",
+            "source_object_id": "43387",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          },
+          {
+            "filename": "Bijlage 1 Jaarstukken 2025.pdf",
+            "id": "huizen-document-25991",
+            "source_id": "25991",
+            "source_object_id": "43387",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          }
+        ],
+        "source_id": "25991"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Rapportage Protocol Grote Projecten.pdf",
+            "id": "huizen-document-26003",
+            "source_id": "26003",
+            "source_object_id": "43399",
+            "title": "Raadsvoorstel Rapportage Protocol Grote Projecten"
+          },
+          {
+            "filename": "Raadsvoorstel Rapportage Protocol Grote Projecten.pdf",
+            "id": "huizen-document-26003",
+            "source_id": "26003",
+            "source_object_id": "43399",
+            "title": "Raadsvoorstel Rapportage Protocol Grote Projecten"
+          }
+        ],
+        "source_id": "26003"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren.pdf",
+            "id": "huizen-document-26013",
+            "source_id": "26013",
+            "source_object_id": "43409",
+            "title": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren"
+          },
+          {
+            "filename": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren.pdf",
+            "id": "huizen-document-26013",
+            "source_id": "26013",
+            "source_object_id": "43409",
+            "title": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren"
+          }
+        ],
+        "source_id": "26013"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16792
+    "unique_count": 16820
   },
   "source_object_id": {
-    "duplicate_count": 490,
+    "duplicate_count": 444,
     "duplicates": [
       {
         "count": 2,
         "documents": [
           {
-            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
-            "id": "huizen-document-23161",
-            "source_id": "23161",
-            "source_object_id": "38408",
-            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
+            "filename": "Collegebesluit Protocol Bijtincidenten.pdf",
+            "id": "huizen-document-7472",
+            "source_id": "7472",
+            "source_object_id": "12928",
+            "title": "Collegebesluit Protocol Bijtincidenten"
           },
           {
-            "filename": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024.pdf",
-            "id": "huizen-document-23161",
-            "source_id": "23161",
-            "source_object_id": "38408",
-            "title": "Raadsvoorstel Vaststellen jaarverslag en jaarrekening 2024"
+            "filename": "Collegebesluit Protocol Bijtincidenten.pdf",
+            "id": "huizen-document-7472",
+            "source_id": "7472",
+            "source_object_id": "12928",
+            "title": "Collegebesluit Protocol Bijtincidenten"
           }
         ],
-        "source_object_id": "38408"
+        "source_object_id": "12928"
       },
       {
         "count": 2,
@@ -2256,26 +2164,6 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
-            "id": "huizen-document-25926",
-            "source_id": "25926",
-            "source_object_id": "43289",
-            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
-          },
-          {
-            "filename": "Agenda jaarrekeningcommissie 9 juni 2026.pdf",
-            "id": "huizen-document-25926",
-            "source_id": "25926",
-            "source_object_id": "43289",
-            "title": "Agenda jaarrekeningcommissie 9 juni 2026"
-          }
-        ],
-        "source_object_id": "43289"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
             "filename": "Raadsvoorstel vaststellen jaarverslag en jaarrekening 2025.pdf",
             "id": "huizen-document-25927",
             "source_id": "25927",
@@ -2436,26 +2324,6 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
-            "id": "huizen-document-25963",
-            "source_id": "25963",
-            "source_object_id": "43355",
-            "title": "Bijlage 4 Termijnkalender"
-          },
-          {
-            "filename": "Bijlage 4 Termijnkalender definitief.pdf",
-            "id": "huizen-document-25963",
-            "source_id": "25963",
-            "source_object_id": "43355",
-            "title": "Bijlage 4 Termijnkalender"
-          }
-        ],
-        "source_object_id": "43355"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
             "filename": "Bijlage 6 Financiele bijlage.pdf",
             "id": "huizen-document-25964",
             "source_id": "25964",
@@ -2511,9 +2379,49 @@
           }
         ],
         "source_object_id": "43384"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage 1 Jaarstukken 2025.pdf",
+            "id": "huizen-document-25991",
+            "source_id": "25991",
+            "source_object_id": "43387",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          },
+          {
+            "filename": "Bijlage 1 Jaarstukken 2025.pdf",
+            "id": "huizen-document-25991",
+            "source_id": "25991",
+            "source_object_id": "43387",
+            "title": "Bijlage 1 Jaarstukken 2025"
+          }
+        ],
+        "source_object_id": "43387"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Raadsvoorstel Rapportage Protocol Grote Projecten.pdf",
+            "id": "huizen-document-26003",
+            "source_id": "26003",
+            "source_object_id": "43399",
+            "title": "Raadsvoorstel Rapportage Protocol Grote Projecten"
+          },
+          {
+            "filename": "Raadsvoorstel Rapportage Protocol Grote Projecten.pdf",
+            "id": "huizen-document-26003",
+            "source_id": "26003",
+            "source_object_id": "43399",
+            "title": "Raadsvoorstel Rapportage Protocol Grote Projecten"
+          }
+        ],
+        "source_object_id": "43399"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16792
+    "unique_count": 16820
   }
 }
