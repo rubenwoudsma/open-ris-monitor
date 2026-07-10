@@ -1,6 +1,6 @@
 {
-  "documents_total": 17042,
-  "generated_at": "2026-07-09T07:09:06.300440+00:00",
+  "documents_total": 17070,
+  "generated_at": "2026-07-10T07:03:58.646457+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -53,7 +53,7 @@
       "normalized_document_type_label": "Agenda"
     },
     "Amendementen": {
-      "count": 158,
+      "count": 161,
       "normalized_document_type": "amendment",
       "normalized_document_type_label": "Amendement"
     },
@@ -118,7 +118,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Besluit": {
-      "count": 1178,
+      "count": 1204,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
     },
@@ -178,7 +178,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Collegevoorstel (Intern)": {
-      "count": 922,
+      "count": 923,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -333,7 +333,7 @@
       "normalized_document_type_label": "Motie"
     },
     "Moties": {
-      "count": 273,
+      "count": 274,
       "normalized_document_type": "motion",
       "normalized_document_type_label": "Motie"
     },
@@ -663,7 +663,7 @@
       "normalized_document_type_label": "Vraag"
     },
     "Vragen van raadsleden": {
-      "count": 338,
+      "count": 335,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4496,
+      "count": 4497,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -728,7 +728,7 @@
       ]
     },
     {
-      "count": 1730,
+      "count": 1756,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit",
       "source_document_types": [
@@ -811,7 +811,7 @@
       ]
     },
     {
-      "count": 411,
+      "count": 408,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag",
       "source_document_types": [
@@ -821,7 +821,7 @@
       ]
     },
     {
-      "count": 280,
+      "count": 281,
       "normalized_document_type": "motion",
       "normalized_document_type_label": "Motie",
       "source_document_types": [
@@ -852,7 +852,7 @@
       ]
     },
     {
-      "count": 158,
+      "count": 161,
       "normalized_document_type": "amendment",
       "normalized_document_type_label": "Amendement",
       "source_document_types": [
@@ -1001,7 +1001,7 @@
       "normalized_document_type_label": "Mededeling"
     },
     {
-      "count": 1178,
+      "count": 1204,
       "document_type": "Besluit",
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
@@ -1013,7 +1013,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 922,
+      "count": 923,
       "document_type": "Collegevoorstel (Intern)",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
@@ -1031,13 +1031,13 @@
       "normalized_document_type_label": "Verzoek of aanvullende gegevens"
     },
     {
-      "count": 338,
+      "count": 335,
       "document_type": "Vragen van raadsleden",
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
     },
     {
-      "count": 273,
+      "count": 274,
       "document_type": "Moties",
       "normalized_document_type": "motion",
       "normalized_document_type_label": "Motie"
@@ -1079,7 +1079,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 158,
+      "count": 161,
       "document_type": "Amendementen",
       "normalized_document_type": "amendment",
       "normalized_document_type_label": "Amendement"

@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 444,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -508,7 +508,7 @@
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 444,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -1396,14 +1396,126 @@
       },
       {
         "count": 2,
+        "value": "26330:43932"
+      },
+      {
+        "count": 2,
+        "value": "26331:43933"
+      },
+      {
+        "count": 2,
+        "value": "26332:43934"
+      },
+      {
+        "count": 2,
+        "value": "26333:43935"
+      },
+      {
+        "count": 2,
+        "value": "26334:43936"
+      },
+      {
+        "count": 2,
+        "value": "26335:43937"
+      },
+      {
+        "count": 2,
+        "value": "26336:43938"
+      },
+      {
+        "count": 2,
+        "value": "26337:43939"
+      },
+      {
+        "count": 2,
+        "value": "26338:43940"
+      },
+      {
+        "count": 2,
+        "value": "26339:43941"
+      },
+      {
+        "count": 2,
+        "value": "26340:43942"
+      },
+      {
+        "count": 2,
+        "value": "26341:43943"
+      },
+      {
+        "count": 2,
+        "value": "26342:43944"
+      },
+      {
+        "count": 2,
+        "value": "26343:43945"
+      },
+      {
+        "count": 2,
+        "value": "26344:43946"
+      },
+      {
+        "count": 2,
+        "value": "26345:43947"
+      },
+      {
+        "count": 2,
+        "value": "26346:43948"
+      },
+      {
+        "count": 2,
+        "value": "26347:43949"
+      },
+      {
+        "count": 2,
+        "value": "26348:43950"
+      },
+      {
+        "count": 2,
+        "value": "26349:43951"
+      },
+      {
+        "count": 2,
+        "value": "26350:43952"
+      },
+      {
+        "count": 2,
+        "value": "26351:43953"
+      },
+      {
+        "count": 2,
+        "value": "26352:43954"
+      },
+      {
+        "count": 2,
+        "value": "26353:43955"
+      },
+      {
+        "count": 2,
+        "value": "26354:43956"
+      },
+      {
+        "count": 2,
+        "value": "26355:43957"
+      },
+      {
+        "count": 2,
+        "value": "26357:43959"
+      },
+      {
+        "count": 2,
         "value": "7472:12928"
+      },
+      {
+        "count": 2,
+        "value": "7473:12929"
       }
     ],
     "missing_count": 0,
     "unique_count": 16820
   },
-  "documents_total": 17042,
-  "generated_at": "2026-07-09T07:09:06.198852+00:00",
+  "documents_total": 17070,
+  "generated_at": "2026-07-10T07:03:58.550127+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1411,7 +1523,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 444,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -1918,7 +2030,7 @@
     "unique_count": 16820
   },
   "source_object_id": {
-    "duplicate_count": 444,
+    "duplicate_count": 500,
     "duplicates": [
       {
         "count": 2,
@@ -1939,6 +2051,26 @@
           }
         ],
         "source_object_id": "12928"
+      },
+      {
+        "count": 2,
+        "documents": [
+          {
+            "filename": "Bijlage Burgemeestersvoorstel Protocol Bijtincidenten nw.pdf",
+            "id": "huizen-document-7473",
+            "source_id": "7473",
+            "source_object_id": "12929",
+            "title": "Bijlage Burgemeestersvoorstel Protocol Bijtincidenten"
+          },
+          {
+            "filename": "Bijlage Burgemeestersvoorstel Protocol Bijtincidenten nw.pdf",
+            "id": "huizen-document-7473",
+            "source_id": "7473",
+            "source_object_id": "12929",
+            "title": "Bijlage Burgemeestersvoorstel Protocol Bijtincidenten"
+          }
+        ],
+        "source_object_id": "12929"
       },
       {
         "count": 2,
@@ -2399,26 +2531,6 @@
           }
         ],
         "source_object_id": "43387"
-      },
-      {
-        "count": 2,
-        "documents": [
-          {
-            "filename": "Raadsvoorstel Rapportage Protocol Grote Projecten.pdf",
-            "id": "huizen-document-26003",
-            "source_id": "26003",
-            "source_object_id": "43399",
-            "title": "Raadsvoorstel Rapportage Protocol Grote Projecten"
-          },
-          {
-            "filename": "Raadsvoorstel Rapportage Protocol Grote Projecten.pdf",
-            "id": "huizen-document-26003",
-            "source_id": "26003",
-            "source_object_id": "43399",
-            "title": "Raadsvoorstel Rapportage Protocol Grote Projecten"
-          }
-        ],
-        "source_object_id": "43399"
       }
     ],
     "missing_count": 0,
