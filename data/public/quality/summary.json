@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-07-10T07:03:58.787095+00:00",
+  "generated_at": "2026-07-11T06:00:24.352754+00:00",
   "counts": {
     "documents": 17070,
     "document_versions": 25,
     "harvest_runs": 1,
     "meetings": 250,
     "meeting_items": 1000,
-    "meeting_documents": 90,
+    "meeting_documents": 91,
     "meeting_item_documents": 1734
   },
   "coverage": {
-    "documents_with_relations": 1455,
-    "documents_without_relations": 15615,
-    "coverage_pct": 8.52
+    "documents_with_relations": 1456,
+    "documents_without_relations": 15614,
+    "coverage_pct": 8.53
   },
   "integrity": {
     "orphan_meeting_document_relations": 0,
@@ -51,7 +51,7 @@
       "Besluit B&W (Intern)": 2,
       "Besluitenlijst (Intern)": 216,
       "Besluitenlijst raad": 114,
-      "Besluitenlijsten": 117,
+      "Besluitenlijsten": 118,
       "Bezwaarschrift (Inkomend)": 3,
       "Bijlage": 2362,
       "Brief besluit college (Uitgaand)": 6,
@@ -103,7 +103,7 @@
       "Onderhoudsrapport (Intern)": 1,
       "Onderzoeksstuk (Intern)": 3,
       "Opdracht (Intern)": 2,
-      "Overig": 1920,
+      "Overig": 1919,
       "Overig stuk inkomend": 4,
       "Overig stuk intern": 82,
       "Overig stuk uitgaand": 1,
@@ -166,7 +166,7 @@
       "answer": 42,
       "attachment": 2362,
       "commitment": 206,
-      "decision": 1756,
+      "decision": 1757,
       "incoming_document": 1501,
       "invitation": 150,
       "memo_or_advice": 67,
@@ -174,7 +174,7 @@
       "motion": 281,
       "notice": 270,
       "objection_or_response": 15,
-      "other": 2007,
+      "other": 2006,
       "policy_or_plan": 91,
       "proposal": 4497,
       "question": 408,
@@ -196,7 +196,7 @@
     "documents_seen_minus_published": 0,
     "raw_meeting_document_relations_seen": 0,
     "raw_meeting_item_document_relations_seen": 0,
-    "published_meeting_document_relations": 90,
+    "published_meeting_document_relations": 91,
     "published_meeting_item_document_relations": 1734,
     "dropped_meeting_document_relations": 0,
     "dropped_meeting_item_document_relations": 0
@@ -210,15 +210,15 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-07-10T07:03:57.777655+00:00",
-      "id": "harvest-huizen-20260710T065819Z",
+      "finished_at": "2026-07-11T06:00:23.316778+00:00",
+      "id": "harvest-huizen-20260711T055603Z",
       "max_documents": null,
       "meetings_seen": 250,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-07-10T06:58:19.020480+00:00",
+      "started_at": "2026-07-11T05:56:03.934738+00:00",
       "status": "success"
     }
   },

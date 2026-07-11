@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 500,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -504,11 +504,11 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16820
+    "unique_count": 16821
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 500,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -653,10 +653,6 @@
       {
         "count": 2,
         "value": "26073:43497"
-      },
-      {
-        "count": 2,
-        "value": "26084:43508"
       },
       {
         "count": 2,
@@ -1512,10 +1508,10 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16820
+    "unique_count": 16821
   },
   "documents_total": 17070,
-  "generated_at": "2026-07-10T07:03:58.550127+00:00",
+  "generated_at": "2026-07-11T06:00:24.111196+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1523,7 +1519,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 500,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -2027,10 +2023,10 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16820
+    "unique_count": 16821
   },
   "source_object_id": {
-    "duplicate_count": 500,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -2534,6 +2530,6 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16820
+    "unique_count": 16821
   }
 }
