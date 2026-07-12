@@ -1,6 +1,6 @@
 {
-  "documents_total": 17070,
-  "generated_at": "2026-07-11T06:00:24.206074+00:00",
+  "documents_total": 17071,
+  "generated_at": "2026-07-12T07:01:31.793285+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -138,7 +138,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Besluitenlijsten": {
-      "count": 118,
+      "count": 119,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
     },
@@ -728,7 +728,7 @@
       ]
     },
     {
-      "count": 1757,
+      "count": 1758,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit",
       "source_document_types": [
@@ -1091,7 +1091,7 @@
       "normalized_document_type_label": "Uitnodiging"
     },
     {
-      "count": 118,
+      "count": 119,
       "document_type": "Besluitenlijsten",
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
