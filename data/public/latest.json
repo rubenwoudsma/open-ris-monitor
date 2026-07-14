@@ -1,7 +1,7 @@
 {
   "checksums_enabled": false,
   "dataset_agenda_items_total": 1000,
-  "dataset_document_relations_total": 1825,
+  "dataset_document_relations_total": 1810,
   "dataset_documents_total": 17071,
   "dataset_meetings_total": 250,
   "documents_normalized": 17071,
@@ -9,8 +9,8 @@
   "documents_seen": 17071,
   "documents_seen_in_run": 250,
   "documents_versioned": 0,
-  "generated_at": "2026-07-13T06:51:58.912543+00:00",
-  "harvest_run_id": "harvest-huizen-20260713T063452Z",
+  "generated_at": "2026-07-14T05:49:07.227435+00:00",
+  "harvest_run_id": "harvest-huizen-20260714T054315Z",
   "last_full_backfill_at": "2026-06-24T11:32:45.288779+00:00",
   "mode": "latest",
   "municipality": "huizen",
@@ -40,7 +40,7 @@
   "relations_summary": {
     "candidate_meetings_seen": 250,
     "meeting_document_relations_seen": 91,
-    "meeting_item_document_relations_seen": 1734,
+    "meeting_item_document_relations_seen": 1719,
     "meeting_items_seen": 1000,
     "meeting_session_scan_mode": "full",
     "meeting_sessions_seen": 0,

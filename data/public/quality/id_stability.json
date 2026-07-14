@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 500,
+    "duplicate_count": 480,
     "duplicates": [
       {
         "count": 2,
@@ -173,11 +173,11 @@
             "title": "Bijlage 3 Accountantsverslag Huizen 2025"
           },
           {
-            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend) def.pdf",
             "id": "huizen-document-25916",
             "source_id": "25916",
             "source_object_id": "43279",
-            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025 (ondertekend)"
           }
         ],
         "id": "huizen-document-25916"
@@ -486,29 +486,29 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren.pdf",
-            "id": "huizen-document-26013",
-            "source_id": "26013",
-            "source_object_id": "43409",
-            "title": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren"
+            "filename": "Raadsvoorstel toetreding Eemnes.pdf",
+            "id": "huizen-document-26015",
+            "source_id": "26015",
+            "source_object_id": "43411",
+            "title": "Raadsvoorstel Wijziging gemeenschappelijke regeling Gemeentebelastingen Huizen, Blaricum en Laren in verband met toetreding van de gemeente Eemnes"
           },
           {
-            "filename": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren.pdf",
-            "id": "huizen-document-26013",
-            "source_id": "26013",
-            "source_object_id": "43409",
-            "title": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren"
+            "filename": "Raadsvoorstel toetreding Eemnes.pdf",
+            "id": "huizen-document-26015",
+            "source_id": "26015",
+            "source_object_id": "43411",
+            "title": "Raadsvoorstel Wijziging gemeenschappelijke regeling Gemeentebelastingen Huizen, Blaricum en Laren in verband met toetreding van de gemeente Eemnes"
           }
         ],
-        "id": "huizen-document-26013"
+        "id": "huizen-document-26015"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16821
+    "unique_count": 16831
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 500,
+    "duplicate_count": 480,
     "duplicates": [
       {
         "count": 2,
@@ -608,10 +608,6 @@
       },
       {
         "count": 2,
-        "value": "26013:43409"
-      },
-      {
-        "count": 2,
         "value": "26015:43411"
       },
       {
@@ -636,15 +632,7 @@
       },
       {
         "count": 2,
-        "value": "26054:43465"
-      },
-      {
-        "count": 2,
         "value": "26063:43476"
-      },
-      {
-        "count": 2,
-        "value": "26064:43477"
       },
       {
         "count": 2,
@@ -656,23 +644,7 @@
       },
       {
         "count": 2,
-        "value": "26086:43510"
-      },
-      {
-        "count": 2,
-        "value": "26089:43513"
-      },
-      {
-        "count": 2,
-        "value": "26091:43515"
-      },
-      {
-        "count": 2,
         "value": "26092:43517"
-      },
-      {
-        "count": 2,
-        "value": "26093:43519"
       },
       {
         "count": 2,
@@ -713,18 +685,6 @@
       {
         "count": 2,
         "value": "26103:43532"
-      },
-      {
-        "count": 2,
-        "value": "26104:43533"
-      },
-      {
-        "count": 2,
-        "value": "26105:43534"
-      },
-      {
-        "count": 2,
-        "value": "26106:43535"
       },
       {
         "count": 2,
@@ -1512,10 +1472,10 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16821
+    "unique_count": 16831
   },
   "documents_total": 17071,
-  "generated_at": "2026-07-13T06:51:59.222766+00:00",
+  "generated_at": "2026-07-14T05:49:07.502798+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1523,7 +1483,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 500,
+    "duplicate_count": 480,
     "duplicates": [
       {
         "count": 2,
@@ -1696,11 +1656,11 @@
             "title": "Bijlage 3 Accountantsverslag Huizen 2025"
           },
           {
-            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend) def.pdf",
             "id": "huizen-document-25916",
             "source_id": "25916",
             "source_object_id": "43279",
-            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025 (ondertekend)"
           }
         ],
         "source_id": "25916"
@@ -2009,28 +1969,28 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren.pdf",
-            "id": "huizen-document-26013",
-            "source_id": "26013",
-            "source_object_id": "43409",
-            "title": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren"
+            "filename": "Raadsvoorstel toetreding Eemnes.pdf",
+            "id": "huizen-document-26015",
+            "source_id": "26015",
+            "source_object_id": "43411",
+            "title": "Raadsvoorstel Wijziging gemeenschappelijke regeling Gemeentebelastingen Huizen, Blaricum en Laren in verband met toetreding van de gemeente Eemnes"
           },
           {
-            "filename": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren.pdf",
-            "id": "huizen-document-26013",
-            "source_id": "26013",
-            "source_object_id": "43409",
-            "title": "Bijlage 2 Huidige gemeenschappelijke regeling gemeentebelastingen Huizen, Blaricum en Laren"
+            "filename": "Raadsvoorstel toetreding Eemnes.pdf",
+            "id": "huizen-document-26015",
+            "source_id": "26015",
+            "source_object_id": "43411",
+            "title": "Raadsvoorstel Wijziging gemeenschappelijke regeling Gemeentebelastingen Huizen, Blaricum en Laren in verband met toetreding van de gemeente Eemnes"
           }
         ],
-        "source_id": "26013"
+        "source_id": "26015"
       }
     ],
     "missing_count": 0,
-    "unique_count": 16821
+    "unique_count": 16831
   },
   "source_object_id": {
-    "duplicate_count": 500,
+    "duplicate_count": 480,
     "duplicates": [
       {
         "count": 2,
@@ -2243,11 +2203,11 @@
             "title": "Bijlage 3 Accountantsverslag Huizen 2025"
           },
           {
-            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend) def.pdf",
             "id": "huizen-document-25916",
             "source_id": "25916",
             "source_object_id": "43279",
-            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025 (ondertekend)"
           }
         ],
         "source_object_id": "43279"
@@ -2534,6 +2494,6 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16821
+    "unique_count": 16831
   }
 }
