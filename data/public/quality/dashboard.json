@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1656,
-    "documents_with_any_meeting_context_ratio": 0.097,
-    "documents_without_meeting_context": 15415
+    "documents_with_any_meeting_context": 1665,
+    "documents_with_any_meeting_context_ratio": 0.0975,
+    "documents_without_meeting_context": 15416
   },
-  "dataset_generated_at": "2026-07-14T05:49:07.227435+00:00",
+  "dataset_generated_at": "2026-07-15T05:48:54.122634+00:00",
   "document_file_size": {
-    "average_bytes": 1134229,
-    "known_count": 17071,
+    "average_bytes": 1133658,
+    "known_count": 17081,
     "largest_bytes": 162614430,
-    "total_bytes": 19362419028,
+    "total_bytes": 19364003781,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -19,11 +19,11 @@
     },
     {
       "bucket": "0-100 KB",
-      "count": 5830
+      "count": 5831
     },
     {
       "bucket": "100 KB-1 MB",
-      "count": 8237
+      "count": 8246
     },
     {
       "bucket": "1-5 MB",
@@ -36,7 +36,7 @@
   ],
   "documents_by_type": [
     {
-      "count": 4507,
+      "count": 4517,
       "document_type": "Voorstel"
     },
     {
@@ -118,16 +118,16 @@
       "year": "2025"
     },
     {
-      "count": 1399,
+      "count": 1409,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-07-14T05:49:07.227435+00:00",
+    "generated_at": "2026-07-15T05:48:54.122634+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-07-14T05:49:07.730435+00:00",
+  "generated_at": "2026-07-15T05:48:54.533967+00:00",
   "meeting_items_by_year": [
     {
       "count": 237,
@@ -161,8 +161,8 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 17071,
-    "linked_documents": 1656,
+    "documents": 17081,
+    "linked_documents": 1665,
     "meeting_documents": 91,
     "meeting_item_documents": 1719,
     "meeting_items": 1000,
@@ -171,6 +171,6 @@
     "organization_persons": 95,
     "organization_positions": 306,
     "organization_roles": 32,
-    "unlinked_documents": 15415
+    "unlinked_documents": 15416
   }
 }

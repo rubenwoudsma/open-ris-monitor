@@ -1,6 +1,6 @@
 {
   "canonical_id": {
-    "duplicate_count": 480,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -166,11 +166,11 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend) def.pdf",
             "id": "huizen-document-25916",
             "source_id": "25916",
             "source_object_id": "43279",
-            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025 (ondertekend)"
           },
           {
             "filename": "Accountantsverslag Huizen 2025 (ondertekend) def.pdf",
@@ -504,11 +504,11 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16831
+    "unique_count": 16832
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
-    "duplicate_count": 480,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -685,10 +685,6 @@
       {
         "count": 2,
         "value": "26103:43532"
-      },
-      {
-        "count": 2,
-        "value": "26108:43537"
       },
       {
         "count": 2,
@@ -1464,6 +1460,46 @@
       },
       {
         "count": 2,
+        "value": "26362:43968"
+      },
+      {
+        "count": 2,
+        "value": "26363:43970"
+      },
+      {
+        "count": 2,
+        "value": "26364:43972"
+      },
+      {
+        "count": 2,
+        "value": "26365:43974"
+      },
+      {
+        "count": 2,
+        "value": "26366:43976"
+      },
+      {
+        "count": 2,
+        "value": "26367:43978"
+      },
+      {
+        "count": 2,
+        "value": "26368:43980"
+      },
+      {
+        "count": 2,
+        "value": "26369:43982"
+      },
+      {
+        "count": 2,
+        "value": "26370:43984"
+      },
+      {
+        "count": 2,
+        "value": "26371:43986"
+      },
+      {
+        "count": 2,
         "value": "7472:12928"
       },
       {
@@ -1472,10 +1508,10 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16831
+    "unique_count": 16832
   },
-  "documents_total": 17071,
-  "generated_at": "2026-07-14T05:49:07.502798+00:00",
+  "documents_total": 17081,
+  "generated_at": "2026-07-15T05:48:54.358037+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -1483,7 +1519,7 @@
   ],
   "recommended_identity_key": "needs_review",
   "source_id": {
-    "duplicate_count": 480,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -1649,11 +1685,11 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend) def.pdf",
             "id": "huizen-document-25916",
             "source_id": "25916",
             "source_object_id": "43279",
-            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025 (ondertekend)"
           },
           {
             "filename": "Accountantsverslag Huizen 2025 (ondertekend) def.pdf",
@@ -1987,10 +2023,10 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16831
+    "unique_count": 16832
   },
   "source_object_id": {
-    "duplicate_count": 480,
+    "duplicate_count": 498,
     "duplicates": [
       {
         "count": 2,
@@ -2196,11 +2232,11 @@
         "count": 2,
         "documents": [
           {
-            "filename": "Accountantsverslag Huizen 2025 (ondertekend).pdf",
+            "filename": "Accountantsverslag Huizen 2025 (ondertekend) def.pdf",
             "id": "huizen-document-25916",
             "source_id": "25916",
             "source_object_id": "43279",
-            "title": "Bijlage 3 Accountantsverslag Huizen 2025"
+            "title": "Bijlage 3 Accountantsverslag Huizen 2025 (ondertekend)"
           },
           {
             "filename": "Accountantsverslag Huizen 2025 (ondertekend) def.pdf",
@@ -2494,6 +2530,6 @@
       }
     ],
     "missing_count": 0,
-    "unique_count": 16831
+    "unique_count": 16832
   }
 }
