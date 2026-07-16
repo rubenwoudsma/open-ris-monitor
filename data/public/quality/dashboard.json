@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1665,
-    "documents_with_any_meeting_context_ratio": 0.0975,
-    "documents_without_meeting_context": 15416
+    "documents_with_any_meeting_context": 1664,
+    "documents_with_any_meeting_context_ratio": 0.0974,
+    "documents_without_meeting_context": 15418
   },
-  "dataset_generated_at": "2026-07-15T05:48:54.122634+00:00",
+  "dataset_generated_at": "2026-07-16T06:02:15.511790+00:00",
   "document_file_size": {
-    "average_bytes": 1133658,
-    "known_count": 17081,
+    "average_bytes": 1133599,
+    "known_count": 17082,
     "largest_bytes": 162614430,
-    "total_bytes": 19364003781,
+    "total_bytes": 19364130320,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -19,7 +19,7 @@
     },
     {
       "bucket": "0-100 KB",
-      "count": 5831
+      "count": 5832
     },
     {
       "bucket": "100 KB-1 MB",
@@ -44,7 +44,7 @@
       "document_type": "Bijlage"
     },
     {
-      "count": 2001,
+      "count": 2002,
       "document_type": "Overig"
     },
     {
@@ -118,23 +118,23 @@
       "year": "2025"
     },
     {
-      "count": 1409,
+      "count": 1410,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-07-15T05:48:54.122634+00:00",
+    "generated_at": "2026-07-16T06:02:15.511790+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-07-15T05:48:54.533967+00:00",
+  "generated_at": "2026-07-16T06:02:16.100219+00:00",
   "meeting_items_by_year": [
     {
-      "count": 237,
+      "count": 236,
       "year": "2025"
     },
     {
-      "count": 763,
+      "count": 764,
       "year": "2026"
     }
   ],
@@ -161,16 +161,16 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 17081,
-    "linked_documents": 1665,
+    "documents": 17082,
+    "linked_documents": 1664,
     "meeting_documents": 91,
-    "meeting_item_documents": 1719,
+    "meeting_item_documents": 1718,
     "meeting_items": 1000,
     "meetings": 250,
     "organization_groups": 24,
     "organization_persons": 95,
     "organization_positions": 306,
     "organization_roles": 32,
-    "unlinked_documents": 15416
+    "unlinked_documents": 15418
   }
 }
