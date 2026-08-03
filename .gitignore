@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Transactional harvest workspace and incident diagnostics
+data/.harvest-staging/
+data/diagnostics/
