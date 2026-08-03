@@ -133,7 +133,9 @@ The current Open State GemeenteOplossingen extractor:
 
 Their Huizen source is present and currently inherits the default API v1 configuration. This does not provide a proven replacement for the Open RIS Monitor v2 route. It also does not establish from public code alone whether their Huizen import stopped on exactly 17 July 2026.
 
-The useful lesson is limited: API version and source paths should be configurable and diagnosed explicitly. Open State's silent non-200-to-empty behavior should not be copied because it could make an outage look like a valid empty collection.
+The useful lesson is limited but actionable: API version and source paths should be configurable and diagnosed explicitly. The Huizen municipality profile now lists the known v1 base as a diagnostic candidate. A failed GitHub-hosted preflight compares v2 and v1 from the same runner and records the JSON response shape. Open State's silent non-200-to-empty behavior should not be copied because it could make an outage look like a valid empty collection.
+
+A 200 response from the v1 document route is not by itself permission to switch production harvesting. The connector must first support the v1 bare-list response and its date-window discovery semantics, followed by an end-to-end no-commit run and a coverage comparison against the existing public dataset.
 
 ## Implemented controls
 

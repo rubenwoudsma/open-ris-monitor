@@ -20,6 +20,7 @@ import requests
 
 from open_ris_monitor.connectors.gemeenteoplossingen import (
     DEFAULT_USER_AGENT,
+    _is_json_content_type,
     _safe_body_preview,
     sanitize_url,
 )
@@ -183,6 +184,41 @@ def _history(response: requests.Response) -> list[dict[str, Any]]:
     ]
 
 
+def _json_shape(response: requests.Response, content_type: str | None) -> dict[str, Any]:
+    """Describe a JSON response without logging complete public records."""
+    if not _is_json_content_type(content_type):
+        return {}
+    try:
+        payload = json.loads(response.content)
+    except (json.JSONDecodeError, TypeError, UnicodeDecodeError):
+        return {"json_shape": "malformed"}
+
+    if isinstance(payload, list):
+        return {
+            "json_shape": "list",
+            "json_item_count": len(payload),
+            "json_item_shape": (
+                type(payload[0]).__name__ if payload else None
+            ),
+        }
+    if isinstance(payload, dict):
+        result = payload.get("result")
+        details: dict[str, Any] = {
+            "json_shape": "object",
+            "json_keys": sorted(str(key) for key in payload)[:20],
+        }
+        if isinstance(result, dict):
+            details["json_result_shape"] = "object"
+            details["json_result_keys"] = sorted(str(key) for key in result)[:20]
+        elif isinstance(result, list):
+            details["json_result_shape"] = "list"
+            details["json_result_item_count"] = len(result)
+        elif result is None and "result" in payload:
+            details["json_result_shape"] = "null"
+        return details
+    return {"json_shape": type(payload).__name__}
+
+
 def run_single_probe(
     *,
     session: requests.Session,
@@ -237,6 +273,7 @@ def run_single_probe(
                 "redirect_history": _history(response),
                 "response_headers": _safe_headers(response),
                 "body_preview": preview or None,
+                **({} if download_probe else _json_shape(response, content_type)),
             }
         )
     except requests.Timeout:
@@ -262,8 +299,19 @@ def run_probe(
     source_system = config["source_system"]
     configured_base_url = str(source_system["base_url"]).rstrip("/") + "/"
     base_urls = [("configured", configured_base_url)]
-    for index, value in enumerate(additional_base_urls, start=1):
-        base_urls.append((f"additional_{index}", str(value).rstrip("/") + "/"))
+    candidate_values = [
+        *(source_system.get("diagnostic_base_urls") or ()),
+        *additional_base_urls,
+    ]
+    seen_base_urls = {configured_base_url}
+    candidate_index = 0
+    for value in candidate_values:
+        candidate_url = str(value).strip().rstrip("/") + "/"
+        if candidate_url in seen_base_urls:
+            continue
+        candidate_index += 1
+        seen_base_urls.add(candidate_url)
+        base_urls.append((f"candidate_{candidate_index}", candidate_url))
     ids = resolve_probe_ids(public_dir)
     probes = build_probe_matrix(ids, scope=scope)
     agents = [("project", str(source_system.get("user_agent") or DEFAULT_USER_AGENT))]
@@ -308,13 +356,15 @@ def _summary_markdown(report: dict[str, Any]) -> str:
         f"Requests: `{report['request_count']}`  ",
         "The browser-like User-Agent is used only for bounded diagnosis, never for harvesting.",
         "",
-        "| Base | Probe | User-Agent | HTTP | Category | Content-Type |",
-        "| --- | --- | --- | ---: | --- | --- |",
+        "| Base | Probe | User-Agent | HTTP | Category | JSON shape | Items | Content-Type |",
+        "| --- | --- | --- | ---: | --- | --- | ---: | --- |",
     ]
     for item in report["results"]:
         lines.append(
             f"| `{item['base_url_label']}` | `{item['name']}` | `{item['user_agent']}` | "
             f"{item.get('status_code', '')} | `{item.get('category', '')}` | "
+            f"`{item.get('json_shape') or ''}` | "
+            f"{item.get('json_item_count', item.get('json_result_item_count', ''))} | "
             f"`{item.get('content_type') or ''}` |"
         )
     return "\n".join(lines) + "\n"
@@ -364,12 +414,18 @@ def main(argv: list[str] | None = None) -> None:
     for item in report["results"]:
         print(
             "probe base={base} name={name} ua={user_agent} status={status} category={category} "
-            "content_type={content_type} final_url={final_url}".format(
+            "json_shape={json_shape} items={items} content_type={content_type} "
+            "final_url={final_url}".format(
                 base=item.get("base_url_label", "configured"),
                 name=item["name"],
                 user_agent=item["user_agent"],
                 status=item.get("status_code", ""),
                 category=item.get("category", ""),
+                json_shape=item.get("json_shape", ""),
+                items=item.get(
+                    "json_item_count",
+                    item.get("json_result_item_count", ""),
+                ),
                 content_type=item.get("content_type", ""),
                 final_url=item.get("final_url", item.get("request_url", "")),
             )

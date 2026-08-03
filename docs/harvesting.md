@@ -293,7 +293,9 @@ python -m open_ris_monitor.diagnostics.gemeenteoplossingen_probe \
   --output data/diagnostics/probe-v1-v2.json
 ```
 
-`--additional-base-url` is diagnostic only. It does not enable a fallback and cannot select a route for publication.
+Known candidates can also be listed as `source_system.diagnostic_base_urls` in the municipality profile. The Huizen profile compares the currently configured v2 base URL with the v1 base URL used by the current Open State source configuration. These candidates are diagnostic only. They do not enable a fallback and cannot select a route for publication.
+
+`--additional-base-url` remains available for one-off comparisons that should not be committed to municipality configuration.
 
 ## Transactional publication
 
