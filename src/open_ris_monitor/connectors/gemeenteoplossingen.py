@@ -1,16 +1,134 @@
 from __future__ import annotations
 
+import json
 import logging
+import re
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from email.utils import parsedate_to_datetime
 from typing import Any
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
 import requests
 
 LOGGER = logging.getLogger(__name__)
 
 DEFAULT_RETRY_STATUS_CODES = frozenset({408, 429, 500, 502, 503, 504})
+DEFAULT_USER_AGENT = "OpenRISMonitor/0.1 (+https://github.com/rubenwoudsma/open-ris-monitor)"
+SENSITIVE_QUERY_KEYS = frozenset(
+    {"access_token", "api_key", "apikey", "authorization", "key", "password", "secret", "signature", "token"}
+)
+
+
+class GemeenteOplossingenError(RuntimeError):
+    """Base error with safe, actionable upstream request context."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        category: str,
+        method: str = "GET",
+        url: str | None = None,
+        status_code: int | None = None,
+        content_type: str | None = None,
+        redirect_history: tuple[str, ...] = (),
+        body_preview: str | None = None,
+    ) -> None:
+        self.category = category
+        self.method = method
+        self.url = url
+        self.status_code = status_code
+        self.content_type = content_type
+        self.redirect_history = redirect_history
+        self.body_preview = body_preview
+        details = [f"category={category}", f"method={method}"]
+        if url:
+            details.append(f"url={url}")
+        if status_code is not None:
+            details.append(f"status={status_code}")
+        if content_type:
+            details.append(f"content_type={content_type}")
+        if redirect_history:
+            details.append(f"redirects={' -> '.join(redirect_history)}")
+        if body_preview:
+            details.append(f"body_preview={body_preview!r}")
+        super().__init__(f"{message} [{'; '.join(details)}]")
+
+
+class GemeenteOplossingenPreflightError(GemeenteOplossingenError):
+    """Raised after one or more required API endpoints fail preflight."""
+
+    def __init__(self, results: list[dict[str, Any]]) -> None:
+        self.results = results
+        failed = [result for result in results if result.get("status") != "ok"]
+        summary = ", ".join(
+            f"{result.get('endpoint')}={result.get('category', 'unknown')}" for result in failed
+        )
+        super().__init__(
+            f"GemeenteOplossingen preflight failed: {summary}",
+            category="preflight_failed",
+        )
+
+
+def sanitize_url(url: str) -> str:
+    """Remove credentials and sensitive query values from a URL."""
+    parsed = urlparse(url)
+    hostname = parsed.hostname or ""
+    netloc = hostname
+    if parsed.port:
+        netloc = f"{netloc}:{parsed.port}"
+    safe_query = []
+    for key, value in parse_qsl(parsed.query, keep_blank_values=True):
+        safe_query.append((key, "[REDACTED]" if key.lower() in SENSITIVE_QUERY_KEYS else value))
+    return urlunparse((parsed.scheme, netloc, parsed.path, parsed.params, urlencode(safe_query), ""))
+
+
+def _safe_body_preview(response: requests.Response, limit: int = 320) -> str:
+    content = getattr(response, "content", b"") or b""
+    if isinstance(content, str):
+        text = content
+    else:
+        encoding = getattr(response, "encoding", None) or "utf-8"
+        text = content.decode(encoding, errors="replace")
+    text = re.sub(r"(?i)(bearer\s+)[A-Za-z0-9._~+/-]+=*", r"\1[REDACTED]", text)
+    text = re.sub(
+        r"(?i)(access_token|api[_-]?key|password|secret|signature|token)(\s*[:=]\s*)[^&\s<]+",
+        r"\1\2[REDACTED]",
+        text,
+    )
+    text = " ".join(text.split())
+    if len(text) > limit:
+        return text[:limit] + "..."
+    return text
+
+
+def _redirect_history(response: requests.Response) -> tuple[str, ...]:
+    history = []
+    for item in getattr(response, "history", ()) or ():
+        status = getattr(item, "status_code", "?")
+        location = getattr(item, "headers", {}).get("Location", "")
+        history.append(f"{status}:{sanitize_url(location or getattr(item, 'url', ''))}")
+    return tuple(history)
+
+
+def _is_json_content_type(content_type: str | None) -> bool:
+    if not content_type:
+        return False
+    media_type = content_type.split(";", 1)[0].strip().lower()
+    return media_type == "application/json" or media_type.endswith("+json")
+
+
+def _is_html_response(content_type: str | None, preview: str) -> bool:
+    media_type = (content_type or "").split(";", 1)[0].strip().lower()
+    return "html" in media_type or preview.lower().startswith(
+        ("<!doctype html", "<html", "toegang geweigerd")
+    )
+
+
+def _prepared_url(url: str, params: dict[str, Any] | None) -> str:
+    prepared = requests.Request("GET", url, params=params).prepare()
+    return sanitize_url(prepared.url or url)
 
 
 class GemeenteOplossingenConnector:
@@ -30,7 +148,10 @@ class GemeenteOplossingenConnector:
         request_delay_seconds: float = 0.0,
         retry_attempts: int = 3,
         retry_backoff_seconds: float = 1.0,
+        max_retry_delay_seconds: float = 60.0,
         retry_status_codes: set[int] | frozenset[int] | None = None,
+        user_agent: str = DEFAULT_USER_AGENT,
+        allowed_redirect_hosts: Iterable[str] | None = None,
         session: requests.Session | None = None,
         sleep_func: Callable[[float], None] = time.sleep,
     ) -> None:
@@ -39,8 +160,15 @@ class GemeenteOplossingenConnector:
         self.request_delay_seconds = max(0.0, float(request_delay_seconds))
         self.retry_attempts = max(0, int(retry_attempts))
         self.retry_backoff_seconds = max(0.0, float(retry_backoff_seconds))
+        self.max_retry_delay_seconds = max(0.0, float(max_retry_delay_seconds))
         self.retry_status_codes = frozenset(retry_status_codes or DEFAULT_RETRY_STATUS_CODES)
+        self.user_agent = user_agent.strip() or DEFAULT_USER_AGENT
+        base_host = urlparse(self.base_url).hostname or ""
+        self.allowed_redirect_hosts = frozenset({base_host, *(allowed_redirect_hosts or ())})
         self.session = session or requests.Session()
+        session_headers = getattr(self.session, "headers", None)
+        if session_headers is not None and hasattr(session_headers, "update"):
+            session_headers.update({"Accept": "application/json", "User-Agent": self.user_agent})
         self._sleep = sleep_func
 
     def _sleep_if_needed(self) -> None:
@@ -50,42 +178,89 @@ class GemeenteOplossingenConnector:
     def _retry_delay(self, attempt: int, response: requests.Response | None = None) -> float:
         retry_after = _parse_retry_after_seconds(response)
         if retry_after is not None:
-            return retry_after
-        return self.retry_backoff_seconds * (2 ** max(0, attempt - 1))
+            return min(retry_after, self.max_retry_delay_seconds)
+        delay = self.retry_backoff_seconds * (2 ** max(0, attempt - 1))
+        return min(delay, self.max_retry_delay_seconds)
 
     def _request(self, path: str, params: dict[str, Any] | None = None) -> requests.Response:
         self._sleep_if_needed()
         url = self.base_url + path.lstrip("/")
+        request_url = _prepared_url(url, params)
         max_attempts = self.retry_attempts + 1
-        last_exc: requests.RequestException | None = None
 
         for attempt in range(1, max_attempts + 1):
             try:
-                response = self.session.get(url, params=params, timeout=self.timeout_seconds)
-            except (requests.Timeout, requests.ConnectionError) as exc:
-                last_exc = exc
-                if attempt >= max_attempts:
-                    raise
-                delay = self._retry_delay(attempt)
-                LOGGER.warning(
-                    "Temporary GemeenteOplossingen request failure for %s, attempt %s/%s. "
-                    "Retrying in %.2fs: %s",
+                response = self.session.get(
                     url,
-                    attempt,
-                    max_attempts,
-                    delay,
-                    exc,
+                    params=params,
+                    timeout=self.timeout_seconds,
                 )
-                self._sleep(delay)
-                continue
+            except requests.Timeout as exc:
+                if attempt < max_attempts:
+                    delay = self._retry_delay(attempt)
+                    LOGGER.warning(
+                        "Temporary GemeenteOplossingen timeout for %s, attempt %s/%s, "
+                        "retrying in %.2fs",
+                        request_url,
+                        attempt,
+                        max_attempts,
+                        delay,
+                    )
+                    self._sleep(delay)
+                    continue
+                raise GemeenteOplossingenError(
+                    "GemeenteOplossingen request timed out",
+                    category="timeout",
+                    url=request_url,
+                ) from exc
+            except requests.ConnectionError as exc:
+                if attempt < max_attempts:
+                    delay = self._retry_delay(attempt)
+                    LOGGER.warning(
+                        "Temporary GemeenteOplossingen connection error for %s, "
+                        "attempt %s/%s, retrying in %.2fs",
+                        request_url,
+                        attempt,
+                        max_attempts,
+                        delay,
+                    )
+                    self._sleep(delay)
+                    continue
+                raise GemeenteOplossingenError(
+                    "GemeenteOplossingen connection failed",
+                    category="connection_error",
+                    url=request_url,
+                ) from exc
+            except requests.RequestException as exc:
+                raise GemeenteOplossingenError(
+                    "GemeenteOplossingen request failed",
+                    category="network_error",
+                    url=request_url,
+                ) from exc
+
+            final_url = sanitize_url(getattr(response, "url", request_url))
+            content_type = getattr(response, "headers", {}).get("Content-Type")
+            redirects = _redirect_history(response)
+            final_host = urlparse(getattr(response, "url", request_url)).hostname or ""
+            if redirects and final_host not in self.allowed_redirect_hosts:
+                preview = _safe_body_preview(response)
+                raise GemeenteOplossingenError(
+                    "GemeenteOplossingen redirected to an unapproved host",
+                    category="unsafe_redirect",
+                    url=final_url,
+                    status_code=response.status_code,
+                    content_type=content_type,
+                    redirect_history=redirects,
+                    body_preview=preview,
+                )
 
             if response.status_code in self.retry_status_codes and attempt < max_attempts:
                 delay = self._retry_delay(attempt, response=response)
                 LOGGER.warning(
-                    "Temporary GemeenteOplossingen HTTP %s for %s, attempt %s/%s. "
-                    "Retrying in %.2fs.",
+                    "Temporary GemeenteOplossingen HTTP %s for %s, attempt %s/%s, "
+                    "retrying in %.2fs",
                     response.status_code,
-                    url,
+                    final_url,
                     attempt,
                     max_attempts,
                     delay,
@@ -93,18 +268,74 @@ class GemeenteOplossingenConnector:
                 self._sleep(delay)
                 continue
 
-            response.raise_for_status()
+            if response.status_code >= 400:
+                preview = _safe_body_preview(response)
+                if _is_html_response(content_type, preview):
+                    raise GemeenteOplossingenError(
+                        "Received an HTML error or access-control page where API JSON "
+                        "was expected",
+                        category="html_response",
+                        url=final_url,
+                        status_code=response.status_code,
+                        content_type=content_type,
+                        redirect_history=redirects,
+                        body_preview=preview,
+                    )
+                raise GemeenteOplossingenError(
+                    "GemeenteOplossingen returned an HTTP error",
+                    category=f"http_{response.status_code}",
+                    url=final_url,
+                    status_code=response.status_code,
+                    content_type=content_type,
+                    redirect_history=redirects,
+                    body_preview=preview,
+                )
             return response
 
-        if last_exc is not None:
-            raise last_exc
-        raise RuntimeError(f"Failed to fetch {url}")
+        raise GemeenteOplossingenError(
+            "GemeenteOplossingen request exhausted retry budget",
+            category="retry_exhausted",
+            url=request_url,
+        )
 
     def _get_json(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         response = self._request(path, params=params)
-        data = response.json()
+        content_type = getattr(response, "headers", {}).get("Content-Type")
+        preview = _safe_body_preview(response)
+        context = {
+            "url": sanitize_url(getattr(response, "url", self.base_url + path.lstrip("/"))),
+            "status_code": response.status_code,
+            "content_type": content_type,
+            "redirect_history": _redirect_history(response),
+            "body_preview": preview,
+        }
+        if not _is_json_content_type(content_type):
+            is_html = _is_html_response(content_type, preview)
+            raise GemeenteOplossingenError(
+                "Received HTML where JSON was expected" if is_html else "Unexpected response Content-Type",
+                category="html_response" if is_html else "unexpected_content_type",
+                **context,
+            )
+        try:
+            data = response.json()
+        except (requests.JSONDecodeError, json.JSONDecodeError, ValueError) as exc:
+            raise GemeenteOplossingenError(
+                "GemeenteOplossingen returned malformed JSON",
+                category="malformed_json",
+                **context,
+            ) from exc
         if not isinstance(data, dict):
-            raise ValueError(f"Expected JSON object from {response.url}, got {type(data).__name__}")
+            raise GemeenteOplossingenError(
+                f"Expected a JSON object, got {type(data).__name__}",
+                category="unexpected_json_shape",
+                **context,
+            )
+        if not isinstance(data.get("result"), dict):
+            raise GemeenteOplossingenError(
+                "Expected response field 'result' to be an object",
+                category="unsupported_envelope",
+                **context,
+            )
         return data
 
     def _get_json_or_none_on_404(
@@ -112,20 +343,26 @@ class GemeenteOplossingenConnector:
         path: str,
         params: dict[str, Any] | None = None,
     ) -> dict[str, Any] | None:
-        """Fetch JSON but treat 404 as an absent resource."""
+        """Fetch JSON but treat a genuine resource-level 404 as absent."""
         try:
             return self._get_json(path, params=params)
-        except requests.HTTPError as exc:
-            response = exc.response
-            if response is not None and response.status_code == 404:
+        except GemeenteOplossingenError as exc:
+            if (
+                exc.status_code == 404
+                and exc.category == "http_404"
+                and _is_json_content_type(exc.content_type)
+            ):
                 return None
             raise
 
     @staticmethod
     def _result(payload: dict[str, Any]) -> dict[str, Any]:
-        result = payload.get("result", {})
+        result = payload.get("result")
         if not isinstance(result, dict):
-            raise ValueError("Expected response field 'result' to be an object")
+            raise GemeenteOplossingenError(
+                "Expected response field 'result' to be an object",
+                category="unsupported_envelope",
+            )
         return result
 
     @staticmethod
@@ -135,12 +372,82 @@ class GemeenteOplossingenConnector:
         if records is None and field_name != "model":
             records = result.get("model")
         if records is None:
-            records = []
+            raise GemeenteOplossingenError(
+                f"Response contains neither 'result.{field_name}' nor 'result.model'",
+                category="unsupported_envelope",
+            )
         if not isinstance(records, list):
-            raise ValueError(f"Expected response field 'result.{field_name}' to be a list")
+            raise GemeenteOplossingenError(
+                f"Expected response field 'result.{field_name}' to be a list",
+                category="unexpected_json_shape",
+            )
         if not all(isinstance(record, dict) for record in records):
-            raise ValueError(f"Expected every item in 'result.{field_name}' to be an object")
+            raise GemeenteOplossingenError(
+                f"Expected every item in 'result.{field_name}' to be an object",
+                category="unexpected_json_shape",
+            )
         return records
+
+    @staticmethod
+    def _total_count(result: dict[str, Any], endpoint: str) -> int:
+        value = result.get("totalCount")
+        if isinstance(value, bool) or value is None:
+            raise GemeenteOplossingenError(
+                f"Missing or invalid totalCount for {endpoint}",
+                category="invalid_total_count",
+            )
+        try:
+            total_count = int(value)
+        except (TypeError, ValueError) as exc:
+            raise GemeenteOplossingenError(
+                f"Missing or invalid totalCount for {endpoint}",
+                category="invalid_total_count",
+            ) from exc
+        if total_count < 0:
+            raise GemeenteOplossingenError(
+                f"Negative totalCount for {endpoint}",
+                category="invalid_total_count",
+            )
+        return total_count
+
+    def preflight(self, endpoints: Iterable[tuple[str, str]] | None = None) -> list[dict[str, Any]]:
+        """Validate cheap, required collection requests before any harvest writes."""
+        required = tuple(endpoints or (("documents", "documents"), ("meetings", "meetings")))
+        results: list[dict[str, Any]] = []
+        for path, field_name in required:
+            started = time.monotonic()
+            try:
+                payload = self._get_json(path, params={"limit": 1, "offset": 0})
+                result = self._result(payload)
+                records = self._result_list(payload, field_name)
+                total_count = self._total_count(result, path)
+                results.append(
+                    {
+                        "endpoint": path,
+                        "status": "ok",
+                        "category": "ok",
+                        "record_preview_count": len(records),
+                        "total_count": int(total_count) if total_count is not None else None,
+                        "duration_ms": round((time.monotonic() - started) * 1000),
+                    }
+                )
+            except GemeenteOplossingenError as exc:
+                results.append(
+                    {
+                        "endpoint": path,
+                        "status": "failed",
+                        "category": exc.category,
+                        "status_code": exc.status_code,
+                        "content_type": exc.content_type,
+                        "url": exc.url,
+                        "redirect_history": list(exc.redirect_history),
+                        "body_preview": exc.body_preview,
+                        "duration_ms": round((time.monotonic() - started) * 1000),
+                    }
+                )
+        if any(result["status"] != "ok" for result in results):
+            raise GemeenteOplossingenPreflightError(results)
+        return results
 
     def _fetch_paged_result_list(
         self,
@@ -179,9 +486,7 @@ class GemeenteOplossingenConnector:
 
     def fetch_document_count(self) -> int:
         payload = self._get_json("documents", params={"limit": 1, "offset": 0})
-        result = self._result(payload)
-        total_count = result.get("totalCount", 0)
-        return int(total_count)
+        return self._total_count(self._result(payload), "documents")
 
     def fetch_documents_page(self, *, limit: int, offset: int) -> list[dict[str, Any]]:
         if limit <= 0:
@@ -222,6 +527,11 @@ class GemeenteOplossingenConnector:
             offset += len(page)
             if len(page) < limit:
                 break
+        if len(documents) != target_count:
+            raise GemeenteOplossingenError(
+                f"Incomplete document pagination: expected {target_count}, received {len(documents)}",
+                category="incomplete_pagination",
+            )
         return documents
 
     def fetch_meeting_count(
@@ -243,7 +553,7 @@ class GemeenteOplossingenConnector:
         payload = self._get_json("meetings", params=params)
         result = self._result(payload)
         if "totalCount" in result:
-            return int(result.get("totalCount", 0))
+            return self._total_count(result, "meetings")
         return len(self._result_list(payload, "meetings"))
 
     def fetch_meetings_page(
@@ -299,6 +609,11 @@ class GemeenteOplossingenConnector:
             offset += len(page)
             if len(page) < limit:
                 break
+        if len(meetings) != target_count:
+            raise GemeenteOplossingenError(
+                f"Incomplete meeting pagination: expected {target_count}, received {len(meetings)}",
+                category="incomplete_pagination",
+            )
         return meetings
 
     def fetch_latest_meetings(self, limit: int) -> list[dict[str, Any]]:
@@ -441,7 +756,10 @@ class GemeenteOplossingenConnector:
                 offset += len(page)
             return records
 
-        target_count = min(int(total_count), max_records) if max_records is not None else int(total_count)
+        declared_count = self._total_count(result, path)
+        target_count = (
+            min(declared_count, max_records) if max_records is not None else declared_count
+        )
         records: list[dict[str, Any]] = []
         offset = 0
         while offset < target_count:
@@ -456,6 +774,11 @@ class GemeenteOplossingenConnector:
             offset += len(page)
             if len(page) < limit:
                 break
+        if len(records) != target_count:
+            raise GemeenteOplossingenError(
+                f"Incomplete {path} pagination: expected {target_count}, received {len(records)}",
+                category="incomplete_pagination",
+            )
         return records
 
     def fetch_all_groups(

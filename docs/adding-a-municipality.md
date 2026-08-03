@@ -70,7 +70,7 @@ A profile should describe at least:
 municipality:
   name: Huizen
   slug: huizen
-  official_identifier: gm0406
+  id: gm0406
   country: NL
   website_url: https://www.huizen.nl
   ris_url: https://ris.gemeenteraadhuizen.nl
@@ -81,6 +81,12 @@ source_system:
   connector: gemeenteoplossingen
   base_url: https://ris.gemeenteraadhuizen.nl/api/v2/
   api_version: v2
+  timeout_seconds: 30
+  retry_attempts: 3
+  retry_backoff_seconds: 1.0
+  max_retry_delay_seconds: 60.0
+  user_agent: OpenRISMonitor/0.1 (+https://github.com/your-account/open-ris-monitor)
+  allowed_redirect_hosts: []
 
 storage:
   commit_pdf_files: false
@@ -104,7 +110,37 @@ GET /meetingitems/{meetingItemId}
 GET /meetingitems/{meetingItemId}/documents
 ```
 
-Some source systems expose different historical and future meeting coverage. A missing meeting detail may be source variation rather than a fatal error, but it should be documented during onboarding.
+Some source systems expose different historical and future meeting coverage. A missing individual meeting detail may be source variation rather than a fatal error, but a collection-level 403, 404, HTML response or challenge page is not valid empty data.
+
+Run the preflight before the first harvest:
+
+```bash
+python -m open_ris_monitor.diagnostics.gemeenteoplossingen_preflight \
+  --municipality my-municipality \
+  --output data/diagnostics/preflight.json
+```
+
+For an upstream incident, run the bounded full probe. It uses known IDs from the current public exports and limits the download test to one 512-byte chunk:
+
+```bash
+python -m open_ris_monitor.diagnostics.gemeenteoplossingen_probe \
+  --municipality my-municipality \
+  --public-dir data/public \
+  --scope full \
+  --output data/diagnostics/probe.json
+```
+
+To compare a supplier-confirmed API version or base-path candidate without enabling it for harvesting, add `--additional-base-url`. Treat the result as evidence for a branch-only configuration test, never as an automatic fallback.
+
+Before changing a base URL or API version on `main`:
+
+1. add the proposed value to a branch-only municipality profile;
+2. run preflight and inspect final URLs, redirects, Content-Type and JSON structure;
+3. run a bounded `quick` profile without committing;
+4. validate staged exports and compare counts with the last successful dataset;
+5. merge only after the route is documented or its production behavior is reproducible.
+
+Do not add a silent fallback from a failed route to a guessed path.
 
 ## Step 5, run a small local harvest
 
@@ -241,7 +277,10 @@ Use `backfill` only for controlled historical filling, recovery or initial broad
 ## Troubleshooting checklist
 
 - Wrong or empty dataset: check the profile slug and `base_url`.
-- API timeout or 429: reduce limits and retry later.
+- 404 on a collection: confirm the final URL and upstream routing, do not treat it as an empty collection.
+- 403 or HTML access-denied page: inspect WAF, reverse-proxy, IP and bot-protection policy with the municipality or supplier.
+- HTTP 200 with HTML or the wrong Content-Type: stop publication and retain the previous dataset.
+- API timeout or 429: inspect `Retry-After`, reduce limits and retry later.
 - Missing meetings: verify whether the source uses `/meetings`, `/events`, `/dmus` or `/meetingsessions` differently.
 - Missing agenda-item relations: inspect nested meeting item routes for the selected meeting window.
 - Export validation failure: inspect the failing file and line number.

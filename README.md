@@ -186,6 +186,13 @@ python -m pytest
 ruff check .
 ```
 
+Check upstream API health before a harvest:
+
+```bash
+python -m open_ris_monitor.diagnostics.gemeenteoplossingen_preflight \
+  --municipality huizen
+```
+
 Run a small local smoke test:
 
 ```bash
@@ -193,6 +200,8 @@ python -m open_ris_monitor.pipeline.run \
   --municipality huizen \
   --profile quick
 ```
+
+Harvesting fails closed. GitHub Actions writes into a staging directory, validates counts and exports, and promotes the result only after every safety check succeeds. A failed upstream request therefore leaves the last valid public dataset and its timestamp unchanged.
 
 Run a bounded public-style harvest:
 
@@ -270,6 +279,7 @@ Start with:
 - [Validation and CI](docs/validatie-ci.md), checks run by GitHub Actions.
 - [Voting and decision outcome research](docs/voting-and-decision-outcome-research.md), feasibility note for vote and decision insight.
 - [Roadmap](docs/roadmap.md), conservative MVP and post-MVP direction.
+- [July 2026 GemeenteOplossingen API incident](docs/incidents/2026-07-gemeenteoplossingen-api-access.md), evidence, root-cause classification and recovery steps.
 
 ## Repository policy
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from pathlib import Path
 from typing import Any
 
@@ -11,9 +13,12 @@ from open_ris_monitor.pipeline import run as pipeline_run
 class FakeResponse:
     def __init__(self, payload: dict[str, Any], url: str = "https://example.test") -> None:
         self._payload = payload
+        self.headers = {"Content-Type": "application/json"}
+        self.content = json.dumps(payload or {}).encode("utf-8")
+        self.encoding = "utf-8"
+        self.history = ()
         self.url = url
         self.status_code = 200
-        self.headers: dict[str, str] = {}
 
     def json(self) -> dict[str, Any]:
         return self._payload

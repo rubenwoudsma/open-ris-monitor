@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from typing import Any
 
 from open_ris_monitor.connectors.gemeenteoplossingen import GemeenteOplossingenConnector
@@ -89,9 +91,12 @@ def test_latest_relation_harvest_uses_latest_meetings_not_latest_meetingsessions
 class FakeResponse:
     def __init__(self, payload: dict[str, Any], *, url: str = "https://example.invalid") -> None:
         self._payload = payload
+        self.headers = {"Content-Type": "application/json"}
+        self.content = json.dumps(payload or {}).encode("utf-8")
+        self.encoding = "utf-8"
+        self.history = ()
         self.status_code = 200
         self.url = url
-        self.headers: dict[str, str] = {}
 
     def json(self) -> dict[str, Any]:
         return self._payload

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import requests
 
 from open_ris_monitor.connectors.gemeenteoplossingen import GemeenteOplossingenConnector
@@ -7,7 +9,11 @@ from open_ris_monitor.connectors.gemeenteoplossingen import GemeenteOplossingenC
 
 class FakeResponse:
     def __init__(self, payload: dict | None = None, status_code: int = 200) -> None:
-        self.payload = payload or {}
+        self.payload = payload
+        self.headers = {"Content-Type": "application/json"}
+        self.content = json.dumps(payload or {}).encode("utf-8")
+        self.encoding = "utf-8"
+        self.history = ()
         self.status_code = status_code
 
     def raise_for_status(self) -> None:
