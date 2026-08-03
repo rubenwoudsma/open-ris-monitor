@@ -22,6 +22,11 @@ PUBLIC_JSONL_FILES = (
     "meeting_items.jsonl",
     "meeting_documents.jsonl",
     "meeting_item_documents.jsonl",
+    "organization_groups.jsonl",
+    "organization_persons.jsonl",
+    "organization_roles.jsonl",
+    "organization_positions.jsonl",
+    "organization_group_memberships.jsonl",
 )
 
 
@@ -158,6 +163,53 @@ def guard_against_output_shrink(
     return counts
 
 
+
+def validate_required_public_outputs(generated_public_dir: Path) -> None:
+    """Reject empty or internally inconsistent staged public output."""
+
+    documents_path = generated_public_dir / "documents.jsonl"
+    document_count = count_jsonl(documents_path)
+    if document_count <= 0:
+        raise RuntimeError("Refusing to publish a zero-record documents.jsonl export.")
+
+    latest_path = generated_public_dir / "latest.json"
+    if not latest_path.exists():
+        raise RuntimeError("Refusing to publish without latest.json metadata.")
+    payload = json.loads(latest_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise RuntimeError("latest.json must contain a JSON object.")
+    if int(payload.get("dataset_documents_total", -1)) not in {-1, document_count}:
+        raise RuntimeError(
+            "latest.json dataset_documents_total does not match documents.jsonl."
+        )
+
+
+def refresh_latest_dataset_totals(public_dir: Path) -> dict[str, int]:
+    """Refresh latest.json totals after profile-aware staging merges."""
+
+    latest_path = public_dir / "latest.json"
+    if not latest_path.exists():
+        raise RuntimeError("Cannot refresh dataset totals because latest.json is missing.")
+    payload = json.loads(latest_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise RuntimeError("latest.json must contain a JSON object.")
+
+    totals = {
+        "dataset_documents_total": count_jsonl(public_dir / "documents.jsonl"),
+        "dataset_meetings_total": count_jsonl(public_dir / "meetings.jsonl"),
+        "dataset_agenda_items_total": count_jsonl(public_dir / "meeting_items.jsonl"),
+        "dataset_document_relations_total": count_jsonl(public_dir / "meeting_documents.jsonl")
+        + count_jsonl(public_dir / "meeting_item_documents.jsonl"),
+    }
+    payload.update(totals)
+    payload["documents_seen"] = totals["dataset_documents_total"]
+    payload["documents_normalized"] = totals["dataset_documents_total"]
+    latest_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return totals
+
 def protect_public_outputs(
     existing_public_dir: Path,
     generated_public_dir: Path,
@@ -170,11 +222,14 @@ def protect_public_outputs(
     if profile in INCREMENTAL_PROFILES:
         merge_incremental_public_outputs(existing_public_dir, generated_public_dir)
 
-    return guard_against_output_shrink(
+    counts = guard_against_output_shrink(
         existing_public_dir,
         generated_public_dir,
         allow_output_shrink=allow_output_shrink,
     )
+    refresh_latest_dataset_totals(generated_public_dir)
+    validate_required_public_outputs(generated_public_dir)
+    return counts
 
 
 def _parse_bool(value: str | bool) -> bool:

@@ -13,12 +13,18 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0",
-  "ruff>=0.5",
+  "ruff==0.15.22",
   "jsonschema>=4.21.0",  # Voeg deze regel toe
 ]
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
+# Ruff 0.16 expanded its implicit default from 59 to 413 rules. Keep the
+# established project policy explicit so dependency updates cannot silently
+# turn unrelated style migrations into CI blockers.
+select = ["E4", "E7", "E9", "F"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

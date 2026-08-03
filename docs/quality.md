@@ -97,6 +97,25 @@ Warnings can be informative. A run should fail or be treated as unsafe when:
 - relation files reference missing documents, meetings or meeting items;
 - the last harvest status is not successful for a scheduled publication.
 
+## Publication integrity guards
+
+The harvest workflow validates a staged copy before changing the public dataset. Publication is rejected when:
+
+- preflight cannot reach the required JSON collections;
+- the upstream returns zero documents while a previous dataset exists;
+- non-empty raw input normalizes to zero documents;
+- declared document pagination is incomplete;
+- an incremental run would remove existing records;
+- a full or backfill run shrinks any protected export without an explicit override;
+- `documents.jsonl` is empty;
+- `latest.json` is missing or its document total disagrees with the export;
+- JSONL or schema validation fails;
+- promotion of staged directories fails.
+
+Incremental profiles merge their generated rows into the current baseline before validation. Full and backfill profiles may replace exports only when their record counts are at least as large as the current baseline, unless an operator explicitly accepts a shrink for a documented source correction.
+
+Quality metadata is refreshed only in staging. A failed run does not update the last successful `generated_at` value.
+
 ## Manual quality report command
 
 ```bash

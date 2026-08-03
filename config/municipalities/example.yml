@@ -11,6 +11,12 @@ source_system:
   vendor: GemeenteOplossingen
   connector: gemeenteoplossingen
   base_url: https://ris.example.nl/api/v2/
+  timeout_seconds: 30
+  retry_attempts: 3
+  retry_backoff_seconds: 1.0
+  max_retry_delay_seconds: 60.0
+  user_agent: OpenRISMonitor/0.1 (+https://github.com/rubenwoudsma/open-ris-monitor)
+  allowed_redirect_hosts: []
   api_version: v2
   active: true
 

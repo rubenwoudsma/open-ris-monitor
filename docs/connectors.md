@@ -111,7 +111,7 @@ Connectors should support three practical access patterns:
 | `public` | Normal public dataset update | Fetch the configured public window and relation context. |
 | `backfill` | Historical loading or recovery | Fetch broader ranges with explicit limits. |
 
-Where list routes use pagination, use bounded `limit` and `offset` loops. A connector should stop when the configured limit is reached, the upstream returns no more records, or a non-retryable error occurs.
+Where list routes use pagination, use bounded `limit` and `offset` loops. A connector should stop when the configured limit is reached or a non-retryable error occurs. If a declared `totalCount` cannot be fulfilled, the connector must fail with an incomplete-pagination error rather than silently accepting a short result.
 
 ## Errors, retries and back-off
 
@@ -140,6 +140,56 @@ Do not blindly retry normal client errors:
 ```
 
 A known exception is a meeting detail 404 during relation discovery. That can be source variation and should not necessarily fail the whole harvest when the rest of the dataset is usable.
+
+## HTTP response contract and diagnostics
+
+The GemeenteOplossingen connector treats the upstream response as an explicit contract. Successful JSON calls must provide:
+
+- an HTTP status below 400;
+- a JSON media type such as `application/json` or `application/*+json`;
+- a JSON object response;
+- a `result` object;
+- the requested list under `result.<collection>` or the documented compatibility form `result.model`;
+- a valid non-negative `totalCount` where the document collection count is required.
+
+An HTTP 200 response containing HTML, a challenge page or another non-JSON payload is a failure. It must never be interpreted as an empty collection.
+
+Connector exceptions include safe context:
+
+```text
+category
+HTTP method
+sanitized URL
+status code
+Content-Type
+redirect history
+bounded body preview
+```
+
+Credentials and sensitive query values are removed from URLs and previews. Redirects are followed only when their final host is the configured host or an explicitly allowed host.
+
+Categories distinguish at least:
+
+```text
+timeout
+connection_error
+network_error
+http_403
+http_404
+html_response
+unexpected_content_type
+malformed_json
+unsupported_envelope
+invalid_total_count
+incomplete_pagination
+unsafe_redirect
+```
+
+## Endpoint variants and fallbacks
+
+The connector does not turn a collection-level 404 into an empty dataset and does not guess alternative paths. A known endpoint variant may be added only when production behavior or supplier documentation proves it, the variant is configured explicitly, logs show which route was selected and tests cover both forms.
+
+A relation-only document harvest is not a generic fallback. It is permitted only after proving that relation routes cover the complete document collection, including documents without a meeting or agenda relation, and that update and deletion detection remain reliable.
 
 ## Keeping a connector operational
 

@@ -55,20 +55,22 @@ Useful nested relation routes include:
 
 ## Relation discovery
 
-The working relation chain is:
+The normal documented relation chain is:
 
 ```text
-/meetingsessions -> container.meeting.id -> /meetings/{meetingId} -> /meetings/{meetingId}/meetingitems -> /meetings/{meetingId}/documents -> /meetingitems/{meetingItemId}/documents
+/meetings -> /meetings/{meetingId}/meetingitems -> /meetings/{meetingId}/documents -> /meetingitems/{meetingItemId}/documents
 ```
+
+The legacy `/meetingsessions` route remains isolated for diagnostics and backwards compatibility, but normal relation discovery uses the documented `/meetings` collection.
 
 Important observations:
 
-- `/meetingsessions` can be needed for historical coverage;
-- `/meetings` can be useful for recent or future meetings;
 - not every meeting ID resolves through every detail route;
-- a 404 on a meeting detail route can be source variation and should not always fail the harvest;
+- a genuine resource-level 404 on a meeting detail can be source variation and should not always fail the harvest;
+- collection-level 404 responses are structural failures and are not treated as empty data;
 - meeting items can provide enough fields for agenda context;
-- documents can be linked at meeting level and meeting-item level.
+- documents can be linked at meeting level and meeting-item level;
+- relation routes are not a complete substitute for the general document collection unless coverage is proven.
 
 ## Harvest profiles
 
@@ -253,6 +255,60 @@ python -m open_ris_monitor.pipeline.run \
   --max-documents 100 \
   --meeting-scan-limit 100
 ```
+
+## Preflight and incident probe
+
+Every full harvest now starts with a cheap preflight before writing raw state or public exports. The required checks request one document and one meeting and verify HTTP status, JSON Content-Type, the response envelope and the minimum expected list structure.
+
+Run it locally:
+
+```bash
+python -m open_ris_monitor.diagnostics.gemeenteoplossingen_preflight \
+  --municipality huizen \
+  --output data/diagnostics/preflight.json
+```
+
+When preflight fails in GitHub Actions, the workflow runs a seven-request `core` probe with only the normal project User-Agent. It checks the API root, collection routes and trailing-slash behavior without turning every scheduled outage into a broad scan.
+
+Run the complete probe manually when diagnosing an incident. The `full` scope also uses known object identifiers from the last valid public dataset and checks document detail, a bounded download range and relation routes. The document download probe sends `Range: bytes=0-0` and reads at most one 512-byte chunk.
+
+```bash
+python -m open_ris_monitor.diagnostics.gemeenteoplossingen_probe \
+  --municipality huizen \
+  --public-dir data/public \
+  --scope full \
+  --output data/diagnostics/probe.json
+```
+
+The full probe compares the normal project User-Agent with a common browser-like User-Agent only to diagnose client-dependent access. Harvesting always uses the explicit project User-Agent. A browser identity is never used as a fallback or access-control workaround.
+
+A known API version or base-path candidate can be compared explicitly without changing the harvest profile:
+
+```bash
+python -m open_ris_monitor.diagnostics.gemeenteoplossingen_probe \
+  --municipality huizen \
+  --scope core \
+  --no-include-browser-user-agent \
+  --additional-base-url https://ris.gemeenteraadhuizen.nl/api/v1/ \
+  --output data/diagnostics/probe-v1-v2.json
+```
+
+`--additional-base-url` is diagnostic only. It does not enable a fallback and cannot select a route for publication.
+
+## Transactional publication
+
+The workflow treats publication as a transaction:
+
+1. preflight the upstream API;
+2. copy the current public dataset into `data/.harvest-staging/public`;
+3. harvest into staging;
+4. merge incremental output with the current baseline;
+5. reject zero records, shrinkage, malformed data and invalid metadata;
+6. generate quality reports and validate schemas in staging;
+7. promote staged raw and public directories with rollback support;
+8. commit only after promotion succeeds.
+
+A failure before promotion leaves `data/public` and its `generated_at` metadata unchanged. The staging and diagnostic paths are excluded from Git.
 
 ## Failure policy
 

@@ -32,6 +32,10 @@ def test_latest_profile_merges_generated_rows_into_existing_public_output(tmp_pa
         generated / "documents.jsonl",
         [{"id": "doc-2", "title": "new title"}, {"id": "doc-3", "title": "recent"}],
     )
+    (generated / "latest.json").write_text(
+        json.dumps({"dataset_documents_total": 2}),
+        encoding="utf-8",
+    )
 
     counts = protect_public_outputs(existing, generated, profile="latest")
 

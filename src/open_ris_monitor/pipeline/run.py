@@ -68,6 +68,12 @@ def build_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
         base_url=source_system["base_url"],
         timeout_seconds=int(source_system.get("timeout_seconds", 30)),
         request_delay_seconds=_as_float(source_system.get("request_delay_seconds"), 0.0),
+        retry_attempts=int(source_system.get("retry_attempts", 3)),
+        retry_backoff_seconds=_as_float(source_system.get("retry_backoff_seconds"), 1.0),
+        max_retry_delay_seconds=_as_float(source_system.get("max_retry_delay_seconds"), 60.0),
+        user_agent=str(source_system.get("user_agent") or "").strip()
+        or "OpenRISMonitor/0.1 (+https://github.com/rubenwoudsma/open-ris-monitor)",
+        allowed_redirect_hosts=source_system.get("allowed_redirect_hosts") or (),
     )
 
 
@@ -365,11 +371,26 @@ def run_harvest(
     meeting_item_limit: int | None = 1000,
     include_organization: bool = False,
     organization_batch_size: int = 100,
+    raw_dir: Path | None = None,
+    public_dir: Path | None = None,
+    perform_preflight: bool = True,
 ) -> HarvestRun:
-    """Run a metadata harvest and optional raw relation harvest."""
+    """Run a metadata harvest and optional raw relation harvest.
+
+    Upstream preflight completes before any output file is written. Workflows can
+    provide staging directories and promote them only after all validation succeeds.
+    """
     started_at = datetime.now(timezone.utc)
     config = load_municipality_config(municipality)
     connector = build_connector(config)
+    raw_dir = raw_dir or REPO_ROOT / "data" / "raw" / "latest"
+    public_dir = public_dir or REPO_ROOT / "data" / "public"
+    latest_path = public_dir / "latest.json"
+    previous_latest = _read_json(latest_path)
+    existing_document_count = _jsonl_count(public_dir / "documents.jsonl")
+
+    if perform_preflight:
+        connector.preflight()
 
     if mode == "latest":
         raw_documents = connector.fetch_latest_documents(limit=limit)
@@ -381,10 +402,12 @@ def run_harvest(
     else:
         raise ValueError("mode must be 'latest' or 'full'")
 
-    raw_dir = REPO_ROOT / "data" / "raw" / "latest"
-    public_dir = REPO_ROOT / "data" / "public"
-    latest_path = public_dir / "latest.json"
-    previous_latest = _read_json(latest_path)
+    if not raw_documents and existing_document_count > 0:
+        raise RuntimeError(
+            "Upstream returned zero documents while an existing public dataset is present. "
+            "Refusing to update state or public exports."
+        )
+
     municipality_config = config["municipality"]
     source_system_config = config["source_system"]
     retrieved_at = datetime.now(timezone.utc)
@@ -397,6 +420,12 @@ def run_harvest(
         build_download_url=connector.build_document_download_url,
         retrieved_at=retrieved_at,
     )
+
+    if raw_documents and not documents:
+        raise RuntimeError(
+            "Document normalization produced zero records from a non-empty upstream response. "
+            "Refusing to update state or public exports."
+        )
 
     relation_harvest: dict[str, Any] | None = None
     normalized_relations: dict[str, list[Any]] | None = None
@@ -585,6 +614,23 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Batch size for organisation endpoint pagination.",
     )
+    parser.add_argument(
+        "--raw-dir",
+        type=Path,
+        default=None,
+        help="Optional raw output directory, used by transactional workflows.",
+    )
+    parser.add_argument(
+        "--public-dir",
+        type=Path,
+        default=None,
+        help="Optional public output directory, used by transactional workflows.",
+    )
+    parser.add_argument(
+        "--skip-preflight",
+        action="store_true",
+        help="Skip the built-in preflight only when a separate preflight just succeeded.",
+    )
     return parser.parse_args(argv)
 
 
@@ -632,6 +678,9 @@ def main() -> None:
         meeting_item_limit=harvest_options["meeting_item_limit"],
         include_organization=harvest_options["include_organization"],
         organization_batch_size=harvest_options["organization_batch_size"],
+        raw_dir=args.raw_dir,
+        public_dir=args.public_dir,
+        perform_preflight=not args.skip_preflight,
     )
     print(
         f"Harvest {harvest_run.id} completed: "

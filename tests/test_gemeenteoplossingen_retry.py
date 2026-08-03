@@ -1,18 +1,25 @@
 from __future__ import annotations
 
+import json
+
 import requests
 import pytest
 
-from open_ris_monitor.connectors.gemeenteoplossingen import GemeenteOplossingenConnector
+from open_ris_monitor.connectors.gemeenteoplossingen import (
+    GemeenteOplossingenConnector,
+    GemeenteOplossingenError,
+)
 
 
 class FakeResponse:
     def __init__(self, status_code: int, payload: dict | None = None) -> None:
         self.status_code = status_code
         self._payload = payload or {"result": {"documents": []}}
-        self.headers: dict[str, str] = {}
+        self.headers: dict[str, str] = {"Content-Type": "application/json"}
         self.url = "https://example.test/api/v2/documents"
-        self.content = b"payload"
+        self.content = json.dumps(self._payload).encode("utf-8")
+        self.encoding = "utf-8"
+        self.history = ()
 
     def json(self) -> dict:
         return self._payload
@@ -104,7 +111,7 @@ def test_raises_after_retry_budget_is_exhausted() -> None:
         sleep_func=lambda _: None,
     )
 
-    with pytest.raises(requests.HTTPError):
+    with pytest.raises(GemeenteOplossingenError, match="http_503"):
         connector.fetch_document_count()
 
     assert session.calls == 2
