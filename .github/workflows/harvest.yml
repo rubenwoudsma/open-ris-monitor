@@ -149,7 +149,7 @@ jobs:
             --municipality "${{ steps.harvest-inputs.outputs.municipality }}" \
             --output data/diagnostics/preflight.json
 
-      - name: Run bounded incident probe after preflight failure
+      - name: Compare configured and known API variants after preflight failure
         if: ${{ failure() }}
         run: |
           python -m open_ris_monitor.diagnostics.gemeenteoplossingen_probe \
