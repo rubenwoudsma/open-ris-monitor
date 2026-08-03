@@ -19,6 +19,8 @@ source_system:
   max_retry_delay_seconds: 60.0
   user_agent: OpenRISMonitor/0.1 (+https://github.com/rubenwoudsma/open-ris-monitor)
   allowed_redirect_hosts: []
+  diagnostic_base_urls:
+    - https://ris.gemeenteraadhuizen.nl/api/v1/
 
 harvest:
   strategy: document_first

@@ -180,7 +180,7 @@ def test_additional_base_url_is_explicit_and_diagnostic_only(tmp_path: Path, mon
     assert report["request_count"] == 14
     assert {item["base_url_label"] for item in report["results"]} == {
         "configured",
-        "additional_1",
+        "candidate_1",
     }
     assert report["diagnostic_only"] is True
 
@@ -203,3 +203,61 @@ def test_html_404_probe_is_classified_as_access_control_page() -> None:
     )
 
     assert result["category"] == "html_response"
+
+
+def test_probe_reports_v1_bare_list_shape_without_logging_full_records() -> None:
+    response = ProbeResponse(
+        body=b'[{"id": 1, "description": "Public record"}]',
+        url="https://example.test/api/v1/documents?limit=1&offset=0",
+    )
+    session = ProbeSession(response)
+
+    result = probe_module.run_single_probe(
+        session=session,  # type: ignore[arg-type]
+        base_url="https://example.test/api/v1/",
+        probe={"name": "documents_page", "path": "documents", "params": {"limit": 1}},
+        user_agent_label="project",
+        user_agent="OpenRISMonitor/test",
+        timeout_seconds=5,
+    )
+
+    assert result["category"] == "ok_json"
+    assert result["json_shape"] == "list"
+    assert result["json_item_count"] == 1
+    assert result["json_item_shape"] == "dict"
+
+
+def test_profile_diagnostic_base_urls_are_included_and_deduplicated(
+    tmp_path: Path, monkeypatch
+) -> None:
+    response = ProbeResponse()
+    session = ProbeSession(response)
+    monkeypatch.setattr(
+        probe_module,
+        "load_municipality_config",
+        lambda _: {
+            "source_system": {
+                "base_url": "https://example.test/api/v2/",
+                "diagnostic_base_urls": [
+                    "https://example.test/api/v1/",
+                    "https://example.test/api/v1/",
+                ],
+                "user_agent": "OpenRISMonitor/test",
+            }
+        },
+    )
+
+    report = probe_module.run_probe(
+        "huizen",
+        public_dir=tmp_path,
+        include_browser_user_agent=False,
+        scope="core",
+        additional_base_urls=["https://example.test/api/v2/"],
+        session=session,  # type: ignore[arg-type]
+    )
+
+    assert report["request_count"] == 14
+    assert report["base_urls"] == [
+        {"label": "configured", "url": "https://example.test/api/v2/"},
+        {"label": "candidate_1", "url": "https://example.test/api/v1/"},
+    ]
