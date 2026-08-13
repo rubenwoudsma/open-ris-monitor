@@ -56,6 +56,11 @@ on:
         required: true
         default: false
         type: boolean
+      allow_output_shrink:
+        description: Allow a reviewed backfill to remove stable public identities. Manual backfill only.
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -98,12 +103,14 @@ jobs:
           INPUT_ENRICH_CHECKSUMS: ${{ inputs.enrich_checksums }}
           INPUT_CHECKSUM_MAX_DOCUMENTS: ${{ inputs.checksum_max_documents }}
           INPUT_COMMIT_PUBLIC: ${{ inputs.commit_public }}
+          INPUT_ALLOW_OUTPUT_SHRINK: ${{ inputs.allow_output_shrink }}
         run: |
           if [ "$EVENT_NAME" = "schedule" ]; then
             municipality="huizen"
             enrich_checksums="false"
             checksum_max_documents="50"
             commit_public="true"
+            allow_output_shrink="false"
 
             if [ "$EVENT_SCHEDULE" = "41 3 1 * *" ]; then
               profile="backfill"
@@ -125,6 +132,22 @@ jobs:
             enrich_checksums="$INPUT_ENRICH_CHECKSUMS"
             checksum_max_documents="$INPUT_CHECKSUM_MAX_DOCUMENTS"
             commit_public="$INPUT_COMMIT_PUBLIC"
+            allow_output_shrink="$INPUT_ALLOW_OUTPUT_SHRINK"
+          fi
+
+          if [ "$allow_output_shrink" = "true" ]; then
+            if [ "$profile" != "backfill" ]; then
+              echo "allow_output_shrink=true is only supported for the backfill profile." >&2
+              exit 1
+            fi
+            if [ -n "$mode" ] && [ "$mode" != "full" ]; then
+              echo "allow_output_shrink=true requires full mode when mode is overridden." >&2
+              exit 1
+            fi
+            if [ -n "$max_documents" ] && [ "$max_documents" != "0" ]; then
+              echo "allow_output_shrink=true requires an unbounded full backfill." >&2
+              exit 1
+            fi
           fi
 
           {
@@ -137,11 +160,13 @@ jobs:
             echo "enrich_checksums=$enrich_checksums"
             echo "checksum_max_documents=$checksum_max_documents"
             echo "commit_public=$commit_public"
+            echo "allow_output_shrink=$allow_output_shrink"
           } >> "$GITHUB_OUTPUT"
 
           echo "Resolved harvest profile: $profile"
           echo "Resolved municipality: $municipality"
           echo "Commit public output: $commit_public"
+          echo "Allow output shrink: $allow_output_shrink"
 
       - name: Preflight upstream API
         run: |
@@ -208,7 +233,8 @@ jobs:
           python -m open_ris_monitor.pipeline.harvest_safety \
             --existing-public-dir data/public \
             --generated-public-dir data/.harvest-staging/public \
-            --profile "${{ steps.harvest-inputs.outputs.profile }}"
+            --profile "${{ steps.harvest-inputs.outputs.profile }}" \
+            --allow-output-shrink "${{ steps.harvest-inputs.outputs.allow_output_shrink }}"
 
       - name: Generate staged public quality reports
         run: |
