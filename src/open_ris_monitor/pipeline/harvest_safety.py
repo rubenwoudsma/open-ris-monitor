@@ -13,7 +13,10 @@ import shutil
 from pathlib import Path
 from typing import Any, Iterable
 
+from open_ris_monitor.pipeline.record_identity import public_record_key
+
 INCREMENTAL_PROFILES = frozenset({"quick", "latest", "public"})
+SHRINK_OVERRIDE_PROFILES = frozenset({"backfill", "full"})
 PUBLIC_JSONL_FILES = (
     "documents.jsonl",
     "document_versions.jsonl",
@@ -28,29 +31,6 @@ PUBLIC_JSONL_FILES = (
     "organization_positions.jsonl",
     "organization_group_memberships.jsonl",
 )
-
-
-def _json_key(record: dict[str, Any]) -> str:
-    """Return a deterministic fallback key for records without a stable id."""
-
-    return json.dumps(record, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
-
-
-def record_key(record: dict[str, Any]) -> str:
-    """Return the stable merge key for a public JSONL record."""
-
-    for key in (
-        "id",
-        "source_id",
-        "document_id",
-        "meeting_item_id",
-        "meeting_id",
-        "harvest_run_id",
-    ):
-        value = record.get(key)
-        if value is not None and str(value).strip():
-            return f"{key}:{value}"
-    return f"json:{_json_key(record)}"
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -115,15 +95,18 @@ def merge_jsonl_file(existing_path: Path, generated_path: Path) -> int:
 
     merged: dict[str, dict[str, Any]] = {}
     for record in existing_records:
-        merged[record_key(record)] = record
+        merged[public_record_key(record, filename=generated_path.name)] = record
     for record in generated_records:
-        merged[record_key(record)] = record
+        merged[public_record_key(record, filename=generated_path.name)] = record
 
     write_jsonl(generated_path, merged.values())
     return len(merged)
 
 
-def merge_incremental_public_outputs(existing_public_dir: Path, generated_public_dir: Path) -> dict[str, int]:
+def merge_incremental_public_outputs(
+    existing_public_dir: Path,
+    generated_public_dir: Path,
+) -> dict[str, int]:
     """Merge generated latest/incremental public exports with the current baseline."""
 
     merged_counts: dict[str, int] = {}
@@ -135,33 +118,77 @@ def merge_incremental_public_outputs(existing_public_dir: Path, generated_public
     return merged_counts
 
 
+def _stable_identity_set(records: list[dict[str, Any]], *, filename: str) -> set[str]:
+    return {public_record_key(record, filename=filename) for record in records}
+
+
+def _sample_identities(identities: set[str], *, limit: int = 10) -> str:
+    sample = sorted(identities)[:limit]
+    suffix = " ..." if len(identities) > limit else ""
+    return ", ".join(sample) + suffix
+
+
 def guard_against_output_shrink(
     existing_public_dir: Path,
     generated_public_dir: Path,
     *,
     allow_output_shrink: bool = False,
 ) -> dict[str, tuple[int, int]]:
-    """Fail if generated public JSONL exports shrink versus the existing baseline."""
+    """Fail when staged output loses stable identities from the public baseline.
+
+    A raw row-count drop is safe when it is fully explained by duplicate compaction.
+    This keeps the fail-closed protection for real removals while allowing a newer
+    merge implementation to clean up duplicate rows without a manual override.
+    """
 
     counts: dict[str, tuple[int, int]] = {}
     failures: list[str] = []
     for filename in PUBLIC_JSONL_FILES:
-        existing_count = count_jsonl(existing_public_dir / filename)
-        generated_count = count_jsonl(generated_public_dir / filename)
+        existing_records = read_jsonl(existing_public_dir / filename)
+        generated_records = read_jsonl(generated_public_dir / filename)
+        existing_count = len(existing_records)
+        generated_count = len(generated_records)
         counts[filename] = (existing_count, generated_count)
-        if existing_count > 0 and generated_count < existing_count:
-            failures.append(f"{filename}: {existing_count} -> {generated_count}")
 
-    if failures and not allow_output_shrink:
+        if existing_count <= 0:
+            continue
+
+        existing_identities = _stable_identity_set(existing_records, filename=filename)
+        generated_identities = _stable_identity_set(generated_records, filename=filename)
+        missing_identities = existing_identities - generated_identities
+
+        if missing_identities:
+            detail = (
+                f"{filename}: {existing_count} -> {generated_count} rows; "
+                f"unique identities {len(existing_identities)} -> {len(generated_identities)}; "
+                f"missing identities={len(missing_identities)} "
+                f"[{_sample_identities(missing_identities)}]"
+            )
+            if allow_output_shrink:
+                print(f"Output shrink override accepted: {detail}")
+            else:
+                failures.append(detail)
+            continue
+
+        if generated_count < existing_count:
+            existing_duplicates = existing_count - len(existing_identities)
+            generated_duplicates = generated_count - len(generated_identities)
+            print(
+                f"Safe duplicate compaction for {filename}: rows {existing_count} -> "
+                f"{generated_count}; unique identities {len(existing_identities)} -> "
+                f"{len(generated_identities)}; duplicate rows {existing_duplicates} -> "
+                f"{generated_duplicates}."
+            )
+
+    if failures:
         formatted = "; ".join(failures)
         raise RuntimeError(
-            "Generated public output is smaller than the current baseline. "
+            "Generated public output would lose stable identities from the current baseline. "
             "Refusing to publish without allow_output_shrink=true. "
-            f"Drops: {formatted}"
+            f"Changes: {formatted}"
         )
 
     return counts
-
 
 
 def validate_required_public_outputs(generated_public_dir: Path) -> None:
@@ -210,6 +237,7 @@ def refresh_latest_dataset_totals(public_dir: Path) -> dict[str, int]:
     )
     return totals
 
+
 def protect_public_outputs(
     existing_public_dir: Path,
     generated_public_dir: Path,
@@ -218,6 +246,12 @@ def protect_public_outputs(
     allow_output_shrink: bool = False,
 ) -> dict[str, tuple[int, int]]:
     """Apply profile-aware merge and shrink protection."""
+
+    if allow_output_shrink and profile not in SHRINK_OVERRIDE_PROFILES:
+        raise RuntimeError(
+            "allow_output_shrink=true is only valid for backfill/full profiles. "
+            "Incremental public harvests must preserve the existing dataset."
+        )
 
     if profile in INCREMENTAL_PROFILES:
         merge_incremental_public_outputs(existing_public_dir, generated_public_dir)
