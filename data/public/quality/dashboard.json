@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1664,
-    "documents_with_any_meeting_context_ratio": 0.0974,
-    "documents_without_meeting_context": 15418
+    "documents_with_any_meeting_context": 1482,
+    "documents_with_any_meeting_context_ratio": 0.0879,
+    "documents_without_meeting_context": 15372
   },
-  "dataset_generated_at": "2026-07-16T06:02:15.511790+00:00",
+  "dataset_generated_at": "2026-08-13T09:45:49.547950+00:00",
   "document_file_size": {
-    "average_bytes": 1133599,
-    "known_count": 17082,
+    "average_bytes": 1145339,
+    "known_count": 16854,
     "largest_bytes": 162614430,
-    "total_bytes": 19364130320,
+    "total_bytes": 19303549278,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -19,52 +19,52 @@
     },
     {
       "bucket": "0-100 KB",
-      "count": 5832
+      "count": 5754
     },
     {
       "bucket": "100 KB-1 MB",
-      "count": 8246
+      "count": 8106
     },
     {
       "bucket": "1-5 MB",
-      "count": 2307
+      "count": 2301
     },
     {
       "bucket": "> 5 MB",
-      "count": 697
+      "count": 693
     }
   ],
   "documents_by_type": [
     {
-      "count": 4517,
+      "count": 4443,
       "document_type": "Voorstel"
     },
     {
-      "count": 2360,
+      "count": 2347,
       "document_type": "Bijlage"
     },
     {
-      "count": 2002,
+      "count": 1955,
       "document_type": "Overig"
     },
     {
-      "count": 1758,
+      "count": 1723,
       "document_type": "Besluit"
     },
     {
-      "count": 1501,
+      "count": 1488,
       "document_type": "Ingekomen stuk"
     },
     {
-      "count": 1302,
+      "count": 1299,
       "document_type": "Mededeling"
     },
     {
-      "count": 941,
+      "count": 932,
       "document_type": "Notulen, verslag of samenvatting"
     },
     {
-      "count": 419,
+      "count": 414,
       "document_type": "Agenda"
     },
     {
@@ -72,16 +72,16 @@
       "document_type": "Verzoek of aanvullende gegevens"
     },
     {
-      "count": 407,
+      "count": 401,
       "document_type": "Vraag"
-    },
-    {
-      "count": 281,
-      "document_type": "Motie"
     },
     {
       "count": 270,
       "document_type": "Kennisgeving of ter kennisname"
+    },
+    {
+      "count": 270,
+      "document_type": "Motie"
     }
   ],
   "documents_by_year": [
@@ -94,7 +94,7 @@
       "year": "2019"
     },
     {
-      "count": 2156,
+      "count": 2154,
       "year": "2020"
     },
     {
@@ -102,7 +102,7 @@
       "year": "2021"
     },
     {
-      "count": 2334,
+      "count": 2337,
       "year": "2022"
     },
     {
@@ -118,29 +118,29 @@
       "year": "2025"
     },
     {
-      "count": 1410,
+      "count": 1181,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-07-16T06:02:15.511790+00:00",
+    "generated_at": "2026-08-13T09:45:49.547950+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-07-16T06:02:16.100219+00:00",
+  "generated_at": "2026-08-13T09:45:50.711601+00:00",
   "meeting_items_by_year": [
     {
-      "count": 236,
+      "count": 242,
       "year": "2025"
     },
     {
-      "count": 764,
+      "count": 768,
       "year": "2026"
     }
   ],
   "meetings_by_year": [
     {
-      "count": 35,
+      "count": 37,
       "year": "2024"
     },
     {
@@ -161,16 +161,16 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 17082,
-    "linked_documents": 1664,
+    "documents": 16854,
+    "linked_documents": 1482,
     "meeting_documents": 91,
-    "meeting_item_documents": 1718,
-    "meeting_items": 1000,
-    "meetings": 250,
+    "meeting_item_documents": 1761,
+    "meeting_items": 1010,
+    "meetings": 252,
     "organization_groups": 24,
     "organization_persons": 95,
     "organization_positions": 306,
     "organization_roles": 32,
-    "unlinked_documents": 15418
+    "unlinked_documents": 15372
   }
 }
