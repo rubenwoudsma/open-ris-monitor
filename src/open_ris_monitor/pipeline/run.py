@@ -22,6 +22,7 @@ from open_ris_monitor.normalizers.gemeenteoplossingen import normalize_documents
 from open_ris_monitor.normalizers.organization import normalize_organization_harvest
 from open_ris_monitor.normalizers.relations import normalize_relation_harvest
 from open_ris_monitor.pipeline.profiles import HARVEST_PROFILE_NAMES, resolve_harvest_options
+from open_ris_monitor.pipeline.record_identity import document_record_key
 from open_ris_monitor.pipeline.relations import collect_raw_relation_harvest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -139,16 +140,6 @@ def _record_to_dict(record: Any) -> dict[str, Any]:
     return payload
 
 
-def _document_merge_key(record: dict[str, Any]) -> str:
-    """Return a stable key for merging latest-run records into the dataset export."""
-    source_system_id = str(record.get("source_system_id") or "")
-    for key in ("source_id", "source_object_id", "id"):
-        value = record.get(key)
-        if value not in (None, ""):
-            return f"{source_system_id}:{key}:{value}"
-    return json.dumps(record, sort_keys=True, default=str)
-
-
 def _merge_document_records(existing: list[dict[str, Any]], current: list[Any]) -> list[dict[str, Any]]:
     """Merge current harvest documents into the existing public dataset documents.
 
@@ -159,14 +150,14 @@ def _merge_document_records(existing: list[dict[str, Any]], current: list[Any]) 
     order: list[str] = []
 
     for record in existing:
-        key = _document_merge_key(record)
+        key = document_record_key(record)
         if key not in merged:
             order.append(key)
         merged[key] = record
 
     for record in current:
         payload = _record_to_dict(record)
-        key = _document_merge_key(payload)
+        key = document_record_key(payload)
         if key not in merged:
             order.append(key)
         merged[key] = payload

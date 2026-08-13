@@ -304,17 +304,23 @@ The workflow treats publication as a transaction:
 1. preflight the upstream API;
 2. copy the current public dataset into `data/.harvest-staging/public`;
 3. harvest into staging;
-4. merge incremental output with the current baseline;
-5. reject zero records, shrinkage, malformed data and invalid metadata;
-6. generate quality reports and validate schemas in staging;
-7. promote staged raw and public directories with rollback support;
-8. commit only after promotion succeeds.
+4. merge incremental output with the current baseline using stable record identities;
+5. reject zero records, loss of stable identities, malformed data and invalid metadata;
+6. allow row-count compaction only when all existing stable identities are still present;
+7. generate quality reports and validate schemas in staging;
+8. promote staged raw and public directories with rollback support;
+9. commit only after promotion succeeds.
 
 A failure before promotion leaves `data/public` and its `generated_at` metadata unchanged. The staging and diagnostic paths are excluded from Git.
 
 ## Failure policy
 
 The pipeline should fail closed.
+
+The shrink guard is identity-aware. A lower physical row count is not by itself a failure when
+the difference is fully explained by duplicate records being compacted and every existing stable
+identity is still present. A disappearing stable identity remains a failure by default, even when
+new records keep the total row count equal or higher.
 
 That means:
 
@@ -372,9 +378,30 @@ Run a manual backfill when:
 - a scheduled monthly backfill failed and the upstream source is healthy again;
 - a longer outage left gaps in the public dataset;
 - a new relation-harvest improvement needs to rebuild historical coverage;
+- the upstream RIS intentionally removed historical public records;
 - a new municipality fork is seeded for the first time.
 
-Do not overwrite a healthy historical dataset with a failing or empty run.
+### Controlled output shrink approval
+
+`workflow_dispatch` exposes `allow_output_shrink`, default `false`. It is deliberately restricted
+to a manual `backfill` profile using full, unbounded mode. `max_documents` must therefore remain
+empty or `0`. Scheduled daily and monthly runs always keep the override disabled.
+
+Use the override only after a normal backfill has failed on missing stable identities and the log
+has been reviewed. The safety error reports raw row counts, unique identity counts, the number of
+missing identities and a bounded sample of identifiers. It does not log document titles.
+
+A typical recovery sequence is:
+
+1. run a manual `backfill` with `commit_public=false` and `allow_output_shrink=false`;
+2. inspect the reported missing identities and confirm that the upstream source intentionally no
+   longer publishes them;
+3. rerun the same `backfill` with `allow_output_shrink=true`;
+4. set `commit_public=true` only when the reviewed shrink should become the new public baseline.
+
+Do not use the override for `quick`, `latest` or `public` runs. Those profiles must preserve the
+existing historical identity set. Do not overwrite a healthy historical dataset with a failing or
+empty run.
 
 ## Forking policy
 
