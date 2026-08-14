@@ -21,7 +21,7 @@ def test_issue_69_backfill_profile_is_the_full_coverage_profile() -> None:
     assert options["max_documents"] is None
     assert options["include_relations"] is True
     assert options["meeting_scan_limit"] == 1000
-    assert options["meeting_item_limit"] == 5000
+    assert options["meeting_item_limit"] is None
 
 
 def test_issue_69_explicit_public_overrides_can_expand_document_scope() -> None:

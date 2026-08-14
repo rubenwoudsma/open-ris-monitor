@@ -26,14 +26,14 @@ def test_public_profile_prefers_recent_bounded_publication_defaults() -> None:
     assert options["meeting_item_limit"] == 1000
 
 
-def test_backfill_profile_is_larger_but_still_relation_bounded() -> None:
+def test_backfill_profile_is_full_and_meeting_items_are_unbounded() -> None:
     options = resolve_harvest_options("backfill")
 
     assert options["mode"] == "full"
     assert options["max_documents"] is None
     assert options["include_relations"] is True
     assert options["meeting_scan_limit"] == 1000
-    assert options["meeting_item_limit"] == 5000
+    assert options["meeting_item_limit"] is None
 
 
 def test_no_profile_keeps_existing_cli_defaults() -> None:
