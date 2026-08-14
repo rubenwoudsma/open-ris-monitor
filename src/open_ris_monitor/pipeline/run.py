@@ -22,7 +22,7 @@ from open_ris_monitor.normalizers.gemeenteoplossingen import normalize_documents
 from open_ris_monitor.normalizers.organization import normalize_organization_harvest
 from open_ris_monitor.normalizers.relations import normalize_relation_harvest
 from open_ris_monitor.pipeline.profiles import HARVEST_PROFILE_NAMES, resolve_harvest_options
-from open_ris_monitor.pipeline.record_identity import document_record_key
+from open_ris_monitor.pipeline.record_identity import document_record_key, public_record_key
 from open_ris_monitor.pipeline.relations import collect_raw_relation_harvest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -163,6 +163,30 @@ def _merge_document_records(existing: list[dict[str, Any]], current: list[Any]) 
         merged[key] = payload
 
     return [merged[key] for key in order]
+
+
+def _merge_harvest_run_records(
+    existing: list[dict[str, Any]],
+    current: Any,
+) -> list[dict[str, Any]]:
+    """Append the current run while preserving earlier public harvest history."""
+
+    merged: dict[str, dict[str, Any]] = {}
+    order: list[str] = []
+
+    for record in existing:
+        key = public_record_key(record, filename="harvest_runs.jsonl")
+        if key not in merged:
+            order.append(key)
+        merged[key] = record
+
+    payload = _record_to_dict(current)
+    key = public_record_key(payload, filename="harvest_runs.jsonl")
+    if key not in merged:
+        order.append(key)
+    merged[key] = payload
+
+    return [merged[item_key] for item_key in order]
 
 
 def _latest_full_backfill_at(
@@ -495,7 +519,9 @@ def run_harvest(
     else:
         public_documents = _to_public_dicts(documents)
     write_jsonl(documents_path, public_documents)
-    write_jsonl(public_dir / "harvest_runs.jsonl", [harvest_run])
+    harvest_runs_path = public_dir / "harvest_runs.jsonl"
+    public_harvest_runs = _merge_harvest_run_records(_read_jsonl(harvest_runs_path), harvest_run)
+    write_jsonl(harvest_runs_path, public_harvest_runs)
     if enrich_checksums:
         write_jsonl(previous_versions_path, merged_versions)
 

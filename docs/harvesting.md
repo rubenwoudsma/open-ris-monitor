@@ -101,13 +101,15 @@ data/public/quality/issues.jsonl
 
 `latest.json` is the operational manifest for the latest generated public dataset. It should contain output paths, totals, generation timestamp, relation status and run profile information.
 
+`harvest_runs.jsonl` is operational history, not an authoritative snapshot of the upstream RIS. Full and incremental harvests therefore preserve earlier run records and append the current run by stable run ID. A source backfill must never erase successful local harvest history merely because the source dataset itself is being rebuilt.
+
 ## Latest, public and backfill
 
 Use `quick` for fast local confidence.
 
 Use `public` for the live dataset. Scheduled daily GitHub Actions runs use this profile.
 
-Use `backfill` for initial historical loading, controlled historical extension, recovery after a longer gap or the monthly scheduled full refresh.
+Use `backfill` for initial historical loading, controlled historical extension, recovery after a longer gap or the monthly scheduled full refresh. The profile deliberately leaves `meeting_item_limit` unbounded. A reviewed full backfill can become the new public baseline, so relation harvesting must not stop silently at an arbitrary agenda-item cap. This makes a backfill more expensive than the daily `public` profile and is intentional.
 
 Do not schedule daily backfills. A `latest` or recent-window style run must not shrink the full public dataset accidentally. The intended behavior is to update recent information while preserving the broader public output unless a full or backfill run is deliberately performed.
 
@@ -385,7 +387,8 @@ Run a manual backfill when:
 
 `workflow_dispatch` exposes `allow_output_shrink`, default `false`. It is deliberately restricted
 to a manual `backfill` profile using full, unbounded mode. `max_documents` must therefore remain
-empty or `0`. Scheduled daily and monthly runs always keep the override disabled.
+empty or `0`, and the standard backfill profile must keep relation harvesting unbounded at meeting-item
+level. Scheduled daily and monthly runs always keep the override disabled.
 
 Use the override only after a normal backfill has failed on missing stable identities and the log
 has been reviewed. The safety error reports raw row counts, unique identity counts, the number of
@@ -394,10 +397,12 @@ missing identities and a bounded sample of identifiers. It does not log document
 A typical recovery sequence is:
 
 1. run a manual `backfill` with `commit_public=false` and `allow_output_shrink=false`;
-2. inspect the reported missing identities and confirm that the upstream source intentionally no
+2. confirm from the harvest summary that documents and relation traversal completed without an
+   artificial profile cap;
+3. inspect the reported missing identities and confirm that the upstream source intentionally no
    longer publishes them;
-3. rerun the same `backfill` with `allow_output_shrink=true`;
-4. set `commit_public=true` only when the reviewed shrink should become the new public baseline.
+4. rerun the same `backfill` with `allow_output_shrink=true` and `commit_public=true` only when the
+   reviewed shrink should become the new public baseline.
 
 Do not use the override for `quick`, `latest` or `public` runs. Those profiles must preserve the
 existing historical identity set. Do not overwrite a healthy historical dataset with a failing or

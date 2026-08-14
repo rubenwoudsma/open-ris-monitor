@@ -85,7 +85,9 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         include_relations=True,
         meeting_scan_limit=1000,
         meeting_session_batch_size=100,
-        meeting_item_limit=5000,
+        # A backfill can become the authoritative public baseline after a reviewed
+        # shrink approval. Do not silently truncate agenda-item relations.
+        meeting_item_limit=None,
         include_organization=True,
         organization_batch_size=100,
     ),
@@ -98,7 +100,7 @@ HARVEST_PROFILES: Final[dict[str, HarvestProfile]] = {
         include_relations=True,
         meeting_scan_limit=1000,
         meeting_session_batch_size=100,
-        meeting_item_limit=5000,
+        meeting_item_limit=None,
         include_organization=True,
         organization_batch_size=100,
     ),
