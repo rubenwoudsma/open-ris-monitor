@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-08-19T04:09:58.622818+00:00",
+  "generated_at": "2026-08-20T04:09:41.117629+00:00",
   "counts": {
-    "documents": 16856,
+    "documents": 16857,
     "document_versions": 25,
-    "harvest_runs": 8,
+    "harvest_runs": 9,
     "meetings": 252,
     "meeting_items": 1010,
     "meeting_documents": 91,
-    "meeting_item_documents": 1762
+    "meeting_item_documents": 1763
   },
   "coverage": {
-    "documents_with_relations": 1483,
+    "documents_with_relations": 1484,
     "documents_without_relations": 15373,
     "coverage_pct": 8.8
   },
@@ -71,7 +71,7 @@
       "Document ter kennisname (Inkomend)": 229,
       "Evaluatie (Intern)": 2,
       "Financiële overzichten commissie": 58,
-      "Ingekomen stuk": 1488,
+      "Ingekomen stuk": 1489,
       "Inkoopopdracht (Intern)": 5,
       "Intern advies": 2,
       "Jaarverslag (Intern)": 3,
@@ -167,7 +167,7 @@
       "attachment": 2348,
       "commitment": 203,
       "decision": 1723,
-      "incoming_document": 1488,
+      "incoming_document": 1489,
       "invitation": 150,
       "memo_or_advice": 67,
       "minutes_or_summary": 932,
@@ -185,19 +185,19 @@
     "unknown_count": 37
   },
   "document_metadata": {
-    "documents_with_file_url": 16856,
+    "documents_with_file_url": 16857,
     "documents_without_file_url": 0,
-    "documents_with_file_size": 16856,
+    "documents_with_file_size": 16857,
     "documents_without_file_size": 0
   },
   "export_diagnostics": {
-    "documents_seen": 16856,
-    "documents_published": 16856,
+    "documents_seen": 16857,
+    "documents_published": 16857,
     "documents_seen_minus_published": 0,
     "raw_meeting_document_relations_seen": 0,
     "raw_meeting_item_document_relations_seen": 0,
     "published_meeting_document_relations": 91,
-    "published_meeting_item_document_relations": 1762,
+    "published_meeting_item_document_relations": 1763,
     "dropped_meeting_document_relations": 0,
     "dropped_meeting_item_document_relations": 0
   },
@@ -210,15 +210,15 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-08-19T04:09:57.069806+00:00",
-      "id": "harvest-huizen-20260819T040343Z",
+      "finished_at": "2026-08-20T04:09:39.348818+00:00",
+      "id": "harvest-huizen-20260820T040329Z",
       "max_documents": null,
       "meetings_seen": 250,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-08-19T04:03:43.029896+00:00",
+      "started_at": "2026-08-20T04:03:29.991498+00:00",
       "status": "success"
     }
   },
