@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1491,
-    "documents_with_any_meeting_context_ratio": 0.0884,
+    "documents_with_any_meeting_context": 1508,
+    "documents_with_any_meeting_context_ratio": 0.0893,
     "documents_without_meeting_context": 15373
   },
-  "dataset_generated_at": "2026-08-24T04:16:19.286198+00:00",
+  "dataset_generated_at": "2026-08-25T04:11:30.077165+00:00",
   "document_file_size": {
-    "average_bytes": 1146041,
-    "known_count": 16864,
+    "average_bytes": 1145088,
+    "known_count": 16881,
     "largest_bytes": 162614430,
-    "total_bytes": 19326835625,
+    "total_bytes": 19330238490,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -23,7 +23,7 @@
     },
     {
       "bucket": "100 KB-1 MB",
-      "count": 8112
+      "count": 8129
     },
     {
       "bucket": "1-5 MB",
@@ -36,7 +36,7 @@
   ],
   "documents_by_type": [
     {
-      "count": 4443,
+      "count": 4460,
       "document_type": "Voorstel"
     },
     {
@@ -118,23 +118,23 @@
       "year": "2025"
     },
     {
-      "count": 1190,
+      "count": 1207,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-08-24T04:16:19.286198+00:00",
+    "generated_at": "2026-08-25T04:11:30.077165+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-08-24T04:16:20.604676+00:00",
+  "generated_at": "2026-08-25T04:11:31.392460+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
       "year": "2025"
     },
     {
-      "count": 768,
+      "count": 785,
       "year": "2026"
     }
   ],
@@ -148,7 +148,7 @@
       "year": "2025"
     },
     {
-      "count": 81,
+      "count": 88,
       "year": "2026"
     },
     {
@@ -161,12 +161,12 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 16864,
-    "linked_documents": 1491,
+    "documents": 16881,
+    "linked_documents": 1508,
     "meeting_documents": 91,
-    "meeting_item_documents": 1770,
-    "meeting_items": 1010,
-    "meetings": 252,
+    "meeting_item_documents": 1787,
+    "meeting_items": 1027,
+    "meetings": 259,
     "organization_groups": 24,
     "organization_persons": 95,
     "organization_positions": 306,
