@@ -1,1 +1,2 @@
+{"severity": "warning", "code": "orphan_meeting_item_document_relations", "count": 3, "message": "Meeting-item-document relations reference missing records."}
 {"severity": "info", "code": "unknown_document_types", "count": 37, "message": "Some documents are not mapped to a normalized document type."}
