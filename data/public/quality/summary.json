@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-29T10:23:06.438905+00:00",
+  "generated_at": "2026-08-30T09:26:51.243548+00:00",
   "counts": {
     "documents": 16919,
     "document_versions": 25,
-    "harvest_runs": 18,
+    "harvest_runs": 19,
     "meetings": 259,
     "meeting_items": 1094,
     "meeting_documents": 91,
@@ -210,15 +210,15 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-08-29T10:23:04.580191+00:00",
-      "id": "harvest-huizen-20260829T101427Z",
+      "finished_at": "2026-08-30T09:26:49.560184+00:00",
+      "id": "harvest-huizen-20260830T092106Z",
       "max_documents": null,
       "meetings_seen": 250,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-08-29T10:14:27.373770+00:00",
+      "started_at": "2026-08-30T09:21:06.973484+00:00",
       "status": "success"
     }
   },
