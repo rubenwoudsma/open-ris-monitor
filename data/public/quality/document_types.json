@@ -1,6 +1,6 @@
 {
-  "documents_total": 16925,
-  "generated_at": "2026-09-03T08:19:26.795886+00:00",
+  "documents_total": 16931,
+  "generated_at": "2026-09-04T08:13:32.308090+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 1875,
+      "count": 1878,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -523,7 +523,7 @@
       "normalized_document_type_label": "Agenda"
     },
     "Toezeggingen": {
-      "count": 166,
+      "count": 169,
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging"
     },
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 1962,
+      "count": 1965,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -843,7 +843,7 @@
       ]
     },
     {
-      "count": 203,
+      "count": 206,
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging",
       "source_document_types": [
@@ -983,7 +983,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 1875,
+      "count": 1878,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
@@ -1067,7 +1067,7 @@
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     {
-      "count": 166,
+      "count": 169,
       "document_type": "Toezeggingen",
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging"
