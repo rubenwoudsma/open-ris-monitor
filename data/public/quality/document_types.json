@@ -1,6 +1,6 @@
 {
-  "documents_total": 16931,
-  "generated_at": "2026-09-04T08:13:32.308090+00:00",
+  "documents_total": 16933,
+  "generated_at": "2026-09-05T07:50:50.642336+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -308,7 +308,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Mededelingen": {
-      "count": 1300,
+      "count": 1301,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
@@ -663,7 +663,7 @@
       "normalized_document_type_label": "Vraag"
     },
     "Vragen van raadsleden": {
-      "count": 328,
+      "count": 329,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
     },
@@ -753,7 +753,7 @@
       ]
     },
     {
-      "count": 1304,
+      "count": 1305,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling",
       "source_document_types": [
@@ -811,7 +811,7 @@
       ]
     },
     {
-      "count": 401,
+      "count": 402,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag",
       "source_document_types": [
@@ -995,7 +995,7 @@
       "normalized_document_type_label": "Ingekomen stuk"
     },
     {
-      "count": 1300,
+      "count": 1301,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
@@ -1031,7 +1031,7 @@
       "normalized_document_type_label": "Verzoek of aanvullende gegevens"
     },
     {
-      "count": 328,
+      "count": 329,
       "document_type": "Vragen van raadsleden",
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
