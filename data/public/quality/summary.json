@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-09-08T08:17:44.865081+00:00",
+  "generated_at": "2026-09-09T08:22:03.679920+00:00",
   "counts": {
-    "documents": 16940,
+    "documents": 16947,
     "document_versions": 25,
-    "harvest_runs": 28,
+    "harvest_runs": 29,
     "meetings": 259,
-    "meeting_items": 1098,
+    "meeting_items": 1102,
     "meeting_documents": 91,
-    "meeting_item_documents": 1861
+    "meeting_item_documents": 1871
   },
   "coverage": {
-    "documents_with_relations": 1565,
+    "documents_with_relations": 1572,
     "documents_without_relations": 15375,
-    "coverage_pct": 9.24
+    "coverage_pct": 9.28
   },
   "integrity": {
     "orphan_meeting_document_relations": 0,
@@ -71,7 +71,7 @@
       "Document ter kennisname (Inkomend)": 229,
       "Evaluatie (Intern)": 2,
       "Financiële overzichten commissie": 59,
-      "Ingekomen stuk": 1494,
+      "Ingekomen stuk": 1495,
       "Inkoopopdracht (Intern)": 5,
       "Intern advies": 2,
       "Jaarverslag (Intern)": 3,
@@ -103,7 +103,7 @@
       "Onderhoudsrapport (Intern)": 1,
       "Onderzoeksstuk (Intern)": 3,
       "Opdracht (Intern)": 2,
-      "Overig": 1882,
+      "Overig": 1887,
       "Overig stuk inkomend": 4,
       "Overig stuk intern": 82,
       "Overig stuk uitgaand": 1,
@@ -155,7 +155,7 @@
       "Voorstel definitieve bekostiging (Intern)": 3,
       "Voorstel planschadeovereenkomst (Intern)": 2,
       "Vraag van raadslid (Inkomend)": 7,
-      "Vragen van raadsleden": 329,
+      "Vragen van raadsleden": 330,
       "Zienswijze (Inkomend)": 8,
       "Zienswijzeadvies": 1
     },
@@ -167,17 +167,17 @@
       "attachment": 2371,
       "commitment": 206,
       "decision": 1723,
-      "incoming_document": 1494,
+      "incoming_document": 1495,
       "invitation": 150,
       "memo_or_advice": 68,
       "minutes_or_summary": 935,
       "motion": 270,
       "notice": 270,
       "objection_or_response": 15,
-      "other": 1969,
+      "other": 1974,
       "policy_or_plan": 91,
       "proposal": 4467,
-      "question": 402,
+      "question": 403,
       "report": 144,
       "request": 411,
       "unknown": 37
@@ -185,19 +185,19 @@
     "unknown_count": 37
   },
   "document_metadata": {
-    "documents_with_file_url": 16940,
+    "documents_with_file_url": 16947,
     "documents_without_file_url": 0,
-    "documents_with_file_size": 16940,
+    "documents_with_file_size": 16947,
     "documents_without_file_size": 0
   },
   "export_diagnostics": {
-    "documents_seen": 16940,
-    "documents_published": 16940,
+    "documents_seen": 16947,
+    "documents_published": 16947,
     "documents_seen_minus_published": 0,
     "raw_meeting_document_relations_seen": 0,
     "raw_meeting_item_document_relations_seen": 0,
     "published_meeting_document_relations": 91,
-    "published_meeting_item_document_relations": 1861,
+    "published_meeting_item_document_relations": 1871,
     "dropped_meeting_document_relations": 0,
     "dropped_meeting_item_document_relations": 0
   },
@@ -210,15 +210,15 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-09-08T08:17:43.212476+00:00",
-      "id": "harvest-huizen-20260908T081226Z",
+      "finished_at": "2026-09-09T08:22:02.122610+00:00",
+      "id": "harvest-huizen-20260909T081541Z",
       "max_documents": null,
       "meetings_seen": 250,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-09-08T08:12:26.012488+00:00",
+      "started_at": "2026-09-09T08:15:41.838762+00:00",
       "status": "success"
     }
   },
