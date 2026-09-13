@@ -4,7 +4,7 @@
     "documents_with_any_meeting_context_ratio": 0.0935,
     "documents_without_meeting_context": 15376
   },
-  "dataset_generated_at": "2026-09-12T08:09:35.653947+00:00",
+  "dataset_generated_at": "2026-09-13T08:34:48.881931+00:00",
   "document_file_size": {
     "average_bytes": 1151534,
     "known_count": 16962,
@@ -124,10 +124,10 @@
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-09-12T08:09:35.653947+00:00",
+    "generated_at": "2026-09-13T08:34:48.881931+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-09-12T08:09:36.989442+00:00",
+  "generated_at": "2026-09-13T08:34:50.032408+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
