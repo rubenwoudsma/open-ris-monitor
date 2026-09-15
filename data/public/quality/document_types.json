@@ -1,6 +1,6 @@
 {
-  "documents_total": 16962,
-  "generated_at": "2026-09-14T09:14:24.667529+00:00",
+  "documents_total": 16964,
+  "generated_at": "2026-09-15T08:56:50.955764+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1495,
+      "count": 1497,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1495,
+      "count": 1497,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -989,7 +989,7 @@
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1495,
+      "count": 1497,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
