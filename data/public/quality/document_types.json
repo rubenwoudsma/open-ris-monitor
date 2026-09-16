@@ -1,6 +1,6 @@
 {
-  "documents_total": 16964,
-  "generated_at": "2026-09-15T08:56:50.955764+00:00",
+  "documents_total": 16966,
+  "generated_at": "2026-09-16T08:51:55.521944+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -428,7 +428,7 @@
       "normalized_document_type_label": "Mededeling"
     },
     "Overzicht stand van zaken": {
-      "count": 56,
+      "count": 58,
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
@@ -871,7 +871,7 @@
       ]
     },
     {
-      "count": 144,
+      "count": 146,
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie",
       "source_document_types": [
@@ -1145,7 +1145,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     {
-      "count": 56,
+      "count": 58,
       "document_type": "Overzicht stand van zaken",
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie"
