@@ -1,6 +1,6 @@
 {
-  "documents_total": 16966,
-  "generated_at": "2026-09-16T08:51:55.521944+00:00",
+  "documents_total": 16968,
+  "generated_at": "2026-09-17T08:53:27.367253+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -308,7 +308,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Mededelingen": {
-      "count": 1304,
+      "count": 1305,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
@@ -458,7 +458,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Raadsvragen": {
-      "count": 66,
+      "count": 67,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
     },
@@ -753,7 +753,7 @@
       ]
     },
     {
-      "count": 1308,
+      "count": 1309,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling",
       "source_document_types": [
@@ -811,7 +811,7 @@
       ]
     },
     {
-      "count": 403,
+      "count": 404,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag",
       "source_document_types": [
@@ -995,7 +995,7 @@
       "normalized_document_type_label": "Ingekomen stuk"
     },
     {
-      "count": 1304,
+      "count": 1305,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
@@ -1127,16 +1127,16 @@
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     {
+      "count": 67,
+      "document_type": "Raadsvragen",
+      "normalized_document_type": "question",
+      "normalized_document_type_label": "Vraag"
+    },
+    {
       "count": 66,
       "document_type": "Raadsbesluit",
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
-    },
-    {
-      "count": 66,
-      "document_type": "Raadsvragen",
-      "normalized_document_type": "question",
-      "normalized_document_type_label": "Vraag"
     },
     {
       "count": 59,
