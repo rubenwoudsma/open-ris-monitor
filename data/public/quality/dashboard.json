@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1609,
-    "documents_with_any_meeting_context_ratio": 0.0947,
-    "documents_without_meeting_context": 15376
+    "documents_with_any_meeting_context": 1612,
+    "documents_with_any_meeting_context_ratio": 0.0949,
+    "documents_without_meeting_context": 15377
   },
-  "dataset_generated_at": "2026-09-21T09:17:56.557123+00:00",
+  "dataset_generated_at": "2026-09-22T08:45:31.607188+00:00",
   "document_file_size": {
-    "average_bytes": 1150161,
-    "known_count": 16985,
+    "average_bytes": 1149915,
+    "known_count": 16989,
     "largest_bytes": 162614430,
-    "total_bytes": 19535486020,
+    "total_bytes": 19535907575,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -19,11 +19,11 @@
     },
     {
       "bucket": "0-100 KB",
-      "count": 5802
+      "count": 5805
     },
     {
       "bucket": "100 KB-1 MB",
-      "count": 8173
+      "count": 8174
     },
     {
       "bucket": "1-5 MB",
@@ -44,7 +44,7 @@
       "document_type": "Bijlage"
     },
     {
-      "count": 1981,
+      "count": 1982,
       "document_type": "Overig"
     },
     {
@@ -72,7 +72,7 @@
       "document_type": "Verzoek of aanvullende gegevens"
     },
     {
-      "count": 404,
+      "count": 407,
       "document_type": "Vraag"
     },
     {
@@ -118,23 +118,23 @@
       "year": "2025"
     },
     {
-      "count": 1311,
+      "count": 1315,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-09-21T09:17:56.557123+00:00",
+    "generated_at": "2026-09-22T08:45:31.607188+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-09-21T09:17:57.961707+00:00",
+  "generated_at": "2026-09-22T08:45:32.951094+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
       "year": "2025"
     },
     {
-      "count": 897,
+      "count": 900,
       "year": "2026"
     }
   ],
@@ -161,16 +161,16 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 16985,
-    "linked_documents": 1609,
+    "documents": 16989,
+    "linked_documents": 1612,
     "meeting_documents": 94,
-    "meeting_item_documents": 1928,
-    "meeting_items": 1139,
+    "meeting_item_documents": 1931,
+    "meeting_items": 1142,
     "meetings": 264,
     "organization_groups": 24,
     "organization_persons": 95,
     "organization_positions": 306,
     "organization_roles": 32,
-    "unlinked_documents": 15376
+    "unlinked_documents": 15377
   }
 }
