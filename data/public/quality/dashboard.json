@@ -4,12 +4,12 @@
     "documents_with_any_meeting_context_ratio": 0.0949,
     "documents_without_meeting_context": 15377
   },
-  "dataset_generated_at": "2026-09-22T08:45:31.607188+00:00",
+  "dataset_generated_at": "2026-09-23T08:48:13.060414+00:00",
   "document_file_size": {
     "average_bytes": 1149915,
     "known_count": 16989,
     "largest_bytes": 162614430,
-    "total_bytes": 19535907575,
+    "total_bytes": 19535907587,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -124,17 +124,17 @@
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-09-22T08:45:31.607188+00:00",
+    "generated_at": "2026-09-23T08:48:13.060414+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-09-22T08:45:32.951094+00:00",
+  "generated_at": "2026-09-23T08:48:14.516425+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
       "year": "2025"
     },
     {
-      "count": 900,
+      "count": 901,
       "year": "2026"
     }
   ],
@@ -165,7 +165,7 @@
     "linked_documents": 1612,
     "meeting_documents": 94,
     "meeting_item_documents": 1931,
-    "meeting_items": 1142,
+    "meeting_items": 1143,
     "meetings": 264,
     "organization_groups": 24,
     "organization_persons": 95,
