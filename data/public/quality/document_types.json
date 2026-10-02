@@ -1,6 +1,6 @@
 {
-  "documents_total": 17054,
-  "generated_at": "2026-10-01T10:23:29.682151+00:00",
+  "documents_total": 17062,
+  "generated_at": "2026-10-02T10:01:55.950832+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -308,7 +308,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Mededelingen": {
-      "count": 1310,
+      "count": 1313,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 1899,
+      "count": 1904,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 1986,
+      "count": 1991,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -753,7 +753,7 @@
       ]
     },
     {
-      "count": 1314,
+      "count": 1317,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling",
       "source_document_types": [
@@ -983,7 +983,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 1899,
+      "count": 1904,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
@@ -995,7 +995,7 @@
       "normalized_document_type_label": "Ingekomen stuk"
     },
     {
-      "count": 1310,
+      "count": 1313,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
