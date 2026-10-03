@@ -1,6 +1,6 @@
 {
-  "documents_total": 17062,
-  "generated_at": "2026-10-02T10:01:55.950832+00:00",
+  "documents_total": 17068,
+  "generated_at": "2026-10-03T09:22:25.385338+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -138,7 +138,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Besluitenlijsten": {
-      "count": 115,
+      "count": 116,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
     },
@@ -148,7 +148,7 @@
       "normalized_document_type_label": "Bezwaar, klacht of zienswijze"
     },
     "Bijlage": {
-      "count": 2402,
+      "count": 2406,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
     },
@@ -448,7 +448,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Raadsvoorstel": {
-      "count": 1005,
+      "count": 1006,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4485,
+      "count": 4486,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -709,7 +709,7 @@
       ]
     },
     {
-      "count": 2402,
+      "count": 2406,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage",
       "source_document_types": [
@@ -728,7 +728,7 @@
       ]
     },
     {
-      "count": 1726,
+      "count": 1727,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit",
       "source_document_types": [
@@ -971,7 +971,7 @@
   "source_document_type_count": 135,
   "source_document_types": [
     {
-      "count": 2402,
+      "count": 2406,
       "document_type": "Bijlage",
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
@@ -1007,7 +1007,7 @@
       "normalized_document_type_label": "Besluit"
     },
     {
-      "count": 1005,
+      "count": 1006,
       "document_type": "Raadsvoorstel",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
@@ -1091,14 +1091,14 @@
       "normalized_document_type_label": "Uitnodiging"
     },
     {
-      "count": 115,
-      "document_type": "Besluitenlijst raad",
+      "count": 116,
+      "document_type": "Besluitenlijsten",
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
     },
     {
       "count": 115,
-      "document_type": "Besluitenlijsten",
+      "document_type": "Besluitenlijst raad",
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
     },

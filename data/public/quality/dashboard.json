@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1679,
-    "documents_with_any_meeting_context_ratio": 0.0984,
+    "documents_with_any_meeting_context": 1685,
+    "documents_with_any_meeting_context_ratio": 0.0987,
     "documents_without_meeting_context": 15383
   },
-  "dataset_generated_at": "2026-10-02T10:01:55.037367+00:00",
+  "dataset_generated_at": "2026-10-03T09:22:24.140159+00:00",
   "document_file_size": {
-    "average_bytes": 1148048,
-    "known_count": 17062,
+    "average_bytes": 1147701,
+    "known_count": 17068,
     "largest_bytes": 162614430,
-    "total_bytes": 19587996721,
+    "total_bytes": 19588954570,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -19,11 +19,11 @@
     },
     {
       "bucket": "0-100 KB",
-      "count": 5845
+      "count": 5847
     },
     {
       "bucket": "100 KB-1 MB",
-      "count": 8199
+      "count": 8203
     },
     {
       "bucket": "1-5 MB",
@@ -36,11 +36,11 @@
   ],
   "documents_by_type": [
     {
-      "count": 4485,
+      "count": 4486,
       "document_type": "Voorstel"
     },
     {
-      "count": 2402,
+      "count": 2406,
       "document_type": "Bijlage"
     },
     {
@@ -48,7 +48,7 @@
       "document_type": "Overig"
     },
     {
-      "count": 1726,
+      "count": 1727,
       "document_type": "Besluit"
     },
     {
@@ -118,23 +118,23 @@
       "year": "2025"
     },
     {
-      "count": 1388,
+      "count": 1394,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-10-02T10:01:55.037367+00:00",
+    "generated_at": "2026-10-03T09:22:24.140159+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-10-02T10:01:56.069395+00:00",
+  "generated_at": "2026-10-03T09:22:25.543142+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
       "year": "2025"
     },
     {
-      "count": 932,
+      "count": 933,
       "year": "2026"
     },
     {
@@ -173,11 +173,11 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 17062,
-    "linked_documents": 1679,
-    "meeting_documents": 94,
-    "meeting_item_documents": 1998,
-    "meeting_items": 1184,
+    "documents": 17068,
+    "linked_documents": 1685,
+    "meeting_documents": 95,
+    "meeting_item_documents": 2003,
+    "meeting_items": 1185,
     "meetings": 303,
     "organization_groups": 24,
     "organization_persons": 95,
