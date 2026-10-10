@@ -1,6 +1,6 @@
 {
-  "documents_total": 17134,
-  "generated_at": "2026-10-09T10:49:34.669903+00:00",
+  "documents_total": 17135,
+  "generated_at": "2026-10-10T10:08:52.682393+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 1917,
+      "count": 1918,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 2004,
+      "count": 2005,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -983,7 +983,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 1917,
+      "count": 1918,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
