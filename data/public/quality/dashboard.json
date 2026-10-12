@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1747,
-    "documents_with_any_meeting_context_ratio": 0.102,
+    "documents_with_any_meeting_context": 1750,
+    "documents_with_any_meeting_context_ratio": 0.1021,
     "documents_without_meeting_context": 15388
   },
-  "dataset_generated_at": "2026-10-11T10:15:03.242837+00:00",
+  "dataset_generated_at": "2026-10-12T11:15:22.034077+00:00",
   "document_file_size": {
-    "average_bytes": 1150625,
-    "known_count": 17135,
+    "average_bytes": 1150447,
+    "known_count": 17138,
     "largest_bytes": 162614430,
-    "total_bytes": 19715967608,
+    "total_bytes": 19716354788,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -23,7 +23,7 @@
     },
     {
       "bucket": "100 KB-1 MB",
-      "count": 8239
+      "count": 8242
     },
     {
       "bucket": "1-5 MB",
@@ -44,7 +44,7 @@
       "document_type": "Bijlage"
     },
     {
-      "count": 2005,
+      "count": 2006,
       "document_type": "Overig"
     },
     {
@@ -52,7 +52,7 @@
       "document_type": "Besluit"
     },
     {
-      "count": 1515,
+      "count": 1517,
       "document_type": "Ingekomen stuk"
     },
     {
@@ -118,16 +118,16 @@
       "year": "2025"
     },
     {
-      "count": 1461,
+      "count": 1464,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-10-11T10:15:03.242837+00:00",
+    "generated_at": "2026-10-12T11:15:22.034077+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-10-11T10:15:04.128076+00:00",
+  "generated_at": "2026-10-12T11:15:23.556793+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
@@ -173,10 +173,10 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 17135,
-    "linked_documents": 1747,
+    "documents": 17138,
+    "linked_documents": 1750,
     "meeting_documents": 95,
-    "meeting_item_documents": 2065,
+    "meeting_item_documents": 2068,
     "meeting_items": 1244,
     "meetings": 306,
     "organization_groups": 24,
