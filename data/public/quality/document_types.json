@@ -1,6 +1,6 @@
 {
-  "documents_total": 17187,
-  "generated_at": "2026-10-15T08:32:04.468941+00:00",
+  "documents_total": 17240,
+  "generated_at": "2026-10-16T08:28:20.497816+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -173,7 +173,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Collegevoorstel (BBV)": {
-      "count": 2285,
+      "count": 2308,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1541,
+      "count": 1551,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -308,7 +308,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Mededelingen": {
-      "count": 1315,
+      "count": 1318,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 1941,
+      "count": 1955,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -523,7 +523,7 @@
       "normalized_document_type_label": "Agenda"
     },
     "Toezeggingen": {
-      "count": 169,
+      "count": 172,
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4490,
+      "count": 4513,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 2028,
+      "count": 2042,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1541,
+      "count": 1551,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -753,7 +753,7 @@
       ]
     },
     {
-      "count": 1319,
+      "count": 1322,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling",
       "source_document_types": [
@@ -843,7 +843,7 @@
       ]
     },
     {
-      "count": 206,
+      "count": 209,
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging",
       "source_document_types": [
@@ -977,25 +977,25 @@
       "normalized_document_type_label": "Bijlage"
     },
     {
-      "count": 2285,
+      "count": 2308,
       "document_type": "Collegevoorstel (BBV)",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 1941,
+      "count": 1955,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1541,
+      "count": 1551,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
     {
-      "count": 1315,
+      "count": 1318,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
@@ -1067,7 +1067,7 @@
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     {
-      "count": 169,
+      "count": 172,
       "document_type": "Toezeggingen",
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging"
@@ -1782,7 +1782,7 @@
     }
   ],
   "unknown_document_type_count": 37,
-  "unknown_document_type_percentage": 0.22,
+  "unknown_document_type_percentage": 0.21,
   "unknown_source_document_types": [
     {
       "count": 11,
