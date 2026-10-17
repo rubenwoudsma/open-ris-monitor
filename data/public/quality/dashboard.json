@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1846,
-    "documents_with_any_meeting_context_ratio": 0.1071,
+    "documents_with_any_meeting_context": 1858,
+    "documents_with_any_meeting_context_ratio": 0.1077,
     "documents_without_meeting_context": 15394
   },
-  "dataset_generated_at": "2026-10-16T08:28:19.187174+00:00",
+  "dataset_generated_at": "2026-10-17T08:00:09.021408+00:00",
   "document_file_size": {
-    "average_bytes": 1145313,
-    "known_count": 17240,
+    "average_bytes": 1144653,
+    "known_count": 17252,
     "largest_bytes": 162614430,
-    "total_bytes": 19745192941,
+    "total_bytes": 19747552051,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -19,11 +19,11 @@
     },
     {
       "bucket": "0-100 KB",
-      "count": 5910
+      "count": 5912
     },
     {
       "bucket": "100 KB-1 MB",
-      "count": 8290
+      "count": 8300
     },
     {
       "bucket": "1-5 MB",
@@ -36,7 +36,7 @@
   ],
   "documents_by_type": [
     {
-      "count": 4513,
+      "count": 4521,
       "document_type": "Voorstel"
     },
     {
@@ -44,7 +44,7 @@
       "document_type": "Bijlage"
     },
     {
-      "count": 2042,
+      "count": 2046,
       "document_type": "Overig"
     },
     {
@@ -118,23 +118,23 @@
       "year": "2025"
     },
     {
-      "count": 1566,
+      "count": 1578,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-10-16T08:28:19.187174+00:00",
+    "generated_at": "2026-10-17T08:00:09.021408+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-10-16T08:28:20.658478+00:00",
+  "generated_at": "2026-10-17T08:00:10.494163+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
       "year": "2025"
     },
     {
-      "count": 1017,
+      "count": 1025,
       "year": "2026"
     },
     {
@@ -156,7 +156,7 @@
       "year": "2025"
     },
     {
-      "count": 98,
+      "count": 101,
       "year": "2026"
     },
     {
@@ -173,12 +173,12 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 17240,
-    "linked_documents": 1846,
+    "documents": 17252,
+    "linked_documents": 1858,
     "meeting_documents": 95,
-    "meeting_item_documents": 2164,
-    "meeting_items": 1269,
-    "meetings": 310,
+    "meeting_item_documents": 2176,
+    "meeting_items": 1277,
+    "meetings": 313,
     "organization_groups": 24,
     "organization_persons": 95,
     "organization_positions": 306,
