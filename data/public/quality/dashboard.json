@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1858,
-    "documents_with_any_meeting_context_ratio": 0.1077,
+    "documents_with_any_meeting_context": 1865,
+    "documents_with_any_meeting_context_ratio": 0.1081,
     "documents_without_meeting_context": 15394
   },
-  "dataset_generated_at": "2026-10-18T08:16:33.345921+00:00",
+  "dataset_generated_at": "2026-10-19T09:11:59.644052+00:00",
   "document_file_size": {
-    "average_bytes": 1144653,
-    "known_count": 17252,
+    "average_bytes": 1144677,
+    "known_count": 17259,
     "largest_bytes": 162614430,
-    "total_bytes": 19747552051,
+    "total_bytes": 19755979954,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -19,11 +19,11 @@
     },
     {
       "bucket": "0-100 KB",
-      "count": 5912
+      "count": 5917
     },
     {
       "bucket": "100 KB-1 MB",
-      "count": 8300
+      "count": 8301
     },
     {
       "bucket": "1-5 MB",
@@ -31,7 +31,7 @@
     },
     {
       "bucket": "> 5 MB",
-      "count": 708
+      "count": 709
     }
   ],
   "documents_by_type": [
@@ -44,7 +44,7 @@
       "document_type": "Bijlage"
     },
     {
-      "count": 2046,
+      "count": 2048,
       "document_type": "Overig"
     },
     {
@@ -52,7 +52,7 @@
       "document_type": "Besluit"
     },
     {
-      "count": 1551,
+      "count": 1556,
       "document_type": "Ingekomen stuk"
     },
     {
@@ -118,16 +118,16 @@
       "year": "2025"
     },
     {
-      "count": 1578,
+      "count": 1585,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-10-18T08:16:33.345921+00:00",
+    "generated_at": "2026-10-19T09:11:59.644052+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-10-18T08:16:34.806165+00:00",
+  "generated_at": "2026-10-19T09:12:00.594660+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
@@ -173,10 +173,10 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 17252,
-    "linked_documents": 1858,
+    "documents": 17259,
+    "linked_documents": 1865,
     "meeting_documents": 95,
-    "meeting_item_documents": 2176,
+    "meeting_item_documents": 2183,
     "meeting_items": 1277,
     "meetings": 313,
     "organization_groups": 24,
