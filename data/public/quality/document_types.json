@@ -1,6 +1,6 @@
 {
-  "documents_total": 17327,
-  "generated_at": "2026-10-20T08:48:30.069859+00:00",
+  "documents_total": 17347,
+  "generated_at": "2026-10-21T08:50:00.733349+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1591,
+      "count": 1596,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 1994,
+      "count": 2008,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -663,7 +663,7 @@
       "normalized_document_type_label": "Vraag"
     },
     "Vragen van raadsleden": {
-      "count": 337,
+      "count": 338,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
     },
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 2081,
+      "count": 2095,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1591,
+      "count": 1596,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -797,7 +797,7 @@
       ]
     },
     {
-      "count": 412,
+      "count": 413,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag",
       "source_document_types": [
@@ -983,13 +983,13 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 1994,
+      "count": 2008,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1591,
+      "count": 1596,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
@@ -1031,7 +1031,7 @@
       "normalized_document_type_label": "Verzoek of aanvullende gegevens"
     },
     {
-      "count": 337,
+      "count": 338,
       "document_type": "Vragen van raadsleden",
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
