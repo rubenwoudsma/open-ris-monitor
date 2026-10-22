@@ -1,10 +1,10 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 1951,
+    "documents_with_any_meeting_context": 1952,
     "documents_with_any_meeting_context_ratio": 0.1125,
-    "documents_without_meeting_context": 15396
+    "documents_without_meeting_context": 15395
   },
-  "dataset_generated_at": "2026-10-21T08:49:59.373072+00:00",
+  "dataset_generated_at": "2026-10-22T08:51:17.682783+00:00",
   "document_file_size": {
     "average_bytes": 1140828,
     "known_count": 17347,
@@ -124,17 +124,17 @@
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-10-21T08:49:59.373072+00:00",
+    "generated_at": "2026-10-22T08:51:17.682783+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-10-21T08:50:00.897999+00:00",
+  "generated_at": "2026-10-22T08:51:19.193403+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
       "year": "2025"
     },
     {
-      "count": 1032,
+      "count": 1034,
       "year": "2026"
     },
     {
@@ -174,15 +174,15 @@
   "totals": {
     "document_versions": 25,
     "documents": 17347,
-    "linked_documents": 1951,
+    "linked_documents": 1952,
     "meeting_documents": 95,
-    "meeting_item_documents": 2273,
-    "meeting_items": 1284,
+    "meeting_item_documents": 2274,
+    "meeting_items": 1286,
     "meetings": 313,
     "organization_groups": 24,
     "organization_persons": 95,
     "organization_positions": 306,
     "organization_roles": 32,
-    "unlinked_documents": 15396
+    "unlinked_documents": 15395
   }
 }

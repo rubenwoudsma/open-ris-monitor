@@ -1,26 +1,26 @@
 {
-  "generated_at": "2026-10-21T08:50:00.880773+00:00",
+  "generated_at": "2026-10-22T08:51:19.174945+00:00",
   "counts": {
     "documents": 17347,
     "document_versions": 25,
-    "harvest_runs": 71,
+    "harvest_runs": 72,
     "meetings": 313,
-    "meeting_items": 1284,
+    "meeting_items": 1286,
     "meeting_documents": 95,
-    "meeting_item_documents": 2273
+    "meeting_item_documents": 2274
   },
   "coverage": {
-    "documents_with_relations": 1952,
-    "documents_without_relations": 15395,
-    "coverage_pct": 11.25
+    "documents_with_relations": 1953,
+    "documents_without_relations": 15394,
+    "coverage_pct": 11.26
   },
   "integrity": {
     "orphan_meeting_document_relations": 0,
     "orphan_meeting_item_document_relations": 3
   },
   "activity": {
-    "meetings_without_items": 194,
-    "items_without_documents": 404
+    "meetings_without_items": 193,
+    "items_without_documents": 405
   },
   "document_types": {
     "source": {
@@ -197,7 +197,7 @@
     "raw_meeting_document_relations_seen": 0,
     "raw_meeting_item_document_relations_seen": 0,
     "published_meeting_document_relations": 95,
-    "published_meeting_item_document_relations": 2273,
+    "published_meeting_item_document_relations": 2274,
     "dropped_meeting_document_relations": 0,
     "dropped_meeting_item_document_relations": 0
   },
@@ -210,15 +210,15 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-10-21T08:49:58.894788+00:00",
-      "id": "harvest-huizen-20261021T084331Z",
+      "finished_at": "2026-10-22T08:51:17.193798+00:00",
+      "id": "harvest-huizen-20261022T084603Z",
       "max_documents": null,
       "meetings_seen": 250,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-10-21T08:43:31.813171+00:00",
+      "started_at": "2026-10-22T08:46:03.551912+00:00",
       "status": "success"
     }
   },
