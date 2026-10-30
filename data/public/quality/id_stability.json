@@ -3,17 +3,17 @@
     "duplicate_count": 0,
     "duplicates": [],
     "missing_count": 0,
-    "unique_count": 17477
+    "unique_count": 17507
   },
   "composite_source_key": {
     "description": "source_id + source_object_id",
     "duplicate_count": 0,
     "duplicates": [],
     "missing_count": 0,
-    "unique_count": 17477
+    "unique_count": 17507
   },
-  "documents_total": 17477,
-  "generated_at": "2026-10-29T10:18:47.171428+00:00",
+  "documents_total": 17507,
+  "generated_at": "2026-10-30T10:25:13.134679+00:00",
   "notes": [
     "This report only analyses the current public export snapshot.",
     "Longitudinal stability requires comparing multiple harvest outputs over time.",
@@ -24,12 +24,12 @@
     "duplicate_count": 0,
     "duplicates": [],
     "missing_count": 0,
-    "unique_count": 17477
+    "unique_count": 17507
   },
   "source_object_id": {
     "duplicate_count": 0,
     "duplicates": [],
     "missing_count": 0,
-    "unique_count": 17477
+    "unique_count": 17507
   }
 }

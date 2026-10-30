@@ -1,6 +1,6 @@
 {
-  "documents_total": 17477,
-  "generated_at": "2026-10-29T10:18:47.278408+00:00",
+  "documents_total": 17507,
+  "generated_at": "2026-10-30T10:25:13.215593+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -118,7 +118,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Besluit": {
-      "count": 1185,
+      "count": 1186,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
     },
@@ -173,7 +173,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Collegevoorstel (BBV)": {
-      "count": 2334,
+      "count": 2335,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1640,
+      "count": 1650,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -308,7 +308,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Mededelingen": {
-      "count": 1321,
+      "count": 1323,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 2061,
+      "count": 2075,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -428,7 +428,7 @@
       "normalized_document_type_label": "Mededeling"
     },
     "Overzicht stand van zaken": {
-      "count": 60,
+      "count": 61,
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
@@ -503,7 +503,7 @@
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     "Resumés": {
-      "count": 262,
+      "count": 263,
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4539,
+      "count": 4540,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 2148,
+      "count": 2162,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -728,7 +728,7 @@
       ]
     },
     {
-      "count": 1737,
+      "count": 1738,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit",
       "source_document_types": [
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1640,
+      "count": 1650,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -753,7 +753,7 @@
       ]
     },
     {
-      "count": 1325,
+      "count": 1327,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling",
       "source_document_types": [
@@ -762,7 +762,7 @@
       ]
     },
     {
-      "count": 941,
+      "count": 942,
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting",
       "source_document_types": [
@@ -861,17 +861,6 @@
     },
     {
       "count": 150,
-      "normalized_document_type": "invitation",
-      "normalized_document_type_label": "Uitnodiging",
-      "source_document_types": [
-        "Uitnodiging (Inkomend)",
-        "Uitnodiging overleg (Inkomend)",
-        "Uitnodigingen",
-        "Uitnodigingen (Intern)"
-      ]
-    },
-    {
-      "count": 149,
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie",
       "source_document_types": [
@@ -885,6 +874,17 @@
         "Rapportage (Intern)",
         "Tussentijdse Rapportage (Intern)",
         "Uitslag onderzoek (Intern)"
+      ]
+    },
+    {
+      "count": 150,
+      "normalized_document_type": "invitation",
+      "normalized_document_type_label": "Uitnodiging",
+      "source_document_types": [
+        "Uitnodiging (Inkomend)",
+        "Uitnodiging overleg (Inkomend)",
+        "Uitnodigingen",
+        "Uitnodigingen (Intern)"
       ]
     },
     {
@@ -977,31 +977,31 @@
       "normalized_document_type_label": "Bijlage"
     },
     {
-      "count": 2334,
+      "count": 2335,
       "document_type": "Collegevoorstel (BBV)",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 2061,
+      "count": 2075,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1640,
+      "count": 1650,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
     {
-      "count": 1321,
+      "count": 1323,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
     {
-      "count": 1185,
+      "count": 1186,
       "document_type": "Besluit",
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
@@ -1043,7 +1043,7 @@
       "normalized_document_type_label": "Motie"
     },
     {
-      "count": 262,
+      "count": 263,
       "document_type": "Resumés",
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
@@ -1139,14 +1139,14 @@
       "normalized_document_type_label": "Besluit"
     },
     {
-      "count": 60,
-      "document_type": "Financiële overzichten commissie",
+      "count": 61,
+      "document_type": "Overzicht stand van zaken",
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     {
       "count": 60,
-      "document_type": "Overzicht stand van zaken",
+      "document_type": "Financiële overzichten commissie",
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
