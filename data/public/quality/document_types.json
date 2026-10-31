@@ -1,6 +1,6 @@
 {
-  "documents_total": 17507,
-  "generated_at": "2026-10-30T10:25:13.215593+00:00",
+  "documents_total": 17519,
+  "generated_at": "2026-10-31T09:58:00.957014+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1650,
+      "count": 1654,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 2075,
+      "count": 2081,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -428,7 +428,7 @@
       "normalized_document_type_label": "Mededeling"
     },
     "Overzicht stand van zaken": {
-      "count": 61,
+      "count": 62,
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
@@ -448,7 +448,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Raadsvoorstel": {
-      "count": 1010,
+      "count": 1011,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4540,
+      "count": 4541,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 2162,
+      "count": 2168,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1650,
+      "count": 1654,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -860,7 +860,7 @@
       ]
     },
     {
-      "count": 150,
+      "count": 151,
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie",
       "source_document_types": [
@@ -983,13 +983,13 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 2075,
+      "count": 2081,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1650,
+      "count": 1654,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
@@ -1007,7 +1007,7 @@
       "normalized_document_type_label": "Besluit"
     },
     {
-      "count": 1010,
+      "count": 1011,
       "document_type": "Raadsvoorstel",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
@@ -1139,7 +1139,7 @@
       "normalized_document_type_label": "Besluit"
     },
     {
-      "count": 61,
+      "count": 62,
       "document_type": "Overzicht stand van zaken",
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie"
