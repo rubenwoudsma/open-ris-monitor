@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 2109,
-    "documents_with_any_meeting_context_ratio": 0.1204,
+    "documents_with_any_meeting_context": 2112,
+    "documents_with_any_meeting_context_ratio": 0.1205,
     "documents_without_meeting_context": 15410
   },
-  "dataset_generated_at": "2026-11-02T11:34:06.268657+00:00",
+  "dataset_generated_at": "2026-11-03T11:13:43.615728+00:00",
   "document_file_size": {
-    "average_bytes": 1132502,
-    "known_count": 17519,
+    "average_bytes": 1132691,
+    "known_count": 17522,
     "largest_bytes": 162614430,
-    "total_bytes": 19840307211,
+    "total_bytes": 19847003960,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -19,7 +19,7 @@
     },
     {
       "bucket": "0-100 KB",
-      "count": 6058
+      "count": 6060
     },
     {
       "bucket": "100 KB-1 MB",
@@ -31,7 +31,7 @@
     },
     {
       "bucket": "> 5 MB",
-      "count": 713
+      "count": 714
     }
   ],
   "documents_by_type": [
@@ -52,11 +52,11 @@
       "document_type": "Besluit"
     },
     {
-      "count": 1654,
+      "count": 1655,
       "document_type": "Ingekomen stuk"
     },
     {
-      "count": 1327,
+      "count": 1328,
       "document_type": "Mededeling"
     },
     {
@@ -64,7 +64,7 @@
       "document_type": "Notulen, verslag of samenvatting"
     },
     {
-      "count": 415,
+      "count": 416,
       "document_type": "Vraag"
     },
     {
@@ -118,16 +118,16 @@
       "year": "2025"
     },
     {
-      "count": 1845,
+      "count": 1848,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-11-02T11:34:06.268657+00:00",
+    "generated_at": "2026-11-03T11:13:43.615728+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-11-02T11:34:07.589175+00:00",
+  "generated_at": "2026-11-03T11:13:44.667239+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
@@ -173,10 +173,10 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 17519,
-    "linked_documents": 2109,
+    "documents": 17522,
+    "linked_documents": 2112,
     "meeting_documents": 96,
-    "meeting_item_documents": 2525,
+    "meeting_item_documents": 2528,
     "meeting_items": 1348,
     "meetings": 317,
     "organization_groups": 24,
