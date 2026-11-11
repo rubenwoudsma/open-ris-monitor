@@ -1,6 +1,6 @@
 {
-  "documents_total": 17591,
-  "generated_at": "2026-11-10T11:35:08.446733+00:00",
+  "documents_total": 17598,
+  "generated_at": "2026-11-11T11:23:43.444296+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -118,7 +118,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Besluit": {
-      "count": 1186,
+      "count": 1192,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
     },
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1672,
+      "count": 1673,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -728,7 +728,7 @@
       ]
     },
     {
-      "count": 1738,
+      "count": 1744,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit",
       "source_document_types": [
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1672,
+      "count": 1673,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -989,7 +989,7 @@
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1672,
+      "count": 1673,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
@@ -1001,7 +1001,7 @@
       "normalized_document_type_label": "Mededeling"
     },
     {
-      "count": 1186,
+      "count": 1192,
       "document_type": "Besluit",
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
