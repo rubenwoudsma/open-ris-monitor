@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-11-11T11:23:43.596484+00:00",
+  "generated_at": "2026-11-12T11:40:42.928174+00:00",
   "counts": {
-    "documents": 17598,
+    "documents": 17606,
     "document_versions": 25,
-    "harvest_runs": 92,
-    "meetings": 319,
-    "meeting_items": 1369,
-    "meeting_documents": 96,
-    "meeting_item_documents": 2599
+    "harvest_runs": 93,
+    "meetings": 320,
+    "meeting_items": 1392,
+    "meeting_documents": 98,
+    "meeting_item_documents": 2608
   },
   "coverage": {
-    "documents_with_relations": 2186,
+    "documents_with_relations": 2194,
     "documents_without_relations": 15412,
-    "coverage_pct": 12.42
+    "coverage_pct": 12.46
   },
   "integrity": {
     "orphan_meeting_document_relations": 0,
@@ -20,7 +20,7 @@
   },
   "activity": {
     "meetings_without_items": 190,
-    "items_without_documents": 426
+    "items_without_documents": 442
   },
   "document_types": {
     "source": {
@@ -71,7 +71,7 @@
       "Document ter kennisname (Inkomend)": 229,
       "Evaluatie (Intern)": 2,
       "Financiële overzichten commissie": 60,
-      "Ingekomen stuk": 1673,
+      "Ingekomen stuk": 1676,
       "Inkoopopdracht (Intern)": 5,
       "Intern advies": 2,
       "Jaarverslag (Intern)": 3,
@@ -121,9 +121,9 @@
       "Resumé (intern)": 12,
       "Resumé ABM": 79,
       "Resumé Fysiek Domein": 105,
-      "Resumé Sociaal Domein": 89,
+      "Resumé Sociaal Domein": 91,
       "Resumé gecombineerde commissies": 24,
-      "Resumés": 263,
+      "Resumés": 265,
       "Specificatie verzoek (Inkomend)": 1,
       "Stukken ter kennisname": 6,
       "Termijnagenda": 4,
@@ -155,7 +155,7 @@
       "Voorstel definitieve bekostiging (Intern)": 3,
       "Voorstel planschadeovereenkomst (Intern)": 2,
       "Vraag van raadslid (Inkomend)": 7,
-      "Vragen van raadsleden": 342,
+      "Vragen van raadsleden": 343,
       "Zienswijze (Inkomend)": 8,
       "Zienswijzeadvies": 1
     },
@@ -167,17 +167,17 @@
       "attachment": 2437,
       "commitment": 209,
       "decision": 1744,
-      "incoming_document": 1673,
+      "incoming_document": 1676,
       "invitation": 150,
       "memo_or_advice": 68,
-      "minutes_or_summary": 942,
+      "minutes_or_summary": 946,
       "motion": 294,
       "notice": 270,
       "objection_or_response": 15,
       "other": 2183,
       "policy_or_plan": 91,
       "proposal": 4554,
-      "question": 417,
+      "question": 418,
       "report": 151,
       "request": 411,
       "unknown": 37
@@ -185,19 +185,19 @@
     "unknown_count": 37
   },
   "document_metadata": {
-    "documents_with_file_url": 17598,
+    "documents_with_file_url": 17606,
     "documents_without_file_url": 0,
-    "documents_with_file_size": 17598,
+    "documents_with_file_size": 17606,
     "documents_without_file_size": 0
   },
   "export_diagnostics": {
-    "documents_seen": 17598,
-    "documents_published": 17598,
+    "documents_seen": 17606,
+    "documents_published": 17606,
     "documents_seen_minus_published": 0,
     "raw_meeting_document_relations_seen": 0,
     "raw_meeting_item_document_relations_seen": 0,
-    "published_meeting_document_relations": 96,
-    "published_meeting_item_document_relations": 2599,
+    "published_meeting_document_relations": 98,
+    "published_meeting_item_document_relations": 2608,
     "dropped_meeting_document_relations": 0,
     "dropped_meeting_item_document_relations": 0
   },
@@ -210,15 +210,15 @@
       "documents_downloaded_temporarily": 0,
       "documents_normalized": 250,
       "documents_seen": 250,
-      "finished_at": "2026-11-11T11:23:41.610811+00:00",
-      "id": "harvest-huizen-20261111T111350Z",
+      "finished_at": "2026-11-12T11:40:41.576673+00:00",
+      "id": "harvest-huizen-20261112T113124Z",
       "max_documents": null,
       "meetings_seen": 250,
       "mode": "latest",
       "municipality_id": "gm0406",
       "quality_issues_detected": 0,
       "source_system_id": "huizen-gemeenteoplossingen",
-      "started_at": "2026-11-11T11:13:50.568969+00:00",
+      "started_at": "2026-11-12T11:31:24.556746+00:00",
       "status": "success"
     }
   },
