@@ -1,6 +1,6 @@
 {
-  "documents_total": 17606,
-  "generated_at": "2026-11-12T11:40:42.830401+00:00",
+  "documents_total": 17644,
+  "generated_at": "2026-11-13T11:26:29.062419+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -148,7 +148,7 @@
       "normalized_document_type_label": "Bezwaar, klacht of zienswijze"
     },
     "Bijlage": {
-      "count": 2437,
+      "count": 2454,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
     },
@@ -233,7 +233,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Financiële overzichten commissie": {
-      "count": 60,
+      "count": 61,
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
@@ -308,7 +308,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Mededelingen": {
-      "count": 1329,
+      "count": 1330,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 2096,
+      "count": 2101,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -448,7 +448,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Raadsvoorstel": {
-      "count": 1012,
+      "count": 1019,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -483,12 +483,12 @@
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     "Resumé ABM": {
-      "count": 79,
+      "count": 80,
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     "Resumé Fysiek Domein": {
-      "count": 105,
+      "count": 106,
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
@@ -498,12 +498,12 @@
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     "Resumé gecombineerde commissies": {
-      "count": 24,
+      "count": 27,
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     "Resumés": {
-      "count": 265,
+      "count": 267,
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4554,
+      "count": 4561,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -709,7 +709,7 @@
       ]
     },
     {
-      "count": 2437,
+      "count": 2454,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage",
       "source_document_types": [
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 2183,
+      "count": 2188,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -753,7 +753,7 @@
       ]
     },
     {
-      "count": 1333,
+      "count": 1334,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling",
       "source_document_types": [
@@ -762,7 +762,7 @@
       ]
     },
     {
-      "count": 946,
+      "count": 953,
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting",
       "source_document_types": [
@@ -860,7 +860,7 @@
       ]
     },
     {
-      "count": 151,
+      "count": 152,
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie",
       "source_document_types": [
@@ -971,7 +971,7 @@
   "source_document_type_count": 135,
   "source_document_types": [
     {
-      "count": 2437,
+      "count": 2454,
       "document_type": "Bijlage",
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
@@ -983,7 +983,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 2096,
+      "count": 2101,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
@@ -995,7 +995,7 @@
       "normalized_document_type_label": "Ingekomen stuk"
     },
     {
-      "count": 1329,
+      "count": 1330,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
@@ -1007,7 +1007,7 @@
       "normalized_document_type_label": "Besluit"
     },
     {
-      "count": 1012,
+      "count": 1019,
       "document_type": "Raadsvoorstel",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
@@ -1043,7 +1043,7 @@
       "normalized_document_type_label": "Motie"
     },
     {
-      "count": 265,
+      "count": 267,
       "document_type": "Resumés",
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
@@ -1103,7 +1103,7 @@
       "normalized_document_type_label": "Besluit"
     },
     {
-      "count": 105,
+      "count": 106,
       "document_type": "Resumé Fysiek Domein",
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
@@ -1121,7 +1121,7 @@
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 79,
+      "count": 80,
       "document_type": "Resumé ABM",
       "normalized_document_type": "minutes_or_summary",
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
@@ -1145,7 +1145,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     {
-      "count": 60,
+      "count": 61,
       "document_type": "Financiële overzichten commissie",
       "normalized_document_type": "report",
       "normalized_document_type_label": "Rapportage of evaluatie"
@@ -1206,6 +1206,12 @@
     },
     {
       "count": 27,
+      "document_type": "Resumé gecombineerde commissies",
+      "normalized_document_type": "minutes_or_summary",
+      "normalized_document_type_label": "Notulen, verslag of samenvatting"
+    },
+    {
+      "count": 27,
       "document_type": "Raadsvoorstel (Intern)",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
@@ -1215,12 +1221,6 @@
       "document_type": "Kennisgeving (Inkomend)",
       "normalized_document_type": "notice",
       "normalized_document_type_label": "Kennisgeving of ter kennisname"
-    },
-    {
-      "count": 24,
-      "document_type": "Resumé gecombineerde commissies",
-      "normalized_document_type": "minutes_or_summary",
-      "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     {
       "count": 23,
