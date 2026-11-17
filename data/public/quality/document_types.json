@@ -1,6 +1,6 @@
 {
-  "documents_total": 17646,
-  "generated_at": "2026-11-16T11:54:26.225622+00:00",
+  "documents_total": 17650,
+  "generated_at": "2026-11-17T12:12:51.984311+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1676,
+      "count": 1679,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -663,7 +663,7 @@
       "normalized_document_type_label": "Vraag"
     },
     "Vragen van raadsleden": {
-      "count": 343,
+      "count": 344,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
     },
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1676,
+      "count": 1679,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -788,7 +788,7 @@
       ]
     },
     {
-      "count": 418,
+      "count": 419,
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag",
       "source_document_types": [
@@ -989,7 +989,7 @@
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1676,
+      "count": 1679,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
@@ -1031,7 +1031,7 @@
       "normalized_document_type_label": "Verzoek of aanvullende gegevens"
     },
     {
-      "count": 343,
+      "count": 344,
       "document_type": "Vragen van raadsleden",
       "normalized_document_type": "question",
       "normalized_document_type_label": "Vraag"
