@@ -69,6 +69,21 @@ The static viewer provides four main entry points:
 ### Dashboard
 
 The dashboard view gives public insight into the generated dataset itself. It shows totals, relation coverage, document distribution by year and type, meeting and agenda-item counts, document size metadata and freshness. It deliberately avoids political interpretation, ranking people or parties, and PDF content analysis.
+It also includes detailed findings tables for key quality checks, such as documents that are not linked to any meeting and meetings that have no associated documents.
+
+#### Interpreting the dashboard
+
+The dashboard is designed to be a transparent health monitor for the dataset.
+
+- **Freshness**: The banner at the top shows how recently the dataset was generated. `Fresh` (0-2 days), `Aging` (3-14 days), or `Stale` (>14 days).
+- **Summary Cards**: These provide high-level totals for key entities like documents, meetings, and agenda items.
+- **Document Coverage**: This key metric shows the percentage of documents that are successfully linked to a meeting or agenda item. A high percentage indicates good relational integrity.
+- **Charts**: The bar charts visualize the distribution of documents by year, by type, and by file size, helping users understand the composition of the dataset.
+- **Findings Tables**:
+  - **Niet-gekoppelde documenten (Unlinked Documents)**: This table lists documents that could not be linked to any meeting. This can indicate documents for future meetings, administrative documents not meant for a meeting, or a gap in the source data's relational links.
+  - **Vergaderingen zonder documenten (Meetings without Documents)**: This lists meetings that have no documents attached at all. This often points to placeholder meetings for the future or meetings where documents have not yet been published.
+
+These metrics together provide a clear picture of the dataset's completeness and reliability.
 
 ### Documents
 
@@ -144,6 +159,8 @@ data/public/organization_group_memberships.jsonl
 data/public/latest.json
 data/public/quality/summary.json
 data/public/quality/issues.jsonl
+data/public/quality/unlinked_documents.json
+data/public/quality/meetings_without_documents.json
 data/public/quality/dashboard.json
 ```
 

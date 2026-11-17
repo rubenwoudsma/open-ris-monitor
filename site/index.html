@@ -18,10 +18,10 @@
           </span>
         </a>
         <nav class="top-nav" aria-label="Primaire navigatie">
-          <a id="nav-documents" class="top-nav__link top-nav__link--active" href="#documents">Documenten</a>
+          <a id="nav-dashboard" class="top-nav__link top-nav__link--active" href="#dashboard">Dashboard</a>
+          <a id="nav-documents" class="top-nav__link" href="#documents">Documenten</a>
           <a id="nav-meetings" class="top-nav__link" href="#meetings">Vergaderingen</a>
           <a id="nav-organization" class="top-nav__link" href="#organization">Organisatie</a>
-          <a id="nav-dashboard" class="top-nav__link" href="#dashboard">Dashboard</a>
         </nav>
       </div>
     </header>
@@ -57,6 +57,32 @@
                 <p class="panel__subtitle">Lichte HTML/CSS-grafieken, zonder externe charting-bibliotheek.</p>
               </div>
               <div id="dashboard-charts" class="dashboard-chart-grid"></div>
+            </section>
+
+            <section class="panel" aria-labelledby="unlinked-documents-title">
+              <div class="panel__header">
+                <h2 id="unlinked-documents-title">Niet-gekoppelde documenten</h2>
+                <p class="panel__subtitle">Documenten die niet aan een vergadering of agendapunt gekoppeld zijn. Dit kan duiden op incomplete data of documenten voor toekomstige vergaderingen.</p>
+              </div>
+              <div class="table-wrapper">
+                <table class="documents-table">
+                  <thead><tr><th>Publicatiedatum</th><th>Titel</th><th>Type</th><th>Reden</th></tr></thead>
+                  <tbody id="unlinked-documents-body"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="panel" aria-labelledby="meetings-without-documents-title">
+              <div class="panel__header">
+                <h2 id="meetings-without-documents-title">Vergaderingen zonder documenten</h2>
+                <p class="panel__subtitle">Vergaderingen waarbij geen enkel document is gekoppeld, noch direct, noch via een agendapunt.</p>
+              </div>
+              <div class="table-wrapper">
+                <table class="documents-table">
+                  <thead><tr><th>Vergaderdatum</th><th>Titel</th><th>Commissie</th></tr></thead>
+                  <tbody id="meetings-without-documents-body"></tbody>
+                </table>
+              </div>
             </section>
           </div>
 
@@ -359,6 +385,8 @@
             <a href="../data/public/organization_group_memberships.jsonl">organization_group_memberships.jsonl</a>
             <a href="../data/public/quality/document_types.json">documenttypenrapport</a>
             <a href="../data/public/quality/dashboard.json">dashboard.json</a>
+            <a href="../data/public/quality/unlinked_documents.json">unlinked_documents.json</a>
+            <a href="../data/public/quality/meetings_without_documents.json">meetings_without_documents.json</a>
             <a href="../README.md">README</a>
           </nav>
         </details>

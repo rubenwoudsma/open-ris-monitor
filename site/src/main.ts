@@ -37,7 +37,7 @@ interface ViewerState {
   organizationStatusFilter: "active" | "inactive" | "all";
   organizationGroupFilter: string;
   organizationGroupTypeFilter: string;
-  activeView: "documents" | "meetings" | "organization" | "dashboard";
+  activeView: "dashboard" | "documents" | "meetings" | "organization";
 }
 
 interface DerivedCaches {
@@ -115,6 +115,8 @@ type RequiredElements = {
   dashboardSummaryCards: HTMLElement;
   dashboardCharts: HTMLElement;
   dashboardFreshness: HTMLElement;
+  unlinkedDocumentsBody: HTMLElement;
+  meetingsWithoutDocumentsBody: HTMLElement;
   dashboardExplanation: HTMLElement;
 };
 
@@ -136,7 +138,7 @@ const state: ViewerState = {
   organizationStatusFilter: "active",
   organizationGroupFilter: "",
   organizationGroupTypeFilter: "fractie",
-  activeView: "documents",
+  activeView: "dashboard",
 };
 
 const derivedCaches: DerivedCaches = {
@@ -229,6 +231,8 @@ const elements: RequiredElements = {
   dashboardSummaryCards: byId("dashboard-summary-cards"),
   dashboardCharts: byId("dashboard-charts"),
   dashboardFreshness: byId("dashboard-freshness"),
+  unlinkedDocumentsBody: byId("unlinked-documents-body"),
+  meetingsWithoutDocumentsBody: byId("meetings-without-documents-body"),
   dashboardExplanation: byId("dashboard-explanation"),
 };
 
@@ -1554,6 +1558,43 @@ function renderLineChart(
   return section;
 }
 
+async function renderFindingTables(): Promise<void> {
+  try {
+    const unlinkedResponse = await fetch("data/public/quality/unlinked_documents.json");
+    if (unlinkedResponse.ok) {
+      const unlinkedReport = await unlinkedResponse.json();
+      const unlinkedBody = elements.unlinkedDocumentsBody;
+      unlinkedBody.innerHTML = "";
+      if (unlinkedReport.findings?.length > 0) {
+        for (const finding of unlinkedReport.findings.slice(0, 50)) {
+          const row = document.createElement("tr");
+          row.appendChild(createCell(formatDate(finding.publication_date)));
+          row.appendChild(createCell(text(finding.title, "-")));
+          row.appendChild(createCell(text(finding.document_type, "-")));
+          row.appendChild(createCell(text(finding.suspected_reason, "-")));
+          unlinkedBody.appendChild(row);
+        }
+      } else {
+        unlinkedBody.innerHTML = '<tr><td colspan="4">Geen niet-gekoppelde documenten gevonden.</td></tr>';
+      }
+    }
+
+    const meetingsResponse = await fetch("data/public/quality/meetings_without_documents.json");
+    if (meetingsResponse.ok) {
+      const meetingsReport = await meetingsResponse.json();
+      const meetingsBody = elements.meetingsWithoutDocumentsBody;
+      meetingsBody.innerHTML = "";
+      for (const finding of meetingsReport.findings.slice(0, 50)) {
+        const row = document.createElement("tr");
+        row.appendChild(createCell(formatDate(finding.date)));
+        row.appendChild(createCell(text(finding.title, "-")));
+        row.appendChild(createCell(text(finding.dmu_name, "-")));
+        meetingsBody.appendChild(row);
+      }
+    }
+  } catch (error) { console.error("Failed to render finding tables", error); }
+}
+
 function renderDashboard(): void {
   const data = state.data;
   if (!data) return;
@@ -1592,6 +1633,8 @@ function renderDashboard(): void {
     renderBarChart("Agendapunten per jaar", "Jaarverdeling van de agenda-item export.", itemsByYear.map((item) => ({ label: text(item.year), value: Number(item.count) || 0 }))),
     renderBarChart("Documentgrootte", "Verdeling op basis van bekende file-size metadata, onbekend blijft zichtbaar.", documentsBySize.map((item) => ({ label: text(item.bucket), value: Number(item.count) || 0 }))),
   );
+
+  renderFindingTables();
 }
 
 function renderSummaryCard(label: string, value: number, description: string): HTMLElement {
@@ -1832,11 +1875,12 @@ function updateHashForView(view: "documents" | "meetings" | "organization" | "da
   updateHash(view === "meetings" ? "#meetings" : view === "organization" ? "#organization" : view === "documents" ? "#documents" : "#dashboard");
 }
 
-function viewFromHash(): "documents" | "meetings" | "organization" | "dashboard" {
-  if (window.location.hash === "#dashboard") return "dashboard";
+function viewFromHash(): "dashboard" | "documents" | "meetings" | "organization" {
+  if (window.location.hash.startsWith("#documents")) return "documents";
   if (window.location.hash === "#meetings") return "meetings";
   if (window.location.hash === "#organization") return "organization";
-  return "documents";
+  // Default to dashboard for empty hash or #dashboard
+  return "dashboard";
 }
 
 function applyHashState(scrollDocumentDetail = false): void {

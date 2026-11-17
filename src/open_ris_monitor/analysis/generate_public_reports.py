@@ -9,8 +9,19 @@ from open_ris_monitor.analysis.document_identity import (
     analyze_document_identity,
     analyze_document_types,
 )
+from open_ris_monitor.analysis.unlinked_documents import (
+    analyze_unlinked_documents,
+)
+from open_ris_monitor.analysis.meetings_without_documents import (
+    analyze_meetings_without_documents,
+)
 from open_ris_monitor.analysis.dashboard import write_dashboard_summary
 from open_ris_monitor.exporters.json_exporter import write_json
+from open_ris_monitor.models import Document, Meeting
+from open_ris_monitor.models.relations import (
+    MeetingDocumentRelation,
+    MeetingItemDocumentRelation,
+)
 from open_ris_monitor.quality.report import write_quality_report
 
 
@@ -54,15 +65,39 @@ def generate_reports(public_dir: Path) -> dict[str, Any]:
     quality_dir = public_dir / "quality"
     quality_dir.mkdir(parents=True, exist_ok=True)
 
-    documents = read_jsonl(documents_path)
+    document_records = read_jsonl(documents_path)
+    documents = [Document.model_validate(rec) for rec in document_records]
+    meetings = [
+        Meeting.model_validate(rec)
+        for rec in read_jsonl(public_dir / "meetings.jsonl")
+    ]
+    meeting_documents = [
+        MeetingDocumentRelation.model_validate(rec)
+        for rec in read_jsonl(public_dir / "meeting_documents.jsonl")
+    ]
+    meeting_item_documents = [
+        MeetingItemDocumentRelation.model_validate(rec)
+        for rec in read_jsonl(public_dir / "meeting_item_documents.jsonl")
+    ]
+
     identity_report = analyze_document_identity(documents)
     type_report = analyze_document_types(documents)
+    meetings_report = analyze_meetings_without_documents(
+        meetings, meeting_documents, meeting_item_documents
+    )
+    unlinked_docs_report = analyze_unlinked_documents(
+        documents, [meeting_documents, meeting_item_documents]
+    )
 
     identity_path = quality_dir / "id_stability.json"
     type_path = quality_dir / "document_types.json"
+    meetings_path = quality_dir / "meetings_without_documents.json"
+    unlinked_docs_path = quality_dir / "unlinked_documents.json"
 
     write_json(identity_path, identity_report)
     write_json(type_path, type_report)
+    write_json(meetings_path, meetings_report)
+    write_json(unlinked_docs_path, unlinked_docs_report)
 
     quality_report = write_quality_report(public_dir)
     dashboard_report = write_dashboard_summary(public_dir)
@@ -75,6 +110,8 @@ def generate_reports(public_dir: Path) -> dict[str, Any]:
         {
             "id_stability": "quality/id_stability.json",
             "document_types": "quality/document_types.json",
+            "unlinked_documents": "quality/unlinked_documents.json",
+            "meetings_without_documents": "quality/meetings_without_documents.json",
             "quality_summary": "quality/summary.json",
             "quality_issues": "quality/issues.jsonl",
             "dashboard": "quality/dashboard.json",
@@ -85,6 +122,8 @@ def generate_reports(public_dir: Path) -> dict[str, Any]:
         "documents_total": len(documents),
         "id_stability": str(identity_path),
         "document_types": str(type_path),
+        "unlinked_documents": str(unlinked_docs_path),
+        "meetings_without_documents": str(meetings_path),
         "quality_summary": str(summary_path),
         "quality_issues": str(issues_path),
         "dashboard": str(dashboard_path),

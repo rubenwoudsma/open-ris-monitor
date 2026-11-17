@@ -78,21 +78,6 @@ def build_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
     )
 
 
-def _to_public_dicts(records: list[Any]) -> list[dict[str, Any]]:
-    """Convert canonical model records to plain dictionaries for JSONL export."""
-    result: list[dict[str, Any]] = []
-    for record in records:
-        if hasattr(record, "to_dict"):
-            result.append(record.to_dict())
-        elif hasattr(record, "model_dump"):
-            result.append(record.model_dump(mode="json"))
-        elif isinstance(record, dict):
-            result.append(record)
-        else:
-            raise TypeError(f"Cannot export relation record of type {type(record)!r}")
-    return result
-
-
 def _read_json(path: Path) -> dict[str, Any]:
     """Read a JSON object when it exists, otherwise return an empty object."""
     if not path.exists():
@@ -167,7 +152,7 @@ def _merge_document_records(existing: list[dict[str, Any]], current: list[Any]) 
 
 def _merge_harvest_run_records(
     existing: list[dict[str, Any]],
-    current: Any,
+    current: HarvestRun,
 ) -> list[dict[str, Any]]:
     """Append the current run while preserving earlier public harvest history."""
 
@@ -217,22 +202,8 @@ def _write_public_relation_exports(
         "meeting_documents": "meeting_documents.jsonl",
         "meeting_item_documents": "meeting_item_documents.jsonl",
     }
-    write_jsonl(
-        public_dir / relation_outputs["meetings"],
-        _to_public_dicts(normalized_relations.get("meetings", [])),
-    )
-    write_jsonl(
-        public_dir / relation_outputs["meeting_items"],
-        _to_public_dicts(normalized_relations.get("meeting_items", [])),
-    )
-    write_jsonl(
-        public_dir / relation_outputs["meeting_documents"],
-        _to_public_dicts(normalized_relations.get("meeting_documents", [])),
-    )
-    write_jsonl(
-        public_dir / relation_outputs["meeting_item_documents"],
-        _to_public_dicts(normalized_relations.get("meeting_item_documents", [])),
-    )
+    for key, filename in relation_outputs.items():
+        write_jsonl(public_dir / filename, normalized_relations.get(key, []))
     return relation_outputs
 
 
@@ -355,7 +326,7 @@ def _write_public_organization_exports(
         "organization_group_memberships": "organization_group_memberships.jsonl",
     }
     for key, filename in organization_outputs.items():
-        write_jsonl(public_dir / filename, _to_public_dicts(normalized_organization.get(key, [])))
+        write_jsonl(public_dir / filename, normalized_organization.get(key, []))
     return organization_outputs
 
 
@@ -429,11 +400,9 @@ def run_harvest(
 
     documents = normalize_documents(
         raw_documents,
-        municipality_id=municipality_config["id"],
         municipality_slug=municipality,
-        source_system_id=source_system_config["id"],
-        build_download_url=connector.build_document_download_url,
         retrieved_at=retrieved_at,
+        base_url=source_system_config["base_url"],
     )
 
     if raw_documents and not documents:
@@ -457,6 +426,7 @@ def run_harvest(
             relation_harvest,
             municipality_slug=municipality,
             source_system_id=source_system_config["id"],
+            retrieved_at=retrieved_at,
         )
 
     if include_organization:
@@ -517,7 +487,7 @@ def run_harvest(
     if mode == "latest":
         public_documents = _merge_document_records(_read_jsonl(documents_path), documents)
     else:
-        public_documents = _to_public_dicts(documents)
+        public_documents = documents
     write_jsonl(documents_path, public_documents)
     harvest_runs_path = public_dir / "harvest_runs.jsonl"
     public_harvest_runs = _merge_harvest_run_records(_read_jsonl(harvest_runs_path), harvest_run)
