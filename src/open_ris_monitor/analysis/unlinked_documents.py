@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from typing import Any, Iterable
 
@@ -10,7 +9,6 @@ from open_ris_monitor.analysis.dashboard import (
     _has_typed_identifier_overlap,
     _relation_document_identifier_groups,
 )
-from open_ris_monitor.models import Document
 from open_ris_monitor.models.reports import (
     UnlinkedDocumentFinding,
     UnlinkedDocumentsReport,
@@ -82,7 +80,7 @@ def _suspected_reason(bucket: str, has_meeting_date: bool) -> str:
 
 
 def classify_unlinked_documents(
-    documents: Iterable[Document],
+    documents: Iterable[dict[str, Any]],
     relation_groups: Iterable[Iterable[Any]],
     *,
     reference_date: date | None = None,
@@ -93,10 +91,17 @@ def classify_unlinked_documents(
     source document identifiers against existing meeting-level and agenda-item-level
     relation exports, then groups the remaining documents into stable date buckets.
     """
-    relation_id_groups = {"id": set(), "source_id": set(), "object_id": set(), "url": set()}
+    relation_id_groups: dict[str, set[str]] = {
+        "id": set(),
+        "source_id": set(),
+        "object_id": set(),
+        "url": set(),
+    }
     for relations in relation_groups:
         for relation in relations:
-            for key, values in _clean_identifier_groups(_relation_document_identifier_groups(relation)).items():
+            for key, values in _clean_identifier_groups(
+                _relation_document_identifier_groups(relation)
+            ).items():
                 relation_id_groups.setdefault(key, set()).update(values)
 
     reference = reference_date or datetime.now(timezone.utc).date()
@@ -104,15 +109,20 @@ def classify_unlinked_documents(
     for document in documents:
         if _has_typed_identifier_overlap(document, relation_id_groups):
             continue
-        publication = document.publication_datetime.date() if document.publication_datetime else None
+        publication = _first_date(
+            document,
+            ("publication_datetime", "publication_date", "publicationDate", "published_at", "date"),
+        )
         meeting = _first_date(document, ("meeting_date", "meetingDate", "date"))
         bucket = _date_bucket(reference, meeting, publication)
         findings.append(
             UnlinkedDocumentFinding(
-                document_id=document.id,
-                source_id=document.source_id,
-                title=document.title or document.description,
-                document_type=document.document_type,
+                document_id=_as_text(_field(document, "id")),
+                source_id=_as_text(_field(document, "source_id")),
+                title=_as_text(_field(document, "title"))
+                or _as_text(_field(document, "description")),
+                document_type=_as_text(_field(document, "document_type"))
+                or _as_text(_field(document, "documentTypeLabel")),
                 publication_date=publication.isoformat() if publication is not None else None,
                 meeting_date=meeting.isoformat() if meeting is not None else None,
                 date_bucket=bucket,
@@ -122,7 +132,9 @@ def classify_unlinked_documents(
     return findings
 
 
-def summarize_unlinked_documents(findings: Iterable[UnlinkedDocumentFinding]) -> dict[str, dict[str, int]]:
+def summarize_unlinked_documents(
+    findings: Iterable[UnlinkedDocumentFinding],
+) -> dict[str, dict[str, int]]:
     """Summarize unlinked diagnostics by date bucket, reason and document type."""
     buckets: Counter[str] = Counter()
     reasons: Counter[str] = Counter()
@@ -139,7 +151,7 @@ def summarize_unlinked_documents(findings: Iterable[UnlinkedDocumentFinding]) ->
 
 
 def analyze_unlinked_documents(
-    documents: list[Document],
+    documents: list[dict[str, Any]],
     relation_groups: Iterable[Iterable[Any]],
     *,
     reference_date: date | None = None,

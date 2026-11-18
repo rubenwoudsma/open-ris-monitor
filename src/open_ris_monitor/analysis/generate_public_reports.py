@@ -15,13 +15,8 @@ from open_ris_monitor.analysis.unlinked_documents import (
 from open_ris_monitor.analysis.meetings_without_documents import (
     analyze_meetings_without_documents,
 )
-from open_ris_monitor.analysis.dashboard import write_dashboard_summary
+from open_ris_monitor.analysis.dashboard import read_jsonl_optional, write_dashboard_summary
 from open_ris_monitor.exporters.json_exporter import write_json
-from open_ris_monitor.models import Document, Meeting
-from open_ris_monitor.models.relations import (
-    MeetingDocumentRelation,
-    MeetingItemDocumentRelation,
-)
 from open_ris_monitor.quality.report import write_quality_report
 
 
@@ -65,20 +60,11 @@ def generate_reports(public_dir: Path) -> dict[str, Any]:
     quality_dir = public_dir / "quality"
     quality_dir.mkdir(parents=True, exist_ok=True)
 
-    document_records = read_jsonl(documents_path)
-    documents = [Document.model_validate(rec) for rec in document_records]
-    meetings = [
-        Meeting.model_validate(rec)
-        for rec in read_jsonl(public_dir / "meetings.jsonl")
-    ]
-    meeting_documents = [
-        MeetingDocumentRelation.model_validate(rec)
-        for rec in read_jsonl(public_dir / "meeting_documents.jsonl")
-    ]
-    meeting_item_documents = [
-        MeetingItemDocumentRelation.model_validate(rec)
-        for rec in read_jsonl(public_dir / "meeting_item_documents.jsonl")
-    ]
+    # These are compact public exports, not serialized internal domain models.
+    documents = read_jsonl(documents_path)
+    meetings = read_jsonl_optional(public_dir / "meetings.jsonl")
+    meeting_documents = read_jsonl_optional(public_dir / "meeting_documents.jsonl")
+    meeting_item_documents = read_jsonl_optional(public_dir / "meeting_item_documents.jsonl")
 
     identity_report = analyze_document_identity(documents)
     type_report = analyze_document_types(documents)

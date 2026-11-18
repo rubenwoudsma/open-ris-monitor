@@ -1,3 +1,5 @@
+"""Exercise the installed workflow summary command's report handling."""
+
 from __future__ import annotations
 
 import json
@@ -18,10 +20,14 @@ def test_generate_summary_with_all_reports(tmp_path: Path) -> None:
     (quality_dir / "dashboard.json").write_text(json.dumps(dashboard_data), encoding="utf-8")
 
     unlinked_data = {"unlinked_documents_count": 50, "documents_total": 1000}
-    (quality_dir / "unlinked_documents.json").write_text(json.dumps(unlinked_data), encoding="utf-8")
+    (quality_dir / "unlinked_documents.json").write_text(
+        json.dumps(unlinked_data), encoding="utf-8"
+    )
 
     meetings_no_docs_data = {"meetings_without_documents_count": 2, "meetings_total": 100}
-    (quality_dir / "meetings_without_documents.json").write_text(json.dumps(meetings_no_docs_data), encoding="utf-8")
+    (quality_dir / "meetings_without_documents.json").write_text(
+        json.dumps(meetings_no_docs_data), encoding="utf-8"
+    )
 
     # Act
     generate_summary(public_dir, summary_file)

@@ -4,29 +4,20 @@ from __future__ import annotations
 
 import re
 from html import unescape
-from datetime import datetime
-from collections.abc import Callable, Iterable
-from typing import Any, TypeVar
+from typing import Any, Iterable, TypeVar
 
-from open_ris_monitor.models import (
-    Meeting,
-    MeetingItem,
-)
 from open_ris_monitor.models.relations import (
+    Meeting,
     MeetingDocumentRelation,
+    MeetingItem,
     MeetingItemDocumentRelation,
-)
-from open_ris_monitor.normalizers.gemeenteoplossingen import (
-    normalize_meeting as normalize_go_meeting,
-    normalize_meeting_item as normalize_go_meeting_item,
-    normalize_meeting_document_relation as normalize_go_meeting_document_relation,
-    normalize_meeting_item_document_relation as normalize_go_meeting_item_document_relation,
 )
 
 T = TypeVar("T")
 
 _TAG_RE = re.compile(r"<[^>]+>")
 _WHITESPACE_RE = re.compile(r"\s+")
+
 
 def _as_text(value: Any) -> str | None:
     if value is None:
@@ -74,27 +65,196 @@ def _stable_unique(records: Iterable[T], key_fn: callable) -> list[T]:
     return result
 
 
+def normalize_meeting(
+    raw: dict[str, Any],
+    *,
+    municipality_slug: str,
+    source_system_id: str,
+) -> Meeting | None:
+    """Normalize a raw meeting record."""
+    source_id = _as_text(raw.get("id")) or _as_text(raw.get("source_id"))
+    if not source_id:
+        return None
+
+    # Defensieve lookup voor dmu fields
+    dmu_id = (
+        _as_text(raw.get("dmu_id"))
+        or _as_text(raw.get("dmuId"))
+        or _as_text(raw.get("dmu", {}).get("id"))
+    )
+    dmu_name = (
+        _as_text(raw.get("dmu_name"))
+        or _as_text(raw.get("dmuName"))
+        or _as_text(raw.get("dmu", {}).get("name"))
+    )
+    dmu_sort_order = (
+        _as_int(raw.get("dmu_sort_order"))
+        or _as_int(raw.get("dmuSortOrder"))
+        or _as_int(raw.get("dmu", {}).get("sortOrder"))
+    )
+
+    return Meeting(
+        id=f"{municipality_slug}-meeting-{source_id}",
+        source_id=source_id,
+        municipality_slug=municipality_slug,
+        source_system_id=source_system_id,
+        date=_as_text(raw.get("date")),
+        start_time=_as_text(raw.get("start_time")) or _as_text(raw.get("startTime")),
+        description=_strip_html(raw.get("description")),
+        location=_as_text(raw.get("location")),
+        dmu_id=dmu_id,
+        dmu_name=dmu_name,
+        dmu_sort_order=dmu_sort_order,
+        url=_as_text(raw.get("url")),
+        is_confidential=_as_bool(raw.get("is_confidential") or raw.get("confidential")),
+    )
+
+
+def normalize_meeting_item(
+    raw: dict[str, Any],
+    *,
+    municipality_slug: str,
+    source_system_id: str,
+) -> MeetingItem | None:
+    """Normalize a raw meeting item (agenda item)."""
+    source_id = _as_text(raw.get("id")) or _as_text(raw.get("source_id"))
+    if not source_id:
+        return None
+
+    # Defensieve lookup voor gekoppelde meeting_id (plat of genest)
+    meeting_source_id = (
+        _as_text(raw.get("meeting_id"))
+        or _as_text(raw.get("meetingId"))
+        or _as_text(raw.get("meeting_source_id"))
+        or _as_text(raw.get("meeting", {}).get("id"))
+        or _as_text(raw.get("meeting", {}).get("source_id"))
+    )
+    if not meeting_source_id:
+        return None
+
+    # Defensieve lookup voor status eigenschappen
+    status_id = (
+        _as_text(raw.get("status_id"))
+        or _as_text(raw.get("statusId"))
+        or _as_text(raw.get("status", {}).get("id"))
+    )
+    status_desc = (
+        _as_text(raw.get("status_description"))
+        or _as_text(raw.get("statusDescription"))
+        or _as_text(raw.get("status", {}).get("description"))
+    )
+    status_abbr = (
+        _as_text(raw.get("status_abbreviation"))
+        or _as_text(raw.get("statusAbbreviation"))
+        or _as_text(raw.get("status", {}).get("abbreviation"))
+    )
+
+    return MeetingItem(
+        id=f"{municipality_slug}-meeting-item-{source_id}",
+        source_id=source_id,
+        meeting_id=f"{municipality_slug}-meeting-{meeting_source_id}",
+        meeting_source_id=meeting_source_id,
+        municipality_slug=municipality_slug,
+        source_system_id=source_system_id,
+        number=_as_text(raw.get("number")),
+        sort_order=_as_int(raw.get("sort_order")) or _as_int(raw.get("sortOrder")),
+        title=_strip_html(raw.get("title")),
+        description=_strip_html(raw.get("description")),
+        status_id=status_id,
+        status_description=status_desc,
+        status_abbreviation=status_abbr,
+        is_heading=_as_bool(raw.get("is_heading") or raw.get("isHeading")),
+        is_confidential=_as_bool(raw.get("is_confidential") or raw.get("confidential")),
+    )
+
+
+def normalize_meeting_document_relation(
+    raw: dict[str, Any],
+    *,
+    municipality_slug: str,
+    source_system_id: str,
+) -> MeetingDocumentRelation | None:
+    """Normalize a relation record between a meeting and a document."""
+    meeting_source_id = _as_text(raw.get("meeting_id")) or _as_text(raw.get("meetingId"))
+    doc_data = raw.get("document", {})
+    doc_source_id = _as_text(doc_data.get("id")) or _as_text(doc_data.get("source_id"))
+
+    if not meeting_source_id or not doc_source_id:
+        return None
+
+    meeting_id = f"{municipality_slug}-meeting-{meeting_source_id}"
+    document_id = f"{municipality_slug}-document-{doc_source_id}"
+
+    return MeetingDocumentRelation(
+        id=f"{meeting_id}-document-{doc_source_id}",
+        meeting_id=meeting_id,
+        meeting_source_id=meeting_source_id,
+        document_id=document_id,
+        document_source_id=doc_source_id,
+        document_object_id=_as_text(doc_data.get("source_object_id"))
+        or _as_text(doc_data.get("objectId")),
+        municipality_slug=municipality_slug,
+        source_system_id=source_system_id,
+        relation_type="meeting_document",
+        source_path=f"/meetings/{meeting_source_id}/documents",
+    )
+
+
+def normalize_meeting_item_document_relation(
+    raw: dict[str, Any],
+    *,
+    municipality_slug: str,
+    source_system_id: str,
+) -> MeetingItemDocumentRelation | None:
+    """Normalize a relation record between a meeting item and a document."""
+    meeting_source_id = _as_text(raw.get("meeting_id")) or _as_text(raw.get("meetingId"))
+    item_source_id = _as_text(raw.get("meeting_item_id")) or _as_text(raw.get("meetingItemId"))
+    doc_data = raw.get("document", {})
+    doc_source_id = _as_text(doc_data.get("id")) or _as_text(doc_data.get("source_id"))
+
+    if not meeting_source_id or not item_source_id or not doc_source_id:
+        return None
+
+    meeting_id = f"{municipality_slug}-meeting-{meeting_source_id}"
+    item_id = f"{municipality_slug}-meeting-item-{item_source_id}"
+    document_id = f"{municipality_slug}-document-{doc_source_id}"
+
+    return MeetingItemDocumentRelation(
+        id=f"{item_id}-document-{doc_source_id}",
+        meeting_item_id=item_id,
+        meeting_item_source_id=item_source_id,
+        meeting_id=meeting_id,
+        meeting_source_id=meeting_source_id,
+        document_id=document_id,
+        document_source_id=doc_source_id,
+        document_object_id=_as_text(doc_data.get("source_object_id"))
+        or _as_text(doc_data.get("objectId")),
+        municipality_slug=municipality_slug,
+        source_system_id=source_system_id,
+        relation_type="meeting_item_document",
+        source_path=f"/meetingitems/{item_source_id}/documents",
+    )
+
+
 def normalize_meetings(
     raw_meetings: list[dict[str, Any]],
     *,
     municipality_slug: str,
     source_system_id: str,
-    retrieved_at: datetime,
 ) -> list[Meeting]:
     """Normalize a list of raw meeting records."""
-    records: list[Meeting] = []
-    for raw in raw_meetings:
-        try:
-            record = normalize_go_meeting(
+    records = [
+        record
+        for raw in raw_meetings
+        if (
+            record := normalize_meeting(
                 raw,
                 municipality_slug=municipality_slug,
                 source_system_id=source_system_id,
-                retrieved_at=retrieved_at,
             )
-            records.append(record)
-        except Exception as exc:
-            source_id = raw.get("id", "unknown")
-            print(f"WARNING: Skipping meeting record with source_id '{source_id}' due to normalization error: {exc}")
+        )
+        is not None
+    ]
     # Zorg voor unieke records op basis van het stabiele ID
     return _stable_unique(records, lambda record: record.id)
 
@@ -104,24 +264,23 @@ def normalize_meeting_items(
     *,
     municipality_slug: str,
     source_system_id: str,
-    retrieved_at: datetime,
 ) -> list[MeetingItem]:
     """Normalize a list of raw meeting item records."""
-    records: list[MeetingItem] = []
-    for raw in raw_meeting_items:
-        try:
-            record = normalize_go_meeting_item(
+    records = [
+        record
+        for raw in raw_meeting_items
+        if (
+            record := normalize_meeting_item(
                 raw,
                 municipality_slug=municipality_slug,
                 source_system_id=source_system_id,
-                retrieved_at=retrieved_at,
             )
-            records.append(record)
-        except Exception as exc:
-            source_id = raw.get("id", "unknown")
-            print(f"WARNING: Skipping meeting item record with source_id '{source_id}' due to normalization error: {exc}")
+        )
+        is not None
+    ]
     # Zorg voor unieke records op basis van het stabiele ID
     return _stable_unique(records, lambda record: record.id)
+
 
 def normalize_meeting_document_relations(
     raw_relations: list[dict[str, Any]],
@@ -129,22 +288,18 @@ def normalize_meeting_document_relations(
     municipality_slug: str,
     source_system_id: str,
 ) -> list[MeetingDocumentRelation]:
-    records: list[MeetingDocumentRelation] = []
-    for raw in raw_relations:
-        try:
-            record = normalize_go_meeting_document_relation(
+    records = [
+        record
+        for raw in raw_relations
+        if (
+            record := normalize_meeting_document_relation(
                 raw,
                 municipality_slug=municipality_slug,
                 source_system_id=source_system_id,
             )
-            records.append(record)
-        except Exception as exc:
-            meeting_id = raw.get("meeting_id", "unknown")
-            doc_id = raw.get("document", {}).get("id", "unknown")
-            print(
-                f"WARNING: Skipping meeting-document relation for meeting '{meeting_id}' and document '{doc_id}' "
-                f"due to normalization error: {exc}"
-            )
+        )
+        is not None
+    ]
     return _stable_unique(records, lambda record: record.id)
 
 
@@ -154,19 +309,18 @@ def normalize_meeting_item_document_relations(
     municipality_slug: str,
     source_system_id: str,
 ) -> list[MeetingItemDocumentRelation]:
-    records: list[MeetingItemDocumentRelation] = []
-    for raw in raw_relations:
-        try:
-            record = normalize_go_meeting_item_document_relation(
+    records = [
+        record
+        for raw in raw_relations
+        if (
+            record := normalize_meeting_item_document_relation(
                 raw,
                 municipality_slug=municipality_slug,
                 source_system_id=source_system_id,
             )
-            records.append(record)
-        except Exception as exc:
-            item_id = raw.get("meeting_item_id", "unknown")
-            doc_id = raw.get("document", {}).get("id", "unknown")
-            print(f"WARNING: Skipping item-document relation for item '{item_id}' and document '{doc_id}' due to normalization error: {exc}")
+        )
+        is not None
+    ]
     return _stable_unique(records, lambda record: record.id)
 
 
@@ -175,7 +329,6 @@ def normalize_relation_harvest(
     *,
     municipality_slug: str,
     source_system_id: str,
-    retrieved_at: datetime,
 ) -> dict[str, list[Any]]:
     """Normalize the raw relation harvest returned by collect_raw_relation_harvest."""
     return {
@@ -183,13 +336,11 @@ def normalize_relation_harvest(
             relation_harvest.get("meetings", []),
             municipality_slug=municipality_slug,
             source_system_id=source_system_id,
-            retrieved_at=retrieved_at,
         ),
         "meeting_items": normalize_meeting_items(
             relation_harvest.get("meeting_items", []),
             municipality_slug=municipality_slug,
             source_system_id=source_system_id,
-            retrieved_at=retrieved_at,
         ),
         "meeting_documents": normalize_meeting_document_relations(
             relation_harvest.get("meeting_documents", []),

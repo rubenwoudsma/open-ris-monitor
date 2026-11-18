@@ -26,6 +26,15 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -e .[dev]
 
+      - name: Smoke-test harvest entry points
+        run: |
+          python -m open_ris_monitor.diagnostics.gemeenteoplossingen_preflight --help
+          python -m open_ris_monitor.diagnostics.gemeenteoplossingen_probe --help
+          python -m open_ris_monitor.pipeline.run --help
+          python -m open_ris_monitor.analysis.generate_public_reports --help
+          python -m open_ris_monitor.exporters.generate_schemas --help
+          python -m open_ris_monitor.ci.publish_summary --help
+
       - name: Run tests
         run: pytest
 

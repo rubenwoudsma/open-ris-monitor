@@ -1,0 +1,107 @@
+{
+  "$defs": {
+    "MeetingWithoutDocumentsFinding": {
+      "description": "Represents a meeting that has no direct or indirect document relations.",
+      "properties": {
+        "date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Date"
+        },
+        "dmu_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dmu Name"
+        },
+        "meeting_id": {
+          "title": "Meeting Id",
+          "type": "string"
+        },
+        "meeting_source_id": {
+          "title": "Meeting Source Id",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        }
+      },
+      "required": [
+        "meeting_id",
+        "meeting_source_id",
+        "title",
+        "date",
+        "dmu_name",
+        "url"
+      ],
+      "title": "MeetingWithoutDocumentsFinding",
+      "type": "object"
+    }
+  },
+  "description": "A report of meetings that have no document relations.",
+  "properties": {
+    "findings": {
+      "description": "The list of meetings without documents.",
+      "items": {
+        "$ref": "#/$defs/MeetingWithoutDocumentsFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "generated_at": {
+      "description": "The timestamp when the report was generated.",
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "meetings_total": {
+      "description": "The total number of meetings analyzed.",
+      "title": "Meetings Total",
+      "type": "integer"
+    },
+    "meetings_without_documents_count": {
+      "description": "The number of meetings found without any document relations.",
+      "title": "Meetings Without Documents Count",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "generated_at",
+    "meetings_total",
+    "meetings_without_documents_count",
+    "findings"
+  ],
+  "title": "MeetingsWithoutDocumentsReport",
+  "type": "object"
+}
