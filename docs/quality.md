@@ -19,6 +19,8 @@ data/public/quality/summary.json
 data/public/quality/issues.jsonl
 data/public/quality/document_types.json
 data/public/quality/id_stability.json
+data/public/quality/unlinked_documents.json
+data/public/quality/meetings_without_documents.json
 ```
 
 The exact set can evolve, but `summary.json` and `issues.jsonl` are the main files for MVP-level interpretation.
@@ -35,6 +37,8 @@ The current quality layer focuses on:
 - relation coverage between documents, meetings and meeting items;
 - referential integrity where relation targets are known;
 - meetings without agenda items;
+- meetings without any documents;
+- documents without any meeting or agenda-item relation;
 - agenda items without documents;
 - unexpected drops in counts when detectable.
 
@@ -73,6 +77,21 @@ Missing relations can mean several different things:
 - the upstream API returned incomplete data.
 
 A document without relations is a warning signal, not automatically a pipeline failure.
+
+### Unlinked documents
+
+The `unlinked_documents.json` report lists documents that could not be linked to any meeting or agenda item. This can indicate several things:
+
+- The document is for a future meeting where relations are not yet final in the source system.
+- The document is administrative and not intended to be part of a meeting.
+- There is a gap in the source data's relational links.
+
+### Meetings without documents
+
+The `meetings_without_documents.json` report lists meetings that have no documents attached, either directly or via their agenda items. This often points to:
+
+- Placeholder meetings for the future where documents have not yet been published.
+- An issue with the source data where document relations are missing.
 
 ## Document type quality
 

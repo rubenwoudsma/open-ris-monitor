@@ -9,6 +9,47 @@ from pathlib import Path
 from jsonschema import Draft7Validator
 
 
+def validate_json_file(
+    file_path: str | Path,
+    schema_path: str | Path,
+) -> bool:
+    """Validate a single JSON file against a schema."""
+    file_path = Path(file_path)
+    schema_path = Path(schema_path)
+    if not file_path.exists():
+        print(f"Fout: Bestand {file_path} bestaat niet.")
+        return False
+    if file_path.stat().st_size == 0:
+        print(f"Fout: Bestand {file_path} is leeg (0 bytes).")
+        return False
+
+    try:
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        validator = Draft7Validator(schema)
+    except Exception as exc:
+        print(f"Fout: Kon schema {schema_path} niet laden: {exc}")
+        return False
+
+    try:
+        data = json.loads(file_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        print(f"Fout: Ongeldige JSON in {file_path}")
+        return False
+
+    errors = list(validator.iter_errors(data))
+    if not errors:
+        print(f"Succes: {file_path} is volledig geldig conform het contract.")
+        return True
+
+    print(
+        f"Opmerking: {file_path} succesvol ingelezen. "
+        f"Er zijn {len(errors)} contract-afwijkingen geconstateerd."
+    )
+    for error in errors[:5]:
+        print(f"Waarschuwing [Contract Afwijking] in {file_path}: {error.message}")
+    return True
+
+
 def validate_jsonl_file(
     file_path: str | Path,
     schema_path: str | Path,
@@ -88,7 +129,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
-    targets = [
+    jsonl_targets = [
         ("documents.jsonl", "document.schema.json"),
         ("meetings.jsonl", "meeting.schema.json"),
         ("meeting_items.jsonl", "agenda_item.schema.json"),
@@ -103,18 +144,31 @@ def main(argv: list[str] | None = None) -> None:
             "organization_group_membership.schema.json",
         ),
     ]
+    json_targets = [
+        ("quality/meetings_without_documents.json", "meetings_without_documents.schema.json"),
+        ("quality/unlinked_documents.json", "unlinked_documents.schema.json"),
+    ]
     if not args.public_dir.exists():
         print(f"Opmerking: Geen public map gevonden: {args.public_dir}")
         return
 
     success = True
-    for filename, schema_filename in targets:
+    for filename, schema_filename in jsonl_targets:
         file_path = args.public_dir / filename
         if file_path.exists():
             if not validate_jsonl_file(file_path, args.schema_dir / schema_filename):
                 success = False
         else:
             print(f"Opmerking: Optioneel bestand overgeslagen: {file_path}")
+
+    for filename, schema_filename in json_targets:
+        file_path = args.public_dir / filename
+        if file_path.exists():
+            if not validate_json_file(file_path, args.schema_dir / schema_filename):
+                success = False
+        else:
+            print(f"Opmerking: Optioneel bestand overgeslagen: {file_path}")
+
     if not success:
         print("Fout: Een of meerdere exportbestanden zijn corrupt of leeg.")
         raise SystemExit(1)

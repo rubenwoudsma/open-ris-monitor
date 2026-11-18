@@ -10,21 +10,11 @@ from open_ris_monitor.normalizers.document_types import (
     NormalizedDocumentType,
     normalize_document_type as normalize_document_type_details,
 )
+from open_ris_monitor.models import Document
 
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
-
-
-def _as_string(value: Any) -> str | None:
-    if value is None:
-        return None
-    text = str(value).strip()
-    return text or None
-
-
-def _value(record: dict[str, Any], key: str) -> str | None:
-    return _as_string(record.get(key))
 
 
 def _duplicates(values: list[str | None]) -> dict[str, int]:
@@ -32,10 +22,10 @@ def _duplicates(values: list[str | None]) -> dict[str, int]:
     return {key: count for key, count in sorted(counter.items()) if count > 1}
 
 
-def _duplicate_examples(documents: list[dict[str, Any]], field: str, limit: int = 25) -> list[dict[str, Any]]:
-    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+def _duplicate_examples(documents: list[Document], field: str, limit: int = 25) -> list[dict[str, Any]]:
+    grouped: dict[str, list[Document]] = defaultdict(list)
     for document in documents:
-        value = _as_string(document.get(field))
+        value = getattr(document, field, None)
         if value:
             grouped[value].append(document)
 
@@ -49,11 +39,11 @@ def _duplicate_examples(documents: list[dict[str, Any]], field: str, limit: int 
                 "count": len(items),
                 "documents": [
                     {
-                        "id": item.get("id"),
-                        "source_id": item.get("source_id"),
-                        "source_object_id": item.get("source_object_id"),
-                        "title": item.get("title"),
-                        "filename": item.get("filename"),
+                        "id": item.id,
+                        "source_id": item.source_id,
+                        "source_object_id": item.source_object_id,
+                        "title": item.title,
+                        "filename": item.filename,
                     }
                     for item in items[:5]
                 ],
@@ -80,12 +70,12 @@ def _normalize_with_label(source_type: str | None) -> NormalizedDocumentType:
     return normalize_document_type_details(source_type)
 
 
-def analyze_document_identity(documents: list[dict[str, Any]]) -> dict[str, Any]:
+def analyze_document_identity(documents: list[Document]) -> dict[str, Any]:
     """Analyze source and canonical identifiers in a document export."""
 
-    source_ids = [_as_string(document.get("source_id")) for document in documents]
-    object_ids = [_as_string(document.get("source_object_id")) for document in documents]
-    canonical_ids = [_as_string(document.get("id")) for document in documents]
+    source_ids = [doc.source_id for doc in documents]
+    object_ids = [doc.source_object_id for doc in documents]
+    canonical_ids = [doc.id for doc in documents]
 
     duplicate_source_ids = _duplicates(source_ids)
     duplicate_object_ids = _duplicates(object_ids)
@@ -93,8 +83,8 @@ def analyze_document_identity(documents: list[dict[str, Any]]) -> dict[str, Any]
 
     composite_keys: list[str | None] = []
     for document in documents:
-        source_id = _as_string(document.get("source_id"))
-        object_id = _as_string(document.get("source_object_id"))
+        source_id = document.source_id
+        object_id = document.source_object_id
         if source_id and object_id:
             composite_keys.append(f"{source_id}:{object_id}")
         else:
@@ -148,7 +138,7 @@ def analyze_document_identity(documents: list[dict[str, Any]]) -> dict[str, Any]
     }
 
 
-def analyze_document_types(documents: list[dict[str, Any]]) -> dict[str, Any]:
+def analyze_document_types(documents: list[Document]) -> dict[str, Any]:
     """Analyze source and normalized document types."""
 
     source_counter: Counter[str] = Counter()
@@ -157,7 +147,7 @@ def analyze_document_types(documents: list[dict[str, Any]]) -> dict[str, Any]:
     source_values_by_normalized: dict[str, list[str]] = defaultdict(list)
 
     for document in documents:
-        source_type = _as_string(document.get("document_type")) or "Onbekend"
+        source_type = document.document_type or "Onbekend"
         normalized = _normalize_with_label(source_type)
         source_counter[source_type] += 1
         normalized_counter[normalized.value] += 1

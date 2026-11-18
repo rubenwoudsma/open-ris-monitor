@@ -5,6 +5,17 @@ from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from typing import Any, Iterable
 
+from open_ris_monitor.analysis.dashboard import (
+    _clean_identifier_groups,
+    _has_typed_identifier_overlap,
+    _relation_document_identifier_groups,
+)
+from open_ris_monitor.models import Document
+from open_ris_monitor.models.reports import (
+    UnlinkedDocumentFinding,
+    UnlinkedDocumentsReport,
+)
+
 
 def _field(record: Any, name: str) -> Any:
     if isinstance(record, dict):
@@ -17,12 +28,6 @@ def _as_text(value: Any) -> str | None:
         return None
     text = str(value).strip()
     return text or None
-
-
-def _add_identifier(result: set[str], value: Any) -> None:
-    text = _as_text(value)
-    if text:
-        result.add(text)
 
 
 def _parse_date(value: Any) -> date | None:
@@ -54,56 +59,6 @@ def _first_date(record: Any, field_names: Iterable[str]) -> date | None:
     return None
 
 
-def document_identifiers(document: Any) -> set[str]:
-    """Return source and canonical identifiers that may appear in relation records."""
-    result: set[str] = set()
-    _add_identifier(result, _field(document, "id"))
-    _add_identifier(result, _field(document, "source_id"))
-    _add_identifier(result, _field(document, "source_object_id"))
-    _add_identifier(result, _field(document, "download_url"))
-    _add_identifier(result, _field(document, "source_url"))
-    raw = _field(document, "raw")
-    if isinstance(raw, dict):
-        _add_identifier(result, raw.get("id"))
-        _add_identifier(result, raw.get("objectId"))
-        _add_identifier(result, raw.get("object_id"))
-        _add_identifier(result, raw.get("downloadUrl"))
-        _add_identifier(result, raw.get("download_url"))
-    return result
-
-
-def relation_document_identifiers(relation: Any) -> set[str]:
-    """Return document identifiers from meeting or agenda-item document relations."""
-    result: set[str] = set()
-    _add_identifier(result, _field(relation, "document_id"))
-    _add_identifier(result, _field(relation, "document_source_id"))
-    _add_identifier(result, _field(relation, "document_object_id"))
-    _add_identifier(result, _field(relation, "document_url"))
-    _add_identifier(result, _field(relation, "download_url"))
-    document = _field(relation, "document")
-    if isinstance(document, dict):
-        _add_identifier(result, document.get("id"))
-        _add_identifier(result, document.get("source_id"))
-        _add_identifier(result, document.get("objectId"))
-        _add_identifier(result, document.get("object_id"))
-        _add_identifier(result, document.get("source_object_id"))
-        _add_identifier(result, document.get("downloadUrl"))
-        _add_identifier(result, document.get("download_url"))
-    return result
-
-
-@dataclass(frozen=True)
-class UnlinkedDocumentFinding:
-    document_id: str | None
-    source_id: str | None
-    title: str | None
-    document_type: str | None
-    publication_date: str | None
-    meeting_date: str | None
-    date_bucket: str
-    suspected_reason: str
-
-
 def _date_bucket(reference: date, meeting_date: date | None, publication_date: date | None) -> str:
     candidate = meeting_date or publication_date
     if candidate is None:
@@ -127,7 +82,7 @@ def _suspected_reason(bucket: str, has_meeting_date: bool) -> str:
 
 
 def classify_unlinked_documents(
-    documents: Iterable[Any],
+    documents: Iterable[Document],
     relation_groups: Iterable[Iterable[Any]],
     *,
     reference_date: date | None = None,
@@ -138,26 +93,26 @@ def classify_unlinked_documents(
     source document identifiers against existing meeting-level and agenda-item-level
     relation exports, then groups the remaining documents into stable date buckets.
     """
-    reference = reference_date or datetime.now(timezone.utc).date()
-    related_identifiers: set[str] = set()
+    relation_id_groups = {"id": set(), "source_id": set(), "object_id": set(), "url": set()}
     for relations in relation_groups:
         for relation in relations:
-            related_identifiers.update(relation_document_identifiers(relation))
+            for key, values in _clean_identifier_groups(_relation_document_identifier_groups(relation)).items():
+                relation_id_groups.setdefault(key, set()).update(values)
 
+    reference = reference_date or datetime.now(timezone.utc).date()
     findings: list[UnlinkedDocumentFinding] = []
     for document in documents:
-        if not document_identifiers(document).isdisjoint(related_identifiers):
+        if _has_typed_identifier_overlap(document, relation_id_groups):
             continue
-        publication = _first_date(document, ("publication_date", "publicationDate", "published_at"))
+        publication = document.publication_datetime.date() if document.publication_datetime else None
         meeting = _first_date(document, ("meeting_date", "meetingDate", "date"))
         bucket = _date_bucket(reference, meeting, publication)
         findings.append(
             UnlinkedDocumentFinding(
-                document_id=_as_text(_field(document, "id")),
-                source_id=_as_text(_field(document, "source_id")),
-                title=_as_text(_field(document, "title")) or _as_text(_field(document, "description")),
-                document_type=_as_text(_field(document, "document_type"))
-                or _as_text(_field(document, "documentTypeLabel")),
+                document_id=document.id,
+                source_id=document.source_id,
+                title=document.title or document.description,
+                document_type=document.document_type,
                 publication_date=publication.isoformat() if publication is not None else None,
                 meeting_date=meeting.isoformat() if meeting is not None else None,
                 date_bucket=bucket,
@@ -181,3 +136,24 @@ def summarize_unlinked_documents(findings: Iterable[UnlinkedDocumentFinding]) ->
         "by_suspected_reason": dict(sorted(reasons.items())),
         "by_document_type": dict(sorted(document_types.items())),
     }
+
+
+def analyze_unlinked_documents(
+    documents: list[Document],
+    relation_groups: Iterable[Iterable[Any]],
+    *,
+    reference_date: date | None = None,
+) -> UnlinkedDocumentsReport:
+    """Generate a report of documents without any meeting relations."""
+    findings = classify_unlinked_documents(
+        documents, relation_groups, reference_date=reference_date
+    )
+    summary = summarize_unlinked_documents(findings)
+
+    return UnlinkedDocumentsReport(
+        generated_at=datetime.now(timezone.utc),
+        documents_total=len(documents),
+        unlinked_documents_count=len(findings),
+        summary=summary,
+        findings=findings,
+    )

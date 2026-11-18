@@ -24,6 +24,8 @@ data/public/latest.json
 data/public/quality/summary.json
 data/public/quality/issues.jsonl
 data/public/quality/dashboard.json
+data/public/quality/unlinked_documents.json
+data/public/quality/meetings_without_documents.json
 ```
 
 Raw source files, PDFs and temporary downloads are not part of the public export contract.
@@ -132,6 +134,14 @@ They provide dataset health signals, not a separate product. They are intended t
 ### `quality/dashboard.json`
 
 Compact dataset dashboard summary for the static viewer. It contains aggregate counts only, such as document totals, relation coverage, records by year, top document types, document size buckets, meeting and agenda-item totals, dataset freshness and aggregate organisation counts. It must not include political scoring, person ranking, inferred group membership or PDF-derived content.
+
+### `quality/unlinked_documents.json`
+
+Lists documents that could not be linked to any meeting or agenda item. This can indicate documents for future meetings, administrative documents not meant for a meeting, or a gap in the source data's relational links.
+
+### `quality/meetings_without_documents.json`
+
+Lists meetings that have no documents attached, either directly or via their agenda items. This often points to placeholder meetings for the future or meetings where documents have not yet been published.
 
 ## Validation expectations
 
