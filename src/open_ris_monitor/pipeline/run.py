@@ -8,9 +8,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import yaml
-
+from open_ris_monitor.connectors.factory import build_connector
 from open_ris_monitor.connectors.gemeenteoplossingen import GemeenteOplossingenConnector
+from open_ris_monitor.core.municipality_config import load_municipality_config
 from open_ris_monitor.enrichers.checksum import (
     enrich_document_versions,
     load_previous_versions,
@@ -28,24 +28,6 @@ from open_ris_monitor.pipeline.relations import collect_raw_relation_harvest
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
-def load_municipality_config(slug: str) -> dict[str, Any]:
-    """Load a municipality configuration file."""
-    config_path = REPO_ROOT / "config" / "municipalities" / f"{slug}.yml"
-    if not config_path.exists():
-        raise FileNotFoundError(f"Municipality config not found: {config_path}")
-    with config_path.open("r", encoding="utf-8") as file:
-        payload = yaml.safe_load(file)
-    if not isinstance(payload, dict):
-        raise ValueError(f"Expected YAML object in {config_path}")
-    return payload
-
-
-def _as_float(value: Any, default: float = 0.0) -> float:
-    if value is None or value == "":
-        return default
-    return float(value)
-
-
 def parse_max_documents(value: Any) -> int | None:
     """Parse max_documents from CLI or workflow input.
 
@@ -59,23 +41,19 @@ def parse_max_documents(value: Any) -> int | None:
     return parsed
 
 
-def build_connector(config: dict[str, Any]) -> GemeenteOplossingenConnector:
-    """Build the configured source connector."""
-    source_system = config["source_system"]
-    connector_name = source_system["connector"]
-    if connector_name != "gemeenteoplossingen":
-        raise ValueError(f"Unsupported connector: {connector_name}")
-    return GemeenteOplossingenConnector(
-        base_url=source_system["base_url"],
-        timeout_seconds=int(source_system.get("timeout_seconds", 30)),
-        request_delay_seconds=_as_float(source_system.get("request_delay_seconds"), 0.0),
-        retry_attempts=int(source_system.get("retry_attempts", 3)),
-        retry_backoff_seconds=_as_float(source_system.get("retry_backoff_seconds"), 1.0),
-        max_retry_delay_seconds=_as_float(source_system.get("max_retry_delay_seconds"), 60.0),
-        user_agent=str(source_system.get("user_agent") or "").strip()
-        or "OpenRISMonitor/0.1 (+https://github.com/rubenwoudsma/open-ris-monitor)",
-        allowed_redirect_hosts=source_system.get("allowed_redirect_hosts") or (),
-    )
+def _to_public_dicts(records: list[Any]) -> list[dict[str, Any]]:
+    """Convert canonical model records to plain dictionaries for JSONL export."""
+    result: list[dict[str, Any]] = []
+    for record in records:
+        if hasattr(record, "to_dict"):
+            result.append(record.to_dict())
+        elif hasattr(record, "model_dump"):
+            result.append(record.model_dump(mode="json"))
+        elif isinstance(record, dict):
+            result.append(record)
+        else:
+            raise TypeError(f"Cannot export relation record of type {type(record)!r}")
+    return result
 
 
 def _read_json(path: Path) -> dict[str, Any]:
@@ -125,7 +103,9 @@ def _record_to_dict(record: Any) -> dict[str, Any]:
     return payload
 
 
-def _merge_document_records(existing: list[dict[str, Any]], current: list[Any]) -> list[dict[str, Any]]:
+def _merge_document_records(
+    existing: list[dict[str, Any]], current: list[Any]
+) -> list[dict[str, Any]]:
     """Merge current harvest documents into the existing public dataset documents.
 
     Latest harvests are intentionally narrow. They should update or add records, not
@@ -186,7 +166,9 @@ def _latest_full_backfill_at(
     previous_full_backfill = previous_latest.get("last_full_backfill_at")
     if isinstance(previous_full_backfill, str) and previous_full_backfill:
         return previous_full_backfill
-    if previous_latest.get("mode") == "full" and isinstance(previous_latest.get("generated_at"), str):
+    if previous_latest.get("mode") == "full" and isinstance(
+        previous_latest.get("generated_at"), str
+    ):
         return previous_latest["generated_at"]
     return None
 
@@ -203,7 +185,7 @@ def _write_public_relation_exports(
         "meeting_item_documents": "meeting_item_documents.jsonl",
     }
     for key, filename in relation_outputs.items():
-        write_jsonl(public_dir / filename, normalized_relations.get(key, []))
+        write_jsonl(public_dir / filename, _to_public_dicts(normalized_relations.get(key, [])))
     return relation_outputs
 
 
@@ -282,7 +264,9 @@ def _collect_raw_organization_harvest(
             group_memberships[str(group_id)] = connector.fetch_persons_by_group_id(group_id)
         except Exception as exc:  # pragma: no cover - defensive around optional API relation
             group_memberships[str(group_id)] = []
-            print(f"Waarschuwing: groepsleden voor groep {group_id} konden niet worden opgehaald: {exc}")
+            print(
+                f"Waarschuwing: groepsleden voor groep {group_id} konden niet worden opgehaald: {exc}"
+            )
 
     persons = connector.fetch_all_persons(batch_size=batch_size)
     roles = connector.fetch_all_roles(batch_size=batch_size)
@@ -309,7 +293,9 @@ def _write_raw_organization_harvest(raw_dir: Path, organization_harvest: dict[st
     write_json(raw_dir / "organization_persons.json", organization_harvest["persons"])
     write_json(raw_dir / "organization_roles.json", organization_harvest["roles"])
     write_json(raw_dir / "organization_positions.json", organization_harvest["positions"])
-    write_json(raw_dir / "organization_group_memberships.json", organization_harvest["group_memberships"])
+    write_json(
+        raw_dir / "organization_group_memberships.json", organization_harvest["group_memberships"]
+    )
     write_json(raw_dir / "organization_harvest_summary.json", organization_harvest["summary"])
 
 
@@ -326,7 +312,7 @@ def _write_public_organization_exports(
         "organization_group_memberships": "organization_group_memberships.jsonl",
     }
     for key, filename in organization_outputs.items():
-        write_jsonl(public_dir / filename, normalized_organization.get(key, []))
+        write_jsonl(public_dir / filename, _to_public_dicts(normalized_organization.get(key, [])))
     return organization_outputs
 
 
@@ -400,9 +386,11 @@ def run_harvest(
 
     documents = normalize_documents(
         raw_documents,
+        municipality_id=municipality_config["id"],
         municipality_slug=municipality,
+        source_system_id=source_system_config["id"],
+        build_download_url=connector.build_document_download_url,
         retrieved_at=retrieved_at,
-        base_url=source_system_config["base_url"],
     )
 
     if raw_documents and not documents:
@@ -426,7 +414,6 @@ def run_harvest(
             relation_harvest,
             municipality_slug=municipality,
             source_system_id=source_system_config["id"],
-            retrieved_at=retrieved_at,
         )
 
     if include_organization:
@@ -487,7 +474,7 @@ def run_harvest(
     if mode == "latest":
         public_documents = _merge_document_records(_read_jsonl(documents_path), documents)
     else:
-        public_documents = documents
+        public_documents = _to_public_dicts(documents)
     write_jsonl(documents_path, public_documents)
     harvest_runs_path = public_dir / "harvest_runs.jsonl"
     public_harvest_runs = _merge_harvest_run_records(_read_jsonl(harvest_runs_path), harvest_run)
@@ -501,7 +488,9 @@ def run_harvest(
 
     organization_outputs: dict[str, str] = _existing_public_organization_outputs(public_dir)
     if normalized_organization is not None:
-        organization_outputs = _write_public_organization_exports(public_dir, normalized_organization)
+        organization_outputs = _write_public_organization_exports(
+            public_dir, normalized_organization
+        )
 
     generated_at = datetime.now(timezone.utc).isoformat()
     latest_payload = {
@@ -521,7 +510,9 @@ def run_harvest(
         "relations_enabled": include_relations,
         "relations_summary": relation_summary,
         "organization_enabled": include_organization,
-        "organization_summary": organization_harvest["summary"] if organization_harvest is not None else {},
+        "organization_summary": organization_harvest["summary"]
+        if organization_harvest is not None
+        else {},
         "last_full_backfill_at": _latest_full_backfill_at(
             mode=mode,
             generated_at=generated_at,
@@ -552,7 +543,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Bounded harvest profile. Explicit CLI options override profile defaults.",
     )
     parser.add_argument("--mode", choices=["latest", "full"], default=None, help="Harvest mode")
-    parser.add_argument("--limit", type=int, default=None, help="Number of latest documents to fetch")
+    parser.add_argument(
+        "--limit", type=int, default=None, help="Number of latest documents to fetch"
+    )
     parser.add_argument("--batch-size", type=int, default=None, help="Batch size for full harvest")
     parser.add_argument("--max-documents", default=None, help="Maximum documents for full harvest")
     parser.add_argument(

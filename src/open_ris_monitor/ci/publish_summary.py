@@ -1,4 +1,4 @@
-"""Generate a GitHub Actions summary from quality reports."""
+"""Generate a GitHub Actions summary from published quality reports."""
 
 from __future__ import annotations
 

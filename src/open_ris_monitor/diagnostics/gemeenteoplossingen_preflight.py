@@ -13,7 +13,8 @@ from open_ris_monitor.connectors.gemeenteoplossingen import (
     GemeenteOplossingenPreflightError,
     sanitize_url,
 )
-from open_ris_monitor.pipeline.run import build_connector, load_municipality_config
+from open_ris_monitor.connectors.factory import build_connector
+from open_ris_monitor.core.municipality_config import load_municipality_config
 
 
 def _markdown_table(report: dict[str, Any]) -> str:
@@ -92,7 +93,9 @@ def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
     report, succeeded = run_preflight(args.municipality)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
     markdown = _markdown_table(report)
     summary_path = args.summary

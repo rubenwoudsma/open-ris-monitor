@@ -1,4 +1,4 @@
-"""Pydantic models for analysis and quality reports."""
+"""Data definitions for public quality reports, independent of their producers."""
 
 from __future__ import annotations
 
@@ -26,7 +26,9 @@ class MeetingsWithoutDocumentsReport(BaseModel):
     meetings_without_documents_count: int = Field(
         description="The number of meetings found without any document relations."
     )
-    findings: list[MeetingWithoutDocumentsFinding] = Field(description="The list of meetings without documents.")
+    findings: list[MeetingWithoutDocumentsFinding] = Field(
+        description="The list of meetings without documents."
+    )
 
 
 class UnlinkedDocumentFinding(BaseModel):
@@ -50,5 +52,7 @@ class UnlinkedDocumentsReport(BaseModel):
     unlinked_documents_count: int = Field(
         description="The number of documents found without any meeting relations."
     )
-    summary: dict[str, dict[str, int]] = Field(description="A summary of findings by various categories.")
+    summary: dict[str, dict[str, int]] = Field(
+        description="A summary of findings by various categories."
+    )
     findings: list[UnlinkedDocumentFinding] = Field(description="The list of unlinked documents.")

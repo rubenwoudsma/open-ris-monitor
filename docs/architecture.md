@@ -57,6 +57,29 @@ Normalization converts raw vendor objects into canonical Open RIS Monitor record
 
 The source may be messy. The canonical model should be stable, defensive and honest about missing data.
 
+## Python dependency boundaries
+
+`open_ris_monitor.models` is a package containing data definitions. Its modules
+may depend on the standard library, Pydantic and other model modules. They must
+not import connectors, normalizers, pipeline orchestration, exporters or analysis
+code. Quality-report definitions live in `models/reports.py`; their producers
+remain in `analysis/`.
+
+Keep `models/` as the single owner of the model namespace. A sibling `models.py`
+is shadowed by the package and creates a second, incompatible set of definitions.
+The package exports the existing document and relation types without redefining
+them. The internal `Document` and compact public `documents.jsonl` record have
+different fields; exporters preserve that explicit projection. Analysis reads
+the public export contract rather than validating it as an internal model.
+
+Diagnostics import municipality configuration from `core/municipality_config.py`
+and connector construction from `connectors/factory.py`. They do not import
+`pipeline.run`, so a pipeline import failure cannot disable API diagnostics.
+Import-boundary tests and command `--help` checks exercise these constraints in CI.
+
+The existing public JSONL schemas remain explicit contracts. The schema generator
+derives only the two quality-report schemas from `models/reports.py`.
+
 ## Relation building
 
 The project is document-first, but documents become more useful when linked to the meeting and agenda context where they were used.

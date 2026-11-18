@@ -24,7 +24,7 @@ from open_ris_monitor.connectors.gemeenteoplossingen import (
     _safe_body_preview,
     sanitize_url,
 )
-from open_ris_monitor.pipeline.run import load_municipality_config
+from open_ris_monitor.core.municipality_config import load_municipality_config
 
 BROWSER_USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -197,9 +197,7 @@ def _json_shape(response: requests.Response, content_type: str | None) -> dict[s
         return {
             "json_shape": "list",
             "json_item_count": len(payload),
-            "json_item_shape": (
-                type(payload[0]).__name__ if payload else None
-            ),
+            "json_item_shape": (type(payload[0]).__name__ if payload else None),
         }
     if isinstance(payload, dict):
         result = payload.get("result")
@@ -256,7 +254,11 @@ def run_single_probe(
             chunk = next(response.iter_content(chunk_size=512), b"")
             result["bytes_read"] = len(chunk)
             media_type = (content_type or "").split(";", 1)[0].strip().lower()
-            if response.status_code >= 400 or "html" in media_type or media_type.startswith("text/"):
+            if (
+                response.status_code >= 400
+                or "html" in media_type
+                or media_type.startswith("text/")
+            ):
                 encoding = getattr(response, "encoding", None) or "utf-8"
                 preview = " ".join(chunk.decode(encoding, errors="replace").split())[:320]
             else:
@@ -403,7 +405,9 @@ def main(argv: list[str] | None = None) -> None:
         additional_base_urls=args.additional_base_url,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
     summary_path = args.summary
     if summary_path is None and os.environ.get("GITHUB_STEP_SUMMARY"):
         summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])

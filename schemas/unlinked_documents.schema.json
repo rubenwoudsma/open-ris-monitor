@@ -1,0 +1,142 @@
+{
+  "$defs": {
+    "UnlinkedDocumentFinding": {
+      "description": "Represents a document that is not linked to any meeting context.",
+      "properties": {
+        "date_bucket": {
+          "title": "Date Bucket",
+          "type": "string"
+        },
+        "document_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Document Id"
+        },
+        "document_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Document Type"
+        },
+        "meeting_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Meeting Date"
+        },
+        "publication_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Publication Date"
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Id"
+        },
+        "suspected_reason": {
+          "title": "Suspected Reason",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        }
+      },
+      "required": [
+        "document_id",
+        "source_id",
+        "title",
+        "document_type",
+        "publication_date",
+        "meeting_date",
+        "date_bucket",
+        "suspected_reason"
+      ],
+      "title": "UnlinkedDocumentFinding",
+      "type": "object"
+    }
+  },
+  "description": "A report of documents that are not linked to any meeting context.",
+  "properties": {
+    "documents_total": {
+      "description": "The total number of documents analyzed.",
+      "title": "Documents Total",
+      "type": "integer"
+    },
+    "findings": {
+      "description": "The list of unlinked documents.",
+      "items": {
+        "$ref": "#/$defs/UnlinkedDocumentFinding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "generated_at": {
+      "description": "The timestamp when the report was generated.",
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "summary": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "type": "integer"
+        },
+        "type": "object"
+      },
+      "description": "A summary of findings by various categories.",
+      "title": "Summary",
+      "type": "object"
+    },
+    "unlinked_documents_count": {
+      "description": "The number of documents found without any meeting relations.",
+      "title": "Unlinked Documents Count",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "generated_at",
+    "documents_total",
+    "unlinked_documents_count",
+    "summary",
+    "findings"
+  ],
+  "title": "UnlinkedDocumentsReport",
+  "type": "object"
+}
