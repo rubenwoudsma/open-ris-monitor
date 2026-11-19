@@ -1,0 +1,1111 @@
+{
+  "findings": [
+    {
+      "date": "2028-02-10",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1407",
+      "meeting_source_id": "1407",
+      "title": "Raadsvergadering 10 februari 2028",
+      "url": "/Vergaderingen/Raadsvergadering/2028/10-februari/19:30"
+    },
+    {
+      "date": "2028-02-03",
+      "dmu_name": "Jaarrekeningcommissie",
+      "meeting_id": "huizen-meeting-1426",
+      "meeting_source_id": "1426",
+      "title": "Vergadering jaarrekeningscommissie 3 februari 2028",
+      "url": "/Vergaderingen/Jaarrekeningcommissie/2028/3-februari/20:00"
+    },
+    {
+      "date": "2028-01-27",
+      "dmu_name": "Commissie Algemeen Bestuur en Middelen (ABM)",
+      "meeting_id": "huizen-meeting-1387",
+      "meeting_source_id": "1387",
+      "title": "Commissie Algemeen Bestuur en Middelen 27 januari 2028",
+      "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2028/27-januari/20:00"
+    },
+    {
+      "date": "2028-01-26",
+      "dmu_name": "Commissie Fysiek Domein",
+      "meeting_id": "huizen-meeting-1379",
+      "meeting_source_id": "1379",
+      "title": "Commissie Fysiek Domein 26 januari 2028",
+      "url": "/Vergaderingen/Commissie-Fysiek-Domein/2028/26-januari/20:00"
+    },
+    {
+      "date": "2028-01-25",
+      "dmu_name": "Commissie Sociaal Domein",
+      "meeting_id": "huizen-meeting-1371",
+      "meeting_source_id": "1371",
+      "title": "Commissie Sociaal Domein 25 januari 2028",
+      "url": "/Vergaderingen/Commissie-Sociaal-Domein/2028/25-januari/20:00"
+    },
+    {
+      "date": "2027-12-02",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1406",
+      "meeting_source_id": "1406",
+      "title": "Raadsvergadering 2 december 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/2-december/19:30"
+    },
+    {
+      "date": "2027-11-18",
+      "dmu_name": "Commissie Algemeen Bestuur en Middelen (ABM)",
+      "meeting_id": "huizen-meeting-1386",
+      "meeting_source_id": "1386",
+      "title": "Commissie Algemeen Bestuur en Middelen 18 november 2027",
+      "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2027/18-november/20:00"
+    },
+    {
+      "date": "2027-11-17",
+      "dmu_name": "Commissie Fysiek Domein",
+      "meeting_id": "huizen-meeting-1378",
+      "meeting_source_id": "1378",
+      "title": "Commissie Fysiek Domein 17 november 2027",
+      "url": "/Vergaderingen/Commissie-Fysiek-Domein/2027/17-november/20:00"
+    },
+    {
+      "date": "2027-11-16",
+      "dmu_name": "Commissie Sociaal Domein",
+      "meeting_id": "huizen-meeting-1370",
+      "meeting_source_id": "1370",
+      "title": "Commissie Sociaal Domein 16 november 2027",
+      "url": "/Vergaderingen/Commissie-Sociaal-Domein/2027/16-november/20:00"
+    },
+    {
+      "date": "2027-11-04",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1405",
+      "meeting_source_id": "1405",
+      "title": "Raadsvergadering 4 november 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/4-november/19:30"
+    },
+    {
+      "date": "2027-10-28",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1404",
+      "meeting_source_id": "1404",
+      "title": "Begrotingsraadsvergadering 28 oktober 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/28-oktober/16:00"
+    },
+    {
+      "date": "2027-10-14",
+      "dmu_name": "Commissie Algemeen Bestuur en Middelen (ABM)",
+      "meeting_id": "huizen-meeting-1385",
+      "meeting_source_id": "1385",
+      "title": "Commissie Algemeen Bestuur en Middelen 14 oktober 2027",
+      "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2027/14-oktober/20:00"
+    },
+    {
+      "date": "2027-10-13",
+      "dmu_name": "Commissie Fysiek Domein",
+      "meeting_id": "huizen-meeting-1377",
+      "meeting_source_id": "1377",
+      "title": "Commissie Fysiek Domein 13 oktober 2027",
+      "url": "/Vergaderingen/Commissie-Fysiek-Domein/2027/13-oktober/20:00"
+    },
+    {
+      "date": "2027-10-12",
+      "dmu_name": "Commissie Sociaal Domein",
+      "meeting_id": "huizen-meeting-1369",
+      "meeting_source_id": "1369",
+      "title": "Commissie Sociaal Domein 12 oktober 2027",
+      "url": "/Vergaderingen/Commissie-Sociaal-Domein/2027/12-oktober/20:00"
+    },
+    {
+      "date": "2027-10-07",
+      "dmu_name": "Gecombineerde commissies",
+      "meeting_id": "huizen-meeting-1428",
+      "meeting_source_id": "1428",
+      "title": "Gecombineerde commissievergadering 7 oktober 2027",
+      "url": "/Vergaderingen/Gecombineerde-commissies/2027/7-oktober/20:00"
+    },
+    {
+      "date": "2027-09-23",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1403",
+      "meeting_source_id": "1403",
+      "title": "Raadsvergadering 23 september 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/23-september/19:30"
+    },
+    {
+      "date": "2027-09-09",
+      "dmu_name": "Commissie Algemeen Bestuur en Middelen (ABM)",
+      "meeting_id": "huizen-meeting-1384",
+      "meeting_source_id": "1384",
+      "title": "Commissie Algemeen Bestuur en Middelen 9 september 2027",
+      "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2027/9-september/20:00"
+    },
+    {
+      "date": "2027-09-08",
+      "dmu_name": "Commissie Fysiek Domein",
+      "meeting_id": "huizen-meeting-1376",
+      "meeting_source_id": "1376",
+      "title": "Commissie Fysiek Domein 8 september 2027",
+      "url": "/Vergaderingen/Commissie-Fysiek-Domein/2027/8-september/20:00"
+    },
+    {
+      "date": "2027-09-07",
+      "dmu_name": "Commissie Sociaal Domein",
+      "meeting_id": "huizen-meeting-1368",
+      "meeting_source_id": "1368",
+      "title": "Commissie Sociaal Domein 7 september 2027",
+      "url": "/Vergaderingen/Commissie-Sociaal-Domein/2027/7-september/20:00"
+    },
+    {
+      "date": "2027-07-08",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1402",
+      "meeting_source_id": "1402",
+      "title": "Raadsvergadering 8 juli 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/8-juli/19:30"
+    },
+    {
+      "date": "2027-07-01",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1401",
+      "meeting_source_id": "1401",
+      "title": "Financiële Raadsvergadering 1 juli 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/1-juli/16:00"
+    },
+    {
+      "date": "2027-06-17",
+      "dmu_name": "Gecombineerde commissies",
+      "meeting_id": "huizen-meeting-1427",
+      "meeting_source_id": "1427",
+      "title": "Gecombineerde commissievergadering 17 juni 2027",
+      "url": "/Vergaderingen/Gecombineerde-commissies/2027/17-juni/20:00"
+    },
+    {
+      "date": "2027-06-15",
+      "dmu_name": "Jaarrekeningcommissie",
+      "meeting_id": "huizen-meeting-1425",
+      "meeting_source_id": "1425",
+      "title": "Vergadering jaarrekeningscommissie 15 juni 2027",
+      "url": "/Vergaderingen/Jaarrekeningcommissie/2027/15-juni/20:00"
+    },
+    {
+      "date": "2027-06-10",
+      "dmu_name": "Commissie Algemeen Bestuur en Middelen (ABM)",
+      "meeting_id": "huizen-meeting-1383",
+      "meeting_source_id": "1383",
+      "title": "Commissie Algemeen Bestuur en Middelen 10 juni 2027",
+      "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2027/10-juni/20:00"
+    },
+    {
+      "date": "2027-06-09",
+      "dmu_name": "Commissie Fysiek Domein",
+      "meeting_id": "huizen-meeting-1375",
+      "meeting_source_id": "1375",
+      "title": "Commissie Fysiek Domein 9 juni 2027",
+      "url": "/Vergaderingen/Commissie-Fysiek-Domein/2027/9-juni/20:00"
+    },
+    {
+      "date": "2027-06-08",
+      "dmu_name": "Commissie Sociaal Domein",
+      "meeting_id": "huizen-meeting-1367",
+      "meeting_source_id": "1367",
+      "title": "Commissie Sociaal Domein 8 juni 2027",
+      "url": "/Vergaderingen/Commissie-Sociaal-Domein/2027/8-juni/20:00"
+    },
+    {
+      "date": "2027-05-27",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1400",
+      "meeting_source_id": "1400",
+      "title": "Raadsvergadering 27 mei 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/27-mei/19:30"
+    },
+    {
+      "date": "2027-05-13",
+      "dmu_name": "Commissie Algemeen Bestuur en Middelen (ABM)",
+      "meeting_id": "huizen-meeting-1382",
+      "meeting_source_id": "1382",
+      "title": "Commissie Algemeen Bestuur en Middelen 13 mei 2027",
+      "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2027/13-mei/20:00"
+    },
+    {
+      "date": "2027-05-12",
+      "dmu_name": "Commissie Fysiek Domein",
+      "meeting_id": "huizen-meeting-1374",
+      "meeting_source_id": "1374",
+      "title": "Commissie Fysiek Domein 12 mei 2027",
+      "url": "/Vergaderingen/Commissie-Fysiek-Domein/2027/12-mei/20:00"
+    },
+    {
+      "date": "2027-05-11",
+      "dmu_name": "Commissie Sociaal Domein",
+      "meeting_id": "huizen-meeting-1366",
+      "meeting_source_id": "1366",
+      "title": "Commissie Sociaal Domein 11 mei 2027",
+      "url": "/Vergaderingen/Commissie-Sociaal-Domein/2027/11-mei/20:00"
+    },
+    {
+      "date": "2027-04-22",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1399",
+      "meeting_source_id": "1399",
+      "title": "Raadvergadering 22 april 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/22-april/19:30"
+    },
+    {
+      "date": "2027-04-08",
+      "dmu_name": "Commissie Algemeen Bestuur en Middelen (ABM)",
+      "meeting_id": "huizen-meeting-1381",
+      "meeting_source_id": "1381",
+      "title": "Commissie Algemeen Bestuur en Middelen 8 april 2027",
+      "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2027/8-april/20:00"
+    },
+    {
+      "date": "2027-04-07",
+      "dmu_name": "Commissie Fysiek Domein",
+      "meeting_id": "huizen-meeting-1373",
+      "meeting_source_id": "1373",
+      "title": "Commissie Fysiek Domein 7 april 2027",
+      "url": "/Vergaderingen/Commissie-Fysiek-Domein/2027/7-april/20:00"
+    },
+    {
+      "date": "2027-04-06",
+      "dmu_name": "Commissie Sociaal Domein",
+      "meeting_id": "huizen-meeting-1365",
+      "meeting_source_id": "1365",
+      "title": "Commissie Sociaal Domein 6 april 2027",
+      "url": "/Vergaderingen/Commissie-Sociaal-Domein/2027/6-april/20:00"
+    },
+    {
+      "date": "2027-03-18",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1398",
+      "meeting_source_id": "1398",
+      "title": "Raadsvergadering 18 maart 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/18-maart/19:30"
+    },
+    {
+      "date": "2027-03-04",
+      "dmu_name": "Commissie Algemeen Bestuur en Middelen (ABM)",
+      "meeting_id": "huizen-meeting-1380",
+      "meeting_source_id": "1380",
+      "title": "Commissie Algemeen Bestuur en Middelen 4 maart 2027",
+      "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2027/4-maart/20:00"
+    },
+    {
+      "date": "2027-03-03",
+      "dmu_name": "Commissie Fysiek Domein",
+      "meeting_id": "huizen-meeting-1372",
+      "meeting_source_id": "1372",
+      "title": "Commissie Fysiek Domein 3 maart 2027",
+      "url": "/Vergaderingen/Commissie-Fysiek-Domein/2027/3-maart/20:00"
+    },
+    {
+      "date": "2027-03-02",
+      "dmu_name": "Commissie Sociaal Domein",
+      "meeting_id": "huizen-meeting-1364",
+      "meeting_source_id": "1364",
+      "title": "Commissie Sociaal Domein 2 maart 2027",
+      "url": "/Vergaderingen/Commissie-Sociaal-Domein/2027/2-maart/20:00"
+    },
+    {
+      "date": "2027-02-11",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1263",
+      "meeting_source_id": "1263",
+      "title": "Raadsvergadering 11 februari 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/11-februari/19:30"
+    },
+    {
+      "date": "2027-01-28",
+      "dmu_name": "Commissie Algemeen Bestuur en Middelen (ABM)",
+      "meeting_id": "huizen-meeting-1223",
+      "meeting_source_id": "1223",
+      "title": "Commissie Algemeen Bestuur en Middelen 28 januari 2027",
+      "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2027/28-januari/20:00"
+    },
+    {
+      "date": "2027-01-27",
+      "dmu_name": "Commissie Fysiek Domein",
+      "meeting_id": "huizen-meeting-1212",
+      "meeting_source_id": "1212",
+      "title": "Commissie Fysiek Domein 27 januari 2027",
+      "url": "/Vergaderingen/Commissie-Fysiek-Domein/2027/27-januari/20:00"
+    },
+    {
+      "date": "2027-01-26",
+      "dmu_name": "Commissie Sociaal Domein",
+      "meeting_id": "huizen-meeting-1202",
+      "meeting_source_id": "1202",
+      "title": "Commissie Sociaal Domein 26 februari 2027",
+      "url": "/Vergaderingen/Commissie-Sociaal-Domein/2027/26-januari/20:00"
+    },
+    {
+      "date": "2027-01-21",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1437",
+      "meeting_source_id": "1437",
+      "title": "Begrotingsraadsvergadering 21 januari 2027",
+      "url": "/Vergaderingen/Raadsvergadering/2027/21-januari/16:00"
+    },
+    {
+      "date": "2026-11-30",
+      "dmu_name": "Uitloopavond Commissie",
+      "meeting_id": "huizen-meeting-1241",
+      "meeting_source_id": "1241",
+      "title": "Datum gereserveerd voor uitloopavond commissie",
+      "url": "/Vergaderingen/Uitloopavond-Commissie/2026/30-november/20:00"
+    },
+    {
+      "date": "2026-03-20",
+      "dmu_name": "Duidingsdebat",
+      "meeting_id": "huizen-meeting-1297",
+      "meeting_source_id": "1297",
+      "title": null,
+      "url": "/Vergaderingen/Duidingsdebat/2026/20-maart/20:00"
+    },
+    {
+      "date": "2026-03-10",
+      "dmu_name": "Verkiezingsdebat",
+      "meeting_id": "huizen-meeting-1296",
+      "meeting_source_id": "1296",
+      "title": "Verkiezingsdebat",
+      "url": "/Vergaderingen/Verkiezingsdebat/2026/10-maart/20:00"
+    },
+    {
+      "date": "2026-02-19",
+      "dmu_name": "Raadsvergadering",
+      "meeting_id": "huizen-meeting-1237",
+      "meeting_source_id": "1237",
+      "title": "Extra buitengewone raadsvergadering i.v.m. afscheid raadsgriffier",
+      "url": "/Vergaderingen/Raadsvergadering/2026/19-februari/19:30"
+    },
+    {
+      "date": "2025-10-30",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1236",
+      "meeting_source_id": "1236",
+      "title": "Conformbesluiten openbaar 30 okt 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/30-oktober/09:00"
+    },
+    {
+      "date": "2025-10-28",
+      "dmu_name": "Burgemeestersbenoeming",
+      "meeting_id": "huizen-meeting-1190",
+      "meeting_source_id": "1190",
+      "title": "Besloten raadsvergadering 28 oktober 2025, aanbeveling voor benoeming nieuwe burgemeester",
+      "url": "/Vergaderingen/Burgemeestersbenoeming/2025/28-oktober/19:30"
+    },
+    {
+      "date": "2025-10-23",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1234",
+      "meeting_source_id": "1234",
+      "title": "Conformbesluiten openbaar 23 okt 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/23-oktober/09:00"
+    },
+    {
+      "date": "2025-10-17",
+      "dmu_name": "Uitloopavond Commissie",
+      "meeting_id": "huizen-meeting-1150",
+      "meeting_source_id": "1150",
+      "title": "Datum gereserveerd voor uitloopavond commissie",
+      "url": "/Vergaderingen/Uitloopavond-Commissie/2025/17-oktober/20:00"
+    },
+    {
+      "date": "2025-10-16",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1233",
+      "meeting_source_id": "1233",
+      "title": "Conformbesluiten openbaar 16 okt 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/16-oktober/09:00"
+    },
+    {
+      "date": "2025-10-14",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1235",
+      "meeting_source_id": "1235",
+      "title": "Collegevergadering 14 okt 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/14-oktober/09:30"
+    },
+    {
+      "date": "2025-10-09",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1203",
+      "meeting_source_id": "1203",
+      "title": "Conformbesluiten openbaar 09 okt 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/9-oktober/09:00"
+    },
+    {
+      "date": "2025-10-02",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1194",
+      "meeting_source_id": "1194",
+      "title": "Conformbesluiten openbaar 02 okt 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/2-oktober/09:00"
+    },
+    {
+      "date": "2025-09-30",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1204",
+      "meeting_source_id": "1204",
+      "title": "Collegevergadering 30 sep 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/30-september/09:30"
+    },
+    {
+      "date": "2025-09-25",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1191",
+      "meeting_source_id": "1191",
+      "title": "Conformbesluiten openbaar 25 sep 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/25-september/09:00"
+    },
+    {
+      "date": "2025-09-23",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1195",
+      "meeting_source_id": "1195",
+      "title": "Collegevergadering 23 sep 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/23-september/09:30"
+    },
+    {
+      "date": "2025-09-18",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1188",
+      "meeting_source_id": "1188",
+      "title": "Conformbesluiten openbaar 18 sep 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/18-september/09:00"
+    },
+    {
+      "date": "2025-09-17",
+      "dmu_name": "Adviescommissie vermindering regeldruk",
+      "meeting_id": "huizen-meeting-1079",
+      "meeting_source_id": "1079",
+      "title": "Permanente adviescommissie vermindering regeldruk 17 september 2025",
+      "url": "/Vergaderingen/Adviescommissie-vermindering-regeldruk/2025/17-september/20:00"
+    },
+    {
+      "date": "2025-09-11",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1185",
+      "meeting_source_id": "1185",
+      "title": "Conformbesluiten openbaar 11 sep 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/11-september/09:00"
+    },
+    {
+      "date": "2025-09-09",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1189",
+      "meeting_source_id": "1189",
+      "title": "Collegevergadering 09 sep 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/9-september/09:30"
+    },
+    {
+      "date": "2025-09-04",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1184",
+      "meeting_source_id": "1184",
+      "title": "Conformbesluiten openbaar 04 sep 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/4-september/09:00"
+    },
+    {
+      "date": "2025-09-02",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1186",
+      "meeting_source_id": "1186",
+      "title": "Collegevergadering 02 sep 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/2-september/09:30"
+    },
+    {
+      "date": "2025-08-28",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1182",
+      "meeting_source_id": "1182",
+      "title": "Conformbesluiten openbaar 28 aug 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/28-augustus/09:00"
+    },
+    {
+      "date": "2025-08-21",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1181",
+      "meeting_source_id": "1181",
+      "title": "Conformbesluiten openbaar 21 aug 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/21-augustus/09:00"
+    },
+    {
+      "date": "2025-08-14",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1180",
+      "meeting_source_id": "1180",
+      "title": "Conformbesluiten openbaar 14 aug 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/14-augustus/09:00"
+    },
+    {
+      "date": "2025-08-07",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1177",
+      "meeting_source_id": "1177",
+      "title": "Conformbesluiten openbaar 07 aug 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/7-augustus/09:00"
+    },
+    {
+      "date": "2025-07-31",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1176",
+      "meeting_source_id": "1176",
+      "title": "Conformbesluiten openbaar 31 jul 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/31-juli/09:00"
+    },
+    {
+      "date": "2025-07-24",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1175",
+      "meeting_source_id": "1175",
+      "title": "Conformbesluiten openbaar 24 jul 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/24-juli/09:00"
+    },
+    {
+      "date": "2025-07-17",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1174",
+      "meeting_source_id": "1174",
+      "title": "Conformbesluiten openbaar 17 jul 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/17-juli/09:00"
+    },
+    {
+      "date": "2025-07-10",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1172",
+      "meeting_source_id": "1172",
+      "title": "Conformbesluiten openbaar 10 jul 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/10-juli/09:00"
+    },
+    {
+      "date": "2025-07-08",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1183",
+      "meeting_source_id": "1183",
+      "title": "Collegevergadering 08 jul 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/8-juli/09:30"
+    },
+    {
+      "date": "2025-07-03",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1166",
+      "meeting_source_id": "1166",
+      "title": "Conformbesluiten openbaar 03 jul 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/3-juli/09:00"
+    },
+    {
+      "date": "2025-06-26",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1162",
+      "meeting_source_id": "1162",
+      "title": "Conformbesluiten openbaar 26 jun 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/26-juni/09:00"
+    },
+    {
+      "date": "2025-06-19",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1159",
+      "meeting_source_id": "1159",
+      "title": "Conformbesluiten openbaar 19 jun 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/19-juni/09:00"
+    },
+    {
+      "date": "2025-06-18",
+      "dmu_name": "Adviescommissie vermindering regeldruk",
+      "meeting_id": "huizen-meeting-1078",
+      "meeting_source_id": "1078",
+      "title": "Permanente adviescommissie vermindering regeldruk 18 juni 2025",
+      "url": "/Vergaderingen/Adviescommissie-vermindering-regeldruk/2025/18-juni/20:00"
+    },
+    {
+      "date": "2025-06-16",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1163",
+      "meeting_source_id": "1163",
+      "title": "Collegevergadering 16 jun 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/16-juni/09:30"
+    },
+    {
+      "date": "2025-06-10",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1160",
+      "meeting_source_id": "1160",
+      "title": "Collegevergadering 10 jun 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/10-juni/09:30"
+    },
+    {
+      "date": "2025-06-05",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1153",
+      "meeting_source_id": "1153",
+      "title": "Conformbesluiten openbaar 05 jun 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/5-juni/09:00"
+    },
+    {
+      "date": "2025-06-03",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1158",
+      "meeting_source_id": "1158",
+      "title": "Collegevergadering 03 jun 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/3-juni/09:30"
+    },
+    {
+      "date": "2025-05-29",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1154",
+      "meeting_source_id": "1154",
+      "title": "Conformbesluiten openbaar 29 mei 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/29-mei/09:00"
+    },
+    {
+      "date": "2025-05-27",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1155",
+      "meeting_source_id": "1155",
+      "title": "Collegevergadering 27 mei 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/27-mei/09:30"
+    },
+    {
+      "date": "2025-05-22",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1138",
+      "meeting_source_id": "1138",
+      "title": "Conformbesluiten openbaar 22 mei 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/22-mei/09:00"
+    },
+    {
+      "date": "2025-05-20",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1156",
+      "meeting_source_id": "1156",
+      "title": "Collegevergadering 20 mei 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/20-mei/09:30"
+    },
+    {
+      "date": "2025-05-15",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1137",
+      "meeting_source_id": "1137",
+      "title": "Conformbesluiten openbaar 15 mei 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/15-mei/09:00"
+    },
+    {
+      "date": "2025-05-13",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1139",
+      "meeting_source_id": "1139",
+      "title": "Collegevergadering 13 mei 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/13-mei/09:30"
+    },
+    {
+      "date": "2025-05-08",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1132",
+      "meeting_source_id": "1132",
+      "title": "Conformbesluiten openbaar 08 mei 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/8-mei/09:00"
+    },
+    {
+      "date": "2025-05-06",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1136",
+      "meeting_source_id": "1136",
+      "title": "Collegevergadering 06 mei 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/6-mei/09:30"
+    },
+    {
+      "date": "2025-05-01",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1130",
+      "meeting_source_id": "1130",
+      "title": "Conformbesluiten openbaar 01 mei 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/1-mei/09:00"
+    },
+    {
+      "date": "2025-04-24",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1127",
+      "meeting_source_id": "1127",
+      "title": "Conformbesluiten openbaar 24 apr 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/24-april/09:00"
+    },
+    {
+      "date": "2025-04-17",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1126",
+      "meeting_source_id": "1126",
+      "title": "Conformbesluiten openbaar 17 apr 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/17-april/09:00"
+    },
+    {
+      "date": "2025-04-15",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1134",
+      "meeting_source_id": "1134",
+      "title": "Collegevergadering 15 apr 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/15-april/09:30"
+    },
+    {
+      "date": "2025-04-10",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1122",
+      "meeting_source_id": "1122",
+      "title": "Conformbesluiten openbaar 10 apr 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/10-april/09:00"
+    },
+    {
+      "date": "2025-04-09",
+      "dmu_name": "Adviescommissie vermindering regeldruk",
+      "meeting_id": "huizen-meeting-1077",
+      "meeting_source_id": "1077",
+      "title": "Permanente adviescommissie vermindering regeldruk 9 april 2025",
+      "url": "/Vergaderingen/Adviescommissie-vermindering-regeldruk/2025/9-april/20:00"
+    },
+    {
+      "date": "2025-04-08",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1133",
+      "meeting_source_id": "1133",
+      "title": "Collegevergadering 08 apr 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/8-april/09:30"
+    },
+    {
+      "date": "2025-04-03",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1118",
+      "meeting_source_id": "1118",
+      "title": "Conformbesluiten openbaar 03 apr 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/3-april/09:00"
+    },
+    {
+      "date": "2025-03-27",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1116",
+      "meeting_source_id": "1116",
+      "title": "Conformbesluiten openbaar 27 mrt 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/27-maart/09:00"
+    },
+    {
+      "date": "2025-03-25",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1119",
+      "meeting_source_id": "1119",
+      "title": "Collegevergadering 25 mrt 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/25-maart/09:30"
+    },
+    {
+      "date": "2025-03-20",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1113",
+      "meeting_source_id": "1113",
+      "title": "Conformbesluiten openbaar 20 mrt 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/20-maart/09:00"
+    },
+    {
+      "date": "2025-03-13",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1111",
+      "meeting_source_id": "1111",
+      "title": "Conformbesluiten openbaar 13 mrt 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/13-maart/09:00"
+    },
+    {
+      "date": "2025-03-11",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1114",
+      "meeting_source_id": "1114",
+      "title": "Collegevergadering 11 mrt 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/11-maart/09:30"
+    },
+    {
+      "date": "2025-03-06",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1107",
+      "meeting_source_id": "1107",
+      "title": "Conformbesluiten openbaar 06 mrt 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/6-maart/09:00"
+    },
+    {
+      "date": "2025-02-20",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1104",
+      "meeting_source_id": "1104",
+      "title": "Conformbesluiten openbaar 20 feb 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/20-februari/09:00"
+    },
+    {
+      "date": "2025-02-06",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1101",
+      "meeting_source_id": "1101",
+      "title": "Conformbesluiten openbaar 06 feb 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/6-februari/09:00"
+    },
+    {
+      "date": "2025-02-05",
+      "dmu_name": "Adviescommissie vermindering regeldruk",
+      "meeting_id": "huizen-meeting-1076",
+      "meeting_source_id": "1076",
+      "title": "Permanente adviescommissie vermindering regeldruk 5 februari 2025",
+      "url": "/Vergaderingen/Adviescommissie-vermindering-regeldruk/2025/5-februari/20:00"
+    },
+    {
+      "date": "2025-02-04",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1102",
+      "meeting_source_id": "1102",
+      "title": "Collegevergadering 04 feb 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/4-februari/09:30"
+    },
+    {
+      "date": "2025-01-30",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1099",
+      "meeting_source_id": "1099",
+      "title": "Conformbesluiten openbaar 30 jan 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/30-januari/09:00"
+    },
+    {
+      "date": "2025-01-23",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1096",
+      "meeting_source_id": "1096",
+      "title": "Conformbesluiten openbaar 23 jan 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/23-januari/09:00"
+    },
+    {
+      "date": "2025-01-21",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1100",
+      "meeting_source_id": "1100",
+      "title": "Collegevergadering 21 jan 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/21-januari/09:30"
+    },
+    {
+      "date": "2025-01-09",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1092",
+      "meeting_source_id": "1092",
+      "title": "Conformbesluiten openbaar 09 jan 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/9-januari/09:00"
+    },
+    {
+      "date": "2025-01-07",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1095",
+      "meeting_source_id": "1095",
+      "title": "Collegevergadering 07 jan 2025",
+      "url": "/Vergaderingen/Collegevergadering/2025/7-januari/09:30"
+    },
+    {
+      "date": "2025-01-02",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1090",
+      "meeting_source_id": "1090",
+      "title": "Conformbesluiten openbaar 02 jan 2025",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2025/2-januari/09:00"
+    },
+    {
+      "date": "2024-12-26",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1089",
+      "meeting_source_id": "1089",
+      "title": "Conformbesluiten openbaar 26 dec 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/26-december/09:00"
+    },
+    {
+      "date": "2024-12-19",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1088",
+      "meeting_source_id": "1088",
+      "title": "Conformbesluiten openbaar 19 dec 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/19-december/09:00"
+    },
+    {
+      "date": "2024-12-17",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1094",
+      "meeting_source_id": "1094",
+      "title": "Collegevergadering 17 dec 2024",
+      "url": "/Vergaderingen/Collegevergadering/2024/17-december/09:30"
+    },
+    {
+      "date": "2024-12-12",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1086",
+      "meeting_source_id": "1086",
+      "title": "Conformbesluiten openbaar 12 dec 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/12-december/09:00"
+    },
+    {
+      "date": "2024-12-05",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1083",
+      "meeting_source_id": "1083",
+      "title": "Conformbesluiten openbaar 05 dec 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/5-december/09:00"
+    },
+    {
+      "date": "2024-12-03",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1085",
+      "meeting_source_id": "1085",
+      "title": "Collegevergadering 03 dec 2024",
+      "url": "/Vergaderingen/Collegevergadering/2024/3-december/09:30"
+    },
+    {
+      "date": "2024-11-28",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1082",
+      "meeting_source_id": "1082",
+      "title": "Conformbesluiten openbaar 28 nov 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/28-november/09:00"
+    },
+    {
+      "date": "2024-11-26",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1084",
+      "meeting_source_id": "1084",
+      "title": "Collegevergadering 26 nov 2024",
+      "url": "/Vergaderingen/Collegevergadering/2024/26-november/09:30"
+    },
+    {
+      "date": "2024-11-21",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1074",
+      "meeting_source_id": "1074",
+      "title": "Conformbesluiten openbaar 21 nov 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/21-november/09:00"
+    },
+    {
+      "date": "2024-11-20",
+      "dmu_name": "Adviescommissie vermindering regeldruk",
+      "meeting_id": "huizen-meeting-929",
+      "meeting_source_id": "929",
+      "title": "Permanente adviescommissie vermindering regeldruk 20 november 2024",
+      "url": "/Vergaderingen/Adviescommissie-vermindering-regeldruk/2024/20-november/20:00"
+    },
+    {
+      "date": "2024-11-19",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1081",
+      "meeting_source_id": "1081",
+      "title": "Collegevergadering 19 nov 2024",
+      "url": "/Vergaderingen/Collegevergadering/2024/19-november/09:30"
+    },
+    {
+      "date": "2024-11-14",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1070",
+      "meeting_source_id": "1070",
+      "title": "Conformbesluiten openbaar 14 nov 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/14-november/09:00"
+    },
+    {
+      "date": "2024-11-12",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1072",
+      "meeting_source_id": "1072",
+      "title": "Collegevergadering 12 nov 2024",
+      "url": "/Vergaderingen/Collegevergadering/2024/12-november/09:30"
+    },
+    {
+      "date": "2024-11-07",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1068",
+      "meeting_source_id": "1068",
+      "title": "Conformbesluiten openbaar 07 nov 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/7-november/09:00"
+    },
+    {
+      "date": "2024-11-05",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1069",
+      "meeting_source_id": "1069",
+      "title": "Collegevergadering 05 nov 2024",
+      "url": "/Vergaderingen/Collegevergadering/2024/5-november/09:30"
+    },
+    {
+      "date": "2024-10-31",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1065",
+      "meeting_source_id": "1065",
+      "title": "Conformbesluiten openbaar 31 okt 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/31-oktober/09:00"
+    },
+    {
+      "date": "2024-10-24",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1063",
+      "meeting_source_id": "1063",
+      "title": "Conformbesluiten openbaar 24 okt 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/24-oktober/09:00"
+    },
+    {
+      "date": "2024-10-22",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1067",
+      "meeting_source_id": "1067",
+      "title": "Collegevergadering 22 okt 2024",
+      "url": "/Vergaderingen/Collegevergadering/2024/22-oktober/09:30"
+    },
+    {
+      "date": "2024-10-17",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1062",
+      "meeting_source_id": "1062",
+      "title": "Conformbesluiten openbaar 17 okt 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/17-oktober/09:00"
+    },
+    {
+      "date": "2024-10-10",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1060",
+      "meeting_source_id": "1060",
+      "title": "Conformbesluiten openbaar 10 okt 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/10-oktober/09:00"
+    },
+    {
+      "date": "2024-10-03",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1020",
+      "meeting_source_id": "1020",
+      "title": "Conformbesluiten openbaar 03 okt 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/3-oktober/09:00"
+    },
+    {
+      "date": "2024-10-01",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1047",
+      "meeting_source_id": "1047",
+      "title": "Collegevergadering 01 okt 2024",
+      "url": "/Vergaderingen/Collegevergadering/2024/1-oktober/09:30"
+    },
+    {
+      "date": "2024-09-26",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1019",
+      "meeting_source_id": "1019",
+      "title": "Conformbesluiten openbaar 26 sep 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/26-september/09:00"
+    },
+    {
+      "date": "2024-09-24",
+      "dmu_name": "Collegevergadering",
+      "meeting_id": "huizen-meeting-1021",
+      "meeting_source_id": "1021",
+      "title": "Collegevergadering 24 sep 2024",
+      "url": "/Vergaderingen/Collegevergadering/2024/24-september/09:30"
+    },
+    {
+      "date": "2024-09-19",
+      "dmu_name": "Conformbesluiten openbaar",
+      "meeting_id": "huizen-meeting-1017",
+      "meeting_source_id": "1017",
+      "title": "Conformbesluiten openbaar 19 sep 2024",
+      "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/19-september/09:00"
+    }
+  ],
+  "generated_at": "2026-11-19T12:03:36.237551Z",
+  "meetings_total": 320,
+  "meetings_without_documents_count": 138
+}

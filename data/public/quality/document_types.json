@@ -1,6 +1,6 @@
 {
-  "documents_total": 17655,
-  "generated_at": "2026-11-18T12:06:20.775220+00:00",
+  "documents_total": 17664,
+  "generated_at": "2026-11-19T12:03:36.236169+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -308,7 +308,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Mededelingen": {
-      "count": 1332,
+      "count": 1333,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 2104,
+      "count": 2109,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -523,7 +523,7 @@
       "normalized_document_type_label": "Agenda"
     },
     "Toezeggingen": {
-      "count": 172,
+      "count": 175,
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging"
     },
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 2191,
+      "count": 2196,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -753,7 +753,7 @@
       ]
     },
     {
-      "count": 1336,
+      "count": 1337,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling",
       "source_document_types": [
@@ -843,7 +843,7 @@
       ]
     },
     {
-      "count": 209,
+      "count": 212,
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging",
       "source_document_types": [
@@ -983,7 +983,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 2104,
+      "count": 2109,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
@@ -995,7 +995,7 @@
       "normalized_document_type_label": "Ingekomen stuk"
     },
     {
-      "count": 1332,
+      "count": 1333,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
@@ -1067,7 +1067,7 @@
       "normalized_document_type_label": "Notulen, verslag of samenvatting"
     },
     {
-      "count": 172,
+      "count": 175,
       "document_type": "Toezeggingen",
       "normalized_document_type": "commitment",
       "normalized_document_type_label": "Toezegging"
