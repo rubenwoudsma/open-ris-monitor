@@ -1,5 +1,5 @@
 {
-  "documents_total": 17664,
+  "documents_total": 17673,
   "findings": [
     {
       "date_bucket": "historical",
@@ -153932,7 +153932,7 @@
       "title": "B&W Uitnodigingen 20 oktober 2026"
     },
     {
-      "date_bucket": "recent_past",
+      "date_bucket": "historical",
       "document_id": "huizen-document-27160",
       "document_type": "Ingekomen stuk",
       "meeting_date": "2026-10-20",
@@ -153942,7 +153942,7 @@
       "title": "B67 Verzoek om heroverweging van de opvanglocatie Huizermaatweg Gooierserf (Privé pesoon) geanonimiseerd"
     },
     {
-      "date_bucket": "recent_past",
+      "date_bucket": "historical",
       "document_id": "huizen-document-27161",
       "document_type": "Ingekomen stuk",
       "meeting_date": "2026-10-20",
@@ -154152,33 +154152,33 @@
       "title": "Ingekomen stukken raad (week 45)"
     },
     {
-      "date_bucket": "near_current",
+      "date_bucket": "recent_past",
       "document_id": "huizen-document-27800",
       "document_type": "Overig",
       "meeting_date": "2026-11-12",
       "publication_date": "2026-11-12",
       "source_id": "27800",
-      "suspected_reason": "near_current_or_future_meeting_relations_may_not_be_final_upstream",
+      "suspected_reason": "no_exposed_relation_in_current_relation_exports",
       "title": "Conformbesluiten 12 november 2026"
     },
     {
-      "date_bucket": "near_current",
+      "date_bucket": "recent_past",
       "document_id": "huizen-document-27801",
       "document_type": "Overig",
       "meeting_date": "2026-11-12",
       "publication_date": "2026-11-12",
       "source_id": "27801",
-      "suspected_reason": "near_current_or_future_meeting_relations_may_not_be_final_upstream",
+      "suspected_reason": "no_exposed_relation_in_current_relation_exports",
       "title": "44- 2026 10 27 Besluitenlijst College BW OPENBAAR"
     },
     {
-      "date_bucket": "near_current",
+      "date_bucket": "recent_past",
       "document_id": "huizen-document-27802",
       "document_type": "Overig",
       "meeting_date": "2026-11-12",
       "publication_date": "2026-11-12",
       "source_id": "27802",
-      "suspected_reason": "near_current_or_future_meeting_relations_may_not_be_final_upstream",
+      "suspected_reason": "no_exposed_relation_in_current_relation_exports",
       "title": "2026.11.17 uitnodigingen BW"
     },
     {
@@ -154250,14 +154250,34 @@
       "source_id": "27840",
       "suspected_reason": "near_current_or_future_meeting_relations_may_not_be_final_upstream",
       "title": "Uitnodigingen B&W 24-11-2026"
+    },
+    {
+      "date_bucket": "near_current",
+      "document_id": "huizen-document-27842",
+      "document_type": "Overig",
+      "meeting_date": "2026-11-19",
+      "publication_date": "2026-11-19",
+      "source_id": "27842",
+      "suspected_reason": "near_current_or_future_meeting_relations_may_not_be_final_upstream",
+      "title": "Publicatie ‘Arbeidsmigratie heeft een gezicht tien werkgevers en werknemers aan het woord (Stichting Arbeidsmigratie Werkt)"
+    },
+    {
+      "date_bucket": "near_current",
+      "document_id": "huizen-document-27858",
+      "document_type": "Overig",
+      "meeting_date": "2026-11-19",
+      "publication_date": "2026-11-19",
+      "source_id": "27858",
+      "suspected_reason": "near_current_or_future_meeting_relations_may_not_be_final_upstream",
+      "title": "Ingekomen stukken raad (week 47)"
     }
   ],
-  "generated_at": "2026-11-19T12:03:36.377047Z",
+  "generated_at": "2026-11-20T12:00:53.177449Z",
   "summary": {
     "by_date_bucket": {
-      "historical": 15393,
-      "near_current": 10,
-      "recent_past": 22
+      "historical": 15395,
+      "near_current": 9,
+      "recent_past": 23
     },
     "by_document_type": {
       "Aankondiging toezicht (Inkomend)": 1,
@@ -154339,7 +154359,7 @@
       "Onderhoudsrapport (Intern)": 1,
       "Onderzoeksstuk (Intern)": 3,
       "Opdracht (Intern)": 2,
-      "Overig": 1718,
+      "Overig": 1720,
       "Overig stuk inkomend": 4,
       "Overig stuk intern": 82,
       "Overig stuk uitgaand": 1,
@@ -154397,9 +154417,9 @@
       "unknown": 11
     },
     "by_suspected_reason": {
-      "near_current_or_future_meeting_relations_may_not_be_final_upstream": 10,
-      "no_exposed_relation_in_current_relation_exports": 15415
+      "near_current_or_future_meeting_relations_may_not_be_final_upstream": 9,
+      "no_exposed_relation_in_current_relation_exports": 15418
     }
   },
-  "unlinked_documents_count": 15425
+  "unlinked_documents_count": 15427
 }
