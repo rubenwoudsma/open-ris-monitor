@@ -154182,13 +154182,13 @@
       "title": "2026.11.17 uitnodigingen BW"
     },
     {
-      "date_bucket": "near_current",
+      "date_bucket": "recent_past",
       "document_id": "huizen-document-27807",
       "document_type": "Overig",
       "meeting_date": "2026-11-13",
       "publication_date": "2026-11-13",
       "source_id": "27807",
-      "suspected_reason": "near_current_or_future_meeting_relations_may_not_be_final_upstream",
+      "suspected_reason": "no_exposed_relation_in_current_relation_exports",
       "title": "Ingekomen stukken raad (week 46)"
     },
     {
@@ -154272,12 +154272,12 @@
       "title": "Ingekomen stukken raad (week 47)"
     }
   ],
-  "generated_at": "2026-11-20T12:00:53.177449Z",
+  "generated_at": "2026-11-21T11:37:50.364577Z",
   "summary": {
     "by_date_bucket": {
       "historical": 15395,
-      "near_current": 9,
-      "recent_past": 23
+      "near_current": 8,
+      "recent_past": 24
     },
     "by_document_type": {
       "Aankondiging toezicht (Inkomend)": 1,
@@ -154417,8 +154417,8 @@
       "unknown": 11
     },
     "by_suspected_reason": {
-      "near_current_or_future_meeting_relations_may_not_be_final_upstream": 9,
-      "no_exposed_relation_in_current_relation_exports": 15418
+      "near_current_or_future_meeting_relations_may_not_be_final_upstream": 8,
+      "no_exposed_relation_in_current_relation_exports": 15419
     }
   },
   "unlinked_documents_count": 15427
