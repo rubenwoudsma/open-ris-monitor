@@ -153952,7 +153952,7 @@
       "title": "B68 Opvang vluchtelingen Goede Herderkerk (Privé persoon) geanonimiseerd"
     },
     {
-      "date_bucket": "recent_past",
+      "date_bucket": "historical",
       "document_id": "huizen-document-27212",
       "document_type": "Overig",
       "meeting_date": "2026-10-22",
@@ -153962,7 +153962,7 @@
       "title": "Conformbesluitenlijst 22 oktober 2026"
     },
     {
-      "date_bucket": "recent_past",
+      "date_bucket": "historical",
       "document_id": "huizen-document-27213",
       "document_type": "Overig",
       "meeting_date": "2026-10-22",
@@ -153972,7 +153972,7 @@
       "title": "Uitnodigingen B&W 27-10-2026"
     },
     {
-      "date_bucket": "recent_past",
+      "date_bucket": "historical",
       "document_id": "huizen-document-27218",
       "document_type": "Overig",
       "meeting_date": "2026-10-22",
@@ -154272,12 +154272,12 @@
       "title": "Ingekomen stukken raad (week 47)"
     }
   ],
-  "generated_at": "2026-11-21T11:37:50.364577Z",
+  "generated_at": "2026-11-22T11:48:19.787858Z",
   "summary": {
     "by_date_bucket": {
-      "historical": 15395,
+      "historical": 15398,
       "near_current": 8,
-      "recent_past": 24
+      "recent_past": 21
     },
     "by_document_type": {
       "Aankondiging toezicht (Inkomend)": 1,
