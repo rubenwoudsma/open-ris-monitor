@@ -1,6 +1,6 @@
 {
-  "documents_total": 17673,
-  "generated_at": "2026-11-22T11:48:19.621798+00:00",
+  "documents_total": 17678,
+  "generated_at": "2026-11-23T13:27:53.422604+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -118,7 +118,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Besluit": {
-      "count": 1192,
+      "count": 1195,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
     },
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1683,
+      "count": 1684,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -308,7 +308,7 @@
       "normalized_document_type_label": "Voorstel"
     },
     "Mededelingen": {
-      "count": 1334,
+      "count": 1335,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
@@ -728,7 +728,7 @@
       ]
     },
     {
-      "count": 1744,
+      "count": 1747,
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit",
       "source_document_types": [
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1683,
+      "count": 1684,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -753,7 +753,7 @@
       ]
     },
     {
-      "count": 1338,
+      "count": 1339,
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling",
       "source_document_types": [
@@ -989,19 +989,19 @@
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1683,
+      "count": 1684,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
     {
-      "count": 1334,
+      "count": 1335,
       "document_type": "Mededelingen",
       "normalized_document_type": "announcement",
       "normalized_document_type_label": "Mededeling"
     },
     {
-      "count": 1192,
+      "count": 1195,
       "document_type": "Besluit",
       "normalized_document_type": "decision",
       "normalized_document_type_label": "Besluit"
