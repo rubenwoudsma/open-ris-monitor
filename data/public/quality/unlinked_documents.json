@@ -1,5 +1,5 @@
 {
-  "documents_total": 17686,
+  "documents_total": 17717,
   "findings": [
     {
       "date_bucket": "historical",
@@ -154192,33 +154192,33 @@
       "title": "Ingekomen stukken raad (week 46)"
     },
     {
-      "date_bucket": "near_current",
+      "date_bucket": "recent_past",
       "document_id": "huizen-document-27821",
       "document_type": "Overig",
       "meeting_date": "2026-11-17",
       "publication_date": "2026-11-17",
       "source_id": "27821",
-      "suspected_reason": "near_current_or_future_meeting_relations_may_not_be_final_upstream",
+      "suspected_reason": "no_exposed_relation_in_current_relation_exports",
       "title": "Verslag en presentatie klankbordgroep raadsleden VRGV"
     },
     {
-      "date_bucket": "near_current",
+      "date_bucket": "recent_past",
       "document_id": "huizen-document-27823",
       "document_type": "Ingekomen stuk",
       "meeting_date": "2026-11-17",
       "publication_date": "2026-11-17",
       "source_id": "27823",
-      "suspected_reason": "near_current_or_future_meeting_relations_may_not_be_final_upstream",
+      "suspected_reason": "no_exposed_relation_in_current_relation_exports",
       "title": "Slimme Logistiek - Sterke Gemeente Transport en Logistiek Nederland"
     },
     {
-      "date_bucket": "near_current",
+      "date_bucket": "recent_past",
       "document_id": "huizen-document-27826",
       "document_type": "Overig",
       "meeting_date": "2026-11-17",
       "publication_date": "2026-11-17",
       "source_id": "27826",
-      "suspected_reason": "near_current_or_future_meeting_relations_may_not_be_final_upstream",
+      "suspected_reason": "no_exposed_relation_in_current_relation_exports",
       "title": "Nieuwsbrief Clubondersteuning November 2026"
     },
     {
@@ -154282,12 +154282,12 @@
       "title": "GO releasenotes search 6.0"
     }
   ],
-  "generated_at": "2026-11-24T14:05:32.911943Z",
+  "generated_at": "2026-11-25T13:24:36.208955Z",
   "summary": {
     "by_date_bucket": {
       "historical": 15398,
-      "near_current": 9,
-      "recent_past": 21
+      "near_current": 6,
+      "recent_past": 24
     },
     "by_document_type": {
       "Aankondiging toezicht (Inkomend)": 1,
@@ -154427,8 +154427,8 @@
       "unknown": 11
     },
     "by_suspected_reason": {
-      "near_current_or_future_meeting_relations_may_not_be_final_upstream": 9,
-      "no_exposed_relation_in_current_relation_exports": 15419
+      "near_current_or_future_meeting_relations_may_not_be_final_upstream": 6,
+      "no_exposed_relation_in_current_relation_exports": 15422
     }
   },
   "unlinked_documents_count": 15428
