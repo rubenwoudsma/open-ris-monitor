@@ -1,5 +1,5 @@
 {
-  "documents_total": 17717,
+  "documents_total": 17724,
   "findings": [
     {
       "date_bucket": "historical",
@@ -154282,7 +154282,7 @@
       "title": "GO releasenotes search 6.0"
     }
   ],
-  "generated_at": "2026-11-25T13:24:36.208955Z",
+  "generated_at": "2026-11-26T12:59:18.994516Z",
   "summary": {
     "by_date_bucket": {
       "historical": 15398,

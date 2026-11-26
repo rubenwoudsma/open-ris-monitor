@@ -313,14 +313,6 @@
       "url": "/Vergaderingen/Raadsvergadering/2027/11-februari/19:30"
     },
     {
-      "date": "2027-01-28",
-      "dmu_name": "Commissie Algemeen Bestuur en Middelen (ABM)",
-      "meeting_id": "huizen-meeting-1223",
-      "meeting_source_id": "1223",
-      "title": "Commissie Algemeen Bestuur en Middelen 28 januari 2027",
-      "url": "/Vergaderingen/Commissie-Algemeen-Bestuur-en-Middelen-ABM/2027/28-januari/20:00"
-    },
-    {
       "date": "2027-01-27",
       "dmu_name": "Commissie Fysiek Domein",
       "meeting_id": "huizen-meeting-1212",
@@ -1105,7 +1097,7 @@
       "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/19-september/09:00"
     }
   ],
-  "generated_at": "2026-11-25T13:24:36.067014Z",
+  "generated_at": "2026-11-26T12:59:18.776932Z",
   "meetings_total": 321,
-  "meetings_without_documents_count": 138
+  "meetings_without_documents_count": 137
 }

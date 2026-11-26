@@ -1,15 +1,15 @@
 {
   "coverage": {
-    "documents_with_any_meeting_context": 2289,
-    "documents_with_any_meeting_context_ratio": 0.1292,
+    "documents_with_any_meeting_context": 2296,
+    "documents_with_any_meeting_context_ratio": 0.1295,
     "documents_without_meeting_context": 15428
   },
-  "dataset_generated_at": "2026-11-25T13:24:35.133899+00:00",
+  "dataset_generated_at": "2026-11-26T12:59:17.290909+00:00",
   "document_file_size": {
-    "average_bytes": 1127381,
-    "known_count": 17717,
+    "average_bytes": 1127011,
+    "known_count": 17724,
     "largest_bytes": 162614430,
-    "total_bytes": 19973807474,
+    "total_bytes": 19975137175,
     "unknown_count": 0
   },
   "documents_by_size_bucket": [
@@ -19,11 +19,11 @@
     },
     {
       "bucket": "0-100 KB",
-      "count": 6149
+      "count": 6152
     },
     {
       "bucket": "100 KB-1 MB",
-      "count": 8497
+      "count": 8501
     },
     {
       "bucket": "1-5 MB",
@@ -44,7 +44,7 @@
       "document_type": "Bijlage"
     },
     {
-      "count": 2223,
+      "count": 2226,
       "document_type": "Overig"
     },
     {
@@ -52,7 +52,7 @@
       "document_type": "Besluit"
     },
     {
-      "count": 1695,
+      "count": 1698,
       "document_type": "Ingekomen stuk"
     },
     {
@@ -64,7 +64,7 @@
       "document_type": "Notulen, verslag of samenvatting"
     },
     {
-      "count": 421,
+      "count": 422,
       "document_type": "Vraag"
     },
     {
@@ -118,16 +118,16 @@
       "year": "2025"
     },
     {
-      "count": 2043,
+      "count": 2050,
       "year": "2026"
     }
   ],
   "freshness": {
     "age_days": 0,
-    "generated_at": "2026-11-25T13:24:35.133899+00:00",
+    "generated_at": "2026-11-26T12:59:17.290909+00:00",
     "status": "fresh"
   },
-  "generated_at": "2026-11-25T13:24:36.430301+00:00",
+  "generated_at": "2026-11-26T12:59:19.336702+00:00",
   "meeting_items_by_year": [
     {
       "count": 242,
@@ -138,7 +138,7 @@
       "year": "2026"
     },
     {
-      "count": 15,
+      "count": 18,
       "year": "2027"
     },
     {
@@ -173,11 +173,11 @@
   "schema_version": 1,
   "totals": {
     "document_versions": 25,
-    "documents": 17717,
-    "linked_documents": 2289,
+    "documents": 17724,
+    "linked_documents": 2296,
     "meeting_documents": 100,
-    "meeting_item_documents": 2710,
-    "meeting_items": 1461,
+    "meeting_item_documents": 2717,
+    "meeting_items": 1464,
     "meetings": 321,
     "organization_groups": 24,
     "organization_persons": 95,
