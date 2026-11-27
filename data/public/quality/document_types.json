@@ -1,6 +1,6 @@
 {
-  "documents_total": 17724,
-  "generated_at": "2026-11-26T12:59:18.774891+00:00",
+  "documents_total": 17736,
+  "generated_at": "2026-11-27T12:59:13.942328+00:00",
   "mapping": {
     "Aankondiging toezicht (Inkomend)": {
       "count": 1,
@@ -148,7 +148,7 @@
       "normalized_document_type_label": "Bezwaar, klacht of zienswijze"
     },
     "Bijlage": {
-      "count": 2454,
+      "count": 2457,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
     },
@@ -238,7 +238,7 @@
       "normalized_document_type_label": "Rapportage of evaluatie"
     },
     "Ingekomen stuk": {
-      "count": 1698,
+      "count": 1701,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
     },
@@ -403,7 +403,7 @@
       "normalized_document_type_label": "Document"
     },
     "Overig": {
-      "count": 2139,
+      "count": 2144,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
@@ -448,7 +448,7 @@
       "normalized_document_type_label": "Besluit"
     },
     "Raadsvoorstel": {
-      "count": 1019,
+      "count": 1020,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"
     },
@@ -681,7 +681,7 @@
   "normalized_document_type_count": 21,
   "normalized_document_types": [
     {
-      "count": 4565,
+      "count": 4566,
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel",
       "source_document_types": [
@@ -709,7 +709,7 @@
       ]
     },
     {
-      "count": 2454,
+      "count": 2457,
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage",
       "source_document_types": [
@@ -717,7 +717,7 @@
       ]
     },
     {
-      "count": 2226,
+      "count": 2231,
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig",
       "source_document_types": [
@@ -745,7 +745,7 @@
       ]
     },
     {
-      "count": 1698,
+      "count": 1701,
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk",
       "source_document_types": [
@@ -971,7 +971,7 @@
   "source_document_type_count": 135,
   "source_document_types": [
     {
-      "count": 2454,
+      "count": 2457,
       "document_type": "Bijlage",
       "normalized_document_type": "attachment",
       "normalized_document_type_label": "Bijlage"
@@ -983,13 +983,13 @@
       "normalized_document_type_label": "Voorstel"
     },
     {
-      "count": 2139,
+      "count": 2144,
       "document_type": "Overig",
       "normalized_document_type": "other",
       "normalized_document_type_label": "Overig"
     },
     {
-      "count": 1698,
+      "count": 1701,
       "document_type": "Ingekomen stuk",
       "normalized_document_type": "incoming_document",
       "normalized_document_type_label": "Ingekomen stuk"
@@ -1007,7 +1007,7 @@
       "normalized_document_type_label": "Besluit"
     },
     {
-      "count": 1019,
+      "count": 1020,
       "document_type": "Raadsvoorstel",
       "normalized_document_type": "proposal",
       "normalized_document_type_label": "Voorstel"

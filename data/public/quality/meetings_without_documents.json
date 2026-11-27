@@ -333,7 +333,7 @@
       "dmu_name": "Raadsvergadering",
       "meeting_id": "huizen-meeting-1437",
       "meeting_source_id": "1437",
-      "title": "Begrotingsraadsvergadering 21 januari 2027",
+      "title": "Extra raadsvergadering begrotingswijziging t.b.v. collegeprogramma 21 januari 2027",
       "url": "/Vergaderingen/Raadsvergadering/2027/21-januari/16:00"
     },
     {
@@ -1097,7 +1097,7 @@
       "url": "/Vergaderingen/Conformbesluiten-openbaar-1/2024/19-september/09:00"
     }
   ],
-  "generated_at": "2026-11-26T12:59:18.776932Z",
-  "meetings_total": 321,
+  "generated_at": "2026-11-27T12:59:13.943802Z",
+  "meetings_total": 322,
   "meetings_without_documents_count": 137
 }
